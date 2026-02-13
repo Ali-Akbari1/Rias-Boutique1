@@ -11,7 +11,7 @@ const Footer = () => {
               Handcrafted Afghan clothing that bridges heritage and modern elegance.
             </p>
           </div>
-          <div>
+          <div className="text-left md:justify-self-center md:text-center">
             <h4 className="mb-4 font-display text-lg font-semibold">Quick Links</h4>
             <ul className="space-y-2 font-body text-primary-foreground/70">
               <li>
