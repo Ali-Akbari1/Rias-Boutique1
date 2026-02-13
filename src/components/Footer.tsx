@@ -34,8 +34,9 @@ const Footer = () => {
           <div>
             <h4 className="mb-4 font-display text-lg font-semibold">Get in Touch</h4>
             <ul className="space-y-2 font-body text-primary-foreground/70">
-              <li>info@riasboutique.com</li>
-              <li>+1 (555) 123-4567</li>
+              <li>riasafghanboutique@gmail.com</li>
+              <li>+1 (403) 465-0640</li>
+              <li>260300 Writing Creek Cres Floor 1, Unit H31, Balzac, AB T4A 0X8</li>
             </ul>
           </div>
         </div>
