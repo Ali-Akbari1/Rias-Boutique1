@@ -1,4 +1,5 @@
 import { ShoppingBag } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 
 interface NavbarProps {
@@ -7,15 +8,27 @@ interface NavbarProps {
 
 const Navbar = ({ onCartClick }: NavbarProps) => {
   const { totalItems } = useCart();
+  const { pathname } = useLocation();
+
+  const handleHomeClick = () => {
+    if (pathname === "/") {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="container mx-auto flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
-        <div className="flex items-center gap-2">
-          <h1 className="text-xl font-display font-bold text-foreground tracking-wide sm:text-2xl">
-            Ria's <span className="text-gold">Boutique</span>
-          </h1>
-        </div>
+        <Link
+          to="/"
+          onClick={handleHomeClick}
+          className="flex items-center gap-2 rounded-sm text-xl font-display font-bold tracking-wide text-foreground transition-colors hover:text-gold sm:text-2xl"
+          aria-label="Go to homepage"
+        >
+          <span>
+            Ria&apos;s <span className="text-gold">Boutique</span>
+          </span>
+        </Link>
 
         <div className="hidden md:flex items-center gap-8 font-body text-lg">
           <a href="#collection" className="text-muted-foreground hover:text-foreground transition-colors">
