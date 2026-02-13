@@ -1,17 +1,33 @@
 import { describe, expect, it } from "vitest";
+import { type Product } from "@/data/products";
 import { buildStripeLineItems, formatUsd, getMissingStripeProducts } from "@/lib/stripe";
+
+const buildProduct = (overrides: Partial<Product>): Product => ({
+  id: "1",
+  slug: "item-a",
+  name: "Item A",
+  price: 10,
+  image: "/a.jpg",
+  galleryImages: ["/a.jpg"],
+  category: "Test",
+  description: "A",
+  sizes: ["S"],
+  colors: ["Gold"],
+  fabric: "Test fabric",
+  fitInfo: "True to size",
+  careInstructions: ["Dry clean"],
+  deliveryEstimate: "5-7 business days",
+  popularity: 1,
+  createdAt: "2026-01-01",
+  ...overrides,
+});
 
 describe("stripe helpers", () => {
   it("builds Stripe line items for configured products", () => {
     const lineItems = buildStripeLineItems([
       {
         product: {
-          id: "1",
-          name: "Item A",
-          price: 10,
-          image: "/a.jpg",
-          category: "Test",
-          description: "A",
+          ...buildProduct({ id: "1" }),
           stripePriceId: "price_123",
         },
         quantity: 2,
@@ -26,12 +42,7 @@ describe("stripe helpers", () => {
       buildStripeLineItems([
         {
           product: {
-            id: "2",
-            name: "Item B",
-            price: 20,
-            image: "/b.jpg",
-            category: "Test",
-            description: "B",
+            ...buildProduct({ id: "2", slug: "item-b", name: "Item B", price: 20, image: "/b.jpg", description: "B" }),
           },
           quantity: 1,
         },
@@ -43,24 +54,14 @@ describe("stripe helpers", () => {
     const missing = getMissingStripeProducts([
       {
         product: {
-          id: "3",
-          name: "Item C",
-          price: 30,
-          image: "/c.jpg",
-          category: "Test",
-          description: "C",
+          ...buildProduct({ id: "3", slug: "item-c", name: "Item C", price: 30, image: "/c.jpg", description: "C" }),
           stripePriceId: "price_abc",
         },
         quantity: 1,
       },
       {
         product: {
-          id: "4",
-          name: "Item D",
-          price: 40,
-          image: "/d.jpg",
-          category: "Test",
-          description: "D",
+          ...buildProduct({ id: "4", slug: "item-d", name: "Item D", price: 40, image: "/d.jpg", description: "D" }),
         },
         quantity: 1,
       },

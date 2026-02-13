@@ -1,4 +1,8 @@
 const Footer = () => {
+  const googleReviewsUrl =
+    (import.meta.env.VITE_GOOGLE_REVIEWS_URL as string | undefined) ||
+    "https://www.google.com/search?q=Ria's+Boutique+reviews";
+
   return (
     <footer id="contact" className="bg-primary py-14 text-primary-foreground sm:py-16">
       <div className="container mx-auto px-4 sm:px-6">
@@ -20,6 +24,16 @@ const Footer = () => {
                 </a>
               </li>
               <li>
+                <a href="#reviews" className="transition-colors hover:text-gold-light">
+                  Reviews
+                </a>
+              </li>
+              <li>
+                <a href="#instagram" className="transition-colors hover:text-gold-light">
+                  Instagram
+                </a>
+              </li>
+              <li>
                 <a href="#about" className="transition-colors hover:text-gold-light">
                   About Us
                 </a>
@@ -37,6 +51,11 @@ const Footer = () => {
               <li>riasafghanboutique@gmail.com</li>
               <li>+1 (403) 465-0640</li>
               <li>260300 Writing Creek Cres Floor 1, Unit H31, Balzac, AB T4A 0X8</li>
+              <li>
+                <a href={googleReviewsUrl} target="_blank" rel="noreferrer" className="transition-colors hover:text-gold-light">
+                  Leave a Google Review
+                </a>
+              </li>
             </ul>
           </div>
         </div>

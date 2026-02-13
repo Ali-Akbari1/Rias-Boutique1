@@ -21,6 +21,12 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
           <a href="#collection" className="text-muted-foreground hover:text-foreground transition-colors">
             Collection
           </a>
+          <a href="#reviews" className="text-muted-foreground hover:text-foreground transition-colors">
+            Reviews
+          </a>
+          <a href="#instagram" className="text-muted-foreground hover:text-foreground transition-colors">
+            Instagram
+          </a>
           <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
             About
           </a>

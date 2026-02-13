@@ -1,11 +1,12 @@
 import { type ChangeEvent, type FormEvent, useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowLeft, Loader2, Lock } from "lucide-react";
+import { ArrowLeft, Loader2, Lock, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   buildStripeLineItems,
   formatUsd,
@@ -13,6 +14,7 @@ import {
   getStripeClient,
   isStripeConfigured,
 } from "@/lib/stripe";
+import { faqItems, getGoogleReviewsUrl, returnPolicy, shippingPolicy } from "@/data/store";
 
 interface CheckoutForm {
   fullName: string;
@@ -39,6 +41,7 @@ const Checkout = () => {
   const { toast } = useToast();
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(initialForm);
   const [isLoading, setIsLoading] = useState(false);
+  const googleReviewsUrl = getGoogleReviewsUrl();
 
   const missingProducts = useMemo(() => getMissingStripeProducts(items), [items]);
   const stripeReady = isStripeConfigured(items);
@@ -122,141 +125,211 @@ const Checkout = () => {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="font-display text-2xl">Contact & Shipping</CardTitle>
-              <CardDescription className="font-body text-base">
-                We use this information to prefill your secure Stripe checkout session.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <form onSubmit={handleStripeCheckout} className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2 sm:col-span-2">
-                    <label htmlFor="fullName" className="font-body text-sm font-semibold text-foreground">
-                      Full name
-                    </label>
-                    <Input
-                      id="fullName"
-                      required
-                      value={checkoutForm.fullName}
-                      onChange={handleFormChange("fullName")}
-                      autoComplete="name"
-                    />
+          <div className="space-y-6">
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="font-display text-2xl">Contact & Shipping</CardTitle>
+                <CardDescription className="font-body text-base">
+                  We use this information to prefill your secure Stripe checkout session.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <form onSubmit={handleStripeCheckout} className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2 sm:col-span-2">
+                      <label htmlFor="fullName" className="font-body text-sm font-semibold text-foreground">
+                        Full name
+                      </label>
+                      <Input
+                        id="fullName"
+                        required
+                        value={checkoutForm.fullName}
+                        onChange={handleFormChange("fullName")}
+                        autoComplete="name"
+                      />
+                    </div>
+
+                    <div className="space-y-2 sm:col-span-2">
+                      <label htmlFor="email" className="font-body text-sm font-semibold text-foreground">
+                        Email
+                      </label>
+                      <Input
+                        id="email"
+                        type="email"
+                        required
+                        value={checkoutForm.email}
+                        onChange={handleFormChange("email")}
+                        autoComplete="email"
+                      />
+                    </div>
+
+                    <div className="space-y-2 sm:col-span-2">
+                      <label htmlFor="address" className="font-body text-sm font-semibold text-foreground">
+                        Address
+                      </label>
+                      <Input
+                        id="address"
+                        required
+                        value={checkoutForm.address}
+                        onChange={handleFormChange("address")}
+                        autoComplete="street-address"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="city" className="font-body text-sm font-semibold text-foreground">
+                        City
+                      </label>
+                      <Input
+                        id="city"
+                        required
+                        value={checkoutForm.city}
+                        onChange={handleFormChange("city")}
+                        autoComplete="address-level2"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="state" className="font-body text-sm font-semibold text-foreground">
+                        State / Province
+                      </label>
+                      <Input
+                        id="state"
+                        required
+                        value={checkoutForm.state}
+                        onChange={handleFormChange("state")}
+                        autoComplete="address-level1"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="postalCode" className="font-body text-sm font-semibold text-foreground">
+                        ZIP / Postal code
+                      </label>
+                      <Input
+                        id="postalCode"
+                        required
+                        value={checkoutForm.postalCode}
+                        onChange={handleFormChange("postalCode")}
+                        autoComplete="postal-code"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="country" className="font-body text-sm font-semibold text-foreground">
+                        Country
+                      </label>
+                      <Input
+                        id="country"
+                        required
+                        value={checkoutForm.country}
+                        onChange={handleFormChange("country")}
+                        autoComplete="country-name"
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-2 sm:col-span-2">
-                    <label htmlFor="email" className="font-body text-sm font-semibold text-foreground">
-                      Email
-                    </label>
-                    <Input
-                      id="email"
-                      type="email"
-                      required
-                      value={checkoutForm.email}
-                      onChange={handleFormChange("email")}
-                      autoComplete="email"
-                    />
+                  <div className="rounded-md border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+                    Stripe redirects to a hosted, PCI-compliant payment page where cards, wallets, and additional
+                    payment methods are handled securely.
                   </div>
 
-                  <div className="space-y-2 sm:col-span-2">
-                    <label htmlFor="address" className="font-body text-sm font-semibold text-foreground">
-                      Address
-                    </label>
-                    <Input
-                      id="address"
-                      required
-                      value={checkoutForm.address}
-                      onChange={handleFormChange("address")}
-                      autoComplete="street-address"
-                    />
+                  <Button
+                    type="submit"
+                    disabled={isLoading || !stripeReady}
+                    className="h-12 w-full text-base font-semibold"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Redirecting to Stripe
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="h-4 w-4" />
+                        Pay with Stripe
+                      </>
+                    )}
+                  </Button>
+
+                  <div className="grid gap-2 rounded-md border border-border bg-background p-3 text-xs text-muted-foreground sm:grid-cols-3">
+                    <p className="inline-flex items-center gap-2">
+                      <ShieldCheck className="h-4 w-4 text-primary" />
+                      Secure encrypted payment
+                    </p>
+                    <p className="inline-flex items-center gap-2">
+                      <Truck className="h-4 w-4 text-primary" />
+                      Tracked shipping
+                    </p>
+                    <p className="inline-flex items-center gap-2">
+                      <RotateCcw className="h-4 w-4 text-primary" />
+                      Easy exchanges
+                    </p>
                   </div>
 
-                  <div className="space-y-2">
-                    <label htmlFor="city" className="font-body text-sm font-semibold text-foreground">
-                      City
-                    </label>
-                    <Input
-                      id="city"
-                      required
-                      value={checkoutForm.city}
-                      onChange={handleFormChange("city")}
-                      autoComplete="address-level2"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="state" className="font-body text-sm font-semibold text-foreground">
-                      State / Province
-                    </label>
-                    <Input
-                      id="state"
-                      required
-                      value={checkoutForm.state}
-                      onChange={handleFormChange("state")}
-                      autoComplete="address-level1"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="postalCode" className="font-body text-sm font-semibold text-foreground">
-                      ZIP / Postal code
-                    </label>
-                    <Input
-                      id="postalCode"
-                      required
-                      value={checkoutForm.postalCode}
-                      onChange={handleFormChange("postalCode")}
-                      autoComplete="postal-code"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="country" className="font-body text-sm font-semibold text-foreground">
-                      Country
-                    </label>
-                    <Input
-                      id="country"
-                      required
-                      value={checkoutForm.country}
-                      onChange={handleFormChange("country")}
-                      autoComplete="country-name"
-                    />
-                  </div>
-                </div>
-
-                <div className="rounded-md border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-                  Stripe redirects to a hosted, PCI-compliant payment page where cards, wallets, and additional payment
-                  methods are handled securely.
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading || !stripeReady}
-                  className="h-12 w-full text-base font-semibold"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Redirecting to Stripe
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="h-4 w-4" />
-                      Pay with Stripe
-                    </>
+                  {!stripeReady && (
+                    <p className="text-sm text-destructive">
+                      Stripe isn&apos;t fully configured. Add `VITE_STRIPE_PUBLISHABLE_KEY` and Stripe price IDs to
+                      continue.
+                    </p>
                   )}
-                </Button>
+                </form>
+              </CardContent>
+            </Card>
 
-                {!stripeReady && (
-                  <p className="text-sm text-destructive">
-                    Stripe isn&apos;t fully configured. Add `VITE_STRIPE_PUBLISHABLE_KEY` and Stripe price IDs to
-                    continue.
-                  </p>
-                )}
-              </form>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="font-display text-2xl">Shipping, Returns & FAQs</CardTitle>
+                <CardDescription className="font-body text-base">
+                  Transparent policies before payment.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-5 pt-0 font-body text-sm text-muted-foreground">
+                <div className="grid gap-3 rounded-md border border-border bg-muted/20 p-4 sm:grid-cols-2">
+                  <div>
+                    <p className="font-semibold text-foreground">Standard shipping</p>
+                    <p>
+                      {shippingPolicy.standardCost} | {shippingPolicy.standardTimeline}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">Express shipping</p>
+                    <p>
+                      {shippingPolicy.expressCost} | {shippingPolicy.expressTimeline}
+                    </p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <p className="font-semibold text-foreground">Free shipping</p>
+                    <p>Orders over {shippingPolicy.freeShippingThreshold} qualify for free standard shipping.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="font-semibold text-foreground">Returns and exchanges</p>
+                  <p className="mt-1">{returnPolicy}</p>
+                </div>
+
+                <Accordion type="single" collapsible className="w-full">
+                  {faqItems.map((faq) => (
+                    <AccordionItem key={faq.id} value={faq.id}>
+                      <AccordionTrigger className="text-left font-semibold text-foreground">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent>{faq.answer}</AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+
+                <p className="text-xs">
+                  Want to see customer feedback?{" "}
+                  <a href={googleReviewsUrl} target="_blank" rel="noreferrer" className="underline hover:text-foreground">
+                    Read our Google Reviews
+                  </a>
+                  .
+                </p>
+              </CardContent>
+            </Card>
+          </div>
 
           <Card className="h-fit lg:sticky lg:top-6">
             <CardHeader className="pb-4">
@@ -267,8 +340,8 @@ const Checkout = () => {
             </CardHeader>
             <CardContent className="space-y-4 pt-0">
               <div className="max-h-[300px] space-y-3 overflow-auto pr-1">
-                {items.map(({ product, quantity }) => (
-                  <div key={product.id} className="flex gap-3 rounded-md border border-border bg-background p-3">
+                {items.map(({ id, product, selection, quantity }) => (
+                  <div key={id} className="flex gap-3 rounded-md border border-border bg-background p-3">
                     <img
                       src={product.image}
                       alt={product.name}
@@ -279,6 +352,9 @@ const Checkout = () => {
                       <p className="font-display text-base font-semibold text-foreground">{product.name}</p>
                       <p className="font-body text-sm text-muted-foreground">
                         {formatUsd(product.price)} x {quantity}
+                      </p>
+                      <p className="font-body text-xs text-muted-foreground">
+                        Size: {selection.size} | Color: {selection.color}
                       </p>
                     </div>
                     <p className="font-display text-base font-semibold text-foreground">
