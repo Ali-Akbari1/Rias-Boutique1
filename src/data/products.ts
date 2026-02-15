@@ -59,13 +59,44 @@ const getString = (value: unknown) => {
   return "";
 };
 
-const getStringArray = (value: unknown) => {
+const getObjectValueString = (value: unknown, preferredKeys: string[]) => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return "";
+  }
+
+  const record = value as Record<string, unknown>;
+
+  for (const key of preferredKeys) {
+    const preferredValue = getString(record[key]);
+    if (preferredValue) {
+      return preferredValue;
+    }
+  }
+
+  for (const entry of Object.values(record)) {
+    const fallbackValue = getString(entry);
+    if (fallbackValue) {
+      return fallbackValue;
+    }
+  }
+
+  return "";
+};
+
+const getStringArray = (value: unknown, preferredKeys: string[] = []) => {
   if (!Array.isArray(value)) {
     return [];
   }
 
   return value
-    .map((item) => getString(item))
+    .map((item) => {
+      const directValue = getString(item);
+      if (directValue) {
+        return directValue;
+      }
+
+      return getObjectValueString(item, preferredKeys);
+    })
     .filter((item) => item.length > 0);
 };
 
@@ -89,10 +120,10 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
   const id = getString(product.id) || getString(product.slug) || String(index + 1);
   const slug = getString(product.slug) || slugify(name) || `product-${id}`;
   const image = getString(product.image) || "/placeholder.svg";
-  const galleryImages = getStringArray(product.galleryImages);
-  const sizes = getStringArray(product.sizes);
-  const colors = getStringArray(product.colors);
-  const careInstructions = getStringArray(product.careInstructions);
+  const galleryImages = getStringArray(product.galleryImages, ["image", "src", "url"]);
+  const sizes = getStringArray(product.sizes, ["size", "label", "value"]);
+  const colors = getStringArray(product.colors, ["color", "label", "value", "name"]);
+  const careInstructions = getStringArray(product.careInstructions, ["instruction", "text", "value"]);
   const createdAt = getString(product.createdAt) || new Date().toISOString().slice(0, 10);
 
   return {

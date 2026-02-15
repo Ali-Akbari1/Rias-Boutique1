@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, CheckCircle2, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
 import { getProductById } from "@/data/products";
@@ -16,16 +16,17 @@ const ProductDetails = () => {
   const { toast } = useToast();
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
-  const [selectedImage, setSelectedImage] = useState(product?.galleryImages[0] ?? "");
-
-  const canAddToCart = Boolean(selectedSize && selectedColor);
+  const [selectedImage, setSelectedImage] = useState(product?.galleryImages?.[0] ?? product?.image ?? "");
 
   const handleAddToCart = () => {
     if (!product) {
       return;
     }
 
-    if (!selectedSize || !selectedColor) {
+    const chosenSize = selectedSize || sizeOptions[0] || "One Size";
+    const chosenColor = selectedColor || colorOptions[0] || "Default";
+
+    if (!chosenSize || !chosenColor) {
       toast({
         title: "Select size and color",
         description: "Please choose both size and color before adding this item to your bag.",
@@ -34,16 +35,45 @@ const ProductDetails = () => {
       return;
     }
 
-    addToCart(product, { size: selectedSize, color: selectedColor });
+    addToCart(product, { size: chosenSize, color: chosenColor });
     toast({
       title: "Added to cart",
-      description: `${product.name} (${selectedSize}, ${selectedColor}) was added to your bag.`,
+      description: `${product.name} (${chosenSize}, ${chosenColor}) was added to your bag.`,
     });
   };
 
   if (!product) {
     return <Navigate to="/" replace />;
   }
+
+  const galleryImages = useMemo(
+    () =>
+      Array.isArray(product.galleryImages) && product.galleryImages.length > 0
+        ? product.galleryImages
+        : [product.image].filter(Boolean),
+    [product.galleryImages, product.image],
+  );
+
+  const sizeOptions = useMemo(
+    () => (Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : ["One Size"]),
+    [product.sizes],
+  );
+
+  const colorOptions = useMemo(
+    () => (Array.isArray(product.colors) && product.colors.length > 0 ? product.colors : ["Default"]),
+    [product.colors],
+  );
+
+  const careInstructions = useMemo(
+    () =>
+      Array.isArray(product.careInstructions) && product.careInstructions.length > 0
+        ? product.careInstructions
+        : ["Care instructions available upon request."],
+    [product.careInstructions],
+  );
+
+  const canAddToCart = Boolean((selectedSize || sizeOptions[0]) && (selectedColor || colorOptions[0]));
+  const primaryImage = selectedImage || galleryImages[0] || product.image || "/placeholder.svg";
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,10 +105,10 @@ const ProductDetails = () => {
         <section className="grid gap-8 lg:grid-cols-[1fr_1fr]">
           <div className="space-y-4">
             <div className="overflow-hidden rounded-md border border-border bg-card">
-              <img src={selectedImage} alt={product.name} className="h-full max-h-[620px] w-full object-cover" />
+              <img src={primaryImage} alt={product.name} className="h-full max-h-[620px] w-full object-cover" />
             </div>
             <div className="grid grid-cols-3 gap-3">
-              {product.galleryImages.map((image, index) => (
+              {galleryImages.map((image, index) => (
                 <button
                   key={`${product.id}-${index}`}
                   type="button"
@@ -114,7 +144,7 @@ const ProductDetails = () => {
               <div>
                 <p className="mb-2 text-sm font-semibold text-foreground">Choose size</p>
                 <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((size) => (
+                  {sizeOptions.map((size) => (
                     <button
                       key={size}
                       type="button"
@@ -134,7 +164,7 @@ const ProductDetails = () => {
               <div>
                 <p className="mb-2 text-sm font-semibold text-foreground">Choose color</p>
                 <div className="flex flex-wrap gap-2">
-                  {product.colors.map((color) => (
+                  {colorOptions.map((color) => (
                     <button
                       key={color}
                       type="button"
@@ -184,7 +214,7 @@ const ProductDetails = () => {
                 <div>
                   <p className="mb-1 font-semibold text-foreground">Care instructions</p>
                   <ul className="space-y-1">
-                    {product.careInstructions.map((instruction) => (
+                    {careInstructions.map((instruction) => (
                       <li key={instruction} className="inline-flex items-start gap-2">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
                         <span>{instruction}</span>

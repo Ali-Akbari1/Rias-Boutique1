@@ -33,7 +33,7 @@ const ProductGrid = () => {
         product.name.toLowerCase().includes(normalizedQuery) ||
         product.description.toLowerCase().includes(normalizedQuery) ||
         product.category.toLowerCase().includes(normalizedQuery) ||
-        product.colors.join(" ").toLowerCase().includes(normalizedQuery);
+        (Array.isArray(product.colors) ? product.colors.join(" ").toLowerCase() : "").includes(normalizedQuery);
 
       return inCategory && inPriceRange && matchesQuery;
     });
