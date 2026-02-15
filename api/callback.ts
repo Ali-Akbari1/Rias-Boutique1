@@ -59,14 +59,38 @@ const popupHtml = (message: string, title: string, details: string) => `<!doctyp
       (function () {
         var authMessage = ${JSON.stringify(message)};
         var fallback = ${JSON.stringify(details)};
+        var statusEl = document.getElementById("status");
+        var hasSent = false;
+
+        function sendAuthMessage(targetOrigin) {
+          if (hasSent || !window.opener || typeof window.opener.postMessage !== "function") {
+            return;
+          }
+
+          hasSent = true;
+          window.opener.postMessage(authMessage, targetOrigin || "*");
+          window.close();
+        }
+
+        function receiveMessage(event) {
+          window.removeEventListener("message", receiveMessage, false);
+          sendAuthMessage((event && event.origin) || "*");
+        }
 
         if (window.opener && typeof window.opener.postMessage === "function") {
-          window.opener.postMessage(authMessage, "*");
-          window.close();
+          window.addEventListener("message", receiveMessage, false);
+          window.opener.postMessage("authorizing:github", "*");
+
+          setTimeout(function () {
+            sendAuthMessage("*");
+          }, 1500);
+
           return;
         }
 
-        document.getElementById("status").textContent = fallback;
+        if (statusEl) {
+          statusEl.textContent = fallback;
+        }
       })();
     </script>
   </body>
