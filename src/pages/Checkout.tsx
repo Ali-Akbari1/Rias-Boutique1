@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   buildStripeLineItems,
-  formatUsd,
+  formatCad,
   getMissingStripeProducts,
   getStripeClient,
   isStripeConfigured,
@@ -351,14 +351,14 @@ const Checkout = () => {
                     <div className="min-w-0 flex-1">
                       <p className="font-display text-base font-semibold text-foreground">{product.name}</p>
                       <p className="font-body text-sm text-muted-foreground">
-                        {formatUsd(product.price)} x {quantity}
+                        {formatCad(product.price)} x {quantity}
                       </p>
                       <p className="font-body text-xs text-muted-foreground">
                         Size: {selection.size} | Color: {selection.color}
                       </p>
                     </div>
                     <p className="font-display text-base font-semibold text-foreground">
-                      {formatUsd(product.price * quantity)}
+                      {formatCad(product.price * quantity)}
                     </p>
                   </div>
                 ))}
@@ -367,7 +367,7 @@ const Checkout = () => {
               <div className="space-y-2 border-t border-border pt-4 text-sm">
                 <div className="flex items-center justify-between text-muted-foreground">
                   <span>Subtotal</span>
-                  <span>{formatUsd(totalPrice)}</span>
+                  <span>{formatCad(totalPrice)}</span>
                 </div>
                 <div className="flex items-center justify-between text-muted-foreground">
                   <span>Shipping</span>
@@ -375,7 +375,7 @@ const Checkout = () => {
                 </div>
                 <div className="flex items-center justify-between border-t border-border pt-3 font-display text-lg font-bold text-foreground">
                   <span>Total</span>
-                  <span>{formatUsd(totalPrice)}</span>
+                  <span>{formatCad(totalPrice)}</span>
                 </div>
               </div>
             </CardContent>

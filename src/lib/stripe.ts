@@ -8,12 +8,12 @@ interface CheckoutItem {
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "USD",
+  currency: "CAD",
 });
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
-export function formatUsd(amount: number) {
+export function formatCad(amount: number) {
   return currencyFormatter.format(amount);
 }
 

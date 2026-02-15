@@ -100,9 +100,9 @@ const ProductGrid = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All prices</SelectItem>
-              <SelectItem value="under-300">Under $300</SelectItem>
-              <SelectItem value="300-400">$300 - $400</SelectItem>
-              <SelectItem value="over-400">Over $400</SelectItem>
+              <SelectItem value="under-300">Under CA$300</SelectItem>
+              <SelectItem value="300-400">CA$300 - CA$400</SelectItem>
+              <SelectItem value="over-400">Over CA$400</SelectItem>
             </SelectContent>
           </Select>
 

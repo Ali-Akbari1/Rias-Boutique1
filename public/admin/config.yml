@@ -29,7 +29,7 @@ collections:
               - { label: "ID", name: "id", widget: "string", hint: "Unique number/string like 7 or afghan-blue-1" }
               - { label: "Slug", name: "slug", widget: "string", hint: "URL-safe text, e.g. emerald-zarbaft-gown" }
               - { label: "Name", name: "name", widget: "string" }
-              - { label: "Price (USD)", name: "price", widget: "number", value_type: "int", min: 1 }
+              - { label: "Price (CAD)", name: "price", widget: "number", value_type: "int", min: 1 }
               - { label: "Category", name: "category", widget: "select", options: ["Formal", "Bridal", "Casual"] }
               - { label: "Main Image", name: "image", widget: "image", choose_url: false }
               - label: "Gallery Images"

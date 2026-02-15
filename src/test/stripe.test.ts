@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { type Product } from "@/data/products";
-import { buildStripeLineItems, formatUsd, getMissingStripeProducts } from "@/lib/stripe";
+import { buildStripeLineItems, formatCad, getMissingStripeProducts } from "@/lib/stripe";
 
 const buildProduct = (overrides: Partial<Product>): Product => ({
   id: "1",
@@ -70,7 +70,7 @@ describe("stripe helpers", () => {
     expect(missing).toEqual(["Item D"]);
   });
 
-  it("formats USD values", () => {
-    expect(formatUsd(123.45)).toBe("$123.45");
+  it("formats CAD values", () => {
+    expect(formatCad(123.45)).toBe("CA$123.45");
   });
 });

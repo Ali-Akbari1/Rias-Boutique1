@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { type Product } from "@/data/products";
-import { formatUsd } from "@/lib/stripe";
+import { formatCad } from "@/lib/stripe";
 
 interface ProductCardProps {
   product: Product;
@@ -26,7 +26,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <h3 className="mb-1 font-display text-lg font-semibold text-foreground sm:text-xl">{product.name}</h3>
         <p className="mb-3 line-clamp-2 text-sm font-body text-muted-foreground">{product.description}</p>
 
-        <p className="mb-4 font-display text-xl font-bold text-foreground">{formatUsd(product.price)}</p>
+        <p className="mb-4 font-display text-xl font-bold text-foreground">{formatCad(product.price)}</p>
 
         <div className="flex items-center justify-between">
           <p className="text-xs font-body text-muted-foreground">Select size and color on product page</p>

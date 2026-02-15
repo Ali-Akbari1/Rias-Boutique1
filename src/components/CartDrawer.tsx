@@ -1,7 +1,7 @@
 import { X, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
-import { formatUsd } from "@/lib/stripe";
+import { formatCad } from "@/lib/stripe";
 
 interface CartDrawerProps {
   open: boolean;
@@ -47,7 +47,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                   />
                   <div className="flex-1 min-w-0">
                     <h3 className="font-display truncate font-semibold text-foreground">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground font-body">{formatUsd(product.price)}</p>
+                    <p className="text-sm text-muted-foreground font-body">{formatCad(product.price)}</p>
                     <p className="text-xs text-muted-foreground font-body mt-1">
                       Size: {selection.size} | Color: {selection.color}
                     </p>
@@ -69,7 +69,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                   </div>
                   <div className="flex flex-col items-end justify-between">
                     <span className="font-display text-sm font-bold text-foreground sm:text-base">
-                      {formatUsd(product.price * quantity)}
+                      {formatCad(product.price * quantity)}
                     </span>
                     <button
                       onClick={() => removeFromCart(id)}
@@ -85,7 +85,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
             <div className="space-y-4 border-t border-border p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6">
               <div className="flex justify-between items-center">
                 <span className="font-body text-lg text-muted-foreground">Total</span>
-                <span className="font-display text-2xl font-bold text-foreground">{formatUsd(totalPrice)}</span>
+                <span className="font-display text-2xl font-bold text-foreground">{formatCad(totalPrice)}</span>
               </div>
               <button
                 onClick={handleCheckout}

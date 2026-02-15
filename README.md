@@ -6,7 +6,7 @@ This project now supports Stripe Checkout with product price IDs.
 
 1. Copy `.env.example` to `.env`.
 2. Set `VITE_STRIPE_PUBLISHABLE_KEY` from your Stripe dashboard.
-3. Create one Stripe Price for each product and add the IDs to:
+3. Create one Stripe Price (in CAD) for each product and add the IDs to:
    - `VITE_STRIPE_PRICE_1`
    - `VITE_STRIPE_PRICE_2`
    - `VITE_STRIPE_PRICE_3`

@@ -4,7 +4,7 @@ import { ArrowLeft, CheckCircle2, ShieldCheck, ShoppingBag, Truck } from "lucide
 import { getProductById } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
-import { formatUsd } from "@/lib/stripe";
+import { formatCad } from "@/lib/stripe";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -102,7 +102,7 @@ const ProductDetails = () => {
 
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <Badge variant="secondary" className="font-body">
-                {formatUsd(product.price)}
+                {formatCad(product.price)}
               </Badge>
               <span className="inline-flex items-center gap-1 text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 text-primary" />
