@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle2, ShieldCheck, ShoppingBag, Truck } from "lucide
 import { getProductById } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/stripe";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,9 +18,18 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedImage, setSelectedImage] = useState(product?.galleryImages?.[0] ?? product?.image ?? "");
+  const checkoutEnabled = isCheckoutEnabled();
 
   const handleAddToCart = () => {
     if (!product) {
+      return;
+    }
+
+    if (!checkoutEnabled) {
+      toast({
+        title: "Checkout coming soon",
+        description: "Ordering is temporarily disabled while we finalize checkout.",
+      });
       return;
     }
 
@@ -86,18 +96,28 @@ const ProductDetails = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Collection
           </Link>
-          <Link
-            to="/checkout"
-            className="relative inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            Checkout
-            {totalItems > 0 && (
-              <span className="absolute -right-2 -top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                {totalItems}
-              </span>
-            )}
-          </Link>
+          {checkoutEnabled ? (
+            <Link
+              to="/checkout"
+              className="relative inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              Checkout
+              {totalItems > 0 && (
+                <span className="absolute -right-2 -top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+          ) : (
+            <span
+              aria-disabled="true"
+              className="inline-flex items-center gap-2 rounded-sm border border-border bg-muted/40 px-3 py-2 text-sm font-semibold text-muted-foreground"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              Checkout Soon
+            </span>
+          )}
         </div>
       </header>
 
@@ -105,7 +125,11 @@ const ProductDetails = () => {
         <section className="grid gap-8 lg:grid-cols-[1fr_1fr]">
           <div className="space-y-4">
             <div className="overflow-hidden rounded-md border border-border bg-card">
-              <img src={primaryImage} alt={product.name} className="h-full max-h-[620px] w-full object-cover" />
+              <img
+                src={primaryImage}
+                alt={product.name}
+                className="h-[380px] w-full object-contain bg-muted/20 sm:h-[500px] lg:h-[620px]"
+              />
             </div>
             <div className="grid grid-cols-3 gap-3">
               {galleryImages.map((image, index) => (
@@ -117,7 +141,11 @@ const ProductDetails = () => {
                     selectedImage === image ? "border-primary ring-2 ring-primary/20" : "border-border"
                   }`}
                 >
-                  <img src={image} alt={`${product.name} view ${index + 1}`} className="h-28 w-full object-cover" />
+                  <img
+                    src={image}
+                    alt={`${product.name} view ${index + 1}`}
+                    className="h-28 w-full object-contain bg-muted/20"
+                  />
                 </button>
               ))}
             </div>
@@ -136,7 +164,7 @@ const ProductDetails = () => {
               </Badge>
               <span className="inline-flex items-center gap-1 text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 text-primary" />
-                Secure Stripe checkout
+                {checkoutEnabled ? "Secure Stripe checkout" : "Checkout coming soon"}
               </span>
             </div>
 
@@ -185,16 +213,18 @@ const ProductDetails = () => {
                 type="button"
                 className="h-12 w-full text-base font-semibold"
                 onClick={handleAddToCart}
-                disabled={!canAddToCart}
+                disabled={!canAddToCart || !checkoutEnabled}
               >
-                Add to Bag
+                {checkoutEnabled ? "Add to Bag" : "Add to Bag (Coming Soon)"}
               </Button>
 
-              {!canAddToCart && (
+              {!checkoutEnabled ? (
+                <p className="text-sm text-muted-foreground">Checkout is temporarily disabled. Coming soon.</p>
+              ) : !canAddToCart ? (
                 <p className="text-sm text-muted-foreground">
                   Please select both size and color before adding this product to your bag.
                 </p>
-              )}
+              ) : null}
             </div>
 
             <Card>

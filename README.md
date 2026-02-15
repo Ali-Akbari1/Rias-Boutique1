@@ -13,19 +13,20 @@ This project now supports Stripe Checkout with product price IDs.
    - `VITE_STRIPE_PRICE_4`
    - `VITE_STRIPE_PRICE_5`
    - `VITE_STRIPE_PRICE_6`
-4. Restart the dev server.
-5. Optional: set `VITE_GOOGLE_REVIEWS_URL` to your Google reviews page URL.
-6. Optional: add Instagram section data:
+4. Set `VITE_ENABLE_CHECKOUT=true` when you are ready to accept orders. Keep it `false` to hide/disable checkout.
+5. Restart the dev server.
+6. Optional: set `VITE_GOOGLE_REVIEWS_URL` to your Google reviews page URL.
+7. Optional: add Instagram section data:
    - `VITE_INSTAGRAM_PROFILE_URL` (your Instagram profile URL)
    - `VITE_INSTAGRAM_CARDS` as comma-separated entries in this format:
      `postUrl|thumbnailUrl|label`
    - Example:
      `https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|Blue and gold set`
-7. To enable live Google reviews via Vercel function, also set:
+8. To enable live Google reviews via Vercel function, also set:
    - `GOOGLE_PLACES_API_KEY` (server-side key, do not prefix with `VITE_`)
    - `GOOGLE_PLACE_ID` (your business place ID)
 
-When configured, users can go from cart to `/checkout`, then Stripe redirects back to `/checkout/success` or `/checkout/cancel`.
+When `VITE_ENABLE_CHECKOUT=true` and Stripe is configured, users can go from cart to `/checkout`, then Stripe redirects back to `/checkout/success` or `/checkout/cancel`.
 
 ## Collection CMS (non-coder editing)
 

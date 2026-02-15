@@ -1,6 +1,7 @@
 import { X, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
+import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/stripe";
 
 interface CartDrawerProps {
@@ -11,8 +12,12 @@ interface CartDrawerProps {
 const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
+  const checkoutEnabled = isCheckoutEnabled();
 
   const handleCheckout = () => {
+    if (!checkoutEnabled) {
+      return;
+    }
     onClose();
     navigate("/checkout");
   };
@@ -89,9 +94,10 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
               </div>
               <button
                 onClick={handleCheckout}
-                className="w-full gradient-gold text-foreground font-body font-semibold text-base sm:text-lg py-3.5 sm:py-4 rounded-sm hover:opacity-90 transition-opacity"
+                disabled={!checkoutEnabled}
+                className="w-full gradient-gold text-foreground font-body font-semibold text-base sm:text-lg py-3.5 sm:py-4 rounded-sm hover:opacity-90 transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Checkout
+                {checkoutEnabled ? "Checkout" : "Checkout Coming Soon"}
               </button>
               <button
                 onClick={clearCart}
