@@ -4,6 +4,7 @@
       "fabric": "*",
       "price": 450,
       "galleryImages": [
+        "/uploads/image1-1-.jpeg",
         "/uploads/image2.jpeg",
         "/uploads/image0-3-.jpeg"
       ],
