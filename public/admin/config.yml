@@ -35,22 +35,26 @@ collections:
               - label: "Gallery Images"
                 name: "galleryImages"
                 widget: "list"
+                required: false
                 field: { label: "Image", name: "image", widget: "image", choose_url: false }
-              - { label: "Description", name: "description", widget: "text" }
+              - { label: "Description", name: "description", widget: "text", required: false }
               - label: "Available Sizes"
                 name: "sizes"
                 widget: "list"
+                required: false
                 field: { label: "Size", name: "size", widget: "string" }
               - label: "Available Colors"
                 name: "colors"
                 widget: "list"
+                required: false
                 field: { label: "Color", name: "color", widget: "string" }
-              - { label: "Fabric", name: "fabric", widget: "text" }
-              - { label: "Fit Information", name: "fitInfo", widget: "text" }
+              - { label: "Fabric", name: "fabric", widget: "text", required: false }
+              - { label: "Fit Information", name: "fitInfo", widget: "text", required: false }
               - label: "Care Instructions"
                 name: "careInstructions"
                 widget: "list"
+                required: false
                 field: { label: "Instruction", name: "instruction", widget: "string" }
-              - { label: "Delivery Estimate", name: "deliveryEstimate", widget: "string" }
-              - { label: "Popularity (0-100)", name: "popularity", widget: "number", value_type: "int", min: 0, max: 100 }
-              - { label: "Created Date", name: "createdAt", widget: "datetime", format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+              - { label: "Delivery Estimate", name: "deliveryEstimate", widget: "string", required: false }
+              - { label: "Popularity (0-100)", name: "popularity", widget: "number", value_type: "int", min: 0, max: 100, required: false }
+              - { label: "Created Date", name: "createdAt", widget: "datetime", format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false, required: false }
