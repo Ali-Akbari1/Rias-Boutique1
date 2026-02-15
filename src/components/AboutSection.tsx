@@ -16,7 +16,7 @@ const AboutSection = () => {
           of art designed for the modern woman who honors tradition with grace.
         </p>
       </div>
-    </section>
+    </section> 
   );
 };
 
