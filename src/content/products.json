@@ -1,7 +1,7 @@
 {
   "products": [
     {
-      "fabric": "*",
+      "fabric": "",
       "price": 450,
       "galleryImages": [
         "/uploads/image1-1-.jpeg",
@@ -11,14 +11,14 @@
       "name": "Red Bridal Dress",
       "slug": "Red-Bridal-Dress",
       "sizes": [],
-      "popularity": 100,
+      "popularity": "",
       "id": "1",
       "createdAt": "2026-02-14",
       "image": "/uploads/image1-1-.jpeg",
-      "deliveryEstimate": "*",
+      "deliveryEstimate": "",
       "description": "3 Piece Red Bridal Dress\n*Jewelry Not Included",
       "category": "Bridal",
-      "fitInfo": "*"
+      "fitInfo": ""
     }
   ]
 }
