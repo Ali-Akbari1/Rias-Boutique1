@@ -1,20 +1,28 @@
 {
   "products": [
     {
-      "fabric": "",
+      "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/img.jpg"
+        "/uploads/img.jpg",
+        "/uploads/full-photo.jpg"
       ],
-      "name": "Red Bridal Dress",
-      "slug": "Red-Bridal-Dress",
+      "name": "Burgundy Bridal Dress",
+      "slug": "Burgundy-Bridal-Dress",
+      "colors": [
+        "Red",
+        "Burgundy"
+      ],
       "sizes": [],
       "popularity": "",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
       "id": "1",
       "createdAt": "2026-02-14",
       "image": "/uploads/full-photo.jpg",
       "deliveryEstimate": "",
-      "description": "3 Piece Red Bridal Dress\n*Jewelry Not Included",
+      "description": "3 Piece Burgundy Bridal Dress\n*Jewelry Sold Separately",
       "category": "Bridal",
       "fitInfo": ""
     }
