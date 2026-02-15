@@ -40,14 +40,16 @@ This repo now includes Decap CMS at `/admin` so products can be added/edited/del
 
 ### What you need to do once
 
-1. Open `public/admin/config.yml` and replace:
-   - `repo: YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME`
-   - `branch: main` (change if your default branch is different)
-2. Configure Decap authentication for GitHub backend:
-   - If hosting on Vercel, connect an OAuth provider compatible with Decap GitHub backend.
-   - Decap docs: https://decapcms.org/docs/github-backend/
-3. Deploy to Vercel.
-4. Open `https://your-domain.com/admin` and log in.
+1. Confirm `public/admin/config.yml` has your real repo + branch.
+2. In GitHub, create an OAuth App:
+   - Homepage URL: `https://www.riasboutique.com`
+   - Authorization callback URL: `https://www.riasboutique.com/api/callback`
+3. In Vercel project settings, add environment variables:
+   - `GITHUB_OAUTH_CLIENT_ID`
+   - `GITHUB_OAUTH_CLIENT_SECRET`
+   - `CMS_BASE_URL` = `https://www.riasboutique.com`
+4. Redeploy the project on Vercel.
+5. Open `https://www.riasboutique.com/admin` and click GitHub login.
 
 ### How your sister will update collection
 
