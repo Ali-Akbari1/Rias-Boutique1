@@ -103,7 +103,7 @@ const TrustSection = () => {
           {reviews.map((review) => (
             <Card key={review.id} className="border-border bg-background">
               <CardContent className="pt-6">
-                <p className="mb-2 inline-flex items-center gap-1 text-gold">
+                <p className="mb-2 inline-flex items-center gap-1 text-[#d4af37]">
                   {Array.from({ length: Math.max(1, Math.min(5, Math.round(review.rating))) }).map((_, idx) => (
                     <Star key={`${review.id}-${idx}`} className="h-4 w-4 fill-current" />
                   ))}

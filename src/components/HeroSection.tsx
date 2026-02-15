@@ -23,7 +23,7 @@ const HeroSection = () => {
           </p>
           <a
             href="#collection"
-            className="inline-block rounded-sm gradient-gold px-7 py-3.5 text-base font-body font-semibold tracking-wide text-foreground transition-opacity hover:opacity-90 sm:px-8 sm:py-4 sm:text-lg"
+            className="inline-flex items-center rounded-sm border-2 border-foreground bg-background px-7 py-3.5 text-base font-body font-semibold tracking-wide text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.28)] transition-colors hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground sm:px-8 sm:py-4 sm:text-lg"
           >
             Explore Collection
           </a>
