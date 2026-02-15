@@ -1,0 +1,54 @@
+backend:
+  name: github
+  repo: Ali-Akbari1/Rias-Boutique1
+  branch: main
+
+local_backend: true
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+publish_mode: editorial_workflow
+
+collections:
+  - name: "store"
+    label: "Store Content"
+    files:
+      - label: "Products"
+        name: "products"
+        file: "src/content/products.json"
+        format: "json"
+        fields:
+          - label: "Products"
+            name: "products"
+            widget: "list"
+            summary: "{{fields.name}} ({{fields.category}})"
+            fields:
+              - { label: "ID", name: "id", widget: "string", hint: "Unique number/string like 7 or afghan-blue-1" }
+              - { label: "Slug", name: "slug", widget: "string", hint: "URL-safe text, e.g. emerald-zarbaft-gown" }
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Price (USD)", name: "price", widget: "number", value_type: "int", min: 1 }
+              - { label: "Category", name: "category", widget: "select", options: ["Formal", "Bridal", "Casual"] }
+              - { label: "Main Image", name: "image", widget: "image", choose_url: false }
+              - label: "Gallery Images"
+                name: "galleryImages"
+                widget: "list"
+                field: { label: "Image", name: "image", widget: "image", choose_url: false }
+              - { label: "Description", name: "description", widget: "text" }
+              - label: "Available Sizes"
+                name: "sizes"
+                widget: "list"
+                field: { label: "Size", name: "size", widget: "string" }
+              - label: "Available Colors"
+                name: "colors"
+                widget: "list"
+                field: { label: "Color", name: "color", widget: "string" }
+              - { label: "Fabric", name: "fabric", widget: "text" }
+              - { label: "Fit Information", name: "fitInfo", widget: "text" }
+              - label: "Care Instructions"
+                name: "careInstructions"
+                widget: "list"
+                field: { label: "Instruction", name: "instruction", widget: "string" }
+              - { label: "Delivery Estimate", name: "deliveryEstimate", widget: "string" }
+              - { label: "Popularity (0-100)", name: "popularity", widget: "number", value_type: "int", min: 0, max: 100 }
+              - { label: "Created Date", name: "createdAt", widget: "datetime", format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }

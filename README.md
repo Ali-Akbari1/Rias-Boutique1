@@ -27,6 +27,42 @@ This project now supports Stripe Checkout with product price IDs.
 
 When configured, users can go from cart to `/checkout`, then Stripe redirects back to `/checkout/success` or `/checkout/cancel`.
 
+## Collection CMS (non-coder editing)
+
+This repo now includes Decap CMS at `/admin` so products can be added/edited/deleted from a form UI.
+
+### Files added for CMS
+
+- `public/admin/index.html`
+- `public/admin/config.yml`
+- `src/content/products.json` (source of truth for collection)
+- `public/uploads/` (product images)
+
+### What you need to do once
+
+1. Open `public/admin/config.yml` and replace:
+   - `repo: YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME`
+   - `branch: main` (change if your default branch is different)
+2. Configure Decap authentication for GitHub backend:
+   - If hosting on Vercel, connect an OAuth provider compatible with Decap GitHub backend.
+   - Decap docs: https://decapcms.org/docs/github-backend/
+3. Deploy to Vercel.
+4. Open `https://your-domain.com/admin` and log in.
+
+### How your sister will update collection
+
+1. Go to `/admin`.
+2. Open `Store Content -> Products`.
+3. Add/edit/delete product entries.
+4. Upload images directly in the form (stored in `public/uploads`).
+5. Save and publish. A commit is created, then Vercel auto-deploys.
+
+### Local testing
+
+1. Run app: `npm run dev`
+2. In another terminal run: `npx decap-server`
+3. Open `http://localhost:8080/admin`
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).

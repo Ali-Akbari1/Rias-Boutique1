@@ -1,0 +1,136 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "slug": "emerald-zarbaft-gown",
+      "name": "Emerald Zarbaft Gown",
+      "price": 289,
+      "image": "/uploads/product-1.jpg",
+      "galleryImages": ["/uploads/product-1.jpg", "/uploads/product-4.jpg", "/uploads/product-6.jpg"],
+      "category": "Formal",
+      "description": "Luxurious green silk gown with traditional gold zarbaft embroidery, perfect for celebrations.",
+      "sizes": ["XS", "S", "M", "L", "XL"],
+      "colors": ["Emerald", "Forest"],
+      "fabric": "Silk satin base with hand-worked zari embroidery.",
+      "fitInfo": "Tailored through the waist with a gentle A-line drape. True to size.",
+      "careInstructions": [
+        "Dry clean recommended for best preservation of embroidery.",
+        "Store in a breathable garment bag away from direct sunlight.",
+        "Steam on low heat from the reverse side only."
+      ],
+      "deliveryEstimate": "Ships in 2-3 business days. Delivery in 5-8 business days in North America.",
+      "popularity": 93,
+      "createdAt": "2026-01-17"
+    },
+    {
+      "id": "2",
+      "slug": "burgundy-velvet-anarkali",
+      "name": "Burgundy Velvet Anarkali",
+      "price": 345,
+      "image": "/uploads/product-2.jpg",
+      "galleryImages": ["/uploads/product-2.jpg", "/uploads/product-5.jpg", "/uploads/product-3.jpg"],
+      "category": "Bridal",
+      "description": "Rich burgundy velvet anarkali with intricate gold threadwork and bell sleeves.",
+      "sizes": ["S", "M", "L", "XL"],
+      "colors": ["Burgundy", "Maroon"],
+      "fabric": "Premium velvet with metallic thread detailing and satin lining.",
+      "fitInfo": "Relaxed through the skirt with fitted bodice. Size up if between sizes.",
+      "careInstructions": [
+        "Professional dry clean only.",
+        "Avoid folding heavy embellishment areas; hang when possible.",
+        "Spot clean lining with a damp cloth only."
+      ],
+      "deliveryEstimate": "Ships in 3-4 business days. Delivery in 6-10 business days in North America.",
+      "popularity": 96,
+      "createdAt": "2025-12-11"
+    },
+    {
+      "id": "3",
+      "slug": "ivory-gold-bridal-set",
+      "name": "Ivory & Gold Bridal Set",
+      "price": 520,
+      "image": "/uploads/product-3.jpg",
+      "galleryImages": ["/uploads/product-3.jpg", "/uploads/product-2.jpg", "/uploads/product-1.jpg"],
+      "category": "Bridal",
+      "description": "Stunning ivory bridal set with lavish gold beadwork and crystal embellishments.",
+      "sizes": ["S", "M", "L"],
+      "colors": ["Ivory Gold"],
+      "fabric": "Layered silk blend with beadwork, crystals, and hand-finished trims.",
+      "fitInfo": "Structured bodice with full-length flowing skirt. Runs slightly fitted in the bust.",
+      "careInstructions": [
+        "Dry clean with bridal garment specialist only.",
+        "Do not steam directly on embellishments.",
+        "Lay flat while unpacking to avoid bead stress."
+      ],
+      "deliveryEstimate": "Ships in 4-5 business days. Delivery in 7-12 business days in North America.",
+      "popularity": 98,
+      "createdAt": "2026-02-06"
+    },
+    {
+      "id": "4",
+      "slug": "sapphire-silk-kaftan",
+      "name": "Sapphire Silk Kaftan",
+      "price": 265,
+      "image": "/uploads/product-4.jpg",
+      "galleryImages": ["/uploads/product-4.jpg", "/uploads/product-1.jpg", "/uploads/product-6.jpg"],
+      "category": "Casual",
+      "description": "Elegant blue silk kaftan with delicate silver embroidery and mirror work.",
+      "sizes": ["XS", "S", "M", "L", "XL"],
+      "colors": ["Sapphire", "Midnight Blue"],
+      "fabric": "Soft silk blend with hand-applied mirror accents.",
+      "fitInfo": "Relaxed kaftan silhouette with comfortable shoulder room.",
+      "careInstructions": [
+        "Dry clean recommended for best preservation of embroidery.",
+        "Store in a breathable garment bag away from direct sunlight.",
+        "Steam on low heat from the reverse side only."
+      ],
+      "deliveryEstimate": "Ships in 1-2 business days. Delivery in 4-7 business days in North America.",
+      "popularity": 87,
+      "createdAt": "2025-10-04"
+    },
+    {
+      "id": "5",
+      "slug": "royal-magenta-chapan",
+      "name": "Royal Magenta Chapan",
+      "price": 310,
+      "image": "/uploads/product-5.jpg",
+      "galleryImages": ["/uploads/product-5.jpg", "/uploads/product-2.jpg", "/uploads/product-3.jpg"],
+      "category": "Formal",
+      "description": "Traditional chapan in vibrant magenta with lavish gold zari embroidery.",
+      "sizes": ["S", "M", "L", "XL", "XXL"],
+      "colors": ["Magenta", "Ruby"],
+      "fabric": "Textured brocade with zari and cotton-silk inner lining.",
+      "fitInfo": "Slightly boxy traditional cut. Choose your regular size for intended fit.",
+      "careInstructions": [
+        "Dry clean only.",
+        "Store on broad hanger to retain shoulder shape.",
+        "Avoid direct perfumes on zari areas."
+      ],
+      "deliveryEstimate": "Ships in 2-3 business days. Delivery in 5-9 business days in North America.",
+      "popularity": 91,
+      "createdAt": "2025-11-22"
+    },
+    {
+      "id": "6",
+      "slug": "noir-gold-evening-dress",
+      "name": "Noir Gold Evening Dress",
+      "price": 395,
+      "image": "/uploads/product-6.jpg",
+      "galleryImages": ["/uploads/product-6.jpg", "/uploads/product-1.jpg", "/uploads/product-4.jpg"],
+      "category": "Formal",
+      "description": "Dramatic black evening dress with bold gold embroidery and flowing silhouette.",
+      "sizes": ["XS", "S", "M", "L", "XL"],
+      "colors": ["Noir Gold", "Black Champagne"],
+      "fabric": "Matte crepe body with metallic thread embroidery.",
+      "fitInfo": "Skims the body through the top and flares from the hip.",
+      "careInstructions": [
+        "Dry clean recommended for best preservation of embroidery.",
+        "Store in a breathable garment bag away from direct sunlight.",
+        "Steam on low heat from the reverse side only."
+      ],
+      "deliveryEstimate": "Ships in 2-3 business days. Delivery in 5-8 business days in North America.",
+      "popularity": 95,
+      "createdAt": "2026-01-30"
+    }
+  ]
+}
