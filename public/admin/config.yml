@@ -2,7 +2,7 @@ backend:
   name: github
   repo: Ali-Akbari1/Rias-Boutique1
   branch: main
-  base_url: https://www.riasboutique.com
+  base_url: www.riasboutique.com
   auth_endpoint: api/auth
 
 local_backend: true
