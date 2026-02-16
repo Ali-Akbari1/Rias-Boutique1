@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Search, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
 import { getProductById } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +9,7 @@ import { formatCad } from "@/lib/stripe";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ZoomableImageDialog from "@/components/ZoomableImageDialog";
 
 const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -125,11 +126,19 @@ const ProductDetails = () => {
         <section className="grid gap-8 lg:grid-cols-[1fr_1fr]">
           <div className="space-y-4">
             <div className="overflow-hidden rounded-md border border-border bg-card">
-              <img
-                src={primaryImage}
-                alt={product.name}
-                className="h-[380px] w-full object-contain bg-muted/20 sm:h-[500px] lg:h-[620px]"
-              />
+              <ZoomableImageDialog src={primaryImage} alt={product.name} title={`${product.name} image`}>
+                <button type="button" className="relative block h-full w-full cursor-zoom-in">
+                  <img
+                    src={primaryImage}
+                    alt={product.name}
+                    className="h-[380px] w-full object-contain bg-muted/20 sm:h-[500px] lg:h-[620px]"
+                  />
+                  <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-sm bg-background/80 px-2 py-1 text-xs font-semibold text-foreground">
+                    <Search className="h-3.5 w-3.5" />
+                    Zoom
+                  </span>
+                </button>
+              </ZoomableImageDialog>
             </div>
             <div className="grid grid-cols-3 gap-3">
               {galleryImages.map((image, index) => (

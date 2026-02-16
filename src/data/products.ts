@@ -133,7 +133,7 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
     price: Math.max(0, getNumber(product.price, 0)),
     image,
     galleryImages: galleryImages.length > 0 ? galleryImages : [image],
-    category: getString(product.category) || "Formal",
+    category: getString(product.category) || "Party Wear",
     description: getString(product.description),
     stripePriceId: getString(product.stripePriceId) || stripePrice(id),
     sizes: sizes.length > 0 ? sizes : ["One Size"],

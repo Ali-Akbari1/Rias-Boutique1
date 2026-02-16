@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { type Product } from "@/data/products";
 import { formatCad } from "@/lib/stripe";
+import ZoomableImageDialog from "@/components/ZoomableImageDialog";
 
 interface ProductCardProps {
   product: Product;
@@ -10,16 +11,22 @@ interface ProductCardProps {
 const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <div className="group relative overflow-hidden rounded-sm bg-card shadow-boutique transition-all duration-500 hover:shadow-card-hover">
-      <Link to={`/products/${product.id}`} className="block">
-        <div className="aspect-[3/4] overflow-hidden">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            loading="lazy"
-          />
-        </div>
-      </Link>
+      <div className="aspect-[3/4] overflow-hidden">
+        <ZoomableImageDialog src={product.image} alt={product.name} title={`${product.name} image`}>
+          <button type="button" className="relative block h-full w-full cursor-zoom-in">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+            />
+            <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-sm bg-background/80 px-2 py-1 text-xs font-semibold text-foreground">
+              <Search className="h-3.5 w-3.5" />
+              Zoom
+            </span>
+          </button>
+        </ZoomableImageDialog>
+      </div>
 
       <div className="p-4 sm:p-5">
         <p className="mb-1 text-xs font-body uppercase tracking-[0.2em] text-gold">{product.category}</p>
