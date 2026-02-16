@@ -25,6 +25,26 @@
       "description": "3 Piece Burgundy Bridal Dress\n*Jewelry Sold Separately",
       "category": "Bridal",
       "fitInfo": ""
+    },
+    {
+      "fabric": "Banaras",
+      "price": 550,
+      "galleryImages": [
+        "/uploads/bridalgreencover.jpg",
+        "/uploads/bridalgreen.jpg",
+        "/uploads/bridalgreen2.jpg",
+        "/uploads/bridalgreen3.jpg"
+      ],
+      "name": "Green Bridal Dress",
+      "slug": "Green-Bridal-Dress",
+      "sizes": [
+        "Large (44in)"
+      ],
+      "id": "2",
+      "createdAt": "2026-02-16",
+      "image": "/uploads/bridalgreencover.jpg",
+      "description": "Green bridal banaras dress with handmade dress ",
+      "category": "Bridal"
     }
   ]
 }
