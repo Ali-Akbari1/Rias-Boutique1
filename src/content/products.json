@@ -45,6 +45,21 @@
       "image": "/uploads/bridalgreencover.jpg",
       "description": "Green bridal banaras dress with handmade cheerma",
       "category": "Bridal"
+    },
+    {
+      "fabric": "Velvet ",
+      "price": 400,
+      "galleryImages": [
+        "/uploads/img_0557.jpg"
+      ],
+      "name": "Blue Long Cheerma Dozi Dress",
+      "slug": "Blue-cheerma-dozi",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "3",
+      "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
+      "category": "Formal"
     }
   ]
 }
