@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 const TrustSection = () => {
   const fallbackReviews = useMemo(() => featuredStoreReviews, []);
   const [reviews, setReviews] = useState<StoreReview[]>(fallbackReviews);
+  const [reviewStartIndex, setReviewStartIndex] = useState(0);
   const [googleMapsUri, setGoogleMapsUri] = useState<string>("");
   const [placeName, setPlaceName] = useState<string>("Ria's Boutique");
   const [overallRating, setOverallRating] = useState<number | null>(null);
@@ -68,6 +69,30 @@ const TrustSection = () => {
     };
   }, [fallbackReviews]);
 
+  useEffect(() => {
+    if (reviews.length <= 1) {
+      setReviewStartIndex(0);
+      return;
+    }
+
+    const rotationInterval = window.setInterval(() => {
+      setReviewStartIndex((current) => (current + 1) % reviews.length);
+    }, 5000);
+
+    return () => {
+      window.clearInterval(rotationInterval);
+    };
+  }, [reviews]);
+
+  const rotatingReviews = useMemo(() => {
+    if (reviews.length === 0) {
+      return [];
+    }
+
+    const visibleCount = Math.min(3, reviews.length);
+    return Array.from({ length: visibleCount }, (_, offset) => reviews[(reviewStartIndex + offset) % reviews.length]);
+  }, [reviewStartIndex, reviews]);
+
   const viewReviewsUrl = googleMapsUri || defaultGoogleUrl;
 
   return (
@@ -83,25 +108,12 @@ const TrustSection = () => {
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          {trustBadges.map((badge, index) => (
-            <Card key={badge.id} className="border-border bg-background">
-              <CardContent className="pt-6">
-                <div className="mb-3 inline-flex rounded-full bg-muted p-2 text-primary">
-                  {index === 0 && <ShieldCheck className="h-5 w-5" />}
-                  {index === 1 && <BadgeCheck className="h-5 w-5" />}
-                  {index === 2 && <Truck className="h-5 w-5" />}
-                </div>
-                <p className="font-display text-xl font-semibold text-foreground">{badge.label}</p>
-                <p className="mt-2 font-body text-sm text-muted-foreground">{badge.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
         <div className="grid gap-4 lg:grid-cols-3">
-          {reviews.map((review) => (
-            <Card key={review.id} className="border-border bg-background">
+          {rotatingReviews.map((review, index) => (
+            <Card
+              key={`${review.id}-${reviewStartIndex}-${index}`}
+              className="animate-fade-in border-border bg-background"
+            >
               <CardContent className="pt-6">
                 <p className="mb-2 inline-flex items-center gap-1 text-[#d4af37]">
                   {Array.from({ length: Math.max(1, Math.min(5, Math.round(review.rating))) }).map((_, idx) => (
@@ -119,6 +131,22 @@ const TrustSection = () => {
                   )}
                 </p>
                 <p className="text-xs font-body text-muted-foreground">{review.relativeTime || review.publishedAt}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {trustBadges.map((badge, index) => (
+            <Card key={badge.id} className="border-border bg-background">
+              <CardContent className="pt-6">
+                <div className="mb-3 inline-flex rounded-full bg-muted p-2 text-primary">
+                  {index === 0 && <ShieldCheck className="h-5 w-5" />}
+                  {index === 1 && <BadgeCheck className="h-5 w-5" />}
+                  {index === 2 && <Truck className="h-5 w-5" />}
+                </div>
+                <p className="font-display text-xl font-semibold text-foreground">{badge.label}</p>
+                <p className="mt-2 font-body text-sm text-muted-foreground">{badge.description}</p>
               </CardContent>
             </Card>
           ))}

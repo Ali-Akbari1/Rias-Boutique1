@@ -60,32 +60,16 @@ const popupHtml = (message: string, title: string, details: string) => `<!doctyp
         var authMessage = ${JSON.stringify(message)};
         var fallback = ${JSON.stringify(details)};
         var statusEl = document.getElementById("status");
-        var hasSent = false;
-
-        function sendAuthMessage(targetOrigin) {
-          if (hasSent || !window.opener || typeof window.opener.postMessage !== "function") {
+        try {
+          if (window.opener && typeof window.opener.postMessage === "function") {
+            window.opener.postMessage(authMessage, "*");
+            window.close();
             return;
           }
-
-          hasSent = true;
-          window.opener.postMessage(authMessage, targetOrigin || "*");
-          window.close();
-        }
-
-        function receiveMessage(event) {
-          window.removeEventListener("message", receiveMessage, false);
-          sendAuthMessage((event && event.origin) || "*");
-        }
-
-        if (window.opener && typeof window.opener.postMessage === "function") {
-          window.addEventListener("message", receiveMessage, false);
-          window.opener.postMessage("authorizing:github", "*");
-
-          setTimeout(function () {
-            sendAuthMessage("*");
-          }, 1500);
-
-          return;
+        } catch (error) {
+          if (statusEl) {
+            statusEl.textContent = fallback;
+          }
         }
 
         if (statusEl) {
@@ -96,6 +80,18 @@ const popupHtml = (message: string, title: string, details: string) => `<!doctyp
   </body>
 </html>`;
 
+const setPopupHeaders = (res: any) => {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
+};
+
+const sendPopup = (res: any, status: number, message: string, title: string, details: string) => {
+  setPopupHeaders(res);
+  res.status(status).send(popupHtml(message, title, details));
+};
+
 export default async function handler(req: any, res: any) {
   if (req.method !== "GET") {
     res.status(405).json({ error: "Method not allowed" });
@@ -105,8 +101,7 @@ export default async function handler(req: any, res: any) {
   const provider = asSingle(req.query.provider) || "github";
   if (provider !== "github") {
     const message = "authorization:github:error:Invalid provider";
-    res.status(400).setHeader("Content-Type", "text/html; charset=utf-8");
-    res.send(popupHtml(message, "CMS Login Failed", "Invalid OAuth provider."));
+    sendPopup(res, 400, message, "CMS Login Failed", "Invalid OAuth provider.");
     return;
   }
 
@@ -114,8 +109,7 @@ export default async function handler(req: any, res: any) {
   if (!code) {
     const oauthError = asSingle(req.query.error_description) || asSingle(req.query.error) || "Missing OAuth code.";
     const message = `authorization:github:error:${oauthError}`;
-    res.status(400).setHeader("Content-Type", "text/html; charset=utf-8");
-    res.send(popupHtml(message, "CMS Login Failed", String(oauthError)));
+    sendPopup(res, 400, message, "CMS Login Failed", String(oauthError));
     return;
   }
 
@@ -124,13 +118,12 @@ export default async function handler(req: any, res: any) {
 
   if (!clientId || !clientSecret) {
     const message = "authorization:github:error:Server OAuth credentials are missing.";
-    res.status(500).setHeader("Content-Type", "text/html; charset=utf-8");
-    res.send(
-      popupHtml(
-        message,
-        "CMS Login Failed",
-        "Missing GITHUB_OAUTH_CLIENT_ID or GITHUB_OAUTH_CLIENT_SECRET on the server.",
-      ),
+    sendPopup(
+      res,
+      500,
+      message,
+      "CMS Login Failed",
+      "Missing GITHUB_OAUTH_CLIENT_ID or GITHUB_OAUTH_CLIENT_SECRET on the server.",
     );
     return;
   }
@@ -164,9 +157,7 @@ export default async function handler(req: any, res: any) {
     if (!tokenResponse.ok || !tokenPayload.access_token) {
       const reason = tokenPayload.error_description || tokenPayload.error || "GitHub token exchange failed.";
       const message = `authorization:github:error:${reason}`;
-
-      res.status(502).setHeader("Content-Type", "text/html; charset=utf-8");
-      res.send(popupHtml(message, "CMS Login Failed", reason));
+      sendPopup(res, 502, message, "CMS Login Failed", reason);
       return;
     }
 
@@ -175,13 +166,10 @@ export default async function handler(req: any, res: any) {
       provider: "github",
     })}`;
 
-    res.status(200).setHeader("Content-Type", "text/html; charset=utf-8");
-    res.send(popupHtml(successMessage, "CMS Login Successful", "Authentication complete. You can close this window."));
+    sendPopup(res, 200, successMessage, "CMS Login Successful", "Authentication complete. You can close this window.");
   } catch (error) {
     const reason = error instanceof Error ? error.message : "Unexpected server error.";
     const message = `authorization:github:error:${reason}`;
-
-    res.status(500).setHeader("Content-Type", "text/html; charset=utf-8");
-    res.send(popupHtml(message, "CMS Login Failed", reason));
+    sendPopup(res, 500, message, "CMS Login Failed", reason);
   }
 }

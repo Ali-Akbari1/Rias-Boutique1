@@ -109,6 +109,62 @@ export const featuredStoreReviews: StoreReview[] = [
     quote: "Great experience, been looking for an Eid dress and finally found one here. Great staff and very friendly.",
     publishedAt: "2025-06-12",
   },
+  {
+    id: "store-review-4",
+    author: "Maria Kabiri",
+    rating: 5,
+    quote: "I had an amazing experience at Ria's Boutique! The selection of traditional Afghan clothing and accessories is beautiful, and the quality is top-notch. The staff were incredibly friendly and knowledgeable, offering great advice and making the shopping experience enjoyable. I was especially impressed by the attention to detail in the craftsmanship of the items. If you're looking for authentic, high-quality Afghan products, this is definitely the place to go. Highly recommend!",
+    publishedAt: "2025-03-16",
+  },
+  {
+    id: "store-review-5",
+    author: "Mustafa Hakimzada",
+    rating: 5,
+    quote: "I recently purchased a beautiful outfit from this boutique for my family, and I am really impressed! The quality of the fabric is excellent, and the design is stylish and modern. The fit is perfect, and it really stands out. Highly recommend this place for anyone looking for Afghan trendy and high-quality clothing. Thumbs up for Ria’s Afghan Boutique.",
+    publishedAt: "2025-03-12",
+  },
+  {
+    id: "store-review-6",
+    author: "Mujda Sadat",
+    rating: 5,
+    quote: "I had a great experience at Ria’s Afghan Boutique! Their customer service was truly amazing -friendly, helpful, and attentive from start to finish.They offer a wonderful collection of high-quality Afghan clothes for both men and women, with stylish designs that really stand out. I'm so happy with my purchase and will definitely be coming back!",
+    publishedAt: "2025-04-22",
+  },
+  {
+    id: "store-review-7",
+    author: "Behnaz Hakimzada",
+    rating: 5,
+    quote: "Had a wonderful experience in Ria’s Afghan Boutique. They offer great customer service and provide beautiful and unique designs of traditional clothes and jewelries with perfect quality.",
+    publishedAt: "2025-04-22",
+  },
+  {
+    id: "store-review-8",
+    author: "Jamila Azizi",
+    rating: 5,
+    quote: "Great quality and unique designs at Riaz Afghan Boutique! Highly recommended!",
+    publishedAt: "2025-04-22",
+  },
+  {
+    id: "store-review-10",
+    author: "Sonia Meet",
+    rating: 5,
+    quote: "One of the best place in Calgary and in New horizon mall where we can get all kinds of Afghan dresses and owner is very polite and kind .I highly recommend to everyone one",
+    publishedAt: "2025-02-12",
+  },
+  {
+    id: "store-review-11",
+    author: "Yalda Ahangaran",
+    rating: 5,
+    quote: "Authentic Afghan clothing with beautiful craftsmanship at Riaz Afghan Boutique! Truly exceptional!",
+    publishedAt: "2025-03-12",
+  },
+  {
+    id: "store-review-12",
+    author: "Victoria Barez",
+    rating: 5,
+    quote: "Great quality pieces and beautiful hand made chadors! Friendly and welcoming owners aswell!",
+    publishedAt: "2024-03-12",
+  },
 ];
 
 const normalizeInstagramPostUrl = (url: string) => {
