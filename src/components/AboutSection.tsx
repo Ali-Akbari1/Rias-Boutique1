@@ -12,8 +12,8 @@ const AboutSection = () => {
           generations.
         </p>
         <p className="text-base font-body leading-relaxed text-muted-foreground sm:text-lg">
-          From the intricate zarbaft gold threadwork to delicate mirror embellishments, each piece is a wearable work
-          of art designed for the modern woman who honors tradition with grace.
+        From intricate handcrafted embroidery to delicate mirror embellishments, 
+        each piece is a wearable work of art designed for the modern woman who honors tradition with grace.
         </p>
       </div>
     </section> 

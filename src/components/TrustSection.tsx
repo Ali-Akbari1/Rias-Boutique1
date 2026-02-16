@@ -137,13 +137,13 @@ const TrustSection = () => {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          {trustBadges.map((badge, index) => (
+          {trustBadges.map((badge) => (
             <Card key={badge.id} className="border-border bg-background">
               <CardContent className="pt-6">
                 <div className="mb-3 inline-flex rounded-full bg-muted p-2 text-primary">
-                  {index === 0 && <ShieldCheck className="h-5 w-5" />}
-                  {index === 1 && <BadgeCheck className="h-5 w-5" />}
-                  {index === 2 && <Truck className="h-5 w-5" />}
+                  {badge.id === "custom-orders" && <BadgeCheck className="h-5 w-5" />}
+                  {badge.id === "authentic-craft" && <ShieldCheck className="h-5 w-5" />}
+                  {badge.id === "tracked-shipping" && <Truck className="h-5 w-5" />}
                 </div>
                 <p className="font-display text-xl font-semibold text-foreground">{badge.label}</p>
                 <p className="mt-2 font-body text-sm text-muted-foreground">{badge.description}</p>

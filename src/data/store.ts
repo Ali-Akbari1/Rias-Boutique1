@@ -71,9 +71,9 @@ export const faqItems: FaqItem[] = [
 
 export const trustBadges: TrustBadgeItem[] = [
   {
-    id: "secure-checkout",
-    label: "Secure Checkout",
-    description: "SSL-encrypted checkout with Stripe payment processing.",
+    id: "custom-orders",
+    label: "Custom Orders",
+    description: "Need a unique design or special sizing? Place a custom order directly with our team.",
   },
   {
     id: "authentic-craft",
@@ -81,9 +81,9 @@ export const trustBadges: TrustBadgeItem[] = [
     description: "Hand-finished embroidery by Afghan artisans.",
   },
   {
-    id: "easy-returns",
-    label: "Easy Returns",
-    description: "Simple 14-day return and exchange process.",
+    id: "tracked-shipping",
+    label: "Tracked Shipping",
+    description: "Reliable tracked delivery across Canada and the US.",
   },
 ];
 
