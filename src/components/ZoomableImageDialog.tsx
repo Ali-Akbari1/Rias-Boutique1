@@ -205,7 +205,14 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         hideCloseButton
-        className="relative flex h-[95vh] w-[95vw] max-w-5xl flex-col gap-3 overflow-hidden p-3 sm:p-5"
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        className="flex max-h-[95vh] w-[95vw] max-w-5xl flex-col gap-3 overflow-hidden p-3 sm:p-5"
+        style={{
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          height: "95vh",
+        }}
       >
         <DialogClose asChild>
           <button
