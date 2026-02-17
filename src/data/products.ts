@@ -138,11 +138,11 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
     stripePriceId: getString(product.stripePriceId) || stripePrice(id),
     sizes: sizes.length > 0 ? sizes : ["One Size"],
     colors: colors.length > 0 ? colors : ["Default"],
-    fabric: getString(product.fabric) || "Details coming soon.",
-    fitInfo: getString(product.fitInfo) || "Fit details coming soon.",
+    fabric: getString(product.fabric) || "Please contact us for detailed fabric information.",
+    fitInfo: getString(product.fitInfo) || "Please contact us for detailed sizing and fit information.",
     careInstructions:
       careInstructions.length > 0 ? careInstructions : ["Care instructions available upon request."],
-    deliveryEstimate: getString(product.deliveryEstimate) || "Delivery estimate provided at checkout.",
+    deliveryEstimate: getString(product.deliveryEstimate) || "You will receive an estimated delivery date upon completing your order.",
     popularity: Math.min(100, Math.max(0, getNumber(product.popularity, 0))),
     createdAt,
   };
