@@ -41,7 +41,7 @@ const initialForm: CheckoutForm = {
   city: "",
   state: "",
   postalCode: "",
-  country: "United States",
+  country: "Canada",
 };
 
 const Checkout = () => {
