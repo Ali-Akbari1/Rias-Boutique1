@@ -142,6 +142,32 @@
       "description": "White velvet dress with wide-leg pants, featuring handmade cheerma. \n",
       "category": "Party Wear",
       "fitInfo": "Bust: 42in \nSleeves: 22in\nShoulders: 16in\nLength of Pants: 38in \n\n3 pieces: Dress, Pants, Chadar\n"
+    },
+    {
+      "fabric": "Velvet",
+      "price": 380,
+      "galleryImages": [
+        "/uploads/img_8937.jpg",
+        "/uploads/8adc8535-3f0b-45b6-bebb-95e59dad9d57.jpg",
+        "/uploads/1b047b84-020c-4504-85a1-d6f348628fd1.jpg"
+      ],
+      "name": "Black Dress",
+      "slug": "Black-Gulabatoon-dress",
+      "colors": [
+        "Black with Gold "
+      ],
+      "sizes": [
+        "Large (44in)"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Black-Gulabatoon-dress",
+      "createdAt": "2026-02-17",
+      "image": "/uploads/img_8937.jpg",
+      "description": "Black velvet dress with wide-leg pants, featuring gulabatoon detailing.",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39th"
     }
   ]
 }
