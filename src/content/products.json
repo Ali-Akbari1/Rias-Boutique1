@@ -135,7 +135,7 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
-      "id": "White-cheerma",
+      "id": "White-cheerma-with-gold",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_8832-2.jpg",
       "inventory": 0,
@@ -168,6 +168,32 @@
       "description": "Black velvet dress with wide-leg pants, featuring gulabatoon detailing.",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39th\n\n3 pieces: Dress, Pants, and Chadar"
+    },
+    {
+      "fabric": "Velvet",
+      "price": 400,
+      "galleryImages": [
+        "/uploads/img_8861.jpg",
+        "/uploads/img_8859.jpg",
+        "/uploads/img_8857.jpg"
+      ],
+      "name": "White Velvet Cheerma Dress",
+      "slug": "White-cheerma-white",
+      "colors": [
+        "White and Silver "
+      ],
+      "sizes": [
+        "Large (44in)"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "White-cheerma-white",
+      "createdAt": "2026-02-17",
+      "image": "/uploads/img_8861.jpg",
+      "description": "White velvet dress with wide-leg pants, featuring handmade silver cheerma.",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39in "
     }
   ]
 }
