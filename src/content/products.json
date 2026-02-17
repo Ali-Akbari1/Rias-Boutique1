@@ -40,11 +40,15 @@
       "sizes": [
         "Large (44in)"
       ],
-      "id": "2",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Green-Bridal-Dress",
       "createdAt": "2026-02-16",
       "image": "/uploads/bridalgreencover.jpg",
       "description": "Green bridal banaras dress with handmade cheerma",
-      "category": "Bridal"
+      "category": "Bridal",
+      "fitInfo": "Bust: 44in\nSleeves: 22in \nDress Length: 40in"
     },
     {
       "fabric": "Velvet ",
@@ -85,6 +89,29 @@
       "description": "3 piece velvet suit with gulabatoon embroidery\n",
       "category": "Formal",
       "fitInfo": "Bust: 40in\nTop Length: 36in\nPants Length: 38in\n"
+    },
+    {
+      "fabric": "Shawl",
+      "price": 350,
+      "galleryImages": [
+        "/uploads/img_0628.jpg",
+        "/uploads/img_0670.jpg",
+        "/uploads/img_0675.jpg",
+        "/uploads/img_0674.jpg"
+      ],
+      "name": "Handmade Hazaragi Dress",
+      "slug": "Handmade-Hazaragi-Dress",
+      "sizes": [
+        "Small "
+      ],
+      "careInstructions": [
+        "Dry Clean Only "
+      ],
+      "id": "Handmade Hazaragi Dress",
+      "image": "/uploads/img_0628.jpg",
+      "description": "Handmade Hazaragi dress with mirror work\n\n2 pieces\n",
+      "category": "Formal",
+      "fitInfo": "Bust: 36in \nWaist: 32in \nLength of Pants: 35in"
     }
   ]
 }
