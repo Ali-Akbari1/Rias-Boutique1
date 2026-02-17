@@ -18,7 +18,7 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
-      "id": "1",
+      "id": "Burgundy-Bridal-Dress",
       "createdAt": "2026-02-14",
       "image": "/uploads/full-photo.jpg",
       "deliveryEstimate": "",
@@ -58,11 +58,11 @@
         "/uploads/img_0666.jpg"
       ],
       "name": "Blue Long Cheerma Dozi Dress",
-      "slug": "Blue-cheerma-dozi",
+      "slug": "Blue-Cheerma-Dozi",
       "careInstructions": [
         "Dry Clean Only"
       ],
-      "id": "3",
+      "id": "Blue-Cheerma-Dozi",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0557.jpg",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
@@ -84,11 +84,11 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
-      "id": "3",
+      "id": "Royal-Blue",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0667.jpg",
       "description": "3 piece velvet suit with gulabatoon embroidery\n",
-      "category": "Formal",
+      "category": "Party Wear",
       "fitInfo": "Bust: 40in\nTop Length: 36in\nPants Length: 38in\n"
     },
     {
@@ -108,7 +108,7 @@
       "careInstructions": [
         "Dry Clean Only "
       ],
-      "id": "Handmade Hazaragi Dress",
+      "id": "Handmade-Hazaragi-Dress",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0628.jpg",
       "description": "Handmade Hazaragi dress with mirror work\n\n2 pieces\n",
