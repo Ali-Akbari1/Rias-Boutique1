@@ -88,12 +88,12 @@
     },
     {
       "fabric": "Shawl",
-      "price": 349,
+      "price": 350,
       "galleryImages": [
+        "/uploads/img_0628.jpg",
         "/uploads/img_0670.jpg",
         "/uploads/img_0675.jpg",
-        "/uploads/img_0674.jpg",
-        null
+        "/uploads/img_0674.jpg"
       ],
       "name": "Handmade Hazaragi Dress",
       "slug": "Handmade-Hazaragi-Dress",
@@ -104,8 +104,8 @@
         "Dry Clean Only "
       ],
       "id": "Handmade Hazaragi Dress",
-      "image": "/uploads/img_0670.jpg",
-      "description": "Handmade Hazaragi dress with mirror work\n",
+      "image": "/uploads/img_0628.jpg",
+      "description": "Handmade Hazaragi dress with mirror work\n\n2 pieces\n",
       "category": "Formal",
       "fitInfo": "Bust: 36in \nWaist: 32in \nLength of Pants: 35in"
     }
