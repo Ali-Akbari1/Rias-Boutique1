@@ -83,7 +83,7 @@ export const trustBadges: TrustBadgeItem[] = [
   {
     id: "tracked-shipping",
     label: "Tracked Shipping",
-    description: "Reliable tracked delivery across Canada and the US.",
+    description: "Reliable tracked delivery across the world.",
   },
 ];
 

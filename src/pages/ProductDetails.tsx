@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, Search, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
+import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
 import { getProductById } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
@@ -268,8 +268,8 @@ const ProductDetails = () => {
 
         <section className="grid gap-4 rounded-md border border-border bg-card/40 p-4 sm:grid-cols-3 sm:p-5">
           <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <ShieldCheck className="h-4 w-4 text-primary" />
-            Secure payment processing
+            <BadgeCheck className="h-4 w-4 text-primary" />
+            Authentic craftsmanship
           </div>
           <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
             <Truck className="h-4 w-4 text-primary" />
@@ -277,7 +277,7 @@ const ProductDetails = () => {
           </div>
           <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
             <CheckCircle2 className="h-4 w-4 text-primary" />
-            Easy size exchanges within 14 days
+            Custom orders available on request
           </div>
         </section>
       </main>

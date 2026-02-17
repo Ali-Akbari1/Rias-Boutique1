@@ -203,18 +203,21 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent hideCloseButton className="relative w-[95vw] max-w-5xl p-4 pt-12 sm:p-6 sm:pt-14">
+      <DialogContent
+        hideCloseButton
+        className="relative flex h-[95vh] w-[95vw] max-w-5xl flex-col gap-3 overflow-hidden p-3 sm:p-5"
+      >
         <DialogClose asChild>
           <button
             type="button"
-            className="absolute right-3 top-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-sm border border-border bg-background/90 text-foreground transition-colors hover:bg-secondary"
+            className="absolute right-2 top-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-sm border border-border bg-background/90 text-foreground transition-colors hover:bg-secondary sm:right-3 sm:top-3"
             aria-label="Close image preview"
           >
             <X className="h-4 w-4" />
           </button>
         </DialogClose>
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 pr-11">
           <DialogTitle className="line-clamp-1 text-sm sm:text-base">{title}</DialogTitle>
           <div className="flex items-center gap-2">
             <Button
@@ -245,7 +248,7 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
         </div>
 
         <div
-          className="h-[72vh] overflow-hidden rounded-md border border-border bg-muted/20 touch-none"
+          className="min-h-0 flex-1 overflow-hidden rounded-md border border-border bg-muted/20 touch-none"
           onWheel={handleWheel}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
