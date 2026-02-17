@@ -19,7 +19,6 @@
         "Dry Clean Only"
       ],
       "id": "Burgundy-Bridal-Dress",
-      "inventory": 4,
       "createdAt": "2026-02-14",
       "image": "/uploads/full-photo.jpg",
       "deliveryEstimate": "",
@@ -45,7 +44,6 @@
         "Dry Clean Only"
       ],
       "id": "Green-Bridal-Dress",
-      "inventory": 3,
       "createdAt": "2026-02-16",
       "image": "/uploads/bridalgreencover.jpg",
       "description": "Green bridal banaras dress with handmade cheerma",
@@ -65,7 +63,6 @@
         "Dry Clean Only"
       ],
       "id": "Blue-Cheerma-Dozi",
-      "inventory": 5,
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0557.jpg",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
@@ -88,7 +85,6 @@
         "Dry Clean Only"
       ],
       "id": "Royal-Blue",
-      "inventory": 6,
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0667.jpg",
       "description": "3 piece velvet suit with gulabatoon embroidery\n",
@@ -113,12 +109,65 @@
         "Dry Clean Only "
       ],
       "id": "Handmade-Hazaragi-Dress",
-      "inventory": 4,
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0628.jpg",
       "description": "Handmade Hazaragi dress with mirror work\n\n2 pieces\n",
       "category": "Formal",
       "fitInfo": "Bust: 36in \nWaist: 32in \nLength of Pants: 35in"
+    },
+    {
+      "fabric": "Velvet",
+      "price": 400,
+      "galleryImages": [
+        "/uploads/img_8832-2.jpg",
+        "/uploads/whitecheerma.jpg",
+        "/uploads/img_8831-2.jpg",
+        "/uploads/img_8834-2.jpg"
+      ],
+      "name": "White Cheerma Dress",
+      "slug": "White-cheerma",
+      "colors": [
+        "White "
+      ],
+      "sizes": [
+        "Medium (42in) "
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "White-cheerma",
+      "createdAt": "2026-02-17",
+      "image": "/uploads/img_8832-2.jpg",
+      "inventory": 0,
+      "description": "White velvet dress with wide-leg pants, featuring handmade cheerma. \n",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 42in \nSleeves: 22in\nShoulders: 16in\nLength of Pants: 38in \n\n3 pieces: Dress, Pants, Chadar\n"
+    },
+    {
+      "fabric": "Velvet",
+      "price": 380,
+      "galleryImages": [
+        "/uploads/img_8937.jpg",
+        "/uploads/8adc8535-3f0b-45b6-bebb-95e59dad9d57.jpg",
+        "/uploads/1b047b84-020c-4504-85a1-d6f348628fd1.jpg"
+      ],
+      "name": "Black Velvet Gulabatoon Dress",
+      "slug": "Black-Gulabatoon-dress",
+      "colors": [
+        "Black with Gold "
+      ],
+      "sizes": [
+        "Large (44in)"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Black-Gulabatoon-dress",
+      "createdAt": "2026-02-17",
+      "image": "/uploads/img_8937.jpg",
+      "description": "Black velvet dress with wide-leg pants, featuring gulabatoon detailing.",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39th\n\n3 pieces: Dress, Pants, and Chadar"
     }
   ]
 }
