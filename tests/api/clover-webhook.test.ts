@@ -3,11 +3,11 @@ import { createHmac } from "node:crypto";
 import { rmSync } from "node:fs";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import checkoutHandler from "./clover-checkout";
-import webhookHandler from "./clover-webhook";
-import orderStatusHandler from "./order-status";
-import { createMockRequest, createMockResponse } from "./test/utils";
-import { closeOrderStoreForTests, getInventoryQuantity, resetOrderStoreForTests } from "./lib/order-store";
+import checkoutHandler from "../../api/clover-checkout";
+import webhookHandler from "../../api/clover-webhook";
+import orderStatusHandler from "../../api/order-status";
+import { createMockRequest, createMockResponse } from "./test-utils/utils";
+import { closeOrderStoreForTests, getInventoryQuantity, resetOrderStoreForTests } from "../../server/lib/order-store.js";
 
 const TEST_DB_PATH = path.resolve(process.cwd(), "data", "test-commerce-webhook.sqlite");
 const WEBHOOK_SECRET = "webhook_secret_test";

@@ -4,8 +4,8 @@ import {
   sendError,
   type ApiRequest,
   type ApiResponse,
-} from "./lib/http";
-import { checkRateLimit, applyRateLimitHeaders } from "./lib/rate-limit";
+} from "../server/lib/http.js";
+import { checkRateLimit, applyRateLimitHeaders } from "../server/lib/rate-limit.js";
 import {
   buildAllowedOrigins,
   buildCheckoutIdempotencyKey,
@@ -14,9 +14,9 @@ import {
   looksAutomatedTraffic,
   validateOrigin,
   verifyCartToken,
-} from "./lib/security";
-import { checkoutRequestSchema } from "./lib/checkout-schema";
-import { getCatalogMap, loadCatalog } from "./lib/product-catalog";
+} from "../server/lib/security.js";
+import { checkoutRequestSchema } from "../server/lib/checkout-schema.js";
+import { getCatalogMap, loadCatalog } from "../server/lib/product-catalog.js";
 import {
   attachCheckoutSession,
   createPendingOrder,
@@ -24,8 +24,8 @@ import {
   markOrderFailed,
   seedInventoryFromCatalog,
   type OrderLineItem,
-} from "./lib/order-store";
-import { createCloverCheckoutSession } from "./lib/clover";
+} from "../server/lib/order-store.js";
+import { createCloverCheckoutSession } from "../server/lib/clover.js";
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
@@ -69,13 +69,13 @@ const validateServerConfiguration = () => {
 };
 
 const toShippingFingerprint = (customer: {
-  address: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
 }) =>
-  [customer.address, customer.city, customer.state, customer.postalCode, customer.country]
+  [customer.address || "", customer.city || "", customer.state || "", customer.postalCode || "", customer.country || ""]
     .map((part) => part.trim().toLowerCase())
     .join("|");
 

@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import type { CatalogProduct } from "./product-catalog";
+import type { CatalogProduct } from "./product-catalog.js";
 
 export type PaymentStatus = "pending" | "paid" | "failed" | "canceled";
 
@@ -60,7 +60,7 @@ const nowIso = () => new Date().toISOString();
 const DEFAULT_DB_PATH = path.resolve(process.cwd(), "data", "commerce.sqlite");
 const resolveDbPath = () => process.env.ORDER_DB_PATH?.trim() || DEFAULT_DB_PATH;
 
-const schemaPath = path.resolve(process.cwd(), "api", "db", "schema.sql");
+const schemaPath = path.resolve(process.cwd(), "server", "db", "schema.sql");
 const schemaSql = readFileSync(schemaPath, "utf8");
 
 const ensureParentDirectory = (filePath: string) => {

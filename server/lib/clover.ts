@@ -1,4 +1,4 @@
-import { normalizeErrorMessage } from "./http";
+import { normalizeErrorMessage } from "./http.js";
 
 interface CloverLineItemPayload {
   name: string;

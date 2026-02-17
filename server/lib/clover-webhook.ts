@@ -1,4 +1,4 @@
-import { createDeterministicHash } from "./http";
+import { createDeterministicHash } from "./http.js";
 
 interface ParsedCloverWebhook {
   eventId: string;

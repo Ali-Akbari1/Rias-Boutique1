@@ -2,9 +2,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { rmSync } from "node:fs";
 import path from "node:path";
-import handler from "./clover-checkout";
-import { createMockRequest, createMockResponse } from "./test/utils";
-import { closeOrderStoreForTests, resetOrderStoreForTests } from "./lib/order-store";
+import handler from "../../api/clover-checkout";
+import { createMockRequest, createMockResponse } from "./test-utils/utils";
+import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
 
 const TEST_DB_PATH = path.resolve(process.cwd(), "data", "test-commerce-checkout.sqlite");
 

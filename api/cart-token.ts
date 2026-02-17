@@ -1,7 +1,13 @@
 import { z } from "zod";
-import { parseJsonBody, readRawBody, sendError, type ApiRequest, type ApiResponse } from "./lib/http";
-import { buildAllowedOrigins, canonicalizeCartItems, createCartToken, getClientIp, validateOrigin } from "./lib/security";
-import { applyRateLimitHeaders, checkRateLimit } from "./lib/rate-limit";
+import { parseJsonBody, readRawBody, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import {
+  buildAllowedOrigins,
+  canonicalizeCartItems,
+  createCartToken,
+  getClientIp,
+  validateOrigin,
+} from "../server/lib/security.js";
+import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 
 const tokenRequestSchema = z
   .object({

@@ -5,16 +5,16 @@ import {
   sendError,
   type ApiRequest,
   type ApiResponse,
-} from "./lib/http";
-import { checkRateLimit, applyRateLimitHeaders } from "./lib/rate-limit";
+} from "../server/lib/http.js";
+import { checkRateLimit, applyRateLimitHeaders } from "../server/lib/rate-limit.js";
 import {
   getClientIp,
   verifyWebhookSignature,
   verifyWebhookTimestamp,
   validateOrigin,
   buildAllowedOrigins,
-} from "./lib/security";
-import { parseCloverWebhook } from "./lib/clover-webhook";
+} from "../server/lib/security.js";
+import { parseCloverWebhook } from "../server/lib/clover-webhook.js";
 import {
   findOrderByCheckoutId,
   findOrderById,
@@ -23,8 +23,8 @@ import {
   markOrderPaidAndDecrementInventory,
   markWebhookProcessed,
   upsertWebhookEvent,
-} from "./lib/order-store";
-import { sendOrderConfirmationEmail } from "./lib/email";
+} from "../server/lib/order-store.js";
+import { sendOrderConfirmationEmail } from "../server/lib/email.js";
 
 const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_RATE_WINDOW_MS = 60_000;

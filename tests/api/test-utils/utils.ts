@@ -1,4 +1,4 @@
-import type { ApiRequest, ApiResponse } from "../lib/http";
+import type { ApiRequest, ApiResponse } from "../../../server/lib/http.js";
 
 export interface MockResponse extends ApiResponse {
   statusCode: number;

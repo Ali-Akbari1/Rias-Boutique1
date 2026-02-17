@@ -1,6 +1,6 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
-import type { StoredOrder } from "./order-store";
+import type { StoredOrder } from "./order-store.js";
 
 const EMAIL_LOG_PATH = process.env.EMAIL_LOG_PATH?.trim() || path.resolve(process.cwd(), "data", "email-log.jsonl");
 

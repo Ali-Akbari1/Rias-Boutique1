@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import { asSingle, createDeterministicHash, getHeader, safeTimingCompare, type ApiRequest } from "./http";
+import { asSingle, createDeterministicHash, getHeader, safeTimingCompare, type ApiRequest } from "./http.js";
 
 const DEFAULT_ALLOWED_DEV_ORIGINS = new Set([
   "http://localhost:8080",
@@ -113,9 +113,15 @@ export const verifyWebhookTimestamp = (timestampHeader: string, toleranceMs: num
   return Math.abs(now - timestampMs) <= toleranceMs;
 };
 
-export const canonicalizeCartItems = (items: Array<{ productId: string; quantity: number }>) =>
+export const canonicalizeCartItems = (
+  items: Array<{ productId?: string | null; quantity?: number | null }>,
+) =>
   items
-    .map((item) => ({ productId: item.productId.trim(), quantity: item.quantity }))
+    .map((item) => ({
+      productId: String(item.productId || "").trim(),
+      quantity: Number(item.quantity),
+    }))
+    .filter((item) => item.productId.length > 0 && Number.isFinite(item.quantity) && item.quantity > 0)
     .sort((a, b) => a.productId.localeCompare(b.productId))
     .map((item) => `${item.productId}:${item.quantity}`)
     .join("|");

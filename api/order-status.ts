@@ -1,7 +1,7 @@
-import { findOrderByCheckoutId, findOrderById } from "./lib/order-store";
-import { getQueryValue, sendError, type ApiRequest, type ApiResponse } from "./lib/http";
-import { applyRateLimitHeaders, checkRateLimit } from "./lib/rate-limit";
-import { buildAllowedOrigins, getClientIp, validateOrigin } from "./lib/security";
+import { findOrderByCheckoutId, findOrderById } from "../server/lib/order-store.js";
+import { getQueryValue, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
+import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
 
 const DEFAULT_RATE_LIMIT = 120;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
