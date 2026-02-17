@@ -40,11 +40,15 @@
       "sizes": [
         "Large (44in)"
       ],
-      "id": "2",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Green-Bridal-Dress",
       "createdAt": "2026-02-16",
       "image": "/uploads/bridalgreencover.jpg",
       "description": "Green bridal banaras dress with handmade cheerma",
-      "category": "Bridal"
+      "category": "Bridal",
+      "fitInfo": "Bust: 44in\nSleeves: 22in \nDress Length: 40in"
     },
     {
       "fabric": "Velvet ",
