@@ -1,15 +1,11 @@
 /** @vitest-environment node */
 import { createHmac } from "node:crypto";
-import { rmSync } from "node:fs";
-import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import checkoutHandler from "../../api/clover-checkout";
 import webhookHandler from "../../api/clover-webhook";
 import orderStatusHandler from "../../api/order-status";
 import { createMockRequest, createMockResponse } from "./test-utils/utils";
 import { closeOrderStoreForTests, getInventoryQuantity, resetOrderStoreForTests } from "../../server/lib/order-store.js";
-
-const TEST_DB_PATH = path.resolve(process.cwd(), "data", "test-commerce-webhook.sqlite");
 const WEBHOOK_SECRET = "webhook_secret_test";
 
 const buildCheckoutRequestBody = () => ({
@@ -26,19 +22,18 @@ const buildCheckoutRequestBody = () => ({
 });
 
 describe("clover webhook flow", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.restoreAllMocks();
-    closeOrderStoreForTests();
-    rmSync(TEST_DB_PATH, { force: true });
+    process.env.ORDER_STORE_ADAPTER = "memory";
+    await closeOrderStoreForTests();
 
-    process.env.ORDER_DB_PATH = TEST_DB_PATH;
     process.env.CLOVER_MERCHANT_ID = "merchant_123";
     process.env.CLOVER_PRIVATE_TOKEN = "private_token_123";
     process.env.CLOVER_CHECKOUT_BASE_URL = "https://www.riasboutique.com";
     process.env.CLOVER_API_BASE_URL = "https://apisandbox.dev.clover.com";
     process.env.CLOVER_WEBHOOK_SECRET = WEBHOOK_SECRET;
 
-    resetOrderStoreForTests();
+    await resetOrderStoreForTests();
   });
 
   it("marks order as paid, decrements inventory, and is idempotent", async () => {
@@ -67,7 +62,7 @@ describe("clover webhook flow", () => {
     const orderId = (checkoutResponse.jsonBody as { orderId?: string }).orderId || "";
     expect(orderId).toBeTruthy();
 
-    const inventoryBefore = getInventoryQuantity("Royal-Blue");
+    const inventoryBefore = await getInventoryQuantity("Royal-Blue");
     expect(inventoryBefore).toBe(6);
 
     const webhookPayload = {
@@ -118,7 +113,7 @@ describe("clover webhook flow", () => {
       paymentStatus: "paid",
     });
 
-    const inventoryAfterFirstWebhook = getInventoryQuantity("Royal-Blue");
+    const inventoryAfterFirstWebhook = await getInventoryQuantity("Royal-Blue");
     expect(inventoryAfterFirstWebhook).toBe(5);
 
     const duplicateWebhookResponse = createMockResponse();
@@ -139,7 +134,7 @@ describe("clover webhook flow", () => {
     expect(duplicateWebhookResponse.jsonBody).toMatchObject({
       duplicate: true,
     });
-    expect(getInventoryQuantity("Royal-Blue")).toBe(5);
+    expect(await getInventoryQuantity("Royal-Blue")).toBe(5);
   });
 
   it("rejects invalid webhook signatures", async () => {
@@ -189,7 +184,7 @@ describe("clover webhook flow", () => {
     expect(checkoutResponse.statusCode).toBe(200);
     const orderId = (checkoutResponse.jsonBody as { orderId?: string }).orderId || "";
     expect(orderId).toBeTruthy();
-    expect(getInventoryQuantity("Royal-Blue")).toBe(6);
+    expect(await getInventoryQuantity("Royal-Blue")).toBe(6);
 
     const webhookPayload = {
       id: "evt_failed_1",
@@ -239,6 +234,6 @@ describe("clover webhook flow", () => {
       pending: false,
       paymentStatus: "failed",
     });
-    expect(getInventoryQuantity("Royal-Blue")).toBe(6);
+    expect(await getInventoryQuantity("Royal-Blue")).toBe(6);
   });
 });

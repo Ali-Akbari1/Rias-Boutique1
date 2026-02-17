@@ -1,12 +1,8 @@
 /** @vitest-environment node */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { rmSync } from "node:fs";
-import path from "node:path";
 import handler from "../../api/clover-checkout";
 import { createMockRequest, createMockResponse } from "./test-utils/utils";
 import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
-
-const TEST_DB_PATH = path.resolve(process.cwd(), "data", "test-commerce-checkout.sqlite");
 
 const makeCheckoutBody = () => ({
   customer: {
@@ -22,18 +18,17 @@ const makeCheckoutBody = () => ({
 });
 
 describe("clover checkout endpoint", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.restoreAllMocks();
 
-    closeOrderStoreForTests();
-    rmSync(TEST_DB_PATH, { force: true });
-    process.env.ORDER_DB_PATH = TEST_DB_PATH;
+    process.env.ORDER_STORE_ADAPTER = "memory";
+    await closeOrderStoreForTests();
     process.env.CLOVER_MERCHANT_ID = "merchant_123";
     process.env.CLOVER_PRIVATE_TOKEN = "private_token_123";
     process.env.CLOVER_CHECKOUT_BASE_URL = "https://www.riasboutique.com";
     process.env.CLOVER_API_BASE_URL = "https://apisandbox.dev.clover.com";
 
-    resetOrderStoreForTests();
+    await resetOrderStoreForTests();
   });
 
   it("rejects malformed/tampered cart payload", async () => {

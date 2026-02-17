@@ -93,6 +93,10 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `CLOVER_CHECKOUT_BASE_URL`: HTTPS site URL used for success/failure redirects.
 - `CLOVER_ENABLE_TIPS`: Optional `true`/`false` to enable tips in hosted checkout.
 - `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
+- `SUPABASE_URL`: Supabase project URL for server-side order persistence.
+- `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key used by serverless checkout/webhook/order endpoints.
+- `VITE_SUPABASE_URL`: Optional client URL if frontend calls Supabase directly.
+- `VITE_SUPABASE_ANON_KEY`: Optional client anon key if frontend calls Supabase directly.
 - `GOOGLE_PLACES_API_KEY`: For `/api/google-reviews`.
 - `GOOGLE_PLACE_ID`: For `/api/google-reviews`.
 - `GITHUB_OAUTH_CLIENT_ID`: For Decap GitHub auth.
@@ -108,9 +112,13 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
    - `CLOVER_MERCHANT_ID`
    - `CLOVER_PRIVATE_TOKEN`
    - `CLOVER_CHECKOUT_BASE_URL` (must be `https://...`)
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
 4. Restart/redeploy.
 
 When checkout starts, frontend posts cart/customer data to `api/clover-checkout`, the server creates a Clover checkout session, and the user is redirected to Clover's hosted payment page.
+
+Before first live checkout, run `server/db/schema.sql` in your Supabase SQL Editor.
 
 ## Product content model
 

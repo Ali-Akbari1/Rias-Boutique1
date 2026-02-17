@@ -1,8 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { mkdirSync, readFileSync } from "node:fs";
-import path from "node:path";
-import { DatabaseSync } from "node:sqlite";
 import type { CatalogProduct } from "./product-catalog.js";
+import { getSupabaseAdminClient, hasSupabaseAdminConfig } from "./supabase-admin.js";
 
 export type PaymentStatus = "pending" | "paid" | "failed" | "canceled";
 
@@ -52,149 +50,253 @@ interface CreatePendingOrderInput {
   totalMinor: number;
 }
 
-let database: DatabaseSync | null = null;
-let activeDbPath = "";
+interface SupabaseErrorLike {
+  message: string;
+  code?: string;
+}
+
+interface InventoryRecord {
+  quantity: number | null;
+  updatedAt: string;
+}
+
+interface WebhookEventRecord {
+  eventId: string;
+  eventType: string;
+  orderId: string;
+  payloadJson: string;
+  receivedAt: string;
+  processed: boolean;
+}
 
 const nowIso = () => new Date().toISOString();
+const DEFAULT_CURRENCY = "CAD";
 
-const DEFAULT_DB_PATH = path.resolve(process.cwd(), "data", "commerce.sqlite");
-const resolveDbPath = () => process.env.ORDER_DB_PATH?.trim() || DEFAULT_DB_PATH;
+const isMemoryStoreEnabled = () => process.env.ORDER_STORE_ADAPTER?.trim().toLowerCase() === "memory";
+export const isOrderStoreConfigured = () => isMemoryStoreEnabled() || hasSupabaseAdminConfig();
 
-const schemaPath = path.resolve(process.cwd(), "server", "db", "schema.sql");
-const schemaSql = readFileSync(schemaPath, "utf8");
+const memoryOrders = new Map<string, StoredOrder>();
+const memoryInventory = new Map<string, InventoryRecord>();
+const memoryWebhookEvents = new Map<string, WebhookEventRecord>();
 
-const ensureParentDirectory = (filePath: string) => {
-  const parent = path.dirname(filePath);
-  mkdirSync(parent, { recursive: true });
-};
-
-const toStringValue = (value: unknown) => (typeof value === "string" ? value : "");
-const toNumberValue = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : 0);
-
-const parseOrderRow = (row: Record<string, unknown>): StoredOrder => ({
-  id: toStringValue(row.id),
-  paymentStatus: (toStringValue(row.payment_status) as PaymentStatus) || "pending",
-  idempotencyKey: toStringValue(row.idempotency_key),
-  cloverCheckoutId: toStringValue(row.clover_checkout_id),
-  cloverCheckoutUrl: toStringValue(row.clover_checkout_url),
-  paymentReference: toStringValue(row.payment_reference),
-  currency: toStringValue(row.currency) || "CAD",
-  subtotalMinor: toNumberValue(row.subtotal_minor),
-  totalMinor: toNumberValue(row.total_minor),
-  customer: JSON.parse(toStringValue(row.customer_json) || "{}") as OrderCustomer,
-  lineItems: JSON.parse(toStringValue(row.line_items_json) || "[]") as OrderLineItem[],
-  createdAt: toStringValue(row.created_at),
-  updatedAt: toStringValue(row.updated_at),
-  paidAt: toStringValue(row.paid_at),
-  confirmationEmailSentAt: toStringValue(row.confirmation_email_sent_at),
-  lastError: toStringValue(row.last_error),
+const cloneOrder = (order: StoredOrder): StoredOrder => ({
+  ...order,
+  customer: { ...order.customer },
+  lineItems: order.lineItems.map((item) => ({ ...item })),
 });
 
-const getDb = () => {
-  const dbPath = resolveDbPath();
+const asString = (value: unknown) => (typeof value === "string" ? value : "");
+const asNumber = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : 0);
+const asObject = (value: unknown) => (typeof value === "object" && value !== null ? (value as Record<string, unknown>) : null);
 
-  if (database && activeDbPath === dbPath) {
-    return database;
+const asJsonField = <T>(value: unknown, fallback: T): T => {
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return fallback;
+    }
   }
 
-  if (database && activeDbPath !== dbPath) {
-    database.close();
-    database = null;
+  if (value !== null && typeof value === "object") {
+    return value as T;
   }
 
-  ensureParentDirectory(dbPath);
-  database = new DatabaseSync(dbPath);
-  activeDbPath = dbPath;
-  database.exec("PRAGMA foreign_keys = ON");
-  database.exec(schemaSql);
-  return database;
+  return fallback;
 };
 
-const runInTransaction = <T>(work: () => T): T => {
-  const db = getDb();
-  db.exec("BEGIN IMMEDIATE");
-  try {
-    const result = work();
-    db.exec("COMMIT");
-    return result;
-  } catch (error) {
-    db.exec("ROLLBACK");
-    throw error;
+const parseOrderRow = (row: Record<string, unknown>): StoredOrder => ({
+  id: asString(row.id),
+  paymentStatus: (asString(row.payment_status) as PaymentStatus) || "pending",
+  idempotencyKey: asString(row.idempotency_key),
+  cloverCheckoutId: asString(row.clover_checkout_id),
+  cloverCheckoutUrl: asString(row.clover_checkout_url),
+  paymentReference: asString(row.payment_reference),
+  currency: asString(row.currency) || DEFAULT_CURRENCY,
+  subtotalMinor: asNumber(row.subtotal_minor),
+  totalMinor: asNumber(row.total_minor),
+  customer: asJsonField<OrderCustomer>(row.customer_json, {
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "",
+  }),
+  lineItems: asJsonField<OrderLineItem[]>(row.line_items_json, []),
+  createdAt: asString(row.created_at),
+  updatedAt: asString(row.updated_at),
+  paidAt: asString(row.paid_at),
+  confirmationEmailSentAt: asString(row.confirmation_email_sent_at),
+  lastError: asString(row.last_error),
+});
+
+const ensureNoSupabaseError = (error: SupabaseErrorLike | null, context: string) => {
+  if (!error) {
+    return;
   }
+  throw new Error(`Unable to ${context}: ${error.message}`);
 };
 
-export const seedInventoryFromCatalog = (catalog: CatalogProduct[]) => {
-  const db = getDb();
-  const now = nowIso();
-  const statement = db.prepare(
-    "INSERT OR IGNORE INTO inventory (product_id, quantity, updated_at) VALUES (?, ?, ?)",
-  );
+const normalizePaymentReference = (value: string) => {
+  const normalized = value.trim();
+  return normalized || "";
+};
 
-  for (const product of catalog) {
-    statement.run(product.id, product.inventory, now);
+const findMemoryOrderBy = (predicate: (order: StoredOrder) => boolean) => {
+  for (const order of memoryOrders.values()) {
+    if (predicate(order)) {
+      return cloneOrder(order);
+    }
   }
+  return null;
 };
 
-export const findOrderById = (orderId: string) => {
-  const db = getDb();
-  const row = db.prepare("SELECT * FROM orders WHERE id = ?").get(orderId) as Record<string, unknown> | undefined;
-  return row ? parseOrderRow(row) : null;
+export const seedInventoryFromCatalog = async (catalog: CatalogProduct[]) => {
+  if (catalog.length === 0) {
+    return;
+  }
+
+  const seededAt = nowIso();
+  if (isMemoryStoreEnabled()) {
+    for (const product of catalog) {
+      if (!memoryInventory.has(product.id)) {
+        memoryInventory.set(product.id, {
+          quantity: product.inventory,
+          updatedAt: seededAt,
+        });
+      }
+    }
+    return;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const rows = catalog.map((product) => ({
+    product_id: product.id,
+    quantity: product.inventory,
+    updated_at: seededAt,
+  }));
+
+  const { error } = await supabase.from("inventory").upsert(rows, { onConflict: "product_id", ignoreDuplicates: true });
+  ensureNoSupabaseError(error, "seed inventory");
 };
 
-export const findOrderByCheckoutId = (checkoutId: string) => {
-  const db = getDb();
-  const row = db
-    .prepare("SELECT * FROM orders WHERE clover_checkout_id = ?")
-    .get(checkoutId) as Record<string, unknown> | undefined;
-  return row ? parseOrderRow(row) : null;
+export const findOrderById = async (orderId: string) => {
+  if (isMemoryStoreEnabled()) {
+    const order = memoryOrders.get(orderId);
+    return order ? cloneOrder(order) : null;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase.from("orders").select("*").eq("id", orderId).maybeSingle();
+  if (error && error.code !== "PGRST116") {
+    ensureNoSupabaseError(error, "load order by ID");
+  }
+  return data ? parseOrderRow(data as Record<string, unknown>) : null;
 };
 
-export const findOrderByIdempotencyKey = (idempotencyKey: string) => {
-  const db = getDb();
-  const row = db
-    .prepare("SELECT * FROM orders WHERE idempotency_key = ?")
-    .get(idempotencyKey) as Record<string, unknown> | undefined;
-  return row ? parseOrderRow(row) : null;
+export const findOrderByCheckoutId = async (checkoutId: string) => {
+  if (!checkoutId) {
+    return null;
+  }
+
+  if (isMemoryStoreEnabled()) {
+    return findMemoryOrderBy((order) => order.cloverCheckoutId === checkoutId);
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("clover_checkout_id", checkoutId)
+    .maybeSingle();
+  if (error && error.code !== "PGRST116") {
+    ensureNoSupabaseError(error, "load order by checkout ID");
+  }
+  return data ? parseOrderRow(data as Record<string, unknown>) : null;
 };
 
-export const createPendingOrder = (input: CreatePendingOrderInput) => {
-  const db = getDb();
-  const id = randomUUID();
+export const findOrderByIdempotencyKey = async (idempotencyKey: string) => {
+  if (!idempotencyKey) {
+    return null;
+  }
+
+  if (isMemoryStoreEnabled()) {
+    return findMemoryOrderBy((order) => order.idempotencyKey === idempotencyKey);
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("idempotency_key", idempotencyKey)
+    .maybeSingle();
+  if (error && error.code !== "PGRST116") {
+    ensureNoSupabaseError(error, "load order by idempotency key");
+  }
+  return data ? parseOrderRow(data as Record<string, unknown>) : null;
+};
+
+export const createPendingOrder = async (input: CreatePendingOrderInput) => {
   const createdAt = nowIso();
 
-  db.prepare(
-    `INSERT INTO orders (
-      id,
-      payment_provider,
-      payment_status,
-      idempotency_key,
-      currency,
-      subtotal_minor,
-      total_minor,
-      customer_json,
-      line_items_json,
-      created_at,
-      updated_at
-    ) VALUES (?, 'clover', 'pending', ?, 'CAD', ?, ?, ?, ?, ?, ?)`,
-  ).run(
-    id,
-    input.idempotencyKey,
-    input.subtotalMinor,
-    input.totalMinor,
-    JSON.stringify(input.customer),
-    JSON.stringify(input.lineItems),
-    createdAt,
-    createdAt,
-  );
-
-  const order = findOrderById(id);
-  if (!order) {
-    throw new Error("Failed to create pending order.");
+  if (isMemoryStoreEnabled()) {
+    const order: StoredOrder = {
+      id: randomUUID(),
+      paymentStatus: "pending",
+      idempotencyKey: input.idempotencyKey,
+      cloverCheckoutId: "",
+      cloverCheckoutUrl: "",
+      paymentReference: "",
+      currency: DEFAULT_CURRENCY,
+      subtotalMinor: input.subtotalMinor,
+      totalMinor: input.totalMinor,
+      customer: { ...input.customer },
+      lineItems: input.lineItems.map((lineItem) => ({ ...lineItem })),
+      createdAt,
+      updatedAt: createdAt,
+      paidAt: "",
+      confirmationEmailSentAt: "",
+      lastError: "",
+    };
+    memoryOrders.set(order.id, cloneOrder(order));
+    return cloneOrder(order);
   }
-  return order;
+
+  const orderId = randomUUID();
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.from("orders").insert({
+    id: orderId,
+    payment_provider: "clover",
+    payment_status: "pending",
+    idempotency_key: input.idempotencyKey,
+    currency: DEFAULT_CURRENCY,
+    subtotal_minor: input.subtotalMinor,
+    total_minor: input.totalMinor,
+    customer_json: input.customer,
+    line_items_json: input.lineItems,
+    created_at: createdAt,
+    updated_at: createdAt,
+  });
+
+  if (error?.code === "23505") {
+    const existing = await findOrderByIdempotencyKey(input.idempotencyKey);
+    if (existing) {
+      return existing;
+    }
+  }
+  ensureNoSupabaseError(error, "create pending order");
+
+  const insertedOrder = await findOrderById(orderId);
+  if (!insertedOrder) {
+    throw new Error("Failed to load pending order after creation.");
+  }
+  return insertedOrder;
 };
 
-export const attachCheckoutSession = ({
+export const attachCheckoutSession = async ({
   orderId,
   checkoutUrl,
   checkoutId,
@@ -203,22 +305,59 @@ export const attachCheckoutSession = ({
   checkoutUrl: string;
   checkoutId: string;
 }) => {
-  const db = getDb();
-  db.prepare(
-    "UPDATE orders SET clover_checkout_url = ?, clover_checkout_id = ?, updated_at = ? WHERE id = ?",
-  ).run(checkoutUrl, checkoutId || null, nowIso(), orderId);
+  if (isMemoryStoreEnabled()) {
+    const existing = memoryOrders.get(orderId);
+    if (!existing) {
+      return;
+    }
+
+    existing.cloverCheckoutUrl = checkoutUrl;
+    existing.cloverCheckoutId = checkoutId;
+    existing.updatedAt = nowIso();
+    memoryOrders.set(orderId, cloneOrder(existing));
+    return;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      clover_checkout_url: checkoutUrl,
+      clover_checkout_id: checkoutId || null,
+      updated_at: nowIso(),
+    })
+    .eq("id", orderId);
+  ensureNoSupabaseError(error, "attach checkout session to order");
 };
 
-export const markOrderFailed = ({ orderId, errorMessage }: { orderId: string; errorMessage: string }) => {
-  const db = getDb();
-  db.prepare("UPDATE orders SET payment_status = 'failed', last_error = ?, updated_at = ? WHERE id = ? AND payment_status != 'paid'").run(
-    errorMessage,
-    nowIso(),
-    orderId,
-  );
+export const markOrderFailed = async ({ orderId, errorMessage }: { orderId: string; errorMessage: string }) => {
+  if (isMemoryStoreEnabled()) {
+    const existing = memoryOrders.get(orderId);
+    if (!existing || existing.paymentStatus === "paid") {
+      return;
+    }
+
+    existing.paymentStatus = "failed";
+    existing.lastError = errorMessage;
+    existing.updatedAt = nowIso();
+    memoryOrders.set(orderId, cloneOrder(existing));
+    return;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      payment_status: "failed",
+      last_error: errorMessage,
+      updated_at: nowIso(),
+    })
+    .eq("id", orderId)
+    .neq("payment_status", "paid");
+  ensureNoSupabaseError(error, "mark order as failed");
 };
 
-export const upsertWebhookEvent = ({
+export const upsertWebhookEvent = async ({
   eventId,
   eventType,
   orderId,
@@ -229,103 +368,207 @@ export const upsertWebhookEvent = ({
   orderId: string;
   payloadJson: string;
 }) => {
-  const db = getDb();
-  const result = db
-    .prepare(
-      "INSERT OR IGNORE INTO webhook_events (event_id, event_type, order_id, received_at, payload_json, processed) VALUES (?, ?, ?, ?, ?, 0)",
-    )
-    .run(eventId, eventType, orderId || null, nowIso(), payloadJson);
+  if (isMemoryStoreEnabled()) {
+    if (memoryWebhookEvents.has(eventId)) {
+      return false;
+    }
 
-  return result.changes > 0;
+    memoryWebhookEvents.set(eventId, {
+      eventId,
+      eventType,
+      orderId,
+      payloadJson,
+      receivedAt: nowIso(),
+      processed: false,
+    });
+    return true;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.from("webhook_events").insert({
+    event_id: eventId,
+    event_type: eventType,
+    order_id: orderId || null,
+    received_at: nowIso(),
+    payload_json: asJsonField(payloadJson, {}),
+    processed: false,
+  });
+
+  if (error?.code === "23505") {
+    return false;
+  }
+
+  ensureNoSupabaseError(error, "record webhook event");
+  return true;
 };
 
-export const markWebhookProcessed = (eventId: string) => {
-  const db = getDb();
-  db.prepare("UPDATE webhook_events SET processed = 1 WHERE event_id = ?").run(eventId);
+export const markWebhookProcessed = async (eventId: string) => {
+  if (isMemoryStoreEnabled()) {
+    const existing = memoryWebhookEvents.get(eventId);
+    if (!existing) {
+      return;
+    }
+    existing.processed = true;
+    memoryWebhookEvents.set(eventId, { ...existing });
+    return;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.from("webhook_events").update({ processed: true }).eq("event_id", eventId);
+  ensureNoSupabaseError(error, "mark webhook as processed");
 };
 
-export const markOrderPaidAndDecrementInventory = ({
+export const markOrderPaidAndDecrementInventory = async ({
   orderId,
   paymentReference,
 }: {
   orderId: string;
   paymentReference: string;
-}) =>
-  runInTransaction(() => {
-    const db = getDb();
-    const order = findOrderById(orderId);
+}) => {
+  if (isMemoryStoreEnabled()) {
+    const order = memoryOrders.get(orderId);
     if (!order) {
       throw new Error(`Order ${orderId} not found.`);
     }
 
     if (order.paymentStatus === "paid") {
-      return order;
+      return cloneOrder(order);
     }
 
-    const now = nowIso();
-    const upsertInventoryStatement = db.prepare(
-      "INSERT OR IGNORE INTO inventory (product_id, quantity, updated_at) VALUES (?, NULL, ?)",
-    );
-    const getInventoryStatement = db.prepare("SELECT quantity FROM inventory WHERE product_id = ?");
-    const decrementInventoryStatement = db.prepare(
-      "UPDATE inventory SET quantity = quantity - ?, updated_at = ? WHERE product_id = ?",
-    );
+    const paidAt = nowIso();
 
     for (const lineItem of order.lineItems) {
-      upsertInventoryStatement.run(lineItem.productId, now);
-      const inventoryRow = getInventoryStatement.get(lineItem.productId) as { quantity: number | null } | undefined;
+      if (!memoryInventory.has(lineItem.productId)) {
+        memoryInventory.set(lineItem.productId, {
+          quantity: null,
+          updatedAt: paidAt,
+        });
+      }
 
-      if (inventoryRow && typeof inventoryRow.quantity === "number") {
-        if (inventoryRow.quantity < lineItem.quantity) {
+      const inventory = memoryInventory.get(lineItem.productId);
+      if (!inventory) {
+        continue;
+      }
+
+      if (typeof inventory.quantity === "number") {
+        if (inventory.quantity < lineItem.quantity) {
           throw new Error(`Insufficient inventory for product ${lineItem.productId}.`);
         }
-        decrementInventoryStatement.run(lineItem.quantity, now, lineItem.productId);
+
+        inventory.quantity -= lineItem.quantity;
       }
+      inventory.updatedAt = paidAt;
+      memoryInventory.set(lineItem.productId, { ...inventory });
     }
 
-    db.prepare(
-      "UPDATE orders SET payment_status = 'paid', payment_reference = ?, paid_at = ?, updated_at = ?, last_error = '' WHERE id = ?",
-    ).run(paymentReference || null, now, now, orderId);
+    order.paymentStatus = "paid";
+    order.paymentReference = normalizePaymentReference(paymentReference);
+    order.paidAt = paidAt;
+    order.updatedAt = paidAt;
+    order.lastError = "";
+    memoryOrders.set(orderId, cloneOrder(order));
+    return cloneOrder(order);
+  }
 
-    const updated = findOrderById(orderId);
-    if (!updated) {
-      throw new Error(`Order ${orderId} could not be loaded after payment update.`);
-    }
-    return updated;
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase.rpc("mark_order_paid_and_decrement_inventory", {
+    p_order_id: orderId,
+    p_payment_reference: normalizePaymentReference(paymentReference) || null,
   });
+  ensureNoSupabaseError(error, "mark order as paid and decrement inventory");
 
-export const markConfirmationEmailSent = (orderId: string) => {
-  const db = getDb();
-  db.prepare("UPDATE orders SET confirmation_email_sent_at = ?, updated_at = ? WHERE id = ?").run(nowIso(), nowIso(), orderId);
+  const row = Array.isArray(data) ? data[0] : data;
+  if (asObject(row)) {
+    return parseOrderRow(row);
+  }
+
+  const updatedOrder = await findOrderById(orderId);
+  if (!updatedOrder) {
+    throw new Error(`Order ${orderId} could not be loaded after payment update.`);
+  }
+  return updatedOrder;
 };
 
-export const listOrders = () => {
-  const db = getDb();
-  const rows = db.prepare("SELECT * FROM orders ORDER BY created_at DESC").all() as Record<string, unknown>[];
-  return rows.map(parseOrderRow);
-};
+export const markConfirmationEmailSent = async (orderId: string) => {
+  const sentAt = nowIso();
 
-export const getInventoryQuantity = (productId: string) => {
-  const db = getDb();
-  const row = db.prepare("SELECT quantity FROM inventory WHERE product_id = ?").get(productId) as
-    | { quantity: number | null }
-    | undefined;
-  return row ? row.quantity : null;
-};
+  if (isMemoryStoreEnabled()) {
+    const order = memoryOrders.get(orderId);
+    if (!order) {
+      return;
+    }
 
-export const resetOrderStoreForTests = () => {
-  const db = getDb();
-  db.exec("DELETE FROM webhook_events");
-  db.exec("DELETE FROM inventory");
-  db.exec("DELETE FROM orders");
-};
-
-export const closeOrderStoreForTests = () => {
-  if (!database) {
+    order.confirmationEmailSentAt = sentAt;
+    order.updatedAt = sentAt;
+    memoryOrders.set(orderId, cloneOrder(order));
     return;
   }
 
-  database.close();
-  database = null;
-  activeDbPath = "";
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      confirmation_email_sent_at: sentAt,
+      updated_at: sentAt,
+    })
+    .eq("id", orderId);
+  ensureNoSupabaseError(error, "mark confirmation email as sent");
+};
+
+export const listOrders = async () => {
+  if (isMemoryStoreEnabled()) {
+    return [...memoryOrders.values()]
+      .map(cloneOrder)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
+  ensureNoSupabaseError(error, "list orders");
+  return (data || []).map((row) => parseOrderRow(row as Record<string, unknown>));
+};
+
+export const getInventoryQuantity = async (productId: string) => {
+  if (isMemoryStoreEnabled()) {
+    const record = memoryInventory.get(productId);
+    return record ? record.quantity : null;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("inventory")
+    .select("quantity")
+    .eq("product_id", productId)
+    .maybeSingle();
+
+  if (error && error.code !== "PGRST116") {
+    ensureNoSupabaseError(error, "read inventory quantity");
+  }
+
+  if (!data || typeof data !== "object") {
+    return null;
+  }
+  const row = data as Record<string, unknown>;
+  const quantity = row.quantity;
+  return typeof quantity === "number" ? quantity : null;
+};
+
+export const resetOrderStoreForTests = async () => {
+  if (!isMemoryStoreEnabled()) {
+    throw new Error("resetOrderStoreForTests is only available when ORDER_STORE_ADAPTER=memory.");
+  }
+
+  memoryOrders.clear();
+  memoryInventory.clear();
+  memoryWebhookEvents.clear();
+};
+
+export const closeOrderStoreForTests = async () => {
+  if (!isMemoryStoreEnabled()) {
+    return;
+  }
+
+  memoryOrders.clear();
+  memoryInventory.clear();
+  memoryWebhookEvents.clear();
 };

@@ -1,4 +1,4 @@
-import { findOrderByCheckoutId, findOrderById } from "../server/lib/order-store.js";
+import { findOrderByCheckoutId, findOrderById, isOrderStoreConfigured } from "../server/lib/order-store.js";
 import { getQueryValue, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
@@ -6,7 +6,7 @@ import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/
 const DEFAULT_RATE_LIMIT = 120;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
 
-export default function handler(req: ApiRequest, res: ApiResponse) {
+export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "GET") {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
     return;
@@ -32,6 +32,11 @@ export default function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
+  if (!isOrderStoreConfigured()) {
+    sendError(res, 500, "ORDER_STATUS_NOT_CONFIGURED", "Order status is not configured right now.");
+    return;
+  }
+
   const orderId = getQueryValue(req, "orderId").trim();
   const checkoutId = getQueryValue(req, "checkoutId").trim() || getQueryValue(req, "session_id").trim();
 
@@ -40,7 +45,7 @@ export default function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const order = orderId ? findOrderById(orderId) : findOrderByCheckoutId(checkoutId);
+  const order = orderId ? await findOrderById(orderId) : await findOrderByCheckoutId(checkoutId);
   if (!order) {
     sendError(res, 404, "ORDER_NOT_FOUND", "Order was not found.");
     return;

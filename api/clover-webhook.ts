@@ -18,6 +18,7 @@ import { parseCloverWebhook } from "../server/lib/clover-webhook.js";
 import {
   findOrderByCheckoutId,
   findOrderById,
+  isOrderStoreConfigured,
   markConfirmationEmailSent,
   markOrderFailed,
   markOrderPaidAndDecrementInventory,
@@ -68,6 +69,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
+  if (!isOrderStoreConfigured()) {
+    sendError(res, 500, "WEBHOOK_NOT_CONFIGURED", "Supabase order store is not configured on the server.");
+    return;
+  }
+
   const signatureHeader =
     getHeader(req, "x-clover-signature") ||
     getHeader(req, "clover-signature") ||
@@ -102,7 +108,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const parsed = parseCloverWebhook(payload, rawBody);
-  const order = parsed.orderId ? findOrderById(parsed.orderId) : findOrderByCheckoutId(parsed.checkoutId);
+  const order = parsed.orderId ? await findOrderById(parsed.orderId) : await findOrderByCheckoutId(parsed.checkoutId);
   if (!order) {
     // Ack unknown events to avoid provider retry storms.
     res.status(202).json({
@@ -114,7 +120,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const inserted = upsertWebhookEvent({
+  const inserted = await upsertWebhookEvent({
     eventId: parsed.eventId,
     eventType: parsed.eventType,
     orderId: order.id,
@@ -132,17 +138,17 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   try {
     if (parsed.isPaidEvent) {
-      const updatedOrder = markOrderPaidAndDecrementInventory({
+      const updatedOrder = await markOrderPaidAndDecrementInventory({
         orderId: order.id,
         paymentReference: parsed.paymentReference || parsed.checkoutId || parsed.eventId,
       });
 
       if (!updatedOrder.confirmationEmailSentAt) {
         await sendOrderConfirmationEmail(updatedOrder);
-        markConfirmationEmailSent(updatedOrder.id);
+        await markConfirmationEmailSent(updatedOrder.id);
       }
     } else if (parsed.eventType.includes("fail") || parsed.eventType.includes("cancel")) {
-      markOrderFailed({
+      await markOrderFailed({
         orderId: order.id,
         errorMessage: parsed.eventType.includes("cancel")
           ? "Checkout was canceled before payment confirmation."
@@ -150,7 +156,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       });
     }
 
-    markWebhookProcessed(parsed.eventId);
+    await markWebhookProcessed(parsed.eventId);
     res.status(200).json({
       received: true,
       processed: true,

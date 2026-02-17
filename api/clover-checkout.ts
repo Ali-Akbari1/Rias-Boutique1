@@ -21,6 +21,7 @@ import {
   attachCheckoutSession,
   createPendingOrder,
   findOrderByIdempotencyKey,
+  isOrderStoreConfigured,
   markOrderFailed,
   seedInventoryFromCatalog,
   type OrderLineItem,
@@ -136,6 +137,17 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
+  if (!isOrderStoreConfigured()) {
+    sendError(
+      res,
+      500,
+      "CHECKOUT_NOT_CONFIGURED",
+      "Checkout is not available right now. Please contact support.",
+      "Supabase order store is not configured.",
+    );
+    return;
+  }
+
   const cartCanonical = canonicalizeCartItems(payload.items);
   if (!cartCanonical) {
     sendError(res, 400, "EMPTY_CART", "Your cart is empty.");
@@ -159,7 +171,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const catalog = await loadCatalog();
-  seedInventoryFromCatalog(catalog);
+  await seedInventoryFromCatalog(catalog);
   const catalogMap = await getCatalogMap();
 
   const lineItems: OrderLineItem[] = [];
@@ -191,7 +203,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       shippingFingerprint,
     });
 
-  const existingOrder = findOrderByIdempotencyKey(idempotencyKey);
+  const existingOrder = await findOrderByIdempotencyKey(idempotencyKey);
   if (existingOrder?.cloverCheckoutUrl && existingOrder.paymentStatus === "pending") {
     res.status(200).json({
       checkoutUrl: existingOrder.cloverCheckoutUrl,
@@ -208,7 +220,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const order =
     existingOrder ||
-    createPendingOrder({
+    await createPendingOrder({
       idempotencyKey,
       customer: {
         fullName: payload.customer.fullName,
@@ -247,7 +259,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       timeoutMs: Number(process.env.CLOVER_TIMEOUT_MS || 12_000),
     });
 
-    attachCheckoutSession({
+    await attachCheckoutSession({
       orderId: order.id,
       checkoutUrl: session.checkoutUrl,
       checkoutId: session.checkoutId,
@@ -261,7 +273,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unable to start checkout right now. Please try again in a moment.";
-    markOrderFailed({ orderId: order.id, errorMessage: message });
+    try {
+      await markOrderFailed({ orderId: order.id, errorMessage: message });
+    } catch (storeError) {
+      console.error("[checkout] failed to persist order failure", storeError);
+    }
     sendError(res, 502, "CHECKOUT_PROVIDER_ERROR", message);
   }
 }

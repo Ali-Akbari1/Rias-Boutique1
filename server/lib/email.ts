@@ -1,13 +1,7 @@
-import { appendFileSync, mkdirSync } from "node:fs";
-import path from "node:path";
 import type { StoredOrder } from "./order-store.js";
+import { getSupabaseAdminClient, hasSupabaseAdminConfig } from "./supabase-admin.js";
 
-const EMAIL_LOG_PATH = process.env.EMAIL_LOG_PATH?.trim() || path.resolve(process.cwd(), "data", "email-log.jsonl");
-
-const ensureParentDirectory = (filePath: string) => {
-  const parent = path.dirname(filePath);
-  mkdirSync(parent, { recursive: true });
-};
+const isMemoryEmailLogEnabled = () => process.env.ORDER_STORE_ADAPTER?.trim().toLowerCase() === "memory";
 
 export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
   const timestamp = new Date().toISOString();
@@ -21,9 +15,27 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
     itemCount: order.lineItems.length,
   };
 
-  ensureParentDirectory(EMAIL_LOG_PATH);
-  appendFileSync(EMAIL_LOG_PATH, `${JSON.stringify(payload)}\n`, "utf8");
+  if (!isMemoryEmailLogEnabled()) {
+    if (!hasSupabaseAdminConfig()) {
+      throw new Error("Supabase is not configured for confirmation email logging.");
+    }
 
-  // Mock email transport for now. This can be replaced with SES/SendGrid provider integration.
-  console.log(`[email] confirmation queued`, payload);
+    const supabase = getSupabaseAdminClient();
+    const { error } = await supabase.from("email_logs").insert({
+      order_id: order.id,
+      to_email: order.customer.email,
+      subject: payload.subject,
+      payload_json: payload,
+      provider: "mock",
+      status: "queued",
+      sent_at: timestamp,
+    });
+
+    if (error) {
+      throw new Error(`Unable to record confirmation email log: ${error.message}`);
+    }
+  }
+
+  // Mock email transport for now. Replace with Resend/SendGrid provider integration when ready.
+  console.log("[email] confirmation queued", payload);
 };
