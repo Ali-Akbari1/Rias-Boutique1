@@ -65,16 +65,15 @@
       "id": "3",
       "image": "/uploads/img_0557.jpg",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
-      "category": "Formal"
+      "category": "Party Wear"
     },
     {
       "fabric": "Velvet ",
-      "price": 248,
+      "price": 250,
       "galleryImages": [
         "/uploads/img_0667.jpg",
         "/uploads/img_0668.jpg",
-        "/uploads/img_0669.jpg",
-        null
+        "/uploads/img_0669.jpg"
       ],
       "name": "Royal Blue 3 Piece Suit ",
       "slug": "Royal-Blue",
