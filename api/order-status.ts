@@ -1,0 +1,60 @@
+import { findOrderByCheckoutId, findOrderById } from "./lib/order-store";
+import { getQueryValue, sendError, type ApiRequest, type ApiResponse } from "./lib/http";
+import { applyRateLimitHeaders, checkRateLimit } from "./lib/rate-limit";
+import { buildAllowedOrigins, getClientIp, validateOrigin } from "./lib/security";
+
+const DEFAULT_RATE_LIMIT = 120;
+const DEFAULT_RATE_WINDOW_MS = 60_000;
+
+export default function handler(req: ApiRequest, res: ApiResponse) {
+  if (req.method !== "GET") {
+    sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
+    return;
+  }
+
+  const allowedOrigins = buildAllowedOrigins(
+    process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
+    process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
+  );
+  if (!validateOrigin(req, allowedOrigins)) {
+    sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
+    return;
+  }
+
+  const rateResult = checkRateLimit({
+    key: `order-status:${getClientIp(req)}`,
+    limit: Number(process.env.ORDER_STATUS_RATE_LIMIT || DEFAULT_RATE_LIMIT),
+    windowMs: Number(process.env.ORDER_STATUS_RATE_WINDOW_MS || DEFAULT_RATE_WINDOW_MS),
+  });
+  applyRateLimitHeaders(res.setHeader.bind(res), rateResult);
+  if (!rateResult.allowed) {
+    sendError(res, 429, "RATE_LIMITED", "Too many order status requests.");
+    return;
+  }
+
+  const orderId = getQueryValue(req, "orderId").trim();
+  const checkoutId = getQueryValue(req, "checkoutId").trim() || getQueryValue(req, "session_id").trim();
+
+  if (!orderId && !checkoutId) {
+    sendError(res, 400, "MISSING_IDENTIFIER", "Provide orderId or checkoutId.");
+    return;
+  }
+
+  const order = orderId ? findOrderById(orderId) : findOrderByCheckoutId(checkoutId);
+  if (!order) {
+    sendError(res, 404, "ORDER_NOT_FOUND", "Order was not found.");
+    return;
+  }
+
+  const confirmed = order.paymentStatus === "paid";
+  const pending = order.paymentStatus === "pending";
+
+  res.status(200).json({
+    orderId: order.id,
+    paymentStatus: order.paymentStatus,
+    confirmed,
+    pending,
+    createdAt: order.createdAt,
+    paidAt: order.paidAt || null,
+  });
+}

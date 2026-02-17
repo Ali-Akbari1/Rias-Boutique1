@@ -1,6 +1,6 @@
 # Ria's Boutique
 
-React + Vite storefront for handcrafted Afghan clothing, with product browsing, product detail pages, cart management, optional Stripe Checkout, Google Reviews integration, and Decap CMS editing at `/admin`.
+React + Vite storefront for handcrafted Afghan clothing, with product browsing, product detail pages, cart management, optional Clover Checkout, Google Reviews integration, and Decap CMS editing at `/admin`.
 
 Live site: `https://www.riasboutique.com`
 
@@ -9,7 +9,7 @@ Live site: `https://www.riasboutique.com`
 - Search, filter, and sort product collection.
 - Product detail pages with gallery, zoom, sizes, colors, and care details.
 - Cart drawer with quantity controls and subtotal.
-- Optional Stripe Checkout flow (`/checkout`, `/checkout/success`, `/checkout/cancel`).
+- Optional Clover Checkout flow (`/checkout`, `/checkout/success`, `/checkout/cancel`).
 - Google Reviews section with live fetch fallback to curated reviews.
 - Instagram highlights driven by environment config.
 - Decap CMS for non-coder product editing and media uploads.
@@ -21,7 +21,7 @@ Live site: `https://www.riasboutique.com`
 - Vite 5
 - Tailwind CSS + shadcn/ui (Radix)
 - React Router
-- Stripe JS
+- Clover Hosted Checkout API
 - Decap CMS
 - Vitest + Testing Library
 
@@ -71,8 +71,6 @@ Copy `.env.example` to `.env` and fill what you need.
 ### Client-side (`VITE_`)
 
 - `VITE_ENABLE_CHECKOUT`: `true` or `false` to enable checkout routes/buttons.
-- `VITE_STRIPE_PUBLISHABLE_KEY`: Required when checkout is enabled.
-- `VITE_STRIPE_PRICE_<PRODUCT_ID>`: Optional mapping when product JSON does not define `stripePriceId`.
 - `VITE_GOOGLE_REVIEWS_URL`: Fallback URL for review links.
 - `VITE_GOOGLE_LEAVE_REVIEW_URL`: Optional footer "Leave a Google Review" link.
 - `VITE_INSTAGRAM_PROFILE_URL`: Instagram profile link.
@@ -86,22 +84,30 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 
 ### Server-side (`api/*` on Vercel)
 
+- `CLOVER_API_BASE_URL`: Clover API base URL. Sandbox default is `https://apisandbox.dev.clover.com`.
+- `CLOVER_MERCHANT_ID`: Clover merchant ID.
+- `CLOVER_PRIVATE_TOKEN`: Clover private token for Hosted Checkout.
+- `CLOVER_CHECKOUT_BASE_URL`: HTTPS site URL used for success/failure redirects.
+- `CLOVER_ENABLE_TIPS`: Optional `true`/`false` to enable tips in hosted checkout.
+- `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
 - `GOOGLE_PLACES_API_KEY`: For `/api/google-reviews`.
 - `GOOGLE_PLACE_ID`: For `/api/google-reviews`.
 - `GITHUB_OAUTH_CLIENT_ID`: For Decap GitHub auth.
 - `GITHUB_OAUTH_CLIENT_SECRET`: For Decap GitHub auth.
 - `CMS_BASE_URL`: Base URL used by OAuth callbacks, e.g. `https://www.riasboutique.com`.
 
-## Stripe checkout setup
+## Clover checkout setup
 
-1. Set `VITE_ENABLE_CHECKOUT=true`.
-2. Set `VITE_STRIPE_PUBLISHABLE_KEY`.
-3. Assign a Stripe Price ID to every product:
-   - Preferred: add `stripePriceId` per product in `src/content/products.json`.
-   - Alternative: set matching `VITE_STRIPE_PRICE_<PRODUCT_ID>` env vars.
-4. Restart the dev server.
+1. In Clover dashboard, enable ecommerce + Hosted Checkout and create a private token.
+2. Set `VITE_ENABLE_CHECKOUT=true`.
+3. Add server env vars:
+   - `CLOVER_API_BASE_URL`
+   - `CLOVER_MERCHANT_ID`
+   - `CLOVER_PRIVATE_TOKEN`
+   - `CLOVER_CHECKOUT_BASE_URL` (must be `https://...`)
+4. Restart/redeploy.
 
-Checkout is intentionally disabled when Stripe config is incomplete.
+When checkout starts, frontend posts cart/customer data to `api/clover-checkout`, the server creates a Clover checkout session, and the user is redirected to Clover's hosted payment page.
 
 ## Product content model
 
@@ -149,7 +155,7 @@ Then open `http://localhost:8080/admin`.
 
 ## Testing
 
-Current tests are in `src/test/` and cover Stripe helper logic plus a basic smoke test.
+Current tests are in `src/test/` and cover checkout helper logic plus a basic smoke test.
 
 ```powershell
 npm run test
@@ -159,7 +165,11 @@ npm run test
 
 - Checkout button disabled:
   - Confirm `VITE_ENABLE_CHECKOUT=true`.
-  - Confirm Stripe publishable key and product Stripe price IDs are set.
+  - Confirm Clover server env vars are set in your deployment.
+- Unable to start Clover checkout:
+  - Confirm `CLOVER_CHECKOUT_BASE_URL` is HTTPS.
+  - Confirm `CLOVER_PRIVATE_TOKEN` and `CLOVER_MERCHANT_ID` are valid.
+  - For local testing, use an HTTPS tunnel URL (for example ngrok) as `CLOVER_CHECKOUT_BASE_URL`.
 - Live Google reviews not loading:
   - Check `GOOGLE_PLACES_API_KEY` and `GOOGLE_PLACE_ID`.
   - Site will fall back to static review content if API fetch fails.

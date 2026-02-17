@@ -9,7 +9,7 @@ export interface Product {
   galleryImages: string[];
   category: string;
   description: string;
-  stripePriceId?: string;
+  inventory?: number | null;
   sizes: string[];
   colors: string[];
   fabric: string;
@@ -29,7 +29,7 @@ interface RawProduct {
   galleryImages?: string[];
   category?: string;
   description?: string;
-  stripePriceId?: string;
+  inventory?: number | string | null;
   sizes?: string[];
   colors?: string[];
   fabric?: string;
@@ -43,9 +43,6 @@ interface RawProduct {
 interface ProductContent {
   products?: RawProduct[];
 }
-
-const env = import.meta.env as Record<string, string | undefined>;
-const stripePrice = (productId: string) => env[`VITE_STRIPE_PRICE_${productId}`];
 
 const productContent = rawProductContent as ProductContent;
 
@@ -125,6 +122,7 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
   const colors = getStringArray(product.colors, ["color", "label", "value", "name"]);
   const careInstructions = getStringArray(product.careInstructions, ["instruction", "text", "value"]);
   const createdAt = getString(product.createdAt) || new Date().toISOString().slice(0, 10);
+  const inventory = getNumber(product.inventory, NaN);
 
   return {
     id,
@@ -135,7 +133,7 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
     galleryImages: galleryImages.length > 0 ? galleryImages : [image],
     category: getString(product.category) || "Party Wear",
     description: getString(product.description),
-    stripePriceId: getString(product.stripePriceId) || stripePrice(id),
+    inventory: Number.isFinite(inventory) && inventory >= 0 ? Math.floor(inventory) : null,
     sizes: sizes.length > 0 ? sizes : ["One Size"],
     colors: colors.length > 0 ? colors : ["Default"],
     fabric: getString(product.fabric) || "Please contact us for detailed fabric information.",

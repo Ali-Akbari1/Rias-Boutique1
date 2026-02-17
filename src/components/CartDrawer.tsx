@@ -2,7 +2,7 @@ import { X, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { isCheckoutEnabled } from "@/lib/checkout";
-import { formatCad } from "@/lib/stripe";
+import { formatCad } from "@/lib/money";
 
 interface CartDrawerProps {
   open: boolean;

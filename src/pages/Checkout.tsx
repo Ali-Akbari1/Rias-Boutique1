@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FormEvent, useMemo, useState } from "react";
+import { type ChangeEvent, type FormEvent, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowLeft, Loader2, Lock, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { formatCad } from "@/lib/money";
 import {
-  buildStripeLineItems,
-  formatCad,
-  getMissingStripeProducts,
-  getStripeClient,
-  isStripeConfigured,
-} from "@/lib/stripe";
+  buildCheckoutItems,
+  buildClientIdempotencyKey,
+  redirectToCheckout,
+  extractApiErrorMessage,
+  requestOptionalCartToken,
+} from "@/lib/checkout-request";
 import { faqItems, getGoogleReviewsUrl, returnPolicy, shippingPolicy } from "@/data/store";
 
 interface CheckoutForm {
@@ -24,6 +25,13 @@ interface CheckoutForm {
   state: string;
   postalCode: string;
   country: string;
+}
+
+interface CloverCheckoutResponse {
+  checkoutUrl?: string;
+  reused?: boolean;
+  orderId?: string;
+  error?: string;
 }
 
 const initialForm: CheckoutForm = {
@@ -43,54 +51,58 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(false);
   const googleReviewsUrl = getGoogleReviewsUrl();
 
-  const missingProducts = useMemo(() => getMissingStripeProducts(items), [items]);
-  const stripeReady = isStripeConfigured(items);
-
   const handleFormChange = (field: keyof CheckoutForm) => (event: ChangeEvent<HTMLInputElement>) => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));
   };
 
-  const handleStripeCheckout = async (event: FormEvent) => {
+  const handleCloverCheckout = async (event: FormEvent) => {
     event.preventDefault();
-
-    if (!stripeReady) {
-      const missingMessage =
-        missingProducts.length > 0
-          ? `Missing Stripe price IDs for: ${missingProducts.join(", ")}.`
-          : "Missing Stripe publishable key.";
-      toast({
-        title: "Stripe setup required",
-        description: missingMessage,
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
+
     try {
-      const stripe = await getStripeClient();
-      if (!stripe) {
-        throw new Error("Stripe failed to initialize.");
-      }
-
-      const result = await stripe.redirectToCheckout({
-        mode: "payment",
-        lineItems: buildStripeLineItems(items),
-        successUrl: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrl: `${window.location.origin}/checkout/cancel`,
-        customerEmail: checkoutForm.email.trim(),
-        submitType: "pay",
-        billingAddressCollection: "required",
+      const checkoutItems = buildCheckoutItems(items);
+      const idempotencyKey = buildClientIdempotencyKey({
+        email: checkoutForm.email,
+        postalCode: checkoutForm.postalCode,
+        items: checkoutItems,
       });
+      const { cartToken, cartTimestamp } = await requestOptionalCartToken(checkoutItems).catch(() => ({
+        cartToken: "",
+        cartTimestamp: 0,
+      }));
 
-      if (result.error) {
-        throw new Error(result.error.message);
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 15000);
+      const response = await fetch("/api/clover-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          customer: checkoutForm,
+          items: checkoutItems,
+          idempotencyKey,
+          cartToken,
+          cartTimestamp,
+          website: "",
+        }),
+      }).finally(() => window.clearTimeout(timeout));
+
+      const payload = (await response.json().catch(() => ({}))) as CloverCheckoutResponse;
+      if (!response.ok || !payload.checkoutUrl) {
+        throw new Error(extractApiErrorMessage(payload, "Unable to start Clover checkout right now."));
       }
+
+      redirectToCheckout(payload.checkoutUrl);
     } catch (error) {
+      const message =
+        error instanceof Error && error.name === "AbortError"
+          ? "Checkout request timed out. Please check your connection and try again."
+          : extractApiErrorMessage(error, "An unexpected error occurred while redirecting to Clover.");
       toast({
         title: "Unable to start checkout",
-        description:
-          error instanceof Error ? error.message : "An unexpected error occurred while redirecting to Stripe.",
+        description: message,
         variant: "destructive",
       });
       setIsLoading(false);
@@ -120,7 +132,7 @@ const Checkout = () => {
         <div className="mb-6">
           <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">Secure Checkout</h1>
           <p className="mt-2 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Review your order and continue to Stripe for secure payment processing.
+            Review your order and continue to Clover for secure payment processing.
           </p>
         </div>
 
@@ -130,11 +142,11 @@ const Checkout = () => {
               <CardHeader className="pb-4">
                 <CardTitle className="font-display text-2xl">Contact & Shipping</CardTitle>
                 <CardDescription className="font-body text-base">
-                  We use this information to prefill your secure Stripe checkout session.
+                  We use this information to prefill your secure Clover checkout session.
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-0">
-                <form onSubmit={handleStripeCheckout} className="space-y-4">
+                <form onSubmit={handleCloverCheckout} className="space-y-4">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2 sm:col-span-2">
                       <label htmlFor="fullName" className="font-body text-sm font-semibold text-foreground">
@@ -143,6 +155,7 @@ const Checkout = () => {
                       <Input
                         id="fullName"
                         required
+                        maxLength={120}
                         value={checkoutForm.fullName}
                         onChange={handleFormChange("fullName")}
                         autoComplete="name"
@@ -157,6 +170,7 @@ const Checkout = () => {
                         id="email"
                         type="email"
                         required
+                        maxLength={160}
                         value={checkoutForm.email}
                         onChange={handleFormChange("email")}
                         autoComplete="email"
@@ -170,6 +184,7 @@ const Checkout = () => {
                       <Input
                         id="address"
                         required
+                        maxLength={200}
                         value={checkoutForm.address}
                         onChange={handleFormChange("address")}
                         autoComplete="street-address"
@@ -183,6 +198,7 @@ const Checkout = () => {
                       <Input
                         id="city"
                         required
+                        maxLength={80}
                         value={checkoutForm.city}
                         onChange={handleFormChange("city")}
                         autoComplete="address-level2"
@@ -196,6 +212,7 @@ const Checkout = () => {
                       <Input
                         id="state"
                         required
+                        maxLength={80}
                         value={checkoutForm.state}
                         onChange={handleFormChange("state")}
                         autoComplete="address-level1"
@@ -209,6 +226,8 @@ const Checkout = () => {
                       <Input
                         id="postalCode"
                         required
+                        maxLength={20}
+                        pattern="[A-Za-z0-9\- ]{3,20}"
                         value={checkoutForm.postalCode}
                         onChange={handleFormChange("postalCode")}
                         autoComplete="postal-code"
@@ -222,32 +241,37 @@ const Checkout = () => {
                       <Input
                         id="country"
                         required
+                        maxLength={80}
                         value={checkoutForm.country}
                         onChange={handleFormChange("country")}
                         autoComplete="country-name"
                       />
                     </div>
                   </div>
+                  <Input
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="hidden"
+                    value=""
+                    readOnly
+                  />
 
                   <div className="rounded-md border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-                    Stripe redirects to a hosted, PCI-compliant payment page where cards, wallets, and additional
-                    payment methods are handled securely.
+                    Clover redirects to a hosted, PCI-compliant payment page where cards and digital wallets are
+                    handled securely.
                   </div>
 
-                  <Button
-                    type="submit"
-                    disabled={isLoading || !stripeReady}
-                    className="h-12 w-full text-base font-semibold"
-                  >
+                  <Button type="submit" disabled={isLoading} className="h-12 w-full text-base font-semibold">
                     {isLoading ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Redirecting to Stripe
+                        Redirecting to Clover
                       </>
                     ) : (
                       <>
                         <Lock className="h-4 w-4" />
-                        Pay with Stripe
+                        Pay with Clover
                       </>
                     )}
                   </Button>
@@ -255,7 +279,7 @@ const Checkout = () => {
                   <div className="grid gap-2 rounded-md border border-border bg-background p-3 text-xs text-muted-foreground sm:grid-cols-3">
                     <p className="inline-flex items-center gap-2">
                       <ShieldCheck className="h-4 w-4 text-primary" />
-                      Secure encrypted payment
+                      Secure Clover payment
                     </p>
                     <p className="inline-flex items-center gap-2">
                       <Truck className="h-4 w-4 text-primary" />
@@ -266,13 +290,9 @@ const Checkout = () => {
                       Easy exchanges
                     </p>
                   </div>
-
-                  {!stripeReady && (
-                    <p className="text-sm text-destructive">
-                      Stripe isn&apos;t fully configured. Add `VITE_STRIPE_PUBLISHABLE_KEY` and Stripe price IDs to
-                      continue.
-                    </p>
-                  )}
+                  <p className="text-xs text-muted-foreground">
+                    You&apos;ll be redirected to Clover to complete your payment.
+                  </p>
                 </form>
               </CardContent>
             </Card>
@@ -371,7 +391,7 @@ const Checkout = () => {
                 </div>
                 <div className="flex items-center justify-between text-muted-foreground">
                   <span>Shipping</span>
-                  <span>Calculated on Stripe</span>
+                  <span>Calculated on Clover</span>
                 </div>
                 <div className="flex items-center justify-between border-t border-border pt-3 font-display text-lg font-bold text-foreground">
                   <span>Total</span>

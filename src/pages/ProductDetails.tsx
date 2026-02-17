@@ -5,7 +5,7 @@ import { getProductById } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
-import { formatCad } from "@/lib/stripe";
+import { formatCad } from "@/lib/money";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,35 +53,35 @@ const ProductDetails = () => {
     });
   };
 
-  if (!product) {
-    return <Navigate to="/" replace />;
-  }
-
   const galleryImages = useMemo(
     () =>
-      Array.isArray(product.galleryImages) && product.galleryImages.length > 0
+      Array.isArray(product?.galleryImages) && product.galleryImages.length > 0
         ? product.galleryImages
-        : [product.image].filter(Boolean),
-    [product.galleryImages, product.image],
+        : [product?.image || ""].filter(Boolean),
+    [product?.galleryImages, product?.image],
   );
 
   const sizeOptions = useMemo(
-    () => (Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : ["One Size"]),
-    [product.sizes],
+    () => (Array.isArray(product?.sizes) && product.sizes.length > 0 ? product.sizes : ["One Size"]),
+    [product?.sizes],
   );
 
   const colorOptions = useMemo(
-    () => (Array.isArray(product.colors) && product.colors.length > 0 ? product.colors : ["Default"]),
-    [product.colors],
+    () => (Array.isArray(product?.colors) && product.colors.length > 0 ? product.colors : ["Default"]),
+    [product?.colors],
   );
 
   const careInstructions = useMemo(
     () =>
-      Array.isArray(product.careInstructions) && product.careInstructions.length > 0
+      Array.isArray(product?.careInstructions) && product.careInstructions.length > 0
         ? product.careInstructions
         : ["Care instructions available upon request."],
-    [product.careInstructions],
+    [product?.careInstructions],
   );
+
+  if (!product) {
+    return <Navigate to="/" replace />;
+  }
 
   const canAddToCart = Boolean((selectedSize || sizeOptions[0]) && (selectedColor || colorOptions[0]));
   const primaryImage = selectedImage || galleryImages[0] || product.image || "/placeholder.svg";
@@ -173,7 +173,7 @@ const ProductDetails = () => {
               </Badge>
               <span className="inline-flex items-center gap-1 text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 text-primary" />
-                {checkoutEnabled ? "Secure Stripe checkout" : "Checkout coming soon"}
+                {checkoutEnabled ? "Secure Clover checkout" : "Checkout coming soon"}
               </span>
             </div>
 

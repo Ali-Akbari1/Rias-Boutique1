@@ -30,6 +30,7 @@ collections:
               - { label: "Slug", name: "slug", widget: "string", hint: "URL-safe text, e.g. emerald-zarbaft-gown" }
               - { label: "Name", name: "name", widget: "string" }
               - { label: "Price (CAD)", name: "price", widget: "number", value_type: "int", min: 1 }
+              - { label: "Inventory", name: "inventory", widget: "number", value_type: "int", min: 0, required: false }
               - { label: "Category", name: "category", widget: "select", options: ["Party Wear", "Bridal", "Casual"] }
               - { label: "Main Image", name: "image", widget: "image", choose_url: false }
               - label: "Gallery Images"

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { type Product } from "@/data/products";
-import { formatCad } from "@/lib/stripe";
+import { formatCad } from "@/lib/money";
 
 interface ProductCardProps {
   product: Product;

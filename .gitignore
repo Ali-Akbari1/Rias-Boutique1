@@ -25,3 +25,7 @@ dist-ssr
 
 # Ignore environment variable files
 .env
+
+# Runtime order/email artifacts
+data/*.sqlite
+data/*.jsonl
