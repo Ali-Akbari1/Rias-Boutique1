@@ -1,91 +1,172 @@
+# Ria's Boutique
 
+React + Vite storefront for handcrafted Afghan clothing, with product browsing, product detail pages, cart management, optional Stripe Checkout, Google Reviews integration, and Decap CMS editing at `/admin`.
+
+Live site: `https://www.riasboutique.com`
+
+## Features
+
+- Search, filter, and sort product collection.
+- Product detail pages with gallery, zoom, sizes, colors, and care details.
+- Cart drawer with quantity controls and subtotal.
+- Optional Stripe Checkout flow (`/checkout`, `/checkout/success`, `/checkout/cancel`).
+- Google Reviews section with live fetch fallback to curated reviews.
+- Instagram highlights driven by environment config.
+- Decap CMS for non-coder product editing and media uploads.
+- Vercel serverless functions for Google Places + GitHub OAuth.
+
+## Tech stack
+
+- React 18 + TypeScript
+- Vite 5
+- Tailwind CSS + shadcn/ui (Radix)
+- React Router
+- Stripe JS
+- Decap CMS
+- Vitest + Testing Library
+
+## Project structure
+
+```text
+api/                     # Vercel serverless functions
+public/admin/            # Decap CMS admin app/config
+public/uploads/          # Uploaded product images
+src/content/products.json# Product source of truth
+src/data/products.ts     # Product normalization + runtime mapping
+src/pages/               # Storefront and checkout routes
+src/components/          # UI sections and reusable components
+```
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 18+ (Node 20 LTS recommended)
+- npm
+
+### Install and run
+
+```powershell
+npm install
+Copy-Item .env.example .env
+npm run dev
+```
+
+App runs at `http://localhost:8080`.
+
+## Available scripts
+
+- `npm run dev` - Start local dev server.
+- `npm run build` - Production build.
+- `npm run build:dev` - Development-mode build.
+- `npm run preview` - Preview built app.
+- `npm run lint` - Run ESLint.
+- `npm run test` - Run Vitest once.
+- `npm run test:watch` - Run Vitest in watch mode.
+
+## Environment variables
+
+Copy `.env.example` to `.env` and fill what you need.
+
+### Client-side (`VITE_`)
+
+- `VITE_ENABLE_CHECKOUT`: `true` or `false` to enable checkout routes/buttons.
+- `VITE_STRIPE_PUBLISHABLE_KEY`: Required when checkout is enabled.
+- `VITE_STRIPE_PRICE_<PRODUCT_ID>`: Optional mapping when product JSON does not define `stripePriceId`.
+- `VITE_GOOGLE_REVIEWS_URL`: Fallback URL for review links.
+- `VITE_GOOGLE_LEAVE_REVIEW_URL`: Optional footer "Leave a Google Review" link.
+- `VITE_INSTAGRAM_PROFILE_URL`: Instagram profile link.
+- `VITE_INSTAGRAM_CARDS`: Comma-separated `postUrl|thumbnailUrl|label` entries.
+
+Example:
+
+```env
+VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|Blue and gold set,https://www.instagram.com/reel/REEL_1/|/instagram/reel-1.jpg|Runway reel
+```
+
+### Server-side (`api/*` on Vercel)
+
+- `GOOGLE_PLACES_API_KEY`: For `/api/google-reviews`.
+- `GOOGLE_PLACE_ID`: For `/api/google-reviews`.
+- `GITHUB_OAUTH_CLIENT_ID`: For Decap GitHub auth.
+- `GITHUB_OAUTH_CLIENT_SECRET`: For Decap GitHub auth.
+- `CMS_BASE_URL`: Base URL used by OAuth callbacks, e.g. `https://www.riasboutique.com`.
 
 ## Stripe checkout setup
 
-This project now supports Stripe Checkout with product price IDs.
+1. Set `VITE_ENABLE_CHECKOUT=true`.
+2. Set `VITE_STRIPE_PUBLISHABLE_KEY`.
+3. Assign a Stripe Price ID to every product:
+   - Preferred: add `stripePriceId` per product in `src/content/products.json`.
+   - Alternative: set matching `VITE_STRIPE_PRICE_<PRODUCT_ID>` env vars.
+4. Restart the dev server.
 
-1. Copy `.env.example` to `.env`.
-2. Set `VITE_STRIPE_PUBLISHABLE_KEY` from your Stripe dashboard.
-3. Create one Stripe Price (in CAD) for each product and add the IDs to:
-   - `VITE_STRIPE_PRICE_1`
-   - `VITE_STRIPE_PRICE_2`
-   - `VITE_STRIPE_PRICE_3`
-   - `VITE_STRIPE_PRICE_4`
-   - `VITE_STRIPE_PRICE_5`
-   - `VITE_STRIPE_PRICE_6`
-4. Set `VITE_ENABLE_CHECKOUT=true` when you are ready to accept orders. Keep it `false` to hide/disable checkout.
-5. Restart the dev server.
-6. Optional: set `VITE_GOOGLE_REVIEWS_URL` to your Google reviews page URL.
-7. Optional: add Instagram section data:
-   - `VITE_INSTAGRAM_PROFILE_URL` (your Instagram profile URL)
-   - `VITE_INSTAGRAM_CARDS` as comma-separated entries in this format:
-     `postUrl|thumbnailUrl|label`
-   - Example:
-     `https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|Blue and gold set`
-8. To enable live Google reviews via Vercel function, also set:
-   - `GOOGLE_PLACES_API_KEY` (server-side key, do not prefix with `VITE_`)
-   - `GOOGLE_PLACE_ID` (your business place ID)
+Checkout is intentionally disabled when Stripe config is incomplete.
 
-When `VITE_ENABLE_CHECKOUT=true` and Stripe is configured, users can go from cart to `/checkout`, then Stripe redirects back to `/checkout/success` or `/checkout/cancel`.
+## Product content model
 
-## Collection CMS (non-coder editing)
+Products are managed in `src/content/products.json`.
 
-This repo now includes Decap CMS at `/admin` so products can be added/edited/deleted from a form UI.
+Important rules:
 
-### Files added for CMS
+- Keep `id` unique for each product.
+- Keep `slug` URL-safe and unique.
+- Store uploaded images under `public/uploads` (or through Decap CMS media upload).
 
-- `public/admin/index.html`
-- `public/admin/config.yml`
-- `src/content/products.json` (source of truth for collection)
-- `public/uploads/` (product images)
+`src/data/products.ts` normalizes incomplete data and provides safe defaults.
 
-### What you need to do once
+## Decap CMS setup (`/admin`)
 
-1. Confirm `public/admin/config.yml` has your real repo + branch.
-2. In GitHub, create an OAuth App:
+This repo includes Decap CMS so products can be edited in a form UI.
+
+### One-time setup
+
+1. Verify `public/admin/config.yml` has the correct `repo`, `branch`, and `base_url`.
+2. Create a GitHub OAuth App:
    - Homepage URL: `https://www.riasboutique.com`
-   - Authorization callback URL: `https://www.riasboutique.com/api/callback`
-3. In Vercel project settings, add environment variables:
+   - Callback URL: `https://www.riasboutique.com/api/callback`
+3. In Vercel project settings, set:
    - `GITHUB_OAUTH_CLIENT_ID`
    - `GITHUB_OAUTH_CLIENT_SECRET`
-   - `CMS_BASE_URL` = `https://www.riasboutique.com`
-4. Redeploy the project on Vercel.
-5. Open `https://www.riasboutique.com/admin` and click GitHub login.
+   - `CMS_BASE_URL=https://www.riasboutique.com`
+4. Redeploy.
+5. Open `/admin` and sign in with GitHub.
 
-### How your sister will update collection
+### Local CMS testing
 
-1. Go to `/admin`.
-2. Open `Store Content -> Products`.
-3. Add/edit/delete product entries.
-4. Upload images directly in the form (stored in `public/uploads`).
-5. Save and publish. A commit is created, then Vercel auto-deploys.
+```powershell
+npm run dev
+npx decap-server
+```
 
-### Local testing
+Then open `http://localhost:8080/admin`.
 
-1. Run app: `npm run dev`
-2. In another terminal run: `npx decap-server`
-3. Open `http://localhost:8080/admin`
+## Deployment notes
 
-**Edit a file directly in GitHub**
+- Recommended host: Vercel (uses `api/*.ts` serverless functions).
+- Add all required env vars in the Vercel project.
+- Ensure domain and callback URLs match exactly for GitHub OAuth.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Testing
 
-**Use GitHub Codespaces**
+Current tests are in `src/test/` and cover Stripe helper logic plus a basic smoke test.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```powershell
+npm run test
+```
 
-## What technologies are used for this project?
+## Troubleshooting
 
-This project is built with:
+- Checkout button disabled:
+  - Confirm `VITE_ENABLE_CHECKOUT=true`.
+  - Confirm Stripe publishable key and product Stripe price IDs are set.
+- Live Google reviews not loading:
+  - Check `GOOGLE_PLACES_API_KEY` and `GOOGLE_PLACE_ID`.
+  - Site will fall back to static review content if API fetch fails.
+- `/admin` GitHub login fails:
+  - Recheck OAuth callback URL and `CMS_BASE_URL`.
+  - Verify `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET`.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## License
+
+Private project.
