@@ -95,7 +95,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
               <button
                 onClick={handleCheckout}
                 disabled={!checkoutEnabled}
-                className="w-full gradient-gold text-foreground font-body font-semibold text-base sm:text-lg py-3.5 sm:py-4 rounded-sm hover:opacity-90 transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-sm border border-foreground bg-background px-4 py-3.5 font-body text-base font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground sm:py-4 sm:text-lg"
               >
                 {checkoutEnabled ? "Checkout" : "Checkout Coming Soon"}
               </button>

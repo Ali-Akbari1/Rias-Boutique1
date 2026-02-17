@@ -116,7 +116,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-background/95 backdrop-blur">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4 sm:px-6">
+        <div className="container mx-auto flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
           <Link
             to="/"
             className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
@@ -128,16 +128,16 @@ const Checkout = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mb-6">
-          <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">Secure Checkout</h1>
-          <p className="mt-2 max-w-2xl text-base text-muted-foreground sm:text-lg">
+      <main className="container mx-auto px-4 py-5 sm:px-6 sm:py-8">
+        <div className="mb-5 sm:mb-6">
+          <h1 className="font-display text-2xl font-bold text-foreground sm:text-4xl">Secure Checkout</h1>
+          <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground sm:mt-2 sm:text-lg">
             Review your order and continue to Clover for secure payment processing.
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-6">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="order-2 space-y-4 sm:space-y-6 lg:order-1">
             <Card>
               <CardHeader className="pb-4">
                 <CardTitle className="font-display text-2xl">Contact & Shipping</CardTitle>
@@ -147,7 +147,7 @@ const Checkout = () => {
               </CardHeader>
               <CardContent className="pt-0">
                 <form onSubmit={handleCloverCheckout} className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                     <div className="space-y-2 sm:col-span-2">
                       <label htmlFor="fullName" className="font-body text-sm font-semibold text-foreground">
                         Full name
@@ -262,7 +262,7 @@ const Checkout = () => {
                     handled securely.
                   </div>
 
-                  <Button type="submit" disabled={isLoading} className="h-12 w-full text-base font-semibold">
+                  <Button type="submit" disabled={isLoading} className="h-11 w-full text-sm font-semibold sm:h-12 sm:text-base">
                     {isLoading ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -287,7 +287,7 @@ const Checkout = () => {
                     </p>
                     <p className="inline-flex items-center gap-2">
                       <RotateCcw className="h-4 w-4 text-primary" />
-                      Easy exchanges
+                      Authentic craftsmanship
                     </p>
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -313,10 +313,6 @@ const Checkout = () => {
                     </p>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">Express shipping</p>
-                    <p>
-                      {shippingPolicy.expressCost} | {shippingPolicy.expressTimeline}
-                    </p>
                   </div>
                   <div className="sm:col-span-2">
                     <p className="font-semibold text-foreground">Free shipping</p>
@@ -325,7 +321,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <p className="font-semibold text-foreground">Returns and exchanges</p>
+                  <p className="font-semibold text-foreground"></p>
                   <p className="mt-1">{returnPolicy}</p>
                 </div>
 
@@ -351,7 +347,7 @@ const Checkout = () => {
             </Card>
           </div>
 
-          <Card className="h-fit lg:sticky lg:top-6">
+          <Card className="order-1 h-fit lg:order-2 lg:sticky lg:top-6">
             <CardHeader className="pb-4">
               <CardTitle className="font-display text-2xl">Order Summary</CardTitle>
               <CardDescription className="font-body text-base">
@@ -359,25 +355,25 @@ const Checkout = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-0">
-              <div className="max-h-[300px] space-y-3 overflow-auto pr-1">
+              <div className="max-h-[300px] space-y-2.5 overflow-auto pr-1 sm:space-y-3">
                 {items.map(({ id, product, selection, quantity }) => (
-                  <div key={id} className="flex gap-3 rounded-md border border-border bg-background p-3">
+                  <div key={id} className="flex gap-2.5 rounded-md border border-border bg-background p-2.5 sm:gap-3 sm:p-3">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="h-20 w-16 rounded-sm object-cover"
+                      className="h-16 w-14 rounded-sm object-cover sm:h-20 sm:w-16"
                       loading="lazy"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="font-display text-base font-semibold text-foreground">{product.name}</p>
-                      <p className="font-body text-sm text-muted-foreground">
+                      <p className="font-display text-sm font-semibold text-foreground sm:text-base">{product.name}</p>
+                      <p className="font-body text-xs text-muted-foreground sm:text-sm">
                         {formatCad(product.price)} x {quantity}
                       </p>
                       <p className="font-body text-xs text-muted-foreground">
                         Size: {selection.size} | Color: {selection.color}
                       </p>
                     </div>
-                    <p className="font-display text-base font-semibold text-foreground">
+                    <p className="font-display text-sm font-semibold text-foreground sm:text-base">
                       {formatCad(product.price * quantity)}
                     </p>
                   </div>

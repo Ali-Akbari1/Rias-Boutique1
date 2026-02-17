@@ -38,22 +38,20 @@ export interface GoogleReviewsResponse {
 }
 
 export const shippingPolicy = {
-  standardCost: "CA$12 flat rate",
+  standardCost: "CA$20 flat rate",
   freeShippingThreshold: "CA$350+",
-  standardTimeline: "5-8 business days (US & Canada)",
-  expressCost: "CA$24",
-  expressTimeline: "2-4 business days",
+  standardTimeline: "5-10 business days (Canada)",
 };
 
 export const returnPolicy =
-  "Returns and exchanges are accepted within 14 days of delivery for unworn, unaltered items with tags attached.";
+  "";
 
 export const faqItems: FaqItem[] = [
   {
     id: "faq-1",
     question: "How do I pick the right size?",
     answer:
-      "Each product page includes fit notes and available sizes. If you are between sizes, choose the larger size for formal pieces with fitted bodices.",
+      "Each product page includes fit notes and available sizes. If you are between sizes, you can contact us for personalized recommendations based on your measurements and the specific item.",
   },
   {
     id: "faq-2",
@@ -65,7 +63,7 @@ export const faqItems: FaqItem[] = [
     id: "faq-3",
     question: "Can I exchange for another size?",
     answer:
-      "Yes. Exchanges are allowed once per order within 14 days, subject to stock availability. Items must be unused and in original condition.",
+      "If you need a different size, contact us and we will review exchange options based on available stock and the item's condition.",
   },
 ];
 
