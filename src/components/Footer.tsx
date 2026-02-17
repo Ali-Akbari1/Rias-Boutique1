@@ -1,6 +1,6 @@
 const Footer = () => {
   const googleReviewsUrl =
-    (import.meta.env.VITE_GOOGLE_REVIEWS_URL as string | undefined) ||
+    (import.meta.env.VITE_GOOGLE_LEAVE_REVIEW_URL as string | undefined) ||
     "https://www.google.com/search?q=Ria's+Boutique+reviews";
 
   return (
