@@ -114,6 +114,34 @@
       "description": "Handmade Hazaragi dress with mirror work\n\n2 pieces\n",
       "category": "Formal",
       "fitInfo": "Bust: 36in \nWaist: 32in \nLength of Pants: 35in"
+    },
+    {
+      "fabric": "Velvet",
+      "price": 400,
+      "galleryImages": [
+        "/uploads/img_8832-2.jpg",
+        "/uploads/whitecheerma.jpg",
+        "/uploads/img_8831-2.jpg",
+        "/uploads/img_8834-2.jpg"
+      ],
+      "name": "White Cheerma Dress",
+      "slug": "White-cheerma",
+      "colors": [
+        "White "
+      ],
+      "sizes": [
+        "Medium (42in) "
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "White-cheerma",
+      "createdAt": "2026-02-17",
+      "image": "/uploads/img_8832-2.jpg",
+      "inventory": 0,
+      "description": "While velvet with handmade cheerma. \nWide leg velvet pants with handmade cheerma. \n\n3 pieces: Dress, Pants, Chadar",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 42in \nSleeves: 22in\nShoulders: 16in\nLength of Pants: 38in \n"
     }
   ]
 }
