@@ -62,6 +62,29 @@
       "image": "/uploads/img_0557.jpg",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
       "category": "Formal"
+    },
+    {
+      "fabric": "Velvet ",
+      "price": 248,
+      "galleryImages": [
+        "/uploads/img_0667.jpg",
+        "/uploads/img_0668.jpg",
+        "/uploads/img_0669.jpg",
+        null
+      ],
+      "name": "Royal Blue 3 Piece Suit ",
+      "slug": "Royal-Blue",
+      "sizes": [
+        "Small (40in)"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "3",
+      "image": "/uploads/img_0667.jpg",
+      "description": "3 piece velvet suit with gulabatoon embroidery\n",
+      "category": "Formal",
+      "fitInfo": "Bust: 40in\nTop Length: 36in\nPants Length: 38in\n"
     }
   ]
 }
