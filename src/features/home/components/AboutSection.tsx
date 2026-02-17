@@ -7,13 +7,11 @@ const AboutSection = () => {
           A Legacy of Craftsmanship
         </h2>
         <p className="mb-4 text-base font-body leading-relaxed text-muted-foreground sm:text-lg">
-          Ria&apos;s Boutique celebrates the rich textile heritage of Afghanistan. Every garment in our collection is
-          handcrafted by skilled artisans, preserving centuries-old embroidery techniques passed down through
-          generations.
+        Founded in Canada, our women-owned business was created to honor Afghan craftsmanship while empowering the talented men and women behind every stitch. 
+        We are proud to bring authentic Afghan designs to a modern global audience while staying true to their traditional roots.
         </p>
         <p className="text-base font-body leading-relaxed text-muted-foreground sm:text-lg">
-        From intricate handcrafted embroidery to delicate mirror embellishments, 
-        each piece is a wearable work of art designed for the modern woman who honors tradition with grace.
+        Each garment is more than clothing, it is a wearable work of art designed for the modern woman who carries tradition with confidence, grace, and pride.
         </p>
       </div>
     </section> 
