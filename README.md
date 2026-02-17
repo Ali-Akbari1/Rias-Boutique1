@@ -29,12 +29,15 @@ Live site: `https://www.riasboutique.com`
 
 ```text
 api/                     # Vercel serverless functions
+server/                  # Server-only checkout/order libraries and DB schema
+tests/                   # Node API test suites
 public/admin/            # Decap CMS admin app/config
 public/uploads/          # Uploaded product images
 src/content/products.json# Product source of truth
-src/data/products.ts     # Product normalization + runtime mapping
+src/features/            # Frontend features (cart, catalog, home, navigation, product, store)
+src/shared/ui/           # Shared UI primitives
+src/features/catalog/data/products.ts # Product normalization + runtime mapping
 src/pages/               # Storefront and checkout routes
-src/components/          # UI sections and reusable components
 ```
 
 ## Getting started
@@ -119,7 +122,7 @@ Important rules:
 - Keep `slug` URL-safe and unique.
 - Store uploaded images under `public/uploads` (or through Decap CMS media upload).
 
-`src/data/products.ts` normalizes incomplete data and provides safe defaults.
+`src/features/catalog/data/products.ts` normalizes incomplete data and provides safe defaults.
 
 ## Decap CMS setup (`/admin`)
 
@@ -155,7 +158,7 @@ Then open `http://localhost:8080/admin`.
 
 ## Testing
 
-Current tests are in `src/test/` and cover checkout helper logic plus a basic smoke test.
+Current tests are in `src/test/` (frontend) and `tests/api/` (server/API).
 
 ```powershell
 npm run test

@@ -1,12 +1,12 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/shared/ui/toaster";
+import { Toaster as Sonner } from "@/shared/ui/sonner";
+import { TooltipProvider } from "@/shared/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { CartProvider } from "@/context/CartContext";
-import ScrollToTop from "@/components/ScrollToTop";
+import { CartProvider } from "@/features/cart/context/CartContext";
+import ScrollToTop from "@/features/navigation/components/ScrollToTop";
 import { isCheckoutEnabled } from "@/lib/checkout";
-import Index from "./pages/Index";
+import HomePage from "./pages/HomePage";
 import Checkout from "./pages/Checkout";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import CheckoutCancel from "./pages/CheckoutCancel";
@@ -27,7 +27,7 @@ const App = () => {
           <BrowserRouter>
             <ScrollToTop />
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<HomePage />} />
               <Route path="/products/:productId" element={<ProductDetails />} />
               <Route
                 path="/checkout"
@@ -51,3 +51,6 @@ const App = () => {
 };
 
 export default App;
+
+
+

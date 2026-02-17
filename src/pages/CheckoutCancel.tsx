@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 
 const CheckoutCancel = () => {
   const [searchParams] = useSearchParams();
@@ -38,3 +38,4 @@ const CheckoutCancel = () => {
 };
 
 export default CheckoutCancel;
+

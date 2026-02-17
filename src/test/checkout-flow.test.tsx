@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Checkout from "@/pages/Checkout";
-import { CartProvider } from "@/context/CartContext";
-import { products } from "@/data/products";
+import { CartProvider } from "@/features/cart/context/CartContext";
+import { products } from "@/features/catalog/data/products";
 import * as checkoutRequest from "@/lib/checkout-request";
 
 const CART_STORAGE_KEY = "rias_boutique_cart_v1";
@@ -80,3 +80,4 @@ describe("checkout flow", () => {
     ]);
   });
 });
+

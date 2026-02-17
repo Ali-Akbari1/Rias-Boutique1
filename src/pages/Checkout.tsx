@@ -1,12 +1,12 @@
 import { type ChangeEvent, type FormEvent, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowLeft, Loader2, Lock, RotateCcw, ShieldCheck, Truck } from "lucide-react";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/features/cart/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Input } from "@/shared/ui/input";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/shared/ui/accordion";
 import { formatCad } from "@/lib/money";
 import {
   buildCheckoutItems,
@@ -15,7 +15,7 @@ import {
   extractApiErrorMessage,
   requestOptionalCartToken,
 } from "@/lib/checkout-request";
-import { faqItems, getGoogleReviewsUrl, returnPolicy, shippingPolicy } from "@/data/store";
+import { faqItems, getGoogleReviewsUrl, returnPolicy, shippingPolicy } from "@/features/store/data/store-content";
 
 interface CheckoutForm {
   fullName: string;
@@ -407,3 +407,5 @@ const Checkout = () => {
 };
 
 export default Checkout;
+
+

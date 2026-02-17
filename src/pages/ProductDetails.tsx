@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
-import { getProductById } from "@/data/products";
-import { useCart } from "@/context/CartContext";
+import { getProductById } from "@/features/catalog/data/products";
+import { useCart } from "@/features/cart/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/money";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ZoomableImageDialog from "@/components/ZoomableImageDialog";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import ZoomableImageDialog from "@/features/product/components/ZoomableImageDialog";
 
 const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -286,3 +286,5 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+
+

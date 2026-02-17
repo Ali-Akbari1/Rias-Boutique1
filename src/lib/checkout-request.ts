@@ -1,4 +1,4 @@
-import type { CartItem } from "@/context/CartContext";
+import type { CartItem } from "@/features/cart/context/CartContext";
 
 interface CheckoutItemPayload {
   productId: string;
@@ -95,3 +95,4 @@ export const requestOptionalCartToken = async (items: CheckoutItemPayload[]) => 
 export const redirectToCheckout = (checkoutUrl: string) => {
   window.location.assign(checkoutUrl);
 };
+

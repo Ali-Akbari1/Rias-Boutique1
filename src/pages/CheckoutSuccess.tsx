@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCart } from "@/context/CartContext";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { useCart } from "@/features/cart/context/CartContext";
 
 interface OrderStatusResponse {
   orderId?: string;
@@ -127,3 +127,5 @@ const CheckoutSuccess = () => {
 };
 
 export default CheckoutSuccess;
+
+
