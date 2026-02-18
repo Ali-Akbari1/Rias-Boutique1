@@ -270,6 +270,64 @@ describe("clover webhook flow", () => {
     });
   });
 
+  it("accepts base64 signatures in v1 format", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_b64_1", href: "https://checkout.clover.com/pay/checkout_b64_1" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const checkoutResponse = createMockResponse();
+    await checkoutHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "user-agent": "Mozilla/5.0",
+        },
+        body: JSON.stringify(buildCheckoutRequestBody()),
+      }),
+      checkoutResponse,
+    );
+
+    expect(checkoutResponse.statusCode).toBe(200);
+    const orderId = (checkoutResponse.jsonBody as { orderId?: string }).orderId || "";
+    expect(orderId).toBeTruthy();
+
+    const webhookPayload = {
+      id: "evt_paid_b64_1",
+      type: "payment.succeeded",
+      orderId,
+      checkoutId: "checkout_b64_1",
+      paymentId: "pay_b64_1",
+      status: "paid",
+    };
+    const rawBody = JSON.stringify(webhookPayload);
+    const timestamp = String(Math.floor(Date.now() / 1000));
+    const signatureBase64 = createHmac("sha256", WEBHOOK_SECRET).update(`${timestamp}.${rawBody}`).digest("base64");
+
+    const webhookResponse = createMockResponse();
+    await webhookHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "x-clover-signature": `t=${timestamp},v1=${signatureBase64}`,
+        },
+        body: rawBody,
+      }),
+      webhookResponse,
+    );
+
+    expect(webhookResponse.statusCode).toBe(200);
+    expect(webhookResponse.jsonBody).toMatchObject({
+      processed: true,
+      orderId,
+    });
+  });
+
   it("records failed payments without marking order as paid", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "checkout_fail_1", href: "https://checkout.clover.com/pay/checkout_fail_1" }), {

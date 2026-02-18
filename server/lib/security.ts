@@ -65,13 +65,27 @@ export const looksAutomatedTraffic = (req: ApiRequest) => {
 };
 
 const normalizeSignature = (signature: string) => {
-  const trimmed = signature.trim();
+  const trimmed = signature.trim().replace(/^"|"$/g, "");
   if (!trimmed || /^t=\d+$/i.test(trimmed)) {
     return "";
   }
-  const withoutAlgo = trimmed.replace(/^sha256=/i, "").replace(/^v1=/i, "");
-  const parts = withoutAlgo.split("=");
-  return parts.length > 1 ? parts.at(-1)?.trim() || "" : withoutAlgo;
+
+  const keyValueMatch = trimmed.match(/^([a-z0-9_-]+)=(.+)$/i);
+  if (!keyValueMatch) {
+    return trimmed;
+  }
+
+  const key = keyValueMatch[1]?.trim().toLowerCase() || "";
+  const value = keyValueMatch[2]?.trim().replace(/^"|"$/g, "") || "";
+  if (!value) {
+    return "";
+  }
+
+  if (key === "v1" || key === "sha256" || key === "signature" || key === "sig") {
+    return value;
+  }
+
+  return trimmed;
 };
 
 export const resolveWebhookTimestamp = (signatureHeader: string, timestampHeader: string) => {
