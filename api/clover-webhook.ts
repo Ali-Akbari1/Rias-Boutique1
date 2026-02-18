@@ -100,6 +100,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     console.error("[clover-webhook] signature verification failed", {
       hasSignatureHeader: Boolean(signatureHeader),
       hasTimestampHeader: Boolean(timestampHeader),
+      signatureHeaderSample: signatureHeader.slice(0, 120),
+      signatureParts: signatureHeader
+        .split(",")
+        .map((part) => part.trim().split("=")[0] || "raw")
+        .filter(Boolean),
+      timestampHeaderSample: timestampHeader.slice(0, 32),
+      configuredSecretCount: webhookSecrets.length,
     });
     sendError(res, 401, "INVALID_SIGNATURE", "Webhook signature verification failed.");
     return;

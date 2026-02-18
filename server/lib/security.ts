@@ -81,11 +81,21 @@ const normalizeSignature = (signature: string) => {
     return "";
   }
 
-  if (key === "v1" || key === "sha256" || key === "signature" || key === "sig") {
+  if (
+    key === "v1" ||
+    key === "v0" ||
+    key === "sha256" ||
+    key === "sha1" ||
+    key === "sha512" ||
+    key === "signature" ||
+    key === "sig" ||
+    key === "hmac"
+  ) {
     return value;
   }
 
-  return trimmed;
+  // Unknown key, but still likely key=value signature content. Keep value for best-effort interoperability.
+  return value;
 };
 
 export const resolveWebhookTimestamp = (signatureHeader: string, timestampHeader: string) => {
@@ -130,13 +140,18 @@ export const verifyWebhookSignature = ({
   }
 
   const effectiveTimestamp = resolveWebhookTimestamp(signatureHeader, timestampHeader);
-  const payloads = effectiveTimestamp ? [`${effectiveTimestamp}.${rawBody}`, rawBody] : [rawBody];
+  const payloads = effectiveTimestamp
+    ? [`${effectiveTimestamp}.${rawBody}`, `${effectiveTimestamp}:${rawBody}`, rawBody]
+    : [rawBody];
 
+  const algorithms = ["sha256", "sha1", "sha512"] as const;
   const expectedSignatures = secrets.flatMap((secretEntry) =>
-    payloads.flatMap((payload) => [
-      createHmac("sha256", secretEntry).update(payload).digest("hex"),
-      createHmac("sha256", secretEntry).update(payload).digest("base64"),
-    ]),
+    payloads.flatMap((payload) =>
+      algorithms.flatMap((algorithm) => [
+        createHmac(algorithm, secretEntry).update(payload).digest("hex"),
+        createHmac(algorithm, secretEntry).update(payload).digest("base64"),
+      ]),
+    ),
   );
 
   return signatures.some((candidate) => expectedSignatures.some((expected) => safeTimingCompare(candidate, expected)));
