@@ -12,8 +12,6 @@ import {
   resolveWebhookTimestamp,
   verifyWebhookSignature,
   verifyWebhookTimestamp,
-  validateOrigin,
-  buildAllowedOrigins,
 } from "../server/lib/security.js";
 import { parseCloverWebhook } from "../server/lib/clover-webhook.js";
 import {
@@ -41,15 +39,6 @@ export const config = {
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "POST") {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
-    return;
-  }
-
-  const allowedOrigins = buildAllowedOrigins(
-    process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
-    process.env.ALLOWED_WEBHOOK_ORIGINS?.trim() || "",
-  );
-  if (!validateOrigin(req, allowedOrigins)) {
-    sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This webhook origin is not allowed.");
     return;
   }
 
@@ -97,6 +86,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     secret: webhookSecret,
   });
   if (!signatureValid) {
+    console.error("[clover-webhook] signature verification failed", {
+      hasSignatureHeader: Boolean(signatureHeader),
+      hasTimestampHeader: Boolean(timestampHeader),
+    });
     sendError(res, 401, "INVALID_SIGNATURE", "Webhook signature verification failed.");
     return;
   }
@@ -125,6 +118,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   });
   const order = parsed.orderId ? await findOrderById(parsed.orderId) : await findOrderByCheckoutId(parsed.checkoutId);
   if (!order) {
+    console.warn("[clover-webhook] order not found for parsed payload", {
+      eventId: parsed.eventId,
+      eventType: parsed.eventType,
+      parsedOrderId: parsed.orderId,
+      parsedCheckoutId: parsed.checkoutId,
+    });
     // Ack unknown events to avoid provider retry storms.
     res.status(202).json({
       received: true,
