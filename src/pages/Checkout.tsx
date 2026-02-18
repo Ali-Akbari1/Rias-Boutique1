@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FormEvent, useState } from "react";
+import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowLeft, Loader2, Lock, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/features/cart/context/CartContext";
@@ -59,6 +59,8 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(false);
   const googleReviewsUrl = getGoogleReviewsUrl();
   const shippingChargesEnabled = isShippingChargesEnabled();
+  const checkoutControllerRef = useRef<AbortController | null>(null);
+  const checkoutTimeoutRef = useRef<number | null>(null);
 
   const subtotalMinor = Math.round(totalPrice * 100);
   const shippingMinor =
@@ -74,11 +76,47 @@ const Checkout = () => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));
   };
 
+  const clearPendingCheckoutRequest = () => {
+    if (checkoutTimeoutRef.current !== null) {
+      window.clearTimeout(checkoutTimeoutRef.current);
+      checkoutTimeoutRef.current = null;
+    }
+
+    if (checkoutControllerRef.current) {
+      checkoutControllerRef.current.abort();
+      checkoutControllerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    const handlePageShow = () => {
+      setIsLoading(false);
+    };
+    const handlePageHide = () => {
+      clearPendingCheckoutRequest();
+      setIsLoading(false);
+    };
+
+    window.addEventListener("pageshow", handlePageShow);
+    window.addEventListener("pagehide", handlePageHide);
+
+    return () => {
+      window.removeEventListener("pageshow", handlePageShow);
+      window.removeEventListener("pagehide", handlePageHide);
+      clearPendingCheckoutRequest();
+    };
+  }, []);
+
   const handleCloverCheckout = async (event: FormEvent) => {
     event.preventDefault();
+    if (isLoading) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      clearPendingCheckoutRequest();
       const checkoutItems = buildCheckoutItems(items);
       const idempotencyKey = buildClientIdempotencyKey({
         email: checkoutForm.email,
@@ -91,7 +129,9 @@ const Checkout = () => {
       }));
 
       const controller = new AbortController();
+      checkoutControllerRef.current = controller;
       const timeout = window.setTimeout(() => controller.abort(), 15000);
+      checkoutTimeoutRef.current = timeout;
       const response = await fetch("/api/clover-checkout", {
         method: "POST",
         headers: {
@@ -106,7 +146,13 @@ const Checkout = () => {
           cartTimestamp,
           website: "",
         }),
-      }).finally(() => window.clearTimeout(timeout));
+      }).finally(() => {
+        if (checkoutTimeoutRef.current !== null) {
+          window.clearTimeout(checkoutTimeoutRef.current);
+          checkoutTimeoutRef.current = null;
+        }
+        checkoutControllerRef.current = null;
+      });
 
       const payload = (await response.json().catch(() => ({}))) as CloverCheckoutResponse;
       if (!response.ok || !payload.checkoutUrl) {
@@ -115,6 +161,10 @@ const Checkout = () => {
 
       redirectToCheckout(payload.checkoutUrl);
     } catch (error) {
+      if (error instanceof Error && error.name === "AbortError" && document.visibilityState === "hidden") {
+        return;
+      }
+
       const message =
         error instanceof Error && error.name === "AbortError"
           ? "Checkout request timed out. Please check your connection and try again."
