@@ -52,7 +52,12 @@ const CheckoutSuccess = () => {
           query.set("checkoutId", sessionId);
         }
 
-        const response = await fetch(`/api/order-status?${query.toString()}`);
+        const response = await fetch(`/api/order-status?${query.toString()}`, {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
         const payload = (await response.json().catch(() => ({}))) as OrderStatusResponse;
         if (stopped) {
           return;
