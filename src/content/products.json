@@ -226,6 +226,31 @@
       "inventory": 0,
       "description": "Handmade cheerma dozi dress with wide legged pants.",
       "category": "Party Wear"
+    },
+    {
+      "fabric": "Banaras ",
+      "price": 380,
+      "galleryImages": [
+        "/uploads/img_8963.jpg",
+        "/uploads/img_8967.jpg",
+        "/uploads/img_8966.jpg"
+      ],
+      "name": "Pink Banaras Dress",
+      "slug": "pink-banaras-dress",
+      "colors": [
+        "Pink"
+      ],
+      "sizes": [
+        "SM"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "pink-banaras-dress",
+      "createdAt": "2026-02-18",
+      "image": "/uploads/img_8963.jpg",
+      "description": "3 piece pink banaras dress with handmade cheerma.",
+      "category": "Party Wear"
     }
   ]
 }
