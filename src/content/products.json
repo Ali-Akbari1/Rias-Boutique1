@@ -2,7 +2,7 @@
   "products": [
     {
       "fabric": "Velvet",
-      "price": 1,
+      "price": 450,
       "galleryImages": [
         "/uploads/img.jpg",
         "/uploads/full-photo.jpg"
@@ -52,7 +52,7 @@
     },
     {
       "fabric": "Velvet ",
-      "price": 1,
+      "price": 400,
       "galleryImages": [
         "/uploads/img_0557.jpg",
         "/uploads/img_0666.jpg"
