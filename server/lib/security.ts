@@ -115,11 +115,14 @@ export const verifyWebhookSignature = ({
   }
 
   const effectiveTimestamp = resolveWebhookTimestamp(signatureHeader, timestampHeader);
-  const payload = effectiveTimestamp ? `${effectiveTimestamp}.${rawBody}` : rawBody;
-  const expectedHex = createHmac("sha256", secret).update(payload).digest("hex");
-  const expectedBase64 = createHmac("sha256", secret).update(payload).digest("base64");
+  const payloads = effectiveTimestamp ? [`${effectiveTimestamp}.${rawBody}`, rawBody] : [rawBody];
 
-  return signatures.some((candidate) => safeTimingCompare(candidate, expectedHex) || safeTimingCompare(candidate, expectedBase64));
+  const expectedSignatures = payloads.flatMap((payload) => [
+    createHmac("sha256", secret).update(payload).digest("hex"),
+    createHmac("sha256", secret).update(payload).digest("base64"),
+  ]);
+
+  return signatures.some((candidate) => expectedSignatures.some((expected) => safeTimingCompare(candidate, expected)));
 };
 
 export const verifyWebhookTimestamp = (timestampHeader: string, toleranceMs: number) => {

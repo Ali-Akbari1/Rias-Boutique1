@@ -222,6 +222,65 @@ describe("clover webhook flow", () => {
     });
   });
 
+  it("accepts raw-body signatures even when timestamp header is present", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_rawsig_1", href: "https://checkout.clover.com/pay/checkout_rawsig_1" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const checkoutResponse = createMockResponse();
+    await checkoutHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "user-agent": "Mozilla/5.0",
+        },
+        body: JSON.stringify(buildCheckoutRequestBody()),
+      }),
+      checkoutResponse,
+    );
+
+    expect(checkoutResponse.statusCode).toBe(200);
+    const orderId = (checkoutResponse.jsonBody as { orderId?: string }).orderId || "";
+    expect(orderId).toBeTruthy();
+
+    const webhookPayload = {
+      id: "evt_paid_rawsig_1",
+      type: "payment.succeeded",
+      orderId,
+      checkoutId: "checkout_rawsig_1",
+      paymentId: "pay_rawsig_1",
+      status: "paid",
+    };
+    const rawBody = JSON.stringify(webhookPayload);
+    const timestamp = String(Math.floor(Date.now() / 1000));
+    const signature = createHmac("sha256", WEBHOOK_SECRET).update(rawBody).digest("hex");
+
+    const webhookResponse = createMockResponse();
+    await webhookHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "x-clover-signature": signature,
+          "x-clover-timestamp": timestamp,
+        },
+        body: rawBody,
+      }),
+      webhookResponse,
+    );
+
+    expect(webhookResponse.statusCode).toBe(200);
+    expect(webhookResponse.jsonBody).toMatchObject({
+      processed: true,
+      orderId,
+    });
+  });
+
   it("records failed payments without decrementing inventory", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "checkout_fail_1", href: "https://checkout.clover.com/pay/checkout_fail_1" }), {
