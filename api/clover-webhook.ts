@@ -32,6 +32,12 @@ const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
 const DEFAULT_TIMESTAMP_TOLERANCE_MS = 5 * 60 * 1000;
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "POST") {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
@@ -110,6 +116,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const parsed = parseCloverWebhook(payload, rawBody);
+  console.log("[clover-webhook] parsed payload", {
+    eventId: parsed.eventId,
+    eventType: parsed.eventType,
+    orderId: parsed.orderId,
+    checkoutId: parsed.checkoutId,
+    isPaidEvent: parsed.isPaidEvent,
+  });
   const order = parsed.orderId ? await findOrderById(parsed.orderId) : await findOrderByCheckoutId(parsed.checkoutId);
   if (!order) {
     // Ack unknown events to avoid provider retry storms.

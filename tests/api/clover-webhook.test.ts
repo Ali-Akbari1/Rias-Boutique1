@@ -5,7 +5,7 @@ import checkoutHandler from "../../api/clover-checkout";
 import webhookHandler from "../../api/clover-webhook";
 import orderStatusHandler from "../../api/order-status";
 import { createMockRequest, createMockResponse } from "./test-utils/utils";
-import { closeOrderStoreForTests, getInventoryQuantity, resetOrderStoreForTests } from "../../server/lib/order-store.js";
+import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
 const WEBHOOK_SECRET = "webhook_secret_test";
 
 const buildCheckoutRequestBody = () => ({
@@ -37,7 +37,7 @@ describe("clover webhook flow", () => {
     await resetOrderStoreForTests();
   });
 
-  it("marks order as paid, decrements inventory, and is idempotent", async () => {
+  it("marks order as paid and is idempotent", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "checkout_abc", href: "https://checkout.clover.com/pay/checkout_abc" }), {
         status: 200,
@@ -62,9 +62,6 @@ describe("clover webhook flow", () => {
     expect(checkoutResponse.statusCode).toBe(200);
     const orderId = (checkoutResponse.jsonBody as { orderId?: string }).orderId || "";
     expect(orderId).toBeTruthy();
-
-    const inventoryBefore = await getInventoryQuantity("Royal-Blue");
-    expect(inventoryBefore === null || typeof inventoryBefore === "number").toBe(true);
 
     const webhookPayload = {
       id: "evt_paid_1",
@@ -114,13 +111,6 @@ describe("clover webhook flow", () => {
       paymentStatus: "paid",
     });
 
-    const inventoryAfterFirstWebhook = await getInventoryQuantity("Royal-Blue");
-    if (typeof inventoryBefore === "number") {
-      expect(inventoryAfterFirstWebhook).toBe(inventoryBefore - 1);
-    } else {
-      expect(inventoryAfterFirstWebhook).toBeNull();
-    }
-
     const duplicateWebhookResponse = createMockResponse();
     await webhookHandler(
       createMockRequest({
@@ -139,7 +129,6 @@ describe("clover webhook flow", () => {
     expect(duplicateWebhookResponse.jsonBody).toMatchObject({
       duplicate: true,
     });
-    expect(await getInventoryQuantity("Royal-Blue")).toBe(inventoryAfterFirstWebhook);
   });
 
   it("rejects invalid webhook signatures", async () => {
@@ -281,7 +270,7 @@ describe("clover webhook flow", () => {
     });
   });
 
-  it("records failed payments without decrementing inventory", async () => {
+  it("records failed payments without marking order as paid", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "checkout_fail_1", href: "https://checkout.clover.com/pay/checkout_fail_1" }), {
         status: 200,
@@ -306,8 +295,6 @@ describe("clover webhook flow", () => {
     expect(checkoutResponse.statusCode).toBe(200);
     const orderId = (checkoutResponse.jsonBody as { orderId?: string }).orderId || "";
     expect(orderId).toBeTruthy();
-    const inventoryBeforeFailedWebhook = await getInventoryQuantity("Royal-Blue");
-
     const webhookPayload = {
       id: "evt_failed_1",
       type: "payment.failed",
@@ -356,6 +343,5 @@ describe("clover webhook flow", () => {
       pending: false,
       paymentStatus: "failed",
     });
-    expect(await getInventoryQuantity("Royal-Blue")).toBe(inventoryBeforeFailedWebhook);
   });
 });

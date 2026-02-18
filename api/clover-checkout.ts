@@ -23,7 +23,6 @@ import {
   findOrderByIdempotencyKey,
   isOrderStoreConfigured,
   markOrderFailed,
-  seedInventoryFromCatalog,
   type OrderLineItem,
 } from "../server/lib/order-store.js";
 import { createCloverCheckoutSession } from "../server/lib/clover.js";
@@ -183,7 +182,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const catalog = await loadCatalog();
-  await seedInventoryFromCatalog(catalog);
   const catalogMap = await getCatalogMap();
 
   const lineItems: OrderLineItem[] = [];

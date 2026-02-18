@@ -11,26 +11,53 @@ interface ParsedCloverWebhook {
 
 const asObject = (value: unknown) => (typeof value === "object" && value !== null ? (value as Record<string, unknown>) : null);
 const asString = (value: unknown) => (typeof value === "string" ? value.trim() : "");
+const asScalarString = (value: unknown) => {
+  if (typeof value === "string") {
+    return value.trim();
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+  return "";
+};
+const normalizeKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 const pullNestedString = (payload: Record<string, unknown>, keys: string[]) => {
+  const keySet = new Set(keys.map((key) => normalizeKey(key)));
+
   for (const key of keys) {
-    const direct = asString(payload[key]);
+    const direct = asScalarString(payload[key]);
     if (direct) {
       return direct;
     }
   }
 
-  for (const value of Object.values(payload)) {
-    const nested = asObject(value);
-    if (!nested) {
+  const stack: unknown[] = [...Object.values(payload)];
+  const seen = new Set<object>();
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (Array.isArray(current)) {
+      for (const item of current) {
+        stack.push(item);
+      }
       continue;
     }
 
-    for (const key of keys) {
-      const nestedValue = asString(nested[key]);
-      if (nestedValue) {
-        return nestedValue;
+    const nested = asObject(current);
+    if (!nested || seen.has(nested)) {
+      continue;
+    }
+    seen.add(nested);
+
+    for (const [entryKey, entryValue] of Object.entries(nested)) {
+      if (keySet.has(normalizeKey(entryKey))) {
+        const nestedValue = asScalarString(entryValue);
+        if (nestedValue) {
+          return nestedValue;
+        }
       }
+
+      stack.push(entryValue);
     }
   }
 
@@ -39,13 +66,40 @@ const pullNestedString = (payload: Record<string, unknown>, keys: string[]) => {
 
 export const parseCloverWebhook = (payload: unknown, rawBody: string): ParsedCloverWebhook => {
   const record = asObject(payload) || {};
-  const eventType = pullNestedString(record, ["type", "eventType", "name"]).toLowerCase() || "unknown";
+  const eventType =
+    pullNestedString(record, ["type", "eventType", "name", "event_name", "eventTypeName"]).toLowerCase() || "unknown";
   const eventId =
-    pullNestedString(record, ["eventId", "id", "webhookId"]) || createDeterministicHash(`${eventType}|${rawBody}`);
-  const orderId = pullNestedString(record, ["orderId", "externalReferenceId", "externalId"]);
-  const checkoutId = pullNestedString(record, ["checkoutId", "checkoutSessionId", "sessionId", "paymentId"]);
-  const paymentReference = pullNestedString(record, ["paymentId", "id", "transactionId", "checkoutId", "sessionId"]);
-  const status = pullNestedString(record, ["status", "paymentStatus"]).toLowerCase();
+    pullNestedString(record, ["eventId", "webhookId", "event_id", "id"]) || createDeterministicHash(`${eventType}|${rawBody}`);
+  const orderId = pullNestedString(record, [
+    "orderId",
+    "order_id",
+    "externalReferenceId",
+    "external_reference_id",
+    "externalId",
+    "orderReferenceId",
+    "merchantOrderId",
+  ]);
+  const checkoutId = pullNestedString(record, [
+    "checkoutId",
+    "checkout_id",
+    "checkoutSessionId",
+    "checkout_session_id",
+    "sessionId",
+    "session_id",
+  ]);
+  const paymentReference = pullNestedString(record, [
+    "paymentId",
+    "payment_id",
+    "transactionId",
+    "transaction_id",
+    "paymentReference",
+    "referenceId",
+    "checkoutId",
+    "checkout_id",
+    "sessionId",
+    "session_id",
+  ]);
+  const status = pullNestedString(record, ["status", "paymentStatus", "payment_status", "state", "result"]).toLowerCase();
   const normalizedEventType = eventType.replace(/[\s-]+/g, "_");
   const normalizedStatus = status.replace(/[\s-]+/g, "_");
 

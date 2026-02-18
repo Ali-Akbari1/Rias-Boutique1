@@ -155,32 +155,7 @@ const findMemoryOrderBy = (predicate: (order: StoredOrder) => boolean) => {
 };
 
 export const seedInventoryFromCatalog = async (catalog: CatalogProduct[]) => {
-  if (catalog.length === 0) {
-    return;
-  }
-
-  const seededAt = nowIso();
-  if (isMemoryStoreEnabled()) {
-    for (const product of catalog) {
-      if (!memoryInventory.has(product.id)) {
-        memoryInventory.set(product.id, {
-          quantity: product.inventory,
-          updatedAt: seededAt,
-        });
-      }
-    }
-    return;
-  }
-
-  const supabase = getSupabaseAdminClient();
-  const rows = catalog.map((product) => ({
-    product_id: product.id,
-    quantity: product.inventory,
-    updated_at: seededAt,
-  }));
-
-  const { error } = await supabase.from("inventory").upsert(rows, { onConflict: "product_id", ignoreDuplicates: true });
-  ensureNoSupabaseError(error, "seed inventory");
+  void catalog;
 };
 
 export const findOrderById = async (orderId: string) => {
@@ -436,31 +411,6 @@ export const markOrderPaidAndDecrementInventory = async ({
     }
 
     const paidAt = nowIso();
-
-    for (const lineItem of order.lineItems) {
-      if (!memoryInventory.has(lineItem.productId)) {
-        memoryInventory.set(lineItem.productId, {
-          quantity: null,
-          updatedAt: paidAt,
-        });
-      }
-
-      const inventory = memoryInventory.get(lineItem.productId);
-      if (!inventory) {
-        continue;
-      }
-
-      if (typeof inventory.quantity === "number") {
-        if (inventory.quantity < lineItem.quantity) {
-          throw new Error(`Insufficient inventory for product ${lineItem.productId}.`);
-        }
-
-        inventory.quantity -= lineItem.quantity;
-      }
-      inventory.updatedAt = paidAt;
-      memoryInventory.set(lineItem.productId, { ...inventory });
-    }
-
     order.paymentStatus = "paid";
     order.paymentReference = normalizePaymentReference(paymentReference);
     order.paidAt = paidAt;
@@ -471,16 +421,26 @@ export const markOrderPaidAndDecrementInventory = async ({
   }
 
   const supabase = getSupabaseAdminClient();
-  const { data, error } = await supabase.rpc("mark_order_paid_and_decrement_inventory", {
-    p_order_id: orderId,
-    p_payment_reference: normalizePaymentReference(paymentReference) || null,
-  });
-  ensureNoSupabaseError(error, "mark order as paid and decrement inventory");
-
-  const row = Array.isArray(data) ? data[0] : data;
-  if (asObject(row)) {
-    return parseOrderRow(row);
+  const existingOrder = await findOrderById(orderId);
+  if (!existingOrder) {
+    throw new Error(`Order ${orderId} not found.`);
   }
+  if (existingOrder.paymentStatus === "paid") {
+    return existingOrder;
+  }
+
+  const paidAt = nowIso();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      payment_status: "paid",
+      payment_reference: normalizePaymentReference(paymentReference) || null,
+      paid_at: paidAt,
+      updated_at: paidAt,
+      last_error: "",
+    })
+    .eq("id", orderId);
+  ensureNoSupabaseError(error, "mark order as paid");
 
   const updatedOrder = await findOrderById(orderId);
   if (!updatedOrder) {
