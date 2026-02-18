@@ -2,7 +2,7 @@
   "products": [
     {
       "fabric": "Velvet",
-      "price": 1,
+      "price": 450,
       "galleryImages": [
         "/uploads/img.jpg",
         "/uploads/full-photo.jpg"
@@ -52,7 +52,7 @@
     },
     {
       "fabric": "Velvet ",
-      "price": 1,
+      "price": 400,
       "galleryImages": [
         "/uploads/img_0557.jpg",
         "/uploads/img_0666.jpg"
@@ -165,6 +165,7 @@
       "id": "Black-Gulabatoon-dress",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_8937.jpg",
+      "inventory": 0,
       "description": "Black velvet dress with wide-leg pants, featuring gulabatoon detailing.",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39th\n\n3 pieces: Dress, Pants, and Chadar"
@@ -194,6 +195,62 @@
       "description": "White velvet dress with wide-leg pants, featuring handmade silver cheerma.",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39in "
+    },
+    {
+      "fabric": "Velvet",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/12665fda-357f-442c-bea4-4b06977b5b1b.jpg",
+        "/uploads/img_0643.jpg",
+        "/uploads/img_0712.jpg"
+      ],
+      "name": "Handmade Cheerma Dozi Dress (Pre-Order Only)",
+      "slug": "Cheerma-dozi-3-piece",
+      "colors": [
+        "Burgundy (Pre-order)",
+        "Purple (Pre-order)",
+        "Red (Pre-order)",
+        "Blue (Pre-order)"
+      ],
+      "sizes": [
+        "SM (40in)",
+        "M (42in)",
+        "L (44in)",
+        "XL (46in)"
+      ],
+      "popularity": 100,
+      "id": "Cheerma-dozi-3-piece",
+      "createdAt": "2026-02-18",
+      "image": "/uploads/12665fda-357f-442c-bea4-4b06977b5b1b.jpg",
+      "deliveryEstimate": "Custom Order: Minimum 4 weeks needed outside of shipping time ",
+      "inventory": 0,
+      "description": "Handmade cheerma dozi dress with wide legged pants.",
+      "category": "Party Wear"
+    },
+    {
+      "fabric": "Banaras ",
+      "price": 380,
+      "galleryImages": [
+        "/uploads/img_8963.jpg",
+        "/uploads/img_8967.jpg",
+        "/uploads/img_8966.jpg"
+      ],
+      "name": "Pink Banaras Dress",
+      "slug": "pink-banaras-dress",
+      "colors": [
+        "Pink"
+      ],
+      "sizes": [
+        "SM"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "pink-banaras-dress",
+      "createdAt": "2026-02-18",
+      "image": "/uploads/img_8963.jpg",
+      "description": "3 piece pink banaras dress with handmade cheerma.",
+      "category": "Party Wear"
     }
   ]
 }
