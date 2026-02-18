@@ -36,6 +36,17 @@ export const config = {
   },
 };
 
+const getWebhookSecrets = () => {
+  const rawValues = [
+    process.env.CLOVER_WEBHOOK_SECRET || "",
+    process.env.CLOVER_WEBHOOK_SECRETS || "",
+    process.env.CLOVER_WEBHOOK_SECRET_SANDBOX || "",
+    process.env.CLOVER_WEBHOOK_SECRET_PRODUCTION || "",
+  ];
+
+  return [...new Set(rawValues.flatMap((value) => value.split(",").map((part) => part.trim()).filter(Boolean)))];
+};
+
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "POST") {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
@@ -59,8 +70,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const webhookSecret = process.env.CLOVER_WEBHOOK_SECRET?.trim() || "";
-  if (!webhookSecret) {
+  const webhookSecrets = getWebhookSecrets();
+  if (webhookSecrets.length === 0) {
     sendError(res, 500, "WEBHOOK_NOT_CONFIGURED", "Webhook secret is not configured on the server.");
     return;
   }
@@ -83,7 +94,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     rawBody,
     signatureHeader,
     timestampHeader,
-    secret: webhookSecret,
+    secret: webhookSecrets,
   });
   if (!signatureValid) {
     console.error("[clover-webhook] signature verification failed", {
