@@ -402,4 +402,78 @@ describe("clover webhook flow", () => {
       paymentStatus: "failed",
     });
   });
+
+  it("treats generic Clover payment events as paid when identifiers are present", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_generic_1", href: "https://checkout.clover.com/pay/checkout_generic_1" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const checkoutResponse = createMockResponse();
+    await checkoutHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "user-agent": "Mozilla/5.0",
+        },
+        body: JSON.stringify(buildCheckoutRequestBody()),
+      }),
+      checkoutResponse,
+    );
+
+    expect(checkoutResponse.statusCode).toBe(200);
+    const orderId = (checkoutResponse.jsonBody as { orderId?: string }).orderId || "";
+    expect(orderId).toBeTruthy();
+
+    const webhookPayload = {
+      id: "evt_generic_payment_1",
+      type: "payment",
+      orderId,
+      checkoutId: "checkout_generic_1",
+      paymentId: "pay_generic_1",
+    };
+    const rawBody = JSON.stringify(webhookPayload);
+    const timestamp = String(Math.floor(Date.now() / 1000));
+    const signature = createHmac("sha256", WEBHOOK_SECRET).update(`${timestamp}.${rawBody}`).digest("hex");
+
+    const webhookResponse = createMockResponse();
+    await webhookHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "x-clover-signature": signature,
+          "x-clover-timestamp": timestamp,
+        },
+        body: rawBody,
+      }),
+      webhookResponse,
+    );
+
+    expect(webhookResponse.statusCode).toBe(200);
+    expect(webhookResponse.jsonBody).toMatchObject({
+      processed: true,
+      orderId,
+    });
+
+    const statusResponse = createMockResponse();
+    await orderStatusHandler(
+      createMockRequest({
+        method: "GET",
+        query: { orderId },
+        headers: {},
+      }),
+      statusResponse,
+    );
+
+    expect(statusResponse.statusCode).toBe(200);
+    expect(statusResponse.jsonBody).toMatchObject({
+      confirmed: true,
+      paymentStatus: "paid",
+    });
+  });
 });

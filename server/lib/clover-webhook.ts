@@ -67,7 +67,8 @@ const pullNestedString = (payload: Record<string, unknown>, keys: string[]) => {
 export const parseCloverWebhook = (payload: unknown, rawBody: string): ParsedCloverWebhook => {
   const record = asObject(payload) || {};
   const eventType =
-    pullNestedString(record, ["type", "eventType", "name", "event_name", "eventTypeName"]).toLowerCase() || "unknown";
+    pullNestedString(record, ["type", "eventType", "name", "event_name", "eventTypeName", "objectType", "object_type"])
+      .toLowerCase() || "unknown";
   const eventId =
     pullNestedString(record, ["eventId", "webhookId", "event_id", "id"]) || createDeterministicHash(`${eventType}|${rawBody}`);
   const orderId = pullNestedString(record, [
@@ -99,7 +100,23 @@ export const parseCloverWebhook = (payload: unknown, rawBody: string): ParsedClo
     "sessionId",
     "session_id",
   ]);
-  const status = pullNestedString(record, ["status", "paymentStatus", "payment_status", "state", "result"]).toLowerCase();
+  const status = pullNestedString(record, [
+    "status",
+    "paymentStatus",
+    "payment_status",
+    "paymentState",
+    "payment_state",
+    "state",
+    "result",
+    "paymentResult",
+    "payment_result",
+    "transactionStatus",
+    "transaction_status",
+    "transactionState",
+    "transaction_state",
+    "eventStatus",
+    "event_status",
+  ]).toLowerCase();
   const normalizedEventType = eventType.replace(/[\s-]+/g, "_");
   const normalizedStatus = status.replace(/[\s-]+/g, "_");
 
@@ -107,6 +124,7 @@ export const parseCloverWebhook = (payload: unknown, rawBody: string): ParsedClo
   const paidStatuses = new Set(["paid", "succeeded", "success", "completed", "captured", "settled"]);
   const paidEventNames = new Set([
     "paid",
+    "payment",
     "payment_success",
     "payment.succeeded",
     "payment_succeeded",
@@ -120,7 +138,15 @@ export const parseCloverWebhook = (payload: unknown, rawBody: string): ParsedClo
     paidEventNames.has(normalizedEventType) ||
     /^payment[._]succeeded$/.test(normalizedEventType) ||
     /^charge[._]succeeded$/.test(normalizedEventType);
-  const isPaidEvent = hasPaidEventName || hasPaidStatus;
+  const isGenericPaymentEvent =
+    normalizedEventType === "payment" || normalizedEventType === "payments" || normalizedEventType === "paymentcreated";
+  const hasFailureSignal =
+    negativeStatuses.has(normalizedStatus) ||
+    /fail|cancel|declin|void|refund|chargeback/.test(normalizedEventType) ||
+    /fail|cancel|declin|void|refund|chargeback/.test(normalizedStatus);
+  const hasPaymentIdentifiers = Boolean(paymentReference || checkoutId);
+  const isPaidEvent =
+    hasPaidEventName || hasPaidStatus || (isGenericPaymentEvent && hasPaymentIdentifiers && !hasFailureSignal);
 
   return {
     eventId,
