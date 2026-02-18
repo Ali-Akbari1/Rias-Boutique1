@@ -114,6 +114,32 @@ export const readRawBody = async (req: ApiRequest): Promise<string> => {
   return Buffer.concat(chunks).toString("utf8");
 };
 
+// Reads body bytes directly from the request stream without touching req.body.
+// This is required for webhook signature verification, where any JSON parsing
+// can alter the payload and invalidate HMAC checks.
+export const readRawBodyFromStream = async (req: ApiRequest): Promise<string> => {
+  if (!req.on) {
+    return "";
+  }
+
+  const chunks: Buffer[] = [];
+  await new Promise<void>((resolve, reject) => {
+    req.on?.("data", (chunk: unknown) => {
+      if (typeof chunk === "string") {
+        chunks.push(Buffer.from(chunk));
+        return;
+      }
+      if (Buffer.isBuffer(chunk)) {
+        chunks.push(chunk);
+      }
+    });
+    req.on?.("end", () => resolve());
+    req.on?.("error", (error: unknown) => reject(error));
+  });
+
+  return Buffer.concat(chunks).toString("utf8");
+};
+
 export const parseJsonBody = <T>(rawBody: string): T | null => {
   const normalized = rawBody.trim();
   if (!normalized) {

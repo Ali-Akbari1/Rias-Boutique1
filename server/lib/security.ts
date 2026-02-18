@@ -98,6 +98,14 @@ const normalizeSignature = (signature: string) => {
   return value;
 };
 
+const isHexString = (value: string) => /^[0-9a-f]+$/i.test(value);
+const toBase64Url = (value: string) => value.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+const toBase64Standard = (value: string) => {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padding = normalized.length % 4;
+  return padding === 0 ? normalized : normalized.padEnd(normalized.length + (4 - padding), "=");
+};
+
 export const resolveWebhookTimestamp = (signatureHeader: string, timestampHeader: string) => {
   const headerTimestamp = timestampHeader.trim();
   if (headerTimestamp) {
@@ -145,16 +153,30 @@ export const verifyWebhookSignature = ({
     : [rawBody];
 
   const algorithms = ["sha256", "sha1", "sha512"] as const;
-  const expectedSignatures = secrets.flatMap((secretEntry) =>
-    payloads.flatMap((payload) =>
-      algorithms.flatMap((algorithm) => [
-        createHmac(algorithm, secretEntry).update(payload).digest("hex"),
-        createHmac(algorithm, secretEntry).update(payload).digest("base64"),
-      ]),
+  const expectedSignatures = new Set(
+    secrets.flatMap((secretEntry) =>
+      payloads.flatMap((payload) =>
+        algorithms.flatMap((algorithm) => {
+          const hex = createHmac(algorithm, secretEntry).update(payload).digest("hex");
+          const base64 = createHmac(algorithm, secretEntry).update(payload).digest("base64");
+          return [hex, base64, toBase64Url(base64)];
+        }),
+      ),
     ),
   );
 
-  return signatures.some((candidate) => expectedSignatures.some((expected) => safeTimingCompare(candidate, expected)));
+  return signatures.some((candidate) => {
+    const variants = new Set<string>([candidate]);
+    if (isHexString(candidate)) {
+      variants.add(candidate.toLowerCase());
+    }
+    variants.add(toBase64Standard(candidate));
+    variants.add(toBase64Url(candidate));
+
+    return [...variants].some((variant) =>
+      [...expectedSignatures].some((expected) => safeTimingCompare(variant, expected)),
+    );
+  });
 };
 
 export const verifyWebhookTimestamp = (timestampHeader: string, toleranceMs: number) => {

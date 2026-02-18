@@ -2,6 +2,7 @@ import {
   getHeader,
   parseJsonBody,
   readRawBody,
+  readRawBodyFromStream,
   sendError,
   type ApiRequest,
   type ApiResponse,
@@ -64,7 +65,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const rawBody = await readRawBody(req);
+  // For signature verification we must hash the exact raw stream bytes.
+  // Fallback to generic body reader only in non-stream test environments.
+  const streamBody = await readRawBodyFromStream(req);
+  const rawBody = streamBody || (await readRawBody(req));
   if (!rawBody.trim()) {
     sendError(res, 400, "INVALID_PAYLOAD", "Webhook payload is empty.");
     return;
