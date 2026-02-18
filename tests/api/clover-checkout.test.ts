@@ -8,6 +8,7 @@ const makeCheckoutBody = () => ({
   customer: {
     fullName: "Test Customer",
     email: "test@example.com",
+    phone: "+1 (403) 555-0101",
     address: "123 Main St",
     city: "Calgary",
     state: "Alberta",

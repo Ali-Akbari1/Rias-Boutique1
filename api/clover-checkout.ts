@@ -225,7 +225,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       customer: {
         fullName: payload.customer.fullName,
         email: payload.customer.email,
-        phone: payload.customer.phone || "",
+        phone: payload.customer.phone,
         address: payload.customer.address,
         city: payload.customer.city,
         state: payload.customer.state,

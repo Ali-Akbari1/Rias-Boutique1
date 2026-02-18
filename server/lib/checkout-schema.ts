@@ -16,10 +16,9 @@ export const checkoutCustomerSchema = z
     phone: z
       .string()
       .trim()
+      .min(7, "Phone number is required.")
       .max(22, "Phone number is too long.")
-      .regex(phoneRegex, "Phone number format is invalid.")
-      .optional()
-      .or(z.literal("")),
+      .regex(phoneRegex, "Phone number format is invalid."),
     address: z.string().trim().min(4, "Address is required.").max(200, "Address is too long."),
     city: z
       .string()

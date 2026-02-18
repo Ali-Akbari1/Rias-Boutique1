@@ -10,6 +10,7 @@ Live site: `https://www.riasboutique.com`
 - Product detail pages with gallery, zoom, sizes, colors, and care details.
 - Cart drawer with quantity controls and subtotal.
 - Optional Clover Checkout flow (`/checkout`, `/checkout/success`, `/checkout/cancel`).
+- Admin orders dashboard (`/orders-admin`) for viewing paid/pending orders and shipping details.
 - Google Reviews section with live fetch fallback to curated reviews.
 - Instagram highlights driven by environment config.
 - Decap CMS for non-coder product editing and media uploads.
@@ -99,6 +100,7 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `VITE_SUPABASE_ANON_KEY`: Optional client anon key if frontend calls Supabase directly.
 - `GOOGLE_PLACES_API_KEY`: For `/api/google-reviews`.
 - `GOOGLE_PLACE_ID`: For `/api/google-reviews`.
+- `ADMIN_DASHBOARD_TOKEN`: Required token for `/api/admin-orders` and `/orders-admin`.
 - `GITHUB_OAUTH_CLIENT_ID`: For Decap GitHub auth.
 - `GITHUB_OAUTH_CLIENT_SECRET`: For Decap GitHub auth.
 - `CMS_BASE_URL`: Base URL used by OAuth callbacks, e.g. `https://www.riasboutique.com`.

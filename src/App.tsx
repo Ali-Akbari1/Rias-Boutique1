@@ -10,6 +10,7 @@ import HomePage from "./pages/HomePage";
 import Checkout from "./pages/Checkout";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import CheckoutCancel from "./pages/CheckoutCancel";
+import AdminOrders from "./pages/AdminOrders";
 import ProductDetails from "./pages/ProductDetails";
 import NotFound from "./pages/NotFound";
 
@@ -41,6 +42,7 @@ const App = () => {
                 path="/checkout/cancel"
                 element={checkoutEnabled ? <CheckoutCancel /> : <Navigate to="/" replace />}
               />
+              <Route path="/orders-admin" element={<AdminOrders />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

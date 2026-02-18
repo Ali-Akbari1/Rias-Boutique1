@@ -53,6 +53,7 @@ describe("checkout flow", () => {
 
     fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: "Test Buyer" } });
     fireEvent.change(screen.getByLabelText(/^email$/i), { target: { value: "buyer@example.com" } });
+    fireEvent.change(screen.getByLabelText(/^phone$/i), { target: { value: "+1 (403) 555-0101" } });
     fireEvent.change(screen.getByLabelText(/^address$/i), { target: { value: "123 Main St" } });
     fireEvent.change(screen.getByLabelText(/^city$/i), { target: { value: "Calgary" } });
     fireEvent.change(screen.getByLabelText(/state \/ province/i), { target: { value: "Alberta" } });

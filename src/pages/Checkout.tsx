@@ -20,6 +20,7 @@ import { faqItems, getGoogleReviewsUrl, returnPolicy, shippingPolicy } from "@/f
 interface CheckoutForm {
   fullName: string;
   email: string;
+  phone: string;
   address: string;
   city: string;
   state: string;
@@ -37,6 +38,7 @@ interface CloverCheckoutResponse {
 const initialForm: CheckoutForm = {
   fullName: "",
   email: "",
+  phone: "",
   address: "",
   city: "",
   state: "",
@@ -174,6 +176,22 @@ const Checkout = () => {
                         value={checkoutForm.email}
                         onChange={handleFormChange("email")}
                         autoComplete="email"
+                      />
+                    </div>
+
+                    <div className="space-y-2 sm:col-span-2">
+                      <label htmlFor="phone" className="font-body text-sm font-semibold text-foreground">
+                        Phone
+                      </label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        required
+                        maxLength={22}
+                        pattern="[0-9()+\\-.\\s]{7,22}"
+                        value={checkoutForm.phone}
+                        onChange={handleFormChange("phone")}
+                        autoComplete="tel"
                       />
                     </div>
 
@@ -403,5 +421,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-
-
