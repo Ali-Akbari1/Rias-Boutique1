@@ -66,9 +66,28 @@ export const looksAutomatedTraffic = (req: ApiRequest) => {
 
 const normalizeSignature = (signature: string) => {
   const trimmed = signature.trim();
+  if (!trimmed || /^t=\d+$/i.test(trimmed)) {
+    return "";
+  }
   const withoutAlgo = trimmed.replace(/^sha256=/i, "").replace(/^v1=/i, "");
   const parts = withoutAlgo.split("=");
   return parts.length > 1 ? parts.at(-1)?.trim() || "" : withoutAlgo;
+};
+
+export const resolveWebhookTimestamp = (signatureHeader: string, timestampHeader: string) => {
+  const headerTimestamp = timestampHeader.trim();
+  if (headerTimestamp) {
+    return headerTimestamp;
+  }
+
+  const signatureTimestamp = signatureHeader
+    .split(",")
+    .map((value) => value.trim())
+    .find((part) => /^t=\d+$/i.test(part))
+    ?.replace(/^t=/i, "")
+    .trim();
+
+  return signatureTimestamp || "";
 };
 
 export const verifyWebhookSignature = ({
@@ -95,7 +114,8 @@ export const verifyWebhookSignature = ({
     return false;
   }
 
-  const payload = timestampHeader ? `${timestampHeader}.${rawBody}` : rawBody;
+  const effectiveTimestamp = resolveWebhookTimestamp(signatureHeader, timestampHeader);
+  const payload = effectiveTimestamp ? `${effectiveTimestamp}.${rawBody}` : rawBody;
   const expectedHex = createHmac("sha256", secret).update(payload).digest("hex");
   const expectedBase64 = createHmac("sha256", secret).update(payload).digest("base64");
 

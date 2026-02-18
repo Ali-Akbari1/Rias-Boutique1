@@ -9,6 +9,7 @@ import {
 import { checkRateLimit, applyRateLimitHeaders } from "../server/lib/rate-limit.js";
 import {
   getClientIp,
+  resolveWebhookTimestamp,
   verifyWebhookSignature,
   verifyWebhookTimestamp,
   validateOrigin,
@@ -79,8 +80,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     getHeader(req, "clover-signature") ||
     getHeader(req, "x-webhook-signature") ||
     "";
-  const timestampHeader =
+  const rawTimestampHeader =
     getHeader(req, "x-clover-timestamp") || getHeader(req, "clover-timestamp") || getHeader(req, "x-timestamp") || "";
+  const timestampHeader = resolveWebhookTimestamp(signatureHeader, rawTimestampHeader);
 
   const signatureValid = verifyWebhookSignature({
     rawBody,
