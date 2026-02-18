@@ -38,8 +38,8 @@ export interface GoogleReviewsResponse {
 }
 
 export const shippingPolicy = {
-  standardCost: "CA$20 flat rate",
-  freeShippingThreshold: "CA$350+",
+  standardCost: "CA$30 flat rate",
+  freeShippingThreshold: "CA$400+",
   standardTimeline: "5-10 business days (Canada)",
 };
 

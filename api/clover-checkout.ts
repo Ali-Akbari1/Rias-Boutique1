@@ -30,6 +30,18 @@ import { createCloverCheckoutSession } from "../server/lib/clover.js";
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
+const SHIPPING_FLAT_RATE_MINOR = 3_000; // CA$30.00
+const FREE_SHIPPING_THRESHOLD_MINOR = 40_000; // CA$400.00
+const TAX_RATE = 0.05; // 5%
+const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
+const isShippingChargesEnabled = () => {
+  const serverToggle = process.env.ENABLE_SHIPPING_CHARGES;
+  if (typeof serverToggle === "string" && serverToggle.trim().length > 0) {
+    return toBoolean(serverToggle);
+  }
+
+  return toBoolean(process.env.VITE_ENABLE_SHIPPING_CHARGES);
+};
 
 const getCheckoutBaseUrl = () => process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "";
 
@@ -192,7 +204,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const subtotalMinor = lineItems.reduce((sum, item) => sum + item.lineTotalMinor, 0);
-  const totalMinor = subtotalMinor;
+  const shippingMinor =
+    isShippingChargesEnabled() && subtotalMinor < FREE_SHIPPING_THRESHOLD_MINOR ? SHIPPING_FLAT_RATE_MINOR : 0;
+  const taxMinor = Math.round((subtotalMinor + shippingMinor) * TAX_RATE);
+  const totalMinor = subtotalMinor + shippingMinor + taxMinor;
 
   const shippingFingerprint = toShippingFingerprint(payload.customer);
   const idempotencyKey =
@@ -217,6 +232,32 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     sendError(res, 409, "ORDER_ALREADY_PAID", "This order has already been paid.");
     return;
   }
+
+  const checkoutLineItems = [
+    ...lineItems.map((item) => ({
+      name: item.name,
+      price: item.unitAmountMinor,
+      unitQty: item.quantity,
+    })),
+    ...(shippingMinor > 0
+      ? [
+          {
+            name: "Shipping",
+            price: shippingMinor,
+            unitQty: 1,
+          },
+        ]
+      : []),
+    ...(taxMinor > 0
+      ? [
+          {
+            name: "GST (5%)",
+            price: taxMinor,
+            unitQty: 1,
+          },
+        ]
+      : []),
+  ];
 
   const order =
     existingOrder ||
@@ -249,11 +290,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         fullName: payload.customer.fullName,
         email: payload.customer.email,
       },
-      lineItems: lineItems.map((item) => ({
-        name: item.name,
-        price: item.unitAmountMinor,
-        unitQty: item.quantity,
-      })),
+      lineItems: checkoutLineItems,
       successUrl: `${config.checkoutBaseUrl}/checkout/success?orderId=${encodeURIComponent(order.id)}&session_id={CHECKOUT_SESSION_ID}`,
       failureUrl: `${config.checkoutBaseUrl}/checkout/cancel?orderId=${encodeURIComponent(order.id)}&error_code={ERROR_CODE}`,
       timeoutMs: Number(process.env.CLOVER_TIMEOUT_MS || 12_000),

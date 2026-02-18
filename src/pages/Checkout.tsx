@@ -46,12 +46,29 @@ const initialForm: CheckoutForm = {
   country: "Canada",
 };
 
+const SHIPPING_FLAT_RATE = 30;
+const FREE_SHIPPING_THRESHOLD = 400;
+const TAX_RATE = 0.05;
+const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
+const isShippingChargesEnabled = () => toBoolean(import.meta.env.VITE_ENABLE_SHIPPING_CHARGES as string | undefined);
+
 const Checkout = () => {
   const { items, totalPrice } = useCart();
   const { toast } = useToast();
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(initialForm);
   const [isLoading, setIsLoading] = useState(false);
   const googleReviewsUrl = getGoogleReviewsUrl();
+  const shippingChargesEnabled = isShippingChargesEnabled();
+
+  const subtotalMinor = Math.round(totalPrice * 100);
+  const shippingMinor =
+    shippingChargesEnabled && subtotalMinor < FREE_SHIPPING_THRESHOLD * 100 ? SHIPPING_FLAT_RATE * 100 : 0;
+  const taxMinor = Math.round((subtotalMinor + shippingMinor) * TAX_RATE);
+  const totalMinor = subtotalMinor + shippingMinor + taxMinor;
+  const subtotal = subtotalMinor / 100;
+  const shipping = shippingMinor / 100;
+  const tax = taxMinor / 100;
+  const total = totalMinor / 100;
 
   const handleFormChange = (field: keyof CheckoutForm) => (event: ChangeEvent<HTMLInputElement>) => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));
@@ -398,22 +415,26 @@ const Checkout = () => {
                 ))}
               </div>
 
-              <div className="space-y-2 border-t border-border pt-4 text-sm">
-                <div className="flex items-center justify-between text-muted-foreground">
-                  <span>Subtotal</span>
-                  <span>{formatCad(totalPrice)}</span>
+                <div className="space-y-2 border-t border-border pt-4 text-sm">
+                  <div className="flex items-center justify-between text-muted-foreground">
+                    <span>Subtotal</span>
+                    <span>{formatCad(subtotal)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-muted-foreground">
+                    <span>Shipping</span>
+                    <span>{shipping === 0 ? "Free" : formatCad(shipping)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-muted-foreground">
+                    <span>Tax (5%)</span>
+                    <span>{formatCad(tax)}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-border pt-3 font-display text-lg font-bold text-foreground">
+                    <span>Total</span>
+                    <span>{formatCad(total)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-muted-foreground">
-                  <span>Shipping</span>
-                  <span>Calculated on Clover</span>
-                </div>
-                <div className="flex items-center justify-between border-t border-border pt-3 font-display text-lg font-bold text-foreground">
-                  <span>Total</span>
-                  <span>{formatCad(totalPrice)}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
         </div>
       </main>
     </div>
