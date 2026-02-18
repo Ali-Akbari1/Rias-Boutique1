@@ -255,7 +255,7 @@ const Checkout = () => {
                         type="tel"
                         required
                         maxLength={22}
-                        pattern="[0-9()+\\-.\\s]{7,22}"
+                        pattern="[0-9()+. -]{7,22}"
                         value={checkoutForm.phone}
                         onChange={handleFormChange("phone")}
                         autoComplete="tel"
@@ -312,7 +312,7 @@ const Checkout = () => {
                         id="postalCode"
                         required
                         maxLength={20}
-                        pattern="[A-Za-z0-9\- ]{3,20}"
+                        pattern="[A-Za-z0-9 -]{3,20}"
                         value={checkoutForm.postalCode}
                         onChange={handleFormChange("postalCode")}
                         autoComplete="postal-code"
