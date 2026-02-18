@@ -94,6 +94,9 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `CLOVER_CHECKOUT_BASE_URL`: HTTPS site URL used for success/failure redirects.
 - `CLOVER_ENABLE_TIPS`: Optional `true`/`false` to enable tips in hosted checkout.
 - `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
+- `MERCHANT_ORDER_EMAIL`: Store inbox that receives new paid order alerts.
+- `RESEND_API_KEY`: Optional Resend API key to send real merchant emails.
+- `RESEND_FROM_EMAIL`: Optional sender identity for Resend, e.g. `Ria's Boutique <orders@riasboutique.com>`.
 - `SUPABASE_URL`: Supabase project URL for server-side order persistence.
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key used by serverless checkout/webhook/order endpoints.
 - `VITE_SUPABASE_URL`: Optional client URL if frontend calls Supabase directly.
