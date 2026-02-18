@@ -5,16 +5,19 @@ import {
   markConfirmationEmailSent,
   markOrderPaidAndDecrementInventory,
 } from "../server/lib/order-store.js";
-import { getQueryValue, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import { createDeterministicHash, getQueryValue, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
-import { fetchCloverCheckoutStatus } from "../server/lib/clover.js";
+import { CloverApiError, fetchCloverCheckoutStatus } from "../server/lib/clover.js";
 import { sendOrderConfirmationEmail } from "../server/lib/email.js";
 
 const DEFAULT_RATE_LIMIT = 120;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
 const DEFAULT_CLOVER_API_BASE_URL = "https://apisandbox.dev.clover.com";
 const PROD_CLOVER_API_BASE_URL = "https://api.clover.com";
+const isDebugLoggingEnabled = () => process.env.CLOVER_DEBUG_LOGS?.trim().toLowerCase() === "true";
+const createRequestId = () => createDeterministicHash(`${Date.now()}|${Math.random()}`).slice(0, 12);
+const safeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 const getCloverApiBaseCandidates = (configuredBaseUrl: string) => {
   const normalized = (configuredBaseUrl || DEFAULT_CLOVER_API_BASE_URL).replace(/\/+$/, "");
@@ -43,6 +46,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
     return;
   }
+  const requestId = createRequestId();
+  const debugLogs = isDebugLoggingEnabled();
+  res.setHeader("X-Request-Id", requestId);
 
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   res.setHeader("Pragma", "no-cache");
@@ -93,6 +99,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const privateToken = process.env.CLOVER_PRIVATE_TOKEN?.trim() || "";
     const apiBaseUrl = (process.env.CLOVER_API_BASE_URL?.trim() || DEFAULT_CLOVER_API_BASE_URL).replace(/\/+$/, "");
     const targetCheckoutId = order.cloverCheckoutId || checkoutId;
+    const attemptLogs: Array<{
+      baseCandidate: string;
+      result: "success" | "error";
+      isPaid?: boolean;
+      paymentReference?: string;
+      error?: string;
+      statusCode?: number;
+      cloverRequestId?: string;
+      endpoint?: string;
+    }> = [];
 
     if (merchantId && privateToken && targetCheckoutId) {
       try {
@@ -109,9 +125,29 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
               checkoutId: targetCheckoutId,
               timeoutMs: Number(process.env.CLOVER_TIMEOUT_MS || 12_000),
             });
+            attemptLogs.push({
+              baseCandidate,
+              result: "success",
+              isPaid: cloverStatus.isPaid,
+              paymentReference: cloverStatus.paymentReference,
+            });
             break;
           } catch (error) {
             lookupError = error;
+            const cloverContext =
+              error instanceof CloverApiError
+                ? {
+                    statusCode: error.context.statusCode,
+                    cloverRequestId: error.context.responseRequestId,
+                    endpoint: error.context.endpoint,
+                  }
+                : {};
+            attemptLogs.push({
+              baseCandidate,
+              result: "error",
+              error: safeErrorMessage(error),
+              ...cloverContext,
+            });
             if (!isRetryableCloverLookupError(error)) {
               break;
             }
@@ -120,6 +156,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
         if (!cloverStatus && lookupError) {
           throw lookupError;
+        }
+
+        if (debugLogs) {
+          console.log("[order-status] Clover fallback attempts", {
+            requestId,
+            orderId: order.id,
+            checkoutId: targetCheckoutId,
+            configuredApiBase: apiBaseUrl,
+            attempts: attemptLogs,
+          });
         }
 
         if (cloverStatus?.isPaid) {
@@ -136,12 +182,32 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         }
       } catch (error) {
         console.error("[order-status] Clover fallback verification failed", {
+          requestId,
           orderId: order.id,
           checkoutId: targetCheckoutId,
           configuredApiBase: apiBaseUrl,
-          error: error instanceof Error ? error.message : String(error),
+          error: safeErrorMessage(error),
+          attempts: attemptLogs,
+          cloverContext:
+            error instanceof CloverApiError
+              ? {
+                  statusCode: error.context.statusCode,
+                  endpoint: error.context.endpoint,
+                  apiBaseUrl: error.context.apiBaseUrl,
+                  cloverRequestId: error.context.responseRequestId,
+                  responseBody: error.context.responseBody,
+                }
+              : undefined,
         });
       }
+    } else if (debugLogs) {
+      console.warn("[order-status] skipped Clover fallback verification", {
+        requestId,
+        orderId: order.id,
+        checkoutId: targetCheckoutId,
+        hasMerchantId: Boolean(merchantId),
+        hasPrivateToken: Boolean(privateToken),
+      });
     }
   }
 

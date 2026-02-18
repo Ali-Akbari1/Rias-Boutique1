@@ -1,4 +1,5 @@
 import {
+  createDeterministicHash,
   getHeader,
   parseJsonBody,
   readRawBody,
@@ -11,7 +12,7 @@ import { checkRateLimit, applyRateLimitHeaders } from "../server/lib/rate-limit.
 import {
   getClientIp,
   resolveWebhookTimestamp,
-  verifyWebhookSignature,
+  verifyWebhookSignatureDetailed,
   verifyWebhookTimestamp,
 } from "../server/lib/security.js";
 import { parseCloverWebhook } from "../server/lib/clover-webhook.js";
@@ -30,6 +31,9 @@ import { sendOrderConfirmationEmail } from "../server/lib/email.js";
 const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
 const DEFAULT_TIMESTAMP_TOLERANCE_MS = 5 * 60 * 1000;
+const isDebugLoggingEnabled = () => process.env.CLOVER_DEBUG_LOGS?.trim().toLowerCase() === "true";
+const createRequestId = () => createDeterministicHash(`${Date.now()}|${Math.random()}`).slice(0, 12);
+const safeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 export const config = {
   api: {
@@ -53,6 +57,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
     return;
   }
+  const requestId = createRequestId();
+  const debugLogs = isDebugLoggingEnabled();
+  res.setHeader("X-Request-Id", requestId);
 
   const rateResult = checkRateLimit({
     key: `webhook:${getClientIp(req)}`,
@@ -69,6 +76,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   // Fallback to generic body reader only in non-stream test environments.
   const streamBody = await readRawBodyFromStream(req);
   const rawBody = streamBody || (await readRawBody(req));
+  const rawBodyHash = createDeterministicHash(rawBody).slice(0, 16);
   if (!rawBody.trim()) {
     sendError(res, 400, "INVALID_PAYLOAD", "Webhook payload is empty.");
     return;
@@ -94,14 +102,31 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     getHeader(req, "x-clover-timestamp") || getHeader(req, "clover-timestamp") || getHeader(req, "x-timestamp") || "";
   const timestampHeader = resolveWebhookTimestamp(signatureHeader, rawTimestampHeader);
 
-  const signatureValid = verifyWebhookSignature({
+  const signatureCheck = verifyWebhookSignatureDetailed({
     rawBody,
     signatureHeader,
     timestampHeader,
     secret: webhookSecrets,
   });
-  if (!signatureValid) {
+  if (debugLogs) {
+    console.log("[clover-webhook] received", {
+      requestId,
+      bodyLength: rawBody.length,
+      bodyHash: rawBodyHash,
+      hasSignatureHeader: Boolean(signatureHeader),
+      hasTimestampHeader: Boolean(timestampHeader),
+      signatureHeaderSample: signatureHeader.slice(0, 120),
+      timestampHeaderSample: timestampHeader.slice(0, 32),
+      signatureCheckReason: signatureCheck.reason,
+      contentType: getHeader(req, "content-type") || "",
+      userAgent: getHeader(req, "user-agent") || "",
+    });
+  }
+  if (!signatureCheck.valid) {
     console.error("[clover-webhook] signature verification failed", {
+      requestId,
+      bodyLength: rawBody.length,
+      bodyHash: rawBodyHash,
       hasSignatureHeader: Boolean(signatureHeader),
       hasTimestampHeader: Boolean(timestampHeader),
       signatureHeaderSample: signatureHeader.slice(0, 120),
@@ -111,6 +136,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         .filter(Boolean),
       timestampHeaderSample: timestampHeader.slice(0, 32),
       configuredSecretCount: webhookSecrets.length,
+      signatureDiagnostics: signatureCheck,
     });
     sendError(res, 401, "INVALID_SIGNATURE", "Webhook signature verification failed.");
     return;
@@ -120,6 +146,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     timestampHeader &&
     !verifyWebhookTimestamp(timestampHeader, Number(process.env.CLOVER_WEBHOOK_TOLERANCE_MS || DEFAULT_TIMESTAMP_TOLERANCE_MS))
   ) {
+    console.error("[clover-webhook] timestamp verification failed", {
+      requestId,
+      timestampHeader,
+      toleranceMs: Number(process.env.CLOVER_WEBHOOK_TOLERANCE_MS || DEFAULT_TIMESTAMP_TOLERANCE_MS),
+      bodyHash: rawBodyHash,
+    });
     sendError(res, 401, "STALE_WEBHOOK", "Webhook timestamp is outside the allowed window.");
     return;
   }
@@ -132,6 +164,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const parsed = parseCloverWebhook(payload, rawBody);
   console.log("[clover-webhook] parsed payload", {
+    requestId,
+    bodyHash: rawBodyHash,
     eventId: parsed.eventId,
     eventType: parsed.eventType,
     orderId: parsed.orderId,
@@ -141,6 +175,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const order = parsed.orderId ? await findOrderById(parsed.orderId) : await findOrderByCheckoutId(parsed.checkoutId);
   if (!order) {
     console.warn("[clover-webhook] order not found for parsed payload", {
+      requestId,
       eventId: parsed.eventId,
       eventType: parsed.eventType,
       parsedOrderId: parsed.orderId,
@@ -163,6 +198,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     payloadJson: rawBody,
   });
   if (!inserted) {
+    if (debugLogs) {
+      console.log("[clover-webhook] duplicate event ignored", {
+        requestId,
+        eventId: parsed.eventId,
+        orderId: order.id,
+      });
+    }
     res.status(200).json({
       received: true,
       processed: false,
@@ -193,6 +235,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     await markWebhookProcessed(parsed.eventId);
+    console.log("[clover-webhook] processed", {
+      requestId,
+      eventId: parsed.eventId,
+      orderId: order.id,
+      eventType: parsed.eventType,
+      isPaidEvent: parsed.isPaidEvent,
+    });
     res.status(200).json({
       received: true,
       processed: true,
@@ -200,6 +249,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       orderId: order.id,
     });
   } catch (error) {
+    console.error("[clover-webhook] processing failed", {
+      requestId,
+      eventId: parsed.eventId,
+      orderId: order.id,
+      error: safeErrorMessage(error),
+    });
     sendError(
       res,
       500,

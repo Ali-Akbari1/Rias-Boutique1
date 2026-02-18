@@ -105,6 +105,84 @@ const toBase64Standard = (value: string) => {
   const padding = normalized.length % 4;
   return padding === 0 ? normalized : normalized.padEnd(normalized.length + (4 - padding), "=");
 };
+const previewValue = (value: string, visible = 16) => {
+  const normalized = value.trim();
+  if (!normalized) {
+    return "";
+  }
+  if (normalized.length <= visible) {
+    return normalized;
+  }
+  return `${normalized.slice(0, visible)}...(${normalized.length})`;
+};
+const fingerprintSecret = (value: string) => createDeterministicHash(`clover-secret:${value}`).slice(0, 12);
+
+type SignatureAlgorithm = "sha256" | "sha1" | "sha512";
+type SignatureEncoding = "hex" | "base64" | "base64url";
+type PayloadVariantLabel = "t.body" | "t:body" | "body";
+
+interface ExpectedSignatureCandidate {
+  value: string;
+  algorithm: SignatureAlgorithm;
+  encoding: SignatureEncoding;
+  payloadVariant: PayloadVariantLabel;
+  secretFingerprint: string;
+}
+
+interface SignatureCandidateVariant {
+  value: string;
+  label: "raw" | "hex-lower" | "base64-standard" | "base64url";
+}
+
+export interface WebhookSignatureVerificationDiagnostic {
+  valid: boolean;
+  reason:
+    | "missing_secret_or_signature"
+    | "missing_signature_values"
+    | "no_expected_candidates"
+    | "matched"
+    | "no_match";
+  effectiveTimestamp: string;
+  signatureCount: number;
+  signatureSamples: string[];
+  payloadVariants: Array<{
+    label: PayloadVariantLabel;
+    length: number;
+  }>;
+  secretFingerprints: string[];
+  expectedCandidateCount: number;
+  matched?: {
+    candidateIndex: number;
+    candidatePreview: string;
+    candidateVariant: SignatureCandidateVariant["label"];
+    algorithm: SignatureAlgorithm;
+    encoding: SignatureEncoding;
+    payloadVariant: PayloadVariantLabel;
+    secretFingerprint: string;
+  };
+}
+
+const buildSignatureCandidateVariants = (candidate: string): SignatureCandidateVariant[] => {
+  const variants: SignatureCandidateVariant[] = [{ value: candidate, label: "raw" }];
+
+  if (isHexString(candidate)) {
+    variants.push({ value: candidate.toLowerCase(), label: "hex-lower" });
+  }
+  variants.push({ value: toBase64Standard(candidate), label: "base64-standard" });
+  variants.push({ value: toBase64Url(candidate), label: "base64url" });
+
+  const deduped: SignatureCandidateVariant[] = [];
+  const seen = new Set<string>();
+  for (const variant of variants) {
+    const key = `${variant.label}:${variant.value}`;
+    if (!seen.has(key)) {
+      deduped.push(variant);
+      seen.add(key);
+    }
+  }
+
+  return deduped;
+};
 
 export const resolveWebhookTimestamp = (signatureHeader: string, timestampHeader: string) => {
   const headerTimestamp = timestampHeader.trim();
@@ -122,6 +200,147 @@ export const resolveWebhookTimestamp = (signatureHeader: string, timestampHeader
   return signatureTimestamp || "";
 };
 
+export const verifyWebhookSignatureDetailed = ({
+  rawBody,
+  signatureHeader,
+  timestampHeader,
+  secret,
+}: {
+  rawBody: string;
+  signatureHeader: string;
+  timestampHeader: string;
+  secret: string | string[];
+}): WebhookSignatureVerificationDiagnostic => {
+  const secrets = (Array.isArray(secret) ? secret : [secret]).map((entry) => entry.trim()).filter(Boolean);
+  if (secrets.length === 0 || !signatureHeader) {
+    return {
+      valid: false,
+      reason: "missing_secret_or_signature",
+      effectiveTimestamp: "",
+      signatureCount: 0,
+      signatureSamples: [],
+      payloadVariants: [],
+      secretFingerprints: secrets.map((entry) => fingerprintSecret(entry)),
+      expectedCandidateCount: 0,
+    };
+  }
+
+  const signatures = signatureHeader
+    .split(",")
+    .map((value) => normalizeSignature(value))
+    .filter(Boolean);
+
+  if (signatures.length === 0) {
+    return {
+      valid: false,
+      reason: "missing_signature_values",
+      effectiveTimestamp: "",
+      signatureCount: 0,
+      signatureSamples: [],
+      payloadVariants: [],
+      secretFingerprints: secrets.map((entry) => fingerprintSecret(entry)),
+      expectedCandidateCount: 0,
+    };
+  }
+
+  const effectiveTimestamp = resolveWebhookTimestamp(signatureHeader, timestampHeader);
+  const payloads: Array<{ label: PayloadVariantLabel; value: string }> = effectiveTimestamp
+    ? [
+        { label: "t.body", value: `${effectiveTimestamp}.${rawBody}` },
+        { label: "t:body", value: `${effectiveTimestamp}:${rawBody}` },
+        { label: "body", value: rawBody },
+      ]
+    : [{ label: "body", value: rawBody }];
+
+  const algorithms: SignatureAlgorithm[] = ["sha256", "sha1", "sha512"];
+  const expectedCandidates: ExpectedSignatureCandidate[] = [];
+  for (const secretEntry of secrets) {
+    const secretFingerprint = fingerprintSecret(secretEntry);
+    for (const payload of payloads) {
+      for (const algorithm of algorithms) {
+        const hex = createHmac(algorithm, secretEntry).update(payload.value).digest("hex");
+        const base64 = createHmac(algorithm, secretEntry).update(payload.value).digest("base64");
+        expectedCandidates.push({
+          value: hex,
+          algorithm,
+          encoding: "hex",
+          payloadVariant: payload.label,
+          secretFingerprint,
+        });
+        expectedCandidates.push({
+          value: base64,
+          algorithm,
+          encoding: "base64",
+          payloadVariant: payload.label,
+          secretFingerprint,
+        });
+        expectedCandidates.push({
+          value: toBase64Url(base64),
+          algorithm,
+          encoding: "base64url",
+          payloadVariant: payload.label,
+          secretFingerprint,
+        });
+      }
+    }
+  }
+
+  if (expectedCandidates.length === 0) {
+    return {
+      valid: false,
+      reason: "no_expected_candidates",
+      effectiveTimestamp,
+      signatureCount: signatures.length,
+      signatureSamples: signatures.slice(0, 3).map((value) => previewValue(value)),
+      payloadVariants: payloads.map((entry) => ({ label: entry.label, length: entry.value.length })),
+      secretFingerprints: secrets.map((entry) => fingerprintSecret(entry)),
+      expectedCandidateCount: 0,
+    };
+  }
+
+  for (let signatureIndex = 0; signatureIndex < signatures.length; signatureIndex += 1) {
+    const candidate = signatures[signatureIndex] || "";
+    const candidateVariants = buildSignatureCandidateVariants(candidate);
+
+    for (const candidateVariant of candidateVariants) {
+      for (const expectedCandidate of expectedCandidates) {
+        if (safeTimingCompare(candidateVariant.value, expectedCandidate.value)) {
+          return {
+            valid: true,
+            reason: "matched",
+            effectiveTimestamp,
+            signatureCount: signatures.length,
+            signatureSamples: signatures.slice(0, 3).map((value) => previewValue(value)),
+            payloadVariants: payloads.map((entry) => ({ label: entry.label, length: entry.value.length })),
+            secretFingerprints: secrets.map((entry) => fingerprintSecret(entry)),
+            expectedCandidateCount: expectedCandidates.length,
+            matched: {
+              candidateIndex: signatureIndex,
+              candidatePreview: previewValue(candidate),
+              candidateVariant: candidateVariant.label,
+              algorithm: expectedCandidate.algorithm,
+              encoding: expectedCandidate.encoding,
+              payloadVariant: expectedCandidate.payloadVariant,
+              secretFingerprint: expectedCandidate.secretFingerprint,
+            },
+          };
+        }
+      }
+    }
+  }
+
+  return {
+    valid: false,
+    reason: "no_match",
+    effectiveTimestamp,
+    signatureCount: signatures.length,
+    signatureSamples: signatures.slice(0, 3).map((value) => previewValue(value)),
+    payloadVariants: payloads.map((entry) => ({ label: entry.label, length: entry.value.length })),
+    secretFingerprints: secrets.map((entry) => fingerprintSecret(entry)),
+    expectedCandidateCount: expectedCandidates.length,
+  };
+};
+
 export const verifyWebhookSignature = ({
   rawBody,
   signatureHeader,
@@ -132,52 +351,7 @@ export const verifyWebhookSignature = ({
   signatureHeader: string;
   timestampHeader: string;
   secret: string | string[];
-}) => {
-  const secrets = (Array.isArray(secret) ? secret : [secret]).map((entry) => entry.trim()).filter(Boolean);
-  if (secrets.length === 0 || !signatureHeader) {
-    return false;
-  }
-
-  const signatures = signatureHeader
-    .split(",")
-    .map((value) => normalizeSignature(value))
-    .filter(Boolean);
-
-  if (signatures.length === 0) {
-    return false;
-  }
-
-  const effectiveTimestamp = resolveWebhookTimestamp(signatureHeader, timestampHeader);
-  const payloads = effectiveTimestamp
-    ? [`${effectiveTimestamp}.${rawBody}`, `${effectiveTimestamp}:${rawBody}`, rawBody]
-    : [rawBody];
-
-  const algorithms = ["sha256", "sha1", "sha512"] as const;
-  const expectedSignatures = new Set(
-    secrets.flatMap((secretEntry) =>
-      payloads.flatMap((payload) =>
-        algorithms.flatMap((algorithm) => {
-          const hex = createHmac(algorithm, secretEntry).update(payload).digest("hex");
-          const base64 = createHmac(algorithm, secretEntry).update(payload).digest("base64");
-          return [hex, base64, toBase64Url(base64)];
-        }),
-      ),
-    ),
-  );
-
-  return signatures.some((candidate) => {
-    const variants = new Set<string>([candidate]);
-    if (isHexString(candidate)) {
-      variants.add(candidate.toLowerCase());
-    }
-    variants.add(toBase64Standard(candidate));
-    variants.add(toBase64Url(candidate));
-
-    return [...variants].some((variant) =>
-      [...expectedSignatures].some((expected) => safeTimingCompare(variant, expected)),
-    );
-  });
-};
+}) => verifyWebhookSignatureDetailed({ rawBody, signatureHeader, timestampHeader, secret }).valid;
 
 export const verifyWebhookTimestamp = (timestampHeader: string, toleranceMs: number) => {
   const timestamp = Number(timestampHeader);

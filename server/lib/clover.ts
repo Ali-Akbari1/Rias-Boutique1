@@ -35,6 +35,24 @@ export interface CloverCheckoutStatus {
   raw: unknown;
 }
 
+export interface CloverApiErrorContext {
+  apiBaseUrl: string;
+  endpoint: string;
+  statusCode: number;
+  responseRequestId: string;
+  responseBody: unknown;
+}
+
+export class CloverApiError extends Error {
+  readonly context: CloverApiErrorContext;
+
+  constructor(message: string, context: CloverApiErrorContext) {
+    super(message);
+    this.name = "CloverApiError";
+    this.context = context;
+  }
+}
+
 const toStringValue = (value: unknown) => (typeof value === "string" ? value.trim() : "");
 
 const splitName = (fullName: string) => {
@@ -60,6 +78,11 @@ const extractCheckoutIdFromUrl = (checkoutUrl: string) => {
 };
 
 const asObject = (value: unknown) => (typeof value === "object" && value !== null ? (value as Record<string, unknown>) : null);
+const getCloverResponseRequestId = (response: Response) =>
+  response.headers.get("x-request-id") ||
+  response.headers.get("x-clover-request-id") ||
+  response.headers.get("trace-id") ||
+  "";
 
 const pullNestedString = (payload: Record<string, unknown>, keys: string[]) => {
   for (const key of keys) {
@@ -119,6 +142,8 @@ export const createCloverCheckoutSession = async ({
   lineItems,
   timeoutMs,
 }: CloverCreateCheckoutInput): Promise<CloverCheckoutSession> => {
+  const normalizedApiBase = apiBaseUrl.replace(/\/+$/, "");
+  const endpoint = "/invoicingcheckoutservice/v1/checkouts";
   const { firstName, lastName } = splitName(customer.fullName);
   const payload = {
     customer: {
@@ -143,7 +168,7 @@ export const createCloverCheckoutSession = async ({
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(`${apiBaseUrl.replace(/\/+$/, "")}/invoicingcheckoutservice/v1/checkouts`, {
+    const response = await fetch(`${normalizedApiBase}${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -158,7 +183,13 @@ export const createCloverCheckoutSession = async ({
     const data = (await response.json().catch(() => null)) as unknown;
     if (!response.ok) {
       const message = normalizeErrorMessage(data, `Clover API request failed with status ${response.status}.`);
-      throw new Error(message);
+      throw new CloverApiError(message, {
+        apiBaseUrl: normalizedApiBase,
+        endpoint,
+        statusCode: response.status,
+        responseRequestId: getCloverResponseRequestId(response),
+        responseBody: data,
+      });
     }
 
     const checkoutUrl =
@@ -199,27 +230,32 @@ export const fetchCloverCheckoutStatus = async ({
   checkoutId: string;
   timeoutMs: number;
 }): Promise<CloverCheckoutStatus> => {
+  const normalizedApiBase = apiBaseUrl.replace(/\/+$/, "");
+  const endpoint = `/invoicingcheckoutservice/v1/checkouts/${encodeURIComponent(checkoutId)}`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(
-      `${apiBaseUrl.replace(/\/+$/, "")}/invoicingcheckoutservice/v1/checkouts/${encodeURIComponent(checkoutId)}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${privateToken}`,
-          "X-Clover-Merchant-Id": merchantId,
-        },
-        signal: controller.signal,
+    const response = await fetch(`${normalizedApiBase}${endpoint}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${privateToken}`,
+        "X-Clover-Merchant-Id": merchantId,
       },
-    );
+      signal: controller.signal,
+    });
 
     const data = (await response.json().catch(() => null)) as unknown;
     if (!response.ok) {
       const message = normalizeErrorMessage(data, `Clover checkout status request failed with status ${response.status}.`);
-      throw new Error(message);
+      throw new CloverApiError(message, {
+        apiBaseUrl: normalizedApiBase,
+        endpoint,
+        statusCode: response.status,
+        responseRequestId: getCloverResponseRequestId(response),
+        responseBody: data,
+      });
     }
 
     return parseCheckoutPaymentStatus(data);

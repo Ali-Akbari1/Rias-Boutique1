@@ -1,4 +1,5 @@
 import {
+  createDeterministicHash,
   parseJsonBody,
   readRawBody,
   sendError,
@@ -25,13 +26,25 @@ import {
   markOrderFailed,
   type OrderLineItem,
 } from "../server/lib/order-store.js";
-import { createCloverCheckoutSession } from "../server/lib/clover.js";
+import { CloverApiError, createCloverCheckoutSession } from "../server/lib/clover.js";
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
 const SHIPPING_FLAT_RATE_MINOR = 3_000; // CA$30.00
 const FREE_SHIPPING_THRESHOLD_MINOR = 40_000; // CA$400.00
 const TAX_RATE = 0.05; // 5%
+const isDebugLoggingEnabled = () => process.env.CLOVER_DEBUG_LOGS?.trim().toLowerCase() === "true";
+const createRequestId = () => createDeterministicHash(`${Date.now()}|${Math.random()}`).slice(0, 12);
+const maskValue = (value: string, keepStart = 3, keepEnd = 4) => {
+  if (!value) {
+    return "";
+  }
+  if (value.length <= keepStart + keepEnd) {
+    return "*".repeat(value.length);
+  }
+  return `${value.slice(0, keepStart)}...${value.slice(-keepEnd)}`;
+};
+const safeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
 const isShippingChargesEnabled = () => {
   const serverToggle = process.env.ENABLE_SHIPPING_CHARGES;
@@ -96,6 +109,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
     return;
   }
+  const requestId = createRequestId();
+  const debugLogs = isDebugLoggingEnabled();
+  res.setHeader("X-Request-Id", requestId);
 
   const allowedOrigins = buildAllowedOrigins(
     getCheckoutBaseUrl(),
@@ -144,6 +160,14 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const config = validateServerConfiguration();
   if (!config.ok) {
+    console.error("[clover-checkout] invalid server configuration", {
+      requestId,
+      hasMerchantId: Boolean(process.env.CLOVER_MERCHANT_ID?.trim()),
+      hasPrivateToken: Boolean(process.env.CLOVER_PRIVATE_TOKEN?.trim()),
+      checkoutBaseUrl: getCheckoutBaseUrl(),
+      apiBaseUrl: process.env.CLOVER_API_BASE_URL?.trim() || "https://apisandbox.dev.clover.com",
+      details: config.details,
+    });
     sendError(res, 500, "CHECKOUT_NOT_CONFIGURED", config.error, config.details);
     return;
   }
@@ -218,6 +242,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const existingOrder = await findOrderByIdempotencyKey(idempotencyKey);
   if (existingOrder?.cloverCheckoutUrl && existingOrder.paymentStatus === "pending") {
+    if (debugLogs) {
+      console.log("[clover-checkout] reusing existing pending checkout", {
+        requestId,
+        orderId: existingOrder.id,
+        checkoutId: existingOrder.cloverCheckoutId,
+        paymentStatus: existingOrder.paymentStatus,
+        idempotencyKeyHash: createDeterministicHash(idempotencyKey).slice(0, 12),
+      });
+    }
     res.status(200).json({
       checkoutUrl: existingOrder.cloverCheckoutUrl,
       orderId: existingOrder.id,
@@ -276,6 +309,22 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       totalMinor,
     });
 
+  if (debugLogs) {
+    console.log("[clover-checkout] creating checkout session", {
+      requestId,
+      orderId: order.id,
+      itemCount: lineItems.length,
+      subtotalMinor,
+      shippingMinor,
+      taxMinor,
+      totalMinor,
+      apiBaseUrl: config.apiBaseUrl,
+      merchantId: maskValue(config.merchantId),
+      tokenFingerprint: createDeterministicHash(config.privateToken).slice(0, 12),
+      idempotencyKeyHash: createDeterministicHash(idempotencyKey).slice(0, 12),
+    });
+  }
+
   try {
     const session = await createCloverCheckoutSession({
       apiBaseUrl: config.apiBaseUrl,
@@ -300,6 +349,22 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       checkoutId: session.checkoutId,
     });
 
+    console.log("[clover-checkout] checkout session created", {
+      requestId,
+      orderId: order.id,
+      cloverCheckoutId: session.checkoutId,
+      checkoutUrlHost: (() => {
+        try {
+          return new URL(session.checkoutUrl).host;
+        } catch {
+          return "";
+        }
+      })(),
+      apiBaseUrl: config.apiBaseUrl,
+      merchantId: maskValue(config.merchantId),
+      reused: false,
+    });
+
     res.status(200).json({
       checkoutUrl: session.checkoutUrl,
       orderId: order.id,
@@ -308,10 +373,33 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unable to start checkout right now. Please try again in a moment.";
+    const cloverErrorContext =
+      error instanceof CloverApiError
+        ? {
+            statusCode: error.context.statusCode,
+            endpoint: error.context.endpoint,
+            apiBaseUrl: error.context.apiBaseUrl,
+            cloverRequestId: error.context.responseRequestId,
+            responseBody: error.context.responseBody,
+          }
+        : null;
+    console.error("[clover-checkout] checkout session creation failed", {
+      requestId,
+      orderId: order.id,
+      apiBaseUrl: config.apiBaseUrl,
+      merchantId: maskValue(config.merchantId),
+      tokenFingerprint: createDeterministicHash(config.privateToken).slice(0, 12),
+      error: safeErrorMessage(error),
+      clover: cloverErrorContext,
+    });
     try {
       await markOrderFailed({ orderId: order.id, errorMessage: message });
     } catch (storeError) {
-      console.error("[checkout] failed to persist order failure", storeError);
+      console.error("[clover-checkout] failed to persist order failure", {
+        requestId,
+        orderId: order.id,
+        error: safeErrorMessage(storeError),
+      });
     }
     sendError(res, 502, "CHECKOUT_PROVIDER_ERROR", message);
   }

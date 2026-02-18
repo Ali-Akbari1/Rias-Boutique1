@@ -94,6 +94,7 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `CLOVER_CHECKOUT_BASE_URL`: HTTPS site URL used for success/failure redirects.
 - `CLOVER_ENABLE_TIPS`: Optional `true`/`false` to enable tips in hosted checkout.
 - `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
+- `CLOVER_DEBUG_LOGS`: Optional `true`/`false` to enable verbose Clover diagnostics in Vercel logs.
 - `MERCHANT_ORDER_EMAIL`: Store inbox that receives new paid order alerts.
 - `RESEND_API_KEY`: Optional Resend API key to send real merchant emails.
 - `RESEND_FROM_EMAIL`: Optional sender identity for Resend, e.g. `Ria's Boutique <orders@riasboutique.com>`.
@@ -185,6 +186,7 @@ npm run test
 - Unable to start Clover checkout:
   - Confirm `CLOVER_CHECKOUT_BASE_URL` is HTTPS.
   - Confirm `CLOVER_PRIVATE_TOKEN` and `CLOVER_MERCHANT_ID` are valid.
+  - Temporarily set `CLOVER_DEBUG_LOGS=true` and inspect `X-Request-Id`-correlated logs for checkout, webhook, and order-status.
   - For local testing, use an HTTPS tunnel URL (for example ngrok) as `CLOVER_CHECKOUT_BASE_URL`.
 - Live Google reviews not loading:
   - Check `GOOGLE_PLACES_API_KEY` and `GOOGLE_PLACE_ID`.
