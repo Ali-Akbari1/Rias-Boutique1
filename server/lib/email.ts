@@ -67,13 +67,18 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
     .map((item) => `- ${item.name} x${item.quantity} (${formatMinorCad(item.lineTotalMinor)})`)
     .join("\n");
   const subject = `New Paid Order - ${order.id}`;
-  const shippingText = `${order.customer.fullName}, ${order.customer.phone}, ${order.customer.address}, ${order.customer.city}, ${order.customer.state}, ${order.customer.postalCode}, ${order.customer.country}`;
+  const deliveryMethod = order.customer.deliveryMethod === "pickup" ? "Pick up in store" : "Shipping";
+  const shippingText =
+    order.customer.deliveryMethod === "pickup"
+      ? "Pickup in store selected. Customer will collect from store."
+      : `${order.customer.fullName}, ${order.customer.phone || "-"}, ${order.customer.address}, ${order.customer.city}, ${order.customer.state}, ${order.customer.postalCode}, ${order.customer.country}`;
   const text = [
     "A new order was paid on Ria's Boutique.",
     "",
     `Order ID: ${order.id}`,
     `Customer: ${order.customer.fullName} <${order.customer.email}>`,
     `Phone: ${order.customer.phone}`,
+    `Fulfillment: ${deliveryMethod}`,
     `Shipping: ${shippingText}`,
     `Total: ${formatMinorCad(order.totalMinor)}`,
     "",
@@ -84,7 +89,8 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
     <h2>New paid order</h2>
     <p><strong>Order ID:</strong> ${escapeHtml(order.id)}</p>
     <p><strong>Customer:</strong> ${escapeHtml(order.customer.fullName)} (${escapeHtml(order.customer.email)})</p>
-    <p><strong>Phone:</strong> ${escapeHtml(order.customer.phone)}</p>
+    <p><strong>Phone:</strong> ${escapeHtml(order.customer.phone || "-")}</p>
+    <p><strong>Fulfillment:</strong> ${escapeHtml(deliveryMethod)}</p>
     <p><strong>Shipping:</strong> ${escapeHtml(shippingText)}</p>
     <p><strong>Total:</strong> ${escapeHtml(formatMinorCad(order.totalMinor))}</p>
     <p><strong>Items:</strong></p>

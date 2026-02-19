@@ -37,6 +37,15 @@ export interface GoogleReviewsResponse {
   reviews: StoreReview[];
 }
 
+export interface StorePickupDetails {
+  address: string;
+  mapsUrl: string;
+  phoneDisplay: string;
+  phoneHref: string;
+  hours: string[];
+  note: string;
+}
+
 export const shippingPolicy = {
   standardCost: "CA$30 flat rate",
   freeShippingThreshold: "CA$400+",
@@ -84,6 +93,44 @@ export const trustBadges: TrustBadgeItem[] = [
     description: "Reliable tracked delivery across the world.",
   },
 ];
+
+const DEFAULT_PICKUP_ADDRESS = "260300 Writing Creek Cres Floor 1, Unit H31, Balzac, AB T4A 0X8";
+const DEFAULT_PICKUP_PHONE_DISPLAY = "+1 (403) 465-0640";
+const DEFAULT_PICKUP_PHONE_HREF = "+14034650640";
+const DEFAULT_PICKUP_HOURS = ["Regular store hours are 11:00 AM - 6:00 PM."];
+const DEFAULT_PICKUP_NOTE = "Bring your order confirmation email when you arrive for pickup.";
+
+const parsePickupHours = (value: string | undefined) => {
+  if (!value) {
+    return DEFAULT_PICKUP_HOURS;
+  }
+
+  const parsed = value
+    .split("|")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  return parsed.length > 0 ? parsed : DEFAULT_PICKUP_HOURS;
+};
+
+export const getStorePickupDetails = (): StorePickupDetails => {
+  const address = (import.meta.env.VITE_STORE_PICKUP_ADDRESS as string | undefined)?.trim() || DEFAULT_PICKUP_ADDRESS;
+  const phoneDisplay =
+    (import.meta.env.VITE_STORE_PICKUP_PHONE_DISPLAY as string | undefined)?.trim() || DEFAULT_PICKUP_PHONE_DISPLAY;
+  const phoneHref =
+    (import.meta.env.VITE_STORE_PICKUP_PHONE_HREF as string | undefined)?.trim() || DEFAULT_PICKUP_PHONE_HREF;
+  const hours = parsePickupHours(import.meta.env.VITE_STORE_PICKUP_HOURS as string | undefined);
+  const note = (import.meta.env.VITE_STORE_PICKUP_NOTE as string | undefined)?.trim() || DEFAULT_PICKUP_NOTE;
+
+  return {
+    address,
+    mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
+    phoneDisplay,
+    phoneHref,
+    hours,
+    note,
+  };
+};
 
 export const featuredStoreReviews: StoreReview[] = [
   {

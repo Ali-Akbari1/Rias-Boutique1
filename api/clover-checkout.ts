@@ -94,13 +94,21 @@ const validateServerConfiguration = () => {
 };
 
 const toShippingFingerprint = (customer: {
+  deliveryMethod?: string;
   address?: string;
   city?: string;
   state?: string;
   postalCode?: string;
   country?: string;
 }) =>
-  [customer.address || "", customer.city || "", customer.state || "", customer.postalCode || "", customer.country || ""]
+  [
+    customer.deliveryMethod || "shipping",
+    customer.address || "",
+    customer.city || "",
+    customer.state || "",
+    customer.postalCode || "",
+    customer.country || "",
+  ]
     .map((part) => part.trim().toLowerCase())
     .join("|");
 
@@ -230,8 +238,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const subtotalMinor = lineItems.reduce((sum, item) => sum + item.lineTotalMinor, 0);
+  const isPickupInStore = payload.customer.deliveryMethod === "pickup";
   const shippingMinor =
-    isShippingChargesEnabled() && subtotalMinor < FREE_SHIPPING_THRESHOLD_MINOR ? SHIPPING_FLAT_RATE_MINOR : 0;
+    !isPickupInStore && isShippingChargesEnabled() && subtotalMinor < FREE_SHIPPING_THRESHOLD_MINOR
+      ? SHIPPING_FLAT_RATE_MINOR
+      : 0;
   const taxMinor = Math.round((subtotalMinor + shippingMinor) * TAX_RATE);
   const totalMinor = subtotalMinor + shippingMinor + taxMinor;
 
@@ -299,6 +310,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     await createPendingOrder({
       idempotencyKey,
       customer: {
+        deliveryMethod: payload.customer.deliveryMethod,
         fullName: payload.customer.fullName,
         email: payload.customer.email,
         phone: payload.customer.phone,

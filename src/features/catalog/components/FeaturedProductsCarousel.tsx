@@ -5,8 +5,11 @@ import { Button } from "@/shared/ui/button";
 import { type Product, products } from "@/features/catalog/data/products";
 import ProductCard from "./ProductCard";
 
-const GROUP_SIZE = 3;
-const ROTATION_INTERVAL_MS = 8000;
+const MOBILE_GROUP_SIZE = 1;
+const DESKTOP_GROUP_SIZE = 3;
+const MOBILE_MEDIA_QUERY = "(max-width: 639px)";
+const MOBILE_ROTATION_INTERVAL_MS = 5000;
+const DESKTOP_ROTATION_INTERVAL_MS = 8000;
 const USER_INTERACTION_PAUSE_MS = 10000;
 
 const chunkProducts = (items: Product[], chunkSize: number): Product[][] => {
@@ -28,7 +31,7 @@ interface ProductSlideProps {
 
 const ProductSlide = memo(({ productsChunk, slideIndex }: ProductSlideProps) => (
   <div className="min-w-full">
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
       {productsChunk.map((product) => (
         <div key={`${slideIndex}-${product.id}`} className="h-full">
           <ProductCard product={product} />
@@ -41,7 +44,31 @@ const ProductSlide = memo(({ productsChunk, slideIndex }: ProductSlideProps) => 
 ProductSlide.displayName = "ProductSlide";
 
 const FeaturedProductsCarousel = () => {
-  const groupedProducts = useMemo(() => chunkProducts(products, GROUP_SIZE), []);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia(MOBILE_MEDIA_QUERY).matches : false,
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQueryList = window.matchMedia(MOBILE_MEDIA_QUERY);
+    const updateMatch = (event: MediaQueryListEvent) => {
+      setIsMobile(event.matches);
+    };
+
+    setIsMobile(mediaQueryList.matches);
+    mediaQueryList.addEventListener("change", updateMatch);
+
+    return () => {
+      mediaQueryList.removeEventListener("change", updateMatch);
+    };
+  }, []);
+
+  const groupSize = isMobile ? MOBILE_GROUP_SIZE : DESKTOP_GROUP_SIZE;
+  const rotationIntervalMs = isMobile ? MOBILE_ROTATION_INTERVAL_MS : DESKTOP_ROTATION_INTERVAL_MS;
+  const groupedProducts = useMemo(() => chunkProducts(products, groupSize), [groupSize]);
   const canRotate = groupedProducts.length > 1;
 
   const carouselSlides = useMemo(() => {
@@ -130,12 +157,12 @@ const FeaturedProductsCarousel = () => {
 
     const rotationTimer = window.setInterval(() => {
       handleNext(false);
-    }, ROTATION_INTERVAL_MS);
+    }, rotationIntervalMs);
 
     return () => {
       window.clearInterval(rotationTimer);
     };
-  }, [canRotate, handleNext, isAnimating, isHovered, isInteractionPaused]);
+  }, [canRotate, handleNext, isAnimating, isHovered, isInteractionPaused, rotationIntervalMs]);
 
   const handleTransitionEnd = () => {
     if (!canRotate) {

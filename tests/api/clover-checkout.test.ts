@@ -28,6 +28,7 @@ describe("clover checkout endpoint", () => {
     process.env.CLOVER_PRIVATE_TOKEN = "private_token_123";
     process.env.CLOVER_CHECKOUT_BASE_URL = "https://www.riasboutique.com";
     process.env.CLOVER_API_BASE_URL = "https://apisandbox.dev.clover.com";
+    process.env.ENABLE_SHIPPING_CHARGES = "";
 
     await resetOrderStoreForTests();
   });
@@ -92,7 +93,7 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        items: [{ productId: "White-cheerma-with-gold", quantity: 1 }],
+        items: [{ productId: "Burgundy-Bridal-Dress", quantity: 1 }],
       }),
     });
     const response = createMockResponse();
@@ -106,6 +107,50 @@ describe("clover checkout endpoint", () => {
       },
     });
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("supports pickup in store without requiring a shipping address", async () => {
+    process.env.ENABLE_SHIPPING_CHARGES = "true";
+
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_pickup_1", href: "https://checkout.clover.com/pay/checkout_pickup_1" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const request = createMockRequest({
+      method: "POST",
+      headers: {
+        origin: "https://www.riasboutique.com",
+        "user-agent": "Mozilla/5.0",
+      },
+      body: JSON.stringify({
+        ...makeCheckoutBody(),
+        customer: {
+          ...makeCheckoutBody().customer,
+          deliveryMethod: "pickup",
+          address: "",
+          city: "",
+          state: "",
+          postalCode: "",
+          country: "",
+        },
+      }),
+    });
+    const response = createMockResponse();
+
+    await handler(request, response);
+
+    expect(response.statusCode).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const fetchPayload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body || "{}")) as {
+      shoppingCart?: { lineItems?: Array<{ name: string }> };
+    };
+    const lineItemNames = (fetchPayload.shoppingCart?.lineItems || []).map((item) => item.name);
+    expect(lineItemNames).not.toContain("Shipping");
   });
 
   it("rejects invalid customer fields and quantity limits", async () => {

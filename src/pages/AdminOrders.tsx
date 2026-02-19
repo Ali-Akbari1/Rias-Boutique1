@@ -17,6 +17,7 @@ interface AdminOrder {
   subtotalMinor: number;
   totalMinor: number;
   customer: {
+    deliveryMethod?: "shipping" | "pickup";
     fullName: string;
     email: string;
     phone?: string;
@@ -218,6 +219,10 @@ const AdminOrders = () => {
               <CardContent className="space-y-4 text-sm">
                 <div className="grid gap-2 rounded-md border border-border bg-muted/20 p-3">
                   <p>
+                    <span className="font-semibold text-foreground">Fulfillment:</span>{" "}
+                    {order.customer.deliveryMethod === "pickup" ? "Pick up in store" : "Shipping"}
+                  </p>
+                  <p>
                     <span className="font-semibold text-foreground">Customer:</span> {order.customer.fullName}
                   </p>
                   <p>
@@ -226,10 +231,16 @@ const AdminOrders = () => {
                   <p>
                     <span className="font-semibold text-foreground">Phone:</span> {order.customer.phone || "-"}
                   </p>
-                  <p>
-                    <span className="font-semibold text-foreground">Shipping:</span> {order.customer.address},{" "}
-                    {order.customer.city}, {order.customer.state} {order.customer.postalCode}, {order.customer.country}
-                  </p>
+                  {order.customer.deliveryMethod === "pickup" ? (
+                    <p>
+                      <span className="font-semibold text-foreground">Shipping:</span> Pickup in store selected.
+                    </p>
+                  ) : (
+                    <p>
+                      <span className="font-semibold text-foreground">Shipping:</span> {order.customer.address},{" "}
+                      {order.customer.city}, {order.customer.state} {order.customer.postalCode}, {order.customer.country}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">

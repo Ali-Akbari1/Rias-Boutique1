@@ -3,8 +3,10 @@ import type { CatalogProduct } from "./product-catalog.js";
 import { getSupabaseAdminClient, hasSupabaseAdminConfig } from "./supabase-admin.js";
 
 export type PaymentStatus = "pending" | "paid" | "failed" | "canceled";
+export type DeliveryMethod = "shipping" | "pickup";
 
 export interface OrderCustomer {
+  deliveryMethod: DeliveryMethod;
   fullName: string;
   email: string;
   phone?: string;
@@ -105,6 +107,21 @@ const asJsonField = <T>(value: unknown, fallback: T): T => {
   return fallback;
 };
 
+const normalizeCustomer = (value: unknown): OrderCustomer => {
+  const customer = asJsonField<Partial<OrderCustomer>>(value, {});
+  return {
+    deliveryMethod: customer.deliveryMethod === "pickup" ? "pickup" : "shipping",
+    fullName: asString(customer.fullName),
+    email: asString(customer.email),
+    phone: asString(customer.phone),
+    address: asString(customer.address),
+    city: asString(customer.city),
+    state: asString(customer.state),
+    postalCode: asString(customer.postalCode),
+    country: asString(customer.country),
+  };
+};
+
 const parseOrderRow = (row: Record<string, unknown>): StoredOrder => ({
   id: asString(row.id),
   paymentStatus: (asString(row.payment_status) as PaymentStatus) || "pending",
@@ -115,16 +132,7 @@ const parseOrderRow = (row: Record<string, unknown>): StoredOrder => ({
   currency: asString(row.currency) || DEFAULT_CURRENCY,
   subtotalMinor: asNumber(row.subtotal_minor),
   totalMinor: asNumber(row.total_minor),
-  customer: asJsonField<OrderCustomer>(row.customer_json, {
-    fullName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "",
-  }),
+  customer: normalizeCustomer(row.customer_json),
   lineItems: asJsonField<OrderLineItem[]>(row.line_items_json, []),
   createdAt: asString(row.created_at),
   updatedAt: asString(row.updated_at),

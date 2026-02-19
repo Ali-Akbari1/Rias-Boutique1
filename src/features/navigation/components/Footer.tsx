@@ -1,12 +1,15 @@
+import { getStorePickupDetails } from "@/features/store/data/store-content";
+
 const Footer = () => {
   const googleReviewsUrl =
     (import.meta.env.VITE_GOOGLE_LEAVE_REVIEW_URL as string | undefined) ||
     "https://www.google.com/search?q=Ria's+Boutique+reviews";
   const email = "rias.afghanboutique@gmail.com";
-  const phoneDisplay = "+1 (403) 465-0640";
-  const phoneHref = "+14034650640";
-  const address = "260300 Writing Creek Cres Floor 1, Unit H31, Balzac, AB T4A 0X8";
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  const pickupDetails = getStorePickupDetails();
+  const phoneDisplay = pickupDetails.phoneDisplay;
+  const phoneHref = pickupDetails.phoneHref;
+  const address = pickupDetails.address;
+  const mapsUrl = pickupDetails.mapsUrl;
 
   return (
     <footer id="contact" className="bg-primary py-14 text-white sm:py-16">

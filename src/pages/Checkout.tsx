@@ -15,9 +15,18 @@ import {
   extractApiErrorMessage,
   requestOptionalCartToken,
 } from "@/lib/checkout-request";
-import { faqItems, getGoogleReviewsUrl, returnPolicy, shippingPolicy } from "@/features/store/data/store-content";
+import {
+  faqItems,
+  getGoogleReviewsUrl,
+  getStorePickupDetails,
+  returnPolicy,
+  shippingPolicy,
+} from "@/features/store/data/store-content";
+
+type DeliveryMethod = "shipping" | "pickup";
 
 interface CheckoutForm {
+  deliveryMethod: DeliveryMethod;
   fullName: string;
   email: string;
   phone: string;
@@ -36,6 +45,7 @@ interface CloverCheckoutResponse {
 }
 
 const initialForm: CheckoutForm = {
+  deliveryMethod: "shipping",
   fullName: "",
   email: "",
   phone: "",
@@ -58,13 +68,15 @@ const Checkout = () => {
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(initialForm);
   const [isLoading, setIsLoading] = useState(false);
   const googleReviewsUrl = getGoogleReviewsUrl();
+  const pickupDetails = getStorePickupDetails();
   const shippingChargesEnabled = isShippingChargesEnabled();
   const checkoutControllerRef = useRef<AbortController | null>(null);
   const checkoutTimeoutRef = useRef<number | null>(null);
 
   const subtotalMinor = Math.round(totalPrice * 100);
+  const isPickupInStore = checkoutForm.deliveryMethod === "pickup";
   const shippingMinor =
-    shippingChargesEnabled && subtotalMinor < FREE_SHIPPING_THRESHOLD * 100 ? SHIPPING_FLAT_RATE * 100 : 0;
+    !isPickupInStore && shippingChargesEnabled && subtotalMinor < FREE_SHIPPING_THRESHOLD * 100 ? SHIPPING_FLAT_RATE * 100 : 0;
   const taxMinor = Math.round((subtotalMinor + shippingMinor) * TAX_RATE);
   const totalMinor = subtotalMinor + shippingMinor + taxMinor;
   const subtotal = subtotalMinor / 100;
@@ -72,7 +84,9 @@ const Checkout = () => {
   const tax = taxMinor / 100;
   const total = totalMinor / 100;
   const freeShippingThresholdNote =
-    shippingChargesEnabled && shippingMinor === 0 && subtotalMinor >= FREE_SHIPPING_THRESHOLD * 100
+    isPickupInStore
+      ? "Pick up in store selected. No shipping fee will be charged."
+      : shippingChargesEnabled && shippingMinor === 0 && subtotalMinor >= FREE_SHIPPING_THRESHOLD * 100
       ? `Free shipping on orders over ${formatCad(FREE_SHIPPING_THRESHOLD)}. Applied to this order.`
       : `Free shipping on orders over ${formatCad(FREE_SHIPPING_THRESHOLD)}.`;
 
@@ -124,7 +138,7 @@ const Checkout = () => {
       const checkoutItems = buildCheckoutItems(items);
       const idempotencyKey = buildClientIdempotencyKey({
         email: checkoutForm.email,
-        postalCode: checkoutForm.postalCode,
+        postalCode: checkoutForm.deliveryMethod === "pickup" ? "pickup" : checkoutForm.postalCode,
         items: checkoutItems,
       });
       const { cartToken, cartTimestamp } = await requestOptionalCartToken(checkoutItems).catch(() => ({
@@ -213,7 +227,7 @@ const Checkout = () => {
           <div className="order-2 space-y-4 sm:space-y-6 lg:order-1">
             <Card>
               <CardHeader className="pb-4">
-                <CardTitle className="font-display text-2xl">Contact & Shipping</CardTitle>
+                <CardTitle className="font-display text-2xl">Contact & Fulfillment</CardTitle>
                 <CardDescription className="font-body text-base">
                   We use this information to prefill your secure Clover checkout session.
                 </CardDescription>
@@ -221,6 +235,36 @@ const Checkout = () => {
               <CardContent className="pt-0">
                 <form onSubmit={handleCloverCheckout} className="space-y-4">
                   <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+                    <div className="space-y-2 sm:col-span-2">
+                      <p className="font-body text-sm font-semibold text-foreground">Delivery method</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setCheckoutForm((current) => ({ ...current, deliveryMethod: "shipping" }))}
+                          className={`rounded-sm border px-3 py-2 text-sm font-medium transition ${
+                            checkoutForm.deliveryMethod === "shipping"
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border bg-background text-foreground hover:bg-secondary"
+                          }`}
+                          aria-pressed={checkoutForm.deliveryMethod === "shipping"}
+                        >
+                          Shipping
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCheckoutForm((current) => ({ ...current, deliveryMethod: "pickup" }))}
+                          className={`rounded-sm border px-3 py-2 text-sm font-medium transition ${
+                            checkoutForm.deliveryMethod === "pickup"
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border bg-background text-foreground hover:bg-secondary"
+                          }`}
+                          aria-pressed={checkoutForm.deliveryMethod === "pickup"}
+                        >
+                          Pick up in store
+                        </button>
+                      </div>
+                    </div>
+
                     <div className="space-y-2 sm:col-span-2">
                       <label htmlFor="fullName" className="font-body text-sm font-semibold text-foreground">
                         Full name
@@ -266,76 +310,109 @@ const Checkout = () => {
                       />
                     </div>
 
-                    <div className="space-y-2 sm:col-span-2">
-                      <label htmlFor="address" className="font-body text-sm font-semibold text-foreground">
-                        Address
-                      </label>
-                      <Input
-                        id="address"
-                        required
-                        maxLength={200}
-                        value={checkoutForm.address}
-                        onChange={handleFormChange("address")}
-                        autoComplete="street-address"
-                      />
-                    </div>
+                    {isPickupInStore ? (
+                      <div className="rounded-md border border-border bg-muted/20 p-3 text-sm text-muted-foreground sm:col-span-2">
+                        <p className="mt-2">
+                          <span className="font-semibold text-foreground">Pickup address:</span>{" "}
+                          <a
+                            href={pickupDetails.mapsUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline hover:text-foreground"
+                          >
+                            {pickupDetails.address}
+                          </a>
+                        </p>
+                        <p className="mt-1">
+                          <span className="font-semibold text-foreground">Phone:</span>{" "}
+                          <a href={`tel:${pickupDetails.phoneHref}`} className="underline hover:text-foreground">
+                            {pickupDetails.phoneDisplay}
+                          </a>
+                        </p>
+                        <div className="mt-2">
+                          <p className="font-semibold text-foreground">Pickup hours:</p>
+                          <ul className="mt-1 space-y-1">
+                            {pickupDetails.hours.map((hoursEntry) => (
+                              <li key={hoursEntry}>{hoursEntry}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <p className="mt-2 text-xs">{pickupDetails.note}</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-2 sm:col-span-2">
+                          <label htmlFor="address" className="font-body text-sm font-semibold text-foreground">
+                            Address
+                          </label>
+                          <Input
+                            id="address"
+                            required
+                            maxLength={200}
+                            value={checkoutForm.address}
+                            onChange={handleFormChange("address")}
+                            autoComplete="street-address"
+                          />
+                        </div>
 
-                    <div className="space-y-2">
-                      <label htmlFor="city" className="font-body text-sm font-semibold text-foreground">
-                        City
-                      </label>
-                      <Input
-                        id="city"
-                        required
-                        maxLength={80}
-                        value={checkoutForm.city}
-                        onChange={handleFormChange("city")}
-                        autoComplete="address-level2"
-                      />
-                    </div>
+                        <div className="space-y-2">
+                          <label htmlFor="city" className="font-body text-sm font-semibold text-foreground">
+                            City
+                          </label>
+                          <Input
+                            id="city"
+                            required
+                            maxLength={80}
+                            value={checkoutForm.city}
+                            onChange={handleFormChange("city")}
+                            autoComplete="address-level2"
+                          />
+                        </div>
 
-                    <div className="space-y-2">
-                      <label htmlFor="state" className="font-body text-sm font-semibold text-foreground">
-                        State / Province
-                      </label>
-                      <Input
-                        id="state"
-                        required
-                        maxLength={80}
-                        value={checkoutForm.state}
-                        onChange={handleFormChange("state")}
-                        autoComplete="address-level1"
-                      />
-                    </div>
+                        <div className="space-y-2">
+                          <label htmlFor="state" className="font-body text-sm font-semibold text-foreground">
+                            State / Province
+                          </label>
+                          <Input
+                            id="state"
+                            required
+                            maxLength={80}
+                            value={checkoutForm.state}
+                            onChange={handleFormChange("state")}
+                            autoComplete="address-level1"
+                          />
+                        </div>
 
-                    <div className="space-y-2">
-                      <label htmlFor="postalCode" className="font-body text-sm font-semibold text-foreground">
-                        ZIP / Postal code
-                      </label>
-                      <Input
-                        id="postalCode"
-                        required
-                        maxLength={20}
-                        pattern="[A-Za-z0-9 -]{3,20}"
-                        value={checkoutForm.postalCode}
-                        onChange={handleFormChange("postalCode")}
-                        autoComplete="postal-code"
-                      />
-                    </div>
+                        <div className="space-y-2">
+                          <label htmlFor="postalCode" className="font-body text-sm font-semibold text-foreground">
+                            ZIP / Postal code
+                          </label>
+                          <Input
+                            id="postalCode"
+                            required
+                            maxLength={20}
+                            pattern="[A-Za-z0-9 -]{3,20}"
+                            value={checkoutForm.postalCode}
+                            onChange={handleFormChange("postalCode")}
+                            autoComplete="postal-code"
+                          />
+                        </div>
 
-                    <div className="space-y-2">
-                      <label htmlFor="country" className="font-body text-sm font-semibold text-foreground">
-                        Country
-                      </label>
-                      <Input
-                        id="country"
-                        required
-                        maxLength={80}
-                        value={checkoutForm.country}
-                        onChange={handleFormChange("country")}
-                        autoComplete="country-name"
-                      />
-                    </div>
+                        <div className="space-y-2">
+                          <label htmlFor="country" className="font-body text-sm font-semibold text-foreground">
+                            Country
+                          </label>
+                          <Input
+                            id="country"
+                            required
+                            maxLength={80}
+                            value={checkoutForm.country}
+                            onChange={handleFormChange("country")}
+                            autoComplete="country-name"
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                   <Input
                     tabIndex={-1}
@@ -475,8 +552,8 @@ const Checkout = () => {
                     <span>{formatCad(subtotal)}</span>
                   </div>
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span>Shipping</span>
-                    <span>{shipping === 0 ? "Free" : formatCad(shipping)}</span>
+                    <span>{isPickupInStore ? "Pickup" : "Shipping"}</span>
+                    <span>{isPickupInStore ? "In store" : shipping === 0 ? "Free" : formatCad(shipping)}</span>
                   </div>
                   <p className="text-xs text-muted-foreground">{freeShippingThresholdNote}</p>
                   <div className="flex items-center justify-between text-muted-foreground">

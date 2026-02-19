@@ -3,9 +3,11 @@ import { z } from "zod";
 const nameRegex = /^[\p{L}\p{M}.'\- ]+$/u;
 const phoneRegex = /^[0-9()+\-.\s]{7,22}$/;
 const postalRegex = /^[A-Za-z0-9\- ]{3,20}$/;
+const deliveryMethodSchema = z.enum(["shipping", "pickup"]);
 
 export const checkoutCustomerSchema = z
   .object({
+    deliveryMethod: deliveryMethodSchema.default("shipping"),
     fullName: z
       .string()
       .trim()
@@ -19,33 +21,116 @@ export const checkoutCustomerSchema = z
       .min(7, "Phone number is required.")
       .max(22, "Phone number is too long.")
       .regex(phoneRegex, "Phone number format is invalid."),
-    address: z.string().trim().min(4, "Address is required.").max(200, "Address is too long."),
-    city: z
-      .string()
-      .trim()
-      .min(2, "City is required.")
-      .max(80, "City is too long.")
-      .regex(nameRegex, "City contains invalid characters."),
-    state: z
-      .string()
-      .trim()
-      .min(2, "State / Province is required.")
-      .max(80, "State / Province is too long.")
-      .regex(nameRegex, "State / Province contains invalid characters."),
-    postalCode: z
-      .string()
-      .trim()
-      .min(3, "Postal code is required.")
-      .max(20, "Postal code is too long.")
-      .regex(postalRegex, "Postal code format is invalid."),
-    country: z
-      .string()
-      .trim()
-      .min(2, "Country is required.")
-      .max(80, "Country is too long.")
-      .regex(nameRegex, "Country contains invalid characters."),
+    address: z.string().trim().max(200, "Address is too long.").default(""),
+    city: z.string().trim().max(80, "City is too long.").default(""),
+    state: z.string().trim().max(80, "State / Province is too long.").default(""),
+    postalCode: z.string().trim().max(20, "Postal code is too long.").default(""),
+    country: z.string().trim().max(80, "Country is too long.").default(""),
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    const needsShippingAddress = value.deliveryMethod === "shipping";
+
+    if (needsShippingAddress) {
+      if (value.address.length < 4) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["address"],
+          message: "Address is required.",
+        });
+      }
+
+      if (value.city.length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["city"],
+          message: "City is required.",
+        });
+      } else if (!nameRegex.test(value.city)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["city"],
+          message: "City contains invalid characters.",
+        });
+      }
+
+      if (value.state.length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["state"],
+          message: "State / Province is required.",
+        });
+      } else if (!nameRegex.test(value.state)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["state"],
+          message: "State / Province contains invalid characters.",
+        });
+      }
+
+      if (value.postalCode.length < 3) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["postalCode"],
+          message: "Postal code is required.",
+        });
+      } else if (!postalRegex.test(value.postalCode)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["postalCode"],
+          message: "Postal code format is invalid.",
+        });
+      }
+
+      if (value.country.length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["country"],
+          message: "Country is required.",
+        });
+      } else if (!nameRegex.test(value.country)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["country"],
+          message: "Country contains invalid characters.",
+        });
+      }
+
+      return;
+    }
+
+    if (value.city && !nameRegex.test(value.city)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["city"],
+        message: "City contains invalid characters.",
+      });
+    }
+
+    if (value.state && !nameRegex.test(value.state)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["state"],
+        message: "State / Province contains invalid characters.",
+      });
+    }
+
+    if (value.postalCode && !postalRegex.test(value.postalCode)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["postalCode"],
+        message: "Postal code format is invalid.",
+      });
+    }
+
+    if (value.country && !nameRegex.test(value.country)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["country"],
+        message: "Country contains invalid characters.",
+      });
+    }
+  });
 
 export const checkoutItemSchema = z
   .object({
