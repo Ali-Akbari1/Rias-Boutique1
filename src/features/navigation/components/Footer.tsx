@@ -80,7 +80,16 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-10 border-t border-white/25 pt-6 text-center text-sm font-body text-white/70 sm:mt-12 sm:pt-8">
-          Copyright 2026 Ria&apos;s Boutique. All rights reserved.
+          Copyright 2026 Ria&apos;s Boutique. All rights reserved. Website designed &amp; developed by{" "}
+          <a
+            href="https://www.linkedin.com/in/ali-akbari-a2468227b/"
+            target="_blank"
+            rel="noreferrer"
+            className="transition-colors hover:text-white"
+          >
+            Ali Akbari
+          </a>
+          .
         </div>
       </div>
     </footer>
