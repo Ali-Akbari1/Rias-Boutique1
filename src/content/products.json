@@ -120,8 +120,6 @@
     {
       "fabric": "Velvet",
       "price": 400,
-      "salePercent": 20,
-      "compareAtPrice": 500,
       "galleryImages": [
         "/uploads/img_8832-2.jpg",
         "/uploads/whitecheerma.jpg",
@@ -133,6 +131,7 @@
       "colors": [
         "White "
       ],
+      "compareAtPrice": 500,
       "sizes": [
         "Medium (42in) "
       ],
@@ -145,6 +144,7 @@
       "inventory": "available",
       "description": "White velvet dress with wide-leg pants, featuring handmade cheerma. \n",
       "category": "Party Wear",
+      "salePercent": 20,
       "fitInfo": "Bust: 42in \nSleeves: 22in\nShoulders: 16in\nLength of Pants: 38in \n\n3 pieces: Dress, Pants, Chadar\n"
     },
     {
@@ -268,6 +268,7 @@
       "colors": [
         "Green "
       ],
+      "compareAtPrice": 800,
       "sizes": [
         "SM",
         "M",
@@ -282,6 +283,7 @@
       "image": "/uploads/img_0724.jpg",
       "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
       "category": "Bridal",
+      "salePercent": 20,
       "fitInfo": "*Bridal Shawl sold separately"
     },
     {
