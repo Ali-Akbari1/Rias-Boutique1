@@ -5,6 +5,8 @@ export interface Product {
   slug: string;
   name: string;
   price: number;
+  compareAtPrice?: number;
+  salePercent?: number;
   image: string;
   galleryImages: string[];
   category: string;
@@ -39,6 +41,8 @@ interface RawProduct {
   deliveryEstimate?: string;
   popularity?: number | string;
   createdAt?: string;
+  compareAtPrice?: number | string;
+  salePercent?: number | string;
 }
 
 interface ProductContent {
@@ -128,6 +132,48 @@ const normalizeAvailability = (value: unknown): "available" | "sold_out" => {
   return "available";
 };
 
+const roundToTwoDecimals = (value: number) => Math.round(value * 100) / 100;
+
+const normalizeSaleData = (
+  price: number,
+  salePercentValue: unknown,
+  compareAtPriceValue: unknown,
+): { salePercent?: number; compareAtPrice?: number } => {
+  if (price <= 0) {
+    return {};
+  }
+
+  let normalizedSalePercent = Math.round(getNumber(salePercentValue, 0));
+  let normalizedCompareAtPrice = roundToTwoDecimals(getNumber(compareAtPriceValue, 0));
+
+  if (
+    normalizedSalePercent > 0 &&
+    normalizedSalePercent < 100 &&
+    normalizedCompareAtPrice <= price
+  ) {
+    normalizedCompareAtPrice = roundToTwoDecimals(price / (1 - normalizedSalePercent / 100));
+  }
+
+  if (normalizedSalePercent <= 0 && normalizedCompareAtPrice > price) {
+    normalizedSalePercent = Math.round(
+      ((normalizedCompareAtPrice - price) / normalizedCompareAtPrice) * 100,
+    );
+  }
+
+  if (
+    normalizedSalePercent <= 0 ||
+    normalizedSalePercent >= 100 ||
+    normalizedCompareAtPrice <= price
+  ) {
+    return {};
+  }
+
+  return {
+    salePercent: normalizedSalePercent,
+    compareAtPrice: normalizedCompareAtPrice,
+  };
+};
+
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -145,12 +191,16 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
   const careInstructions = getStringArray(product.careInstructions, ["instruction", "text", "value"]);
   const createdAt = getString(product.createdAt) || new Date().toISOString().slice(0, 10);
   const availability = normalizeAvailability(product.availability ?? product.inventory);
+  const price = Math.max(0, getNumber(product.price, 0));
+  const saleData = normalizeSaleData(price, product.salePercent, product.compareAtPrice);
 
   return {
     id,
     slug,
     name,
-    price: Math.max(0, getNumber(product.price, 0)),
+    price,
+    compareAtPrice: saleData.compareAtPrice,
+    salePercent: saleData.salePercent,
     image,
     galleryImages: galleryImages.length > 0 ? galleryImages : [image],
     category: getString(product.category) || "Party Wear",

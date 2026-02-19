@@ -120,6 +120,8 @@
     {
       "fabric": "Velvet",
       "price": 400,
+      "salePercent": 20,
+      "compareAtPrice": 500,
       "galleryImages": [
         "/uploads/img_8832-2.jpg",
         "/uploads/whitecheerma.jpg",

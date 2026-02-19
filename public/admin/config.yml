@@ -30,6 +30,23 @@ collections:
               - { label: "Slug", name: "slug", widget: "string", hint: "URL-safe text, e.g. emerald-zarbaft-gown" }
               - { label: "Name", name: "name", widget: "string" }
               - { label: "Price (CAD)", name: "price", widget: "number", value_type: "int", min: 1 }
+              - {
+                  label: "Sale Percent Off (optional)",
+                  name: "salePercent",
+                  widget: "number",
+                  value_type: "int",
+                  min: 1,
+                  max: 90,
+                  required: false
+                }
+              - {
+                  label: "Original Price / Compare At (CAD, optional)",
+                  name: "compareAtPrice",
+                  widget: "number",
+                  value_type: "float",
+                  min: 1,
+                  required: false
+                }
               - label: "Inventory Status"
                 name: "inventory"
                 widget: "select"

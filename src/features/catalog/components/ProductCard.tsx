@@ -12,6 +12,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const isSoldOut = product.availability === "sold_out";
+  const isOnSale = !isSoldOut && Boolean(product.salePercent && product.compareAtPrice);
   const checkoutEnabled = isCheckoutEnabled();
   const { addToCart } = useCart();
   const { toast } = useToast();
@@ -71,6 +72,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <span className="absolute left-3 top-3 z-10 rounded-sm bg-foreground/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-background">
             Sold Out
           </span>
+        ) : isOnSale ? (
+          <span className="absolute left-3 top-3 z-10 rounded-sm bg-red-600 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white">
+            Sale {product.salePercent}% OFF
+          </span>
         ) : null}
         <Link to={`/products/${product.id}`} className="block h-full w-full">
           <img
@@ -87,7 +92,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <h3 className="mb-1 font-display text-base font-semibold text-foreground sm:text-lg">{product.name}</h3>
         <p className="mb-2 line-clamp-2 text-xs font-body text-muted-foreground sm:text-sm">{product.description}</p>
 
-        <p className="mb-3 font-display text-lg font-bold text-foreground sm:text-xl">{formatCad(product.price)}</p>
+        <div className="mb-3 flex items-end gap-2">
+          <p className="font-display text-lg font-bold text-foreground sm:text-xl">{formatCad(product.price)}</p>
+          {isOnSale ? (
+            <p className="text-xs font-body text-muted-foreground line-through sm:text-sm">
+              {formatCad(product.compareAtPrice ?? 0)}
+            </p>
+          ) : null}
+        </div>
 
         <div className="space-y-1.5">
           <p className="text-xs font-body text-muted-foreground">Select size and color on product page</p>

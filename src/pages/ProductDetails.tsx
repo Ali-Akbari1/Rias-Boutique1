@@ -112,6 +112,7 @@ const ProductDetails = () => {
   }
 
   const isSoldOut = product.availability === "sold_out";
+  const isOnSale = !isSoldOut && Boolean(product.salePercent && product.compareAtPrice);
   const resolvedSize = selectedSize || (sizeOptions.length === 1 ? sizeOptions[0] || "" : "");
   const resolvedColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
   const canAddToCart = !isSoldOut && Boolean(resolvedSize && resolvedColor);
@@ -193,9 +194,18 @@ const ProductDetails = () => {
               <Badge variant="secondary" className="font-body">
                 {formatCad(product.price)}
               </Badge>
+              {isOnSale ? (
+                <span className="text-sm text-muted-foreground line-through">
+                  {formatCad(product.compareAtPrice ?? 0)}
+                </span>
+              ) : null}
               {isSoldOut ? (
                 <Badge variant="outline" className="border-foreground/30 font-body uppercase tracking-[0.08em]">
                   Sold Out
+                </Badge>
+              ) : isOnSale ? (
+                <Badge className="bg-red-600 font-body uppercase tracking-[0.08em] text-white hover:bg-red-600">
+                  Sale {product.salePercent}% OFF
                 </Badge>
               ) : null}
               <span className="inline-flex items-center gap-1 text-muted-foreground">
