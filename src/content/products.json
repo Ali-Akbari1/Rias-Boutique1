@@ -131,7 +131,6 @@
       "colors": [
         "White "
       ],
-      "compareAtPrice": 500,
       "sizes": [
         "Medium (42in) "
       ],
@@ -144,7 +143,6 @@
       "inventory": "available",
       "description": "White velvet dress with wide-leg pants, featuring handmade cheerma. \n",
       "category": "Party Wear",
-      "salePercent": 20,
       "fitInfo": "Bust: 42in \nSleeves: 22in\nShoulders: 16in\nLength of Pants: 38in \n\n3 pieces: Dress, Pants, Chadar\n"
     },
     {
@@ -268,7 +266,6 @@
       "colors": [
         "Green "
       ],
-      "compareAtPrice": "",
       "sizes": [
         "SM",
         "M",
@@ -283,7 +280,6 @@
       "image": "/uploads/img_0724.jpg",
       "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
       "category": "Bridal",
-      "salePercent": "",
       "fitInfo": "*Bridal Shawl sold separately"
     },
     {
@@ -311,6 +307,29 @@
       "inventory": 1,
       "description": "3 piece purple banaras dress ",
       "category": "Party Wear"
+    },
+    {
+      "fabric": "Velvet",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_0735.jpg",
+        "/uploads/img_0736.jpg",
+        "/uploads/img_0740.jpg"
+      ],
+      "name": "Red Bridal Velvet Dress",
+      "slug": "red-gharara- bridal dress",
+      "colors": [
+        "Red"
+      ],
+      "sizes": [
+        "M (42in)"
+      ],
+      "id": "red-gharara- bridal dress",
+      "image": "/uploads/img_0738.jpg",
+      "inventory": 1,
+      "description": "Bridal red velvet dress with wide-legged pants and beautiful beaded scarf. ",
+      "category": "Bridal",
+      "fitInfo": "Bust: 42in \nSleeves: 22in\nDress Length: 25in\nPants Length: 40in\n"
     }
   ]
 }
