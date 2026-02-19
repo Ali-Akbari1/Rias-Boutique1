@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Navbar from "@/features/navigation/components/Navbar";
 import HeroSection from "@/features/home/components/HeroSection";
-import ProductGrid from "@/features/catalog/components/ProductGrid";
+import FeaturedProductsCarousel from "@/features/catalog/components/FeaturedProductsCarousel";
 import TrustSection from "@/features/home/components/TrustSection";
 import InstagramSection from "@/features/home/components/InstagramSection";
 import AboutSection from "@/features/home/components/AboutSection";
@@ -15,7 +15,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar onCartClick={() => setCartOpen(true)} />
       <HeroSection />
-      <ProductGrid />
+      <FeaturedProductsCarousel />
       <TrustSection />
       <InstagramSection />
       <AboutSection />

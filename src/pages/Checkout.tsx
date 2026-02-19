@@ -71,6 +71,10 @@ const Checkout = () => {
   const shipping = shippingMinor / 100;
   const tax = taxMinor / 100;
   const total = totalMinor / 100;
+  const freeShippingThresholdNote =
+    shippingChargesEnabled && shippingMinor === 0 && subtotalMinor >= FREE_SHIPPING_THRESHOLD * 100
+      ? `Free shipping on orders over ${formatCad(FREE_SHIPPING_THRESHOLD)}. Applied to this order.`
+      : `Free shipping on orders over ${formatCad(FREE_SHIPPING_THRESHOLD)}.`;
 
   const handleFormChange = (field: keyof CheckoutForm) => (event: ChangeEvent<HTMLInputElement>) => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));
@@ -474,6 +478,7 @@ const Checkout = () => {
                     <span>Shipping</span>
                     <span>{shipping === 0 ? "Free" : formatCad(shipping)}</span>
                   </div>
+                  <p className="text-xs text-muted-foreground">{freeShippingThresholdNote}</p>
                   <div className="flex items-center justify-between text-muted-foreground">
                     <span>Tax (5%)</span>
                     <span>{formatCad(tax)}</span>

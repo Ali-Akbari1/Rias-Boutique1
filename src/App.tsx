@@ -12,6 +12,7 @@ import CheckoutSuccess from "./pages/CheckoutSuccess";
 import CheckoutCancel from "./pages/CheckoutCancel";
 import AdminOrders from "./pages/AdminOrders";
 import ProductDetails from "./pages/ProductDetails";
+import CollectionPage from "./pages/CollectionPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => {
             <ScrollToTop />
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/collection" element={<CollectionPage />} />
               <Route path="/products/:productId" element={<ProductDetails />} />
               <Route
                 path="/checkout"

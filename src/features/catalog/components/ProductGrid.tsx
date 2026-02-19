@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { products } from "@/features/catalog/data/products";
 import ProductCard from "./ProductCard";
@@ -8,18 +8,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 type SortOption = "newest" | "price-low" | "price-high" | "popular";
 type PriceOption = "all" | "under-300" | "300-400" | "over-400";
+const SEARCH_DEBOUNCE_MS = 250;
+const PRODUCTS_PER_PAGE = 9;
 
 const ProductGrid = () => {
-  const [query, setQuery] = useState("");
+  const [queryInput, setQueryInput] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [priceRange, setPriceRange] = useState<PriceOption>("all");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const categories = useMemo(() => ["all", ...new Set(products.map((product) => product.category))], []);
 
-  const filteredProducts = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+  useEffect(() => {
+    const debounceTimer = window.setTimeout(() => {
+      setDebouncedQuery(queryInput.trim().toLowerCase());
+    }, SEARCH_DEBOUNCE_MS);
 
+    return () => {
+      window.clearTimeout(debounceTimer);
+    };
+  }, [queryInput]);
+
+  const filteredProducts = useMemo(() => {
     const filtered = products.filter((product) => {
       const inCategory = category === "all" || product.category === category;
       const inPriceRange =
@@ -28,12 +40,20 @@ const ProductGrid = () => {
         (priceRange === "300-400" && product.price >= 300 && product.price <= 400) ||
         (priceRange === "over-400" && product.price > 400);
 
+      const searchableKeywords = [
+        product.name,
+        product.category,
+        product.description,
+        product.fabric,
+        product.fitInfo,
+        product.colors.join(" "),
+      ]
+        .join(" ")
+        .toLowerCase();
+
       const matchesQuery =
-        !normalizedQuery ||
-        product.name.toLowerCase().includes(normalizedQuery) ||
-        product.description.toLowerCase().includes(normalizedQuery) ||
-        product.category.toLowerCase().includes(normalizedQuery) ||
-        (Array.isArray(product.colors) ? product.colors.join(" ").toLowerCase() : "").includes(normalizedQuery);
+        !debouncedQuery ||
+        searchableKeywords.includes(debouncedQuery);
 
       return inCategory && inPriceRange && matchesQuery;
     });
@@ -51,13 +71,36 @@ const ProductGrid = () => {
 
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  }, [category, priceRange, query, sortBy]);
+  }, [category, debouncedQuery, priceRange, sortBy]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [category, debouncedQuery, priceRange, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+
+  useEffect(() => {
+    if (safePage !== currentPage) {
+      setCurrentPage(safePage);
+    }
+  }, [currentPage, safePage]);
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (safePage - 1) * PRODUCTS_PER_PAGE;
+    return filteredProducts.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
+  }, [filteredProducts, safePage]);
+
+  const rangeStart = filteredProducts.length === 0 ? 0 : (safePage - 1) * PRODUCTS_PER_PAGE + 1;
+  const rangeEnd = filteredProducts.length === 0 ? 0 : Math.min(safePage * PRODUCTS_PER_PAGE, filteredProducts.length);
 
   const resetFilters = () => {
-    setQuery("");
+    setQueryInput("");
+    setDebouncedQuery("");
     setCategory("all");
     setPriceRange("all");
     setSortBy("newest");
+    setCurrentPage(1);
   };
 
   return (
@@ -70,12 +113,16 @@ const ProductGrid = () => {
 
         <div className="mb-8 grid gap-3 rounded-md border border-border bg-card/40 p-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="relative self-start sm:col-span-2 lg:col-span-2">
+            <label htmlFor="collection-search" className="sr-only">
+              Search products
+            </label>
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
               <Search className="h-4 w-4 text-muted-foreground" />
             </span>
             <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              id="collection-search"
+              value={queryInput}
+              onChange={(event) => setQueryInput(event.target.value)}
               placeholder="Search by name, color, category..."
               className="h-10 pl-10"
             />
@@ -125,7 +172,7 @@ const ProductGrid = () => {
         </div>
 
         <p className="mb-6 text-sm font-body text-muted-foreground">
-          Showing {filteredProducts.length} of {products.length} products
+          Showing {rangeStart}-{rangeEnd} of {filteredProducts.length} products
         </p>
 
         {filteredProducts.length === 0 ? (
@@ -134,13 +181,43 @@ const ProductGrid = () => {
             <p className="mt-2 font-body text-muted-foreground">Try adjusting your search or filter settings.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
-            {filteredProducts.map((product, index) => (
-              <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.08}s` }}>
-                <ProductCard product={product} />
+          <>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
+              {paginatedProducts.map((product, index) => (
+                <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.08}s` }}>
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+
+            {totalPages > 1 ? (
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={safePage === 1}
+                  aria-label="Previous page"
+                >
+                  Previous
+                </Button>
+
+                <span className="px-2 text-sm font-body text-muted-foreground">
+                  Page {safePage} of {totalPages}
+                </span>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                  disabled={safePage === totalPages}
+                  aria-label="Next page"
+                >
+                  Next
+                </Button>
               </div>
-            ))}
-          </div>
+            ) : null}
+          </>
         )}
       </div>
     </section>

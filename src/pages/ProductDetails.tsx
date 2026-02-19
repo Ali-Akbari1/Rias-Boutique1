@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
 import { getProductById } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
+import CartDrawer from "@/features/cart/components/CartDrawer";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/money";
@@ -19,6 +20,7 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedImage, setSelectedImage] = useState(product?.galleryImages?.[0] ?? product?.image ?? "");
+  const [cartOpen, setCartOpen] = useState(false);
   const checkoutEnabled = isCheckoutEnabled();
 
   const handleAddToCart = () => {
@@ -43,8 +45,8 @@ const ProductDetails = () => {
       return;
     }
 
-    const chosenSize = selectedSize || sizeOptions[0] || "One Size";
-    const chosenColor = selectedColor || colorOptions[0] || "Default";
+    const chosenSize = selectedSize || (sizeOptions.length === 1 ? sizeOptions[0] || "" : "");
+    const chosenColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
 
     if (!chosenSize || !chosenColor) {
       toast({
@@ -88,12 +90,31 @@ const ProductDetails = () => {
     [product?.careInstructions],
   );
 
+  useEffect(() => {
+    setSelectedSize("");
+    setSelectedColor("");
+    setSelectedImage(product?.galleryImages?.[0] ?? product?.image ?? "");
+  }, [product?.id, product?.image, product?.galleryImages]);
+
+  useEffect(() => {
+    if (!product) {
+      return;
+    }
+
+    if (sizeOptions.length === 1 && colorOptions.length === 1) {
+      setSelectedSize((current) => current || sizeOptions[0] || "");
+      setSelectedColor((current) => current || colorOptions[0] || "");
+    }
+  }, [product, sizeOptions, colorOptions]);
+
   if (!product) {
     return <Navigate to="/" replace />;
   }
 
   const isSoldOut = product.availability === "sold_out";
-  const canAddToCart = !isSoldOut && Boolean((selectedSize || sizeOptions[0]) && (selectedColor || colorOptions[0]));
+  const resolvedSize = selectedSize || (sizeOptions.length === 1 ? sizeOptions[0] || "" : "");
+  const resolvedColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
+  const canAddToCart = !isSoldOut && Boolean(resolvedSize && resolvedColor);
   const primaryImage = selectedImage || galleryImages[0] || product.image || "/placeholder.svg";
 
   return (
@@ -107,28 +128,19 @@ const ProductDetails = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Collection
           </Link>
-          {checkoutEnabled ? (
-            <Link
-              to="/checkout"
-              className="relative inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              Checkout
-              {totalItems > 0 && (
-                <span className="absolute -right-2 -top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
-          ) : (
-            <span
-              aria-disabled="true"
-              className="inline-flex items-center gap-2 rounded-sm border border-border bg-muted/40 px-3 py-2 text-sm font-semibold text-muted-foreground"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              Checkout Soon
-            </span>
-          )}
+          <button
+            type="button"
+            onClick={() => setCartOpen(true)}
+            className="relative rounded-sm p-2 text-foreground transition-colors hover:text-gold"
+            aria-label="Shopping cart"
+          >
+            <ShoppingBag className="w-6 h-6" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-body font-semibold">
+                {totalItems}
+              </span>
+            )}
+          </button>
         </div>
       </header>
 
@@ -298,6 +310,7 @@ const ProductDetails = () => {
           </div>
         </section>
       </main>
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </div>
   );
 };
