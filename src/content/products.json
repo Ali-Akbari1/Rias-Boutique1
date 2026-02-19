@@ -195,7 +195,6 @@
       "description": "White velvet dress with wide-leg pants, featuring handmade silver cheerma.",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39in "
-<<<<<<< HEAD
     },
     {
       "fabric": "Velvet",
@@ -252,8 +251,6 @@
       "image": "/uploads/img_8963.jpg",
       "description": "3 piece pink banaras dress with handmade cheerma.",
       "category": "Party Wear"
-=======
->>>>>>> ed9f995e78a5c5828c99d6f6cbd5a3eeeaeaa008
     }
   ]
 }
