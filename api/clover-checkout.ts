@@ -17,7 +17,7 @@ import {
   verifyCartToken,
 } from "../server/lib/security.js";
 import { checkoutRequestSchema } from "../server/lib/checkout-schema.js";
-import { getCatalogMap, loadCatalog } from "../server/lib/product-catalog.js";
+import { getCatalogMap } from "../server/lib/product-catalog.js";
 import {
   attachCheckoutSession,
   createPendingOrder,
@@ -205,7 +205,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
   }
 
-  const catalog = await loadCatalog();
   const catalogMap = await getCatalogMap();
 
   const lineItems: OrderLineItem[] = [];
@@ -213,6 +212,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const product = catalogMap.get(requestedItem.productId);
     if (!product) {
       sendError(res, 400, "UNKNOWN_PRODUCT", `Product ${requestedItem.productId} is no longer available.`);
+      return;
+    }
+
+    if (product.availability === "sold_out") {
+      sendError(res, 400, "PRODUCT_SOLD_OUT", `${product.name} is currently sold out.`);
       return;
     }
 

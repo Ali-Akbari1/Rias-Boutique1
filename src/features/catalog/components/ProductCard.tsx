@@ -8,9 +8,16 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const isSoldOut = product.availability === "sold_out";
+
   return (
     <div className="group relative overflow-hidden rounded-sm bg-card shadow-boutique transition-all duration-500 hover:shadow-card-hover">
       <div className="aspect-[3/4] overflow-hidden">
+        {isSoldOut ? (
+          <span className="absolute left-3 top-3 z-10 rounded-sm bg-foreground/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-background">
+            Sold Out
+          </span>
+        ) : null}
         <Link to={`/products/${product.id}`} className="block h-full w-full">
           <img
             src={product.image}

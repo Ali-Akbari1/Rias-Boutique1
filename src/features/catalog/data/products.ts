@@ -9,7 +9,7 @@ export interface Product {
   galleryImages: string[];
   category: string;
   description: string;
-  inventory?: number | null;
+  availability: "available" | "sold_out";
   sizes: string[];
   colors: string[];
   fabric: string;
@@ -30,6 +30,7 @@ interface RawProduct {
   category?: string;
   description?: string;
   inventory?: number | string | null;
+  availability?: string;
   sizes?: string[];
   colors?: string[];
   fabric?: string;
@@ -106,6 +107,27 @@ const getNumber = (value: unknown, fallback: number) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const normalizeAvailability = (value: unknown): "available" | "sold_out" => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value <= 0 ? "sold_out" : "available";
+  }
+
+  const normalized = getString(value).toLowerCase().replace(/[\s-]+/g, "_");
+  if (!normalized) {
+    return "available";
+  }
+
+  if (["sold_out", "out_of_stock", "unavailable"].includes(normalized)) {
+    return "sold_out";
+  }
+
+  if (["available", "in_stock"].includes(normalized)) {
+    return "available";
+  }
+
+  return "available";
+};
+
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -122,7 +144,7 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
   const colors = getStringArray(product.colors, ["color", "label", "value", "name"]);
   const careInstructions = getStringArray(product.careInstructions, ["instruction", "text", "value"]);
   const createdAt = getString(product.createdAt) || new Date().toISOString().slice(0, 10);
-  const inventory = getNumber(product.inventory, NaN);
+  const availability = normalizeAvailability(product.availability ?? product.inventory);
 
   return {
     id,
@@ -133,7 +155,7 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
     galleryImages: galleryImages.length > 0 ? galleryImages : [image],
     category: getString(product.category) || "Party Wear",
     description: getString(product.description),
-    inventory: Number.isFinite(inventory) && inventory >= 0 ? Math.floor(inventory) : null,
+    availability,
     sizes: sizes.length > 0 ? sizes : ["One Size"],
     colors: colors.length > 0 ? colors : ["Default"],
     fabric: getString(product.fabric) || "Please contact us for detailed fabric information.",

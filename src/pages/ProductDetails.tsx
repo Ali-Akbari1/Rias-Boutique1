@@ -26,6 +26,15 @@ const ProductDetails = () => {
       return;
     }
 
+    if (product.availability === "sold_out") {
+      toast({
+        title: "Sold out",
+        description: "This item is currently sold out and cannot be added to your bag.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!checkoutEnabled) {
       toast({
         title: "Checkout coming soon",
@@ -83,7 +92,8 @@ const ProductDetails = () => {
     return <Navigate to="/" replace />;
   }
 
-  const canAddToCart = Boolean((selectedSize || sizeOptions[0]) && (selectedColor || colorOptions[0]));
+  const isSoldOut = product.availability === "sold_out";
+  const canAddToCart = !isSoldOut && Boolean((selectedSize || sizeOptions[0]) && (selectedColor || colorOptions[0]));
   const primaryImage = selectedImage || galleryImages[0] || product.image || "/placeholder.svg";
 
   return (
@@ -171,6 +181,11 @@ const ProductDetails = () => {
               <Badge variant="secondary" className="font-body">
                 {formatCad(product.price)}
               </Badge>
+              {isSoldOut ? (
+                <Badge variant="outline" className="border-foreground/30 font-body uppercase tracking-[0.08em]">
+                  Sold Out
+                </Badge>
+              ) : null}
               <span className="inline-flex items-center gap-1 text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 text-primary" />
                 {checkoutEnabled ? "Secure Clover checkout" : "Checkout coming soon"}
@@ -224,11 +239,13 @@ const ProductDetails = () => {
                 onClick={handleAddToCart}
                 disabled={!canAddToCart || !checkoutEnabled}
               >
-                {checkoutEnabled ? "Add to Bag" : "Add to Bag (Coming Soon)"}
+                {isSoldOut ? "Sold Out" : checkoutEnabled ? "Add to Bag" : "Add to Bag (Coming Soon)"}
               </Button>
 
               {!checkoutEnabled ? (
                 <p className="text-sm text-muted-foreground">Checkout is temporarily disabled. Coming soon.</p>
+              ) : isSoldOut ? (
+                <p className="text-sm text-muted-foreground">This item is currently sold out.</p>
               ) : !canAddToCart ? (
                 <p className="text-sm text-muted-foreground">
                   Please select both size and color before adding this product to your bag.

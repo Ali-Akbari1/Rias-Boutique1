@@ -6,7 +6,7 @@ export interface CatalogProduct {
   id: string;
   name: string;
   priceMinor: number;
-  inventory: number | null;
+  availability: "available" | "sold_out";
 }
 
 const productSchema = z.object({
@@ -16,19 +16,9 @@ const productSchema = z.object({
     .union([z.number(), z.string()])
     .transform((value) => Number(value))
     .refine((value) => Number.isFinite(value) && value >= 0, "price must be a non-negative number"),
-  inventory: z
-    .union([z.number(), z.string(), z.null(), z.undefined()])
-    .optional()
-    .transform((value) => {
-      if (value === null || value === undefined || value === "") {
-        return null;
-      }
-      const parsed = Number(value);
-      if (!Number.isFinite(parsed) || parsed < 0) {
-        return null;
-      }
-      return Math.floor(parsed);
-    }),
+  // Kept as "inventory" to support Decap CMS schema and legacy numeric values.
+  inventory: z.union([z.number(), z.string(), z.null(), z.undefined()]).optional(),
+  availability: z.string().optional(),
 });
 
 const contentSchema = z.object({
@@ -43,6 +33,27 @@ let cache: {
 const CACHE_TTL_MS = 10_000;
 
 const catalogPath = path.resolve(process.cwd(), "src", "content", "products.json");
+
+const normalizeAvailability = (value: unknown): "available" | "sold_out" => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value <= 0 ? "sold_out" : "available";
+  }
+
+  const normalized = String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+
+  if (["sold_out", "out_of_stock", "unavailable"].includes(normalized)) {
+    return "sold_out";
+  }
+
+  if (["available", "in_stock"].includes(normalized)) {
+    return "available";
+  }
+
+  return "available";
+};
 
 export const loadCatalog = async () => {
   if (cache && Date.now() - cache.loadedAt < CACHE_TTL_MS) {
@@ -68,7 +79,7 @@ export const loadCatalog = async () => {
       id,
       name: product.name,
       priceMinor: Math.round(product.price * 100),
-      inventory: product.inventory,
+      availability: normalizeAvailability(product.availability ?? product.inventory),
     };
   });
 

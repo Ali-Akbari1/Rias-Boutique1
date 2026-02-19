@@ -80,6 +80,34 @@ describe("clover checkout endpoint", () => {
     });
   });
 
+  it("rejects sold out products", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const request = createMockRequest({
+      method: "POST",
+      headers: {
+        origin: "https://www.riasboutique.com",
+        "user-agent": "Mozilla/5.0",
+      },
+      body: JSON.stringify({
+        ...makeCheckoutBody(),
+        items: [{ productId: "White-cheerma-with-gold", quantity: 1 }],
+      }),
+    });
+    const response = createMockResponse();
+
+    await handler(request, response);
+
+    expect(response.statusCode).toBe(400);
+    expect(response.jsonBody).toMatchObject({
+      error: {
+        code: "PRODUCT_SOLD_OUT",
+      },
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("rejects invalid customer fields and quantity limits", async () => {
     const request = createMockRequest({
       method: "POST",
