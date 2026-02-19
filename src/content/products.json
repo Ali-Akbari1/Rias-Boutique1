@@ -22,6 +22,7 @@
       "createdAt": "2026-02-14",
       "image": "/uploads/full-photo.jpg",
       "deliveryEstimate": "",
+      "inventory": "sold_out",
       "description": "3 Piece Burgundy Bridal Dress\n*Jewelry Sold Separately",
       "category": "Bridal",
       "fitInfo": ""
@@ -254,4 +255,3 @@
     }
   ]
 }
-
