@@ -47,6 +47,7 @@
       "id": "Green-Bridal-Dress",
       "createdAt": "2026-02-16",
       "image": "/uploads/bridalgreencover.jpg",
+      "inventory": 0,
       "description": "Green bridal banaras dress with handmade cheerma",
       "category": "Bridal",
       "fitInfo": "Bust: 44in\nSleeves: 22in \nDress Length: 40in"
@@ -252,6 +253,34 @@
       "image": "/uploads/img_8963.jpg",
       "description": "3 piece pink banaras dress with handmade cheerma.",
       "category": "Party Wear"
+    },
+    {
+      "fabric": "Banaras",
+      "price": 650,
+      "galleryImages": [
+        "/uploads/img_0724.jpg",
+        "/uploads/img_0723.jpg"
+      ],
+      "name": "Bridal Green Banaras Dress (Pre-Order Only)",
+      "slug": "Bridal-green-banaras",
+      "colors": [
+        "Green "
+      ],
+      "sizes": [
+        "SM",
+        "M",
+        "L",
+        "XL"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Bridal-green-banaras",
+      "createdAt": "2026-02-19",
+      "image": "/uploads/img_0724.jpg",
+      "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
+      "category": "Bridal",
+      "fitInfo": "*Bridal Shawl sold separately"
     }
   ]
 }
