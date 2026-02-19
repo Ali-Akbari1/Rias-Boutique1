@@ -281,6 +281,32 @@
       "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
       "category": "Bridal",
       "fitInfo": "*Bridal Shawl sold separately"
+    },
+    {
+      "fabric": "Banaras",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_0728-2.jpg",
+        "/uploads/img_0730.jpg",
+        "/uploads/img_0731.jpg"
+      ],
+      "name": "Purple Banaras Dress ",
+      "slug": "Purple-Banaras-Dress ",
+      "colors": [
+        "Purple"
+      ],
+      "sizes": [
+        "SM"
+      ],
+      "careInstructions": [
+        "Dry Clean Only "
+      ],
+      "id": "Purple-Banaras-Dress ",
+      "createdAt": "2026-02-19",
+      "image": "/uploads/img_0728-2.jpg",
+      "inventory": 1,
+      "description": "3 piece purple banaras dress ",
+      "category": "Party Wear"
     }
   ]
 }
