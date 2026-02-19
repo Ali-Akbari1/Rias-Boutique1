@@ -4,30 +4,27 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/3f07036e-8838-4eec-a0ca-6d7a66b34f5f.jpg",
         "/uploads/img.jpg",
         "/uploads/full-photo.jpg"
       ],
       "name": "Burgundy Bridal Dress",
       "slug": "Burgundy-Bridal-Dress",
       "colors": [
-        "Red ",
-        "Burgundy (Pre-Order)"
+        "Red",
+        "Burgundy"
       ],
-      "sizes": [
-        "M"
-      ],
+      "sizes": [],
       "popularity": "",
       "careInstructions": [
         "Dry Clean Only"
       ],
       "id": "Burgundy-Bridal-Dress",
       "createdAt": "2026-02-14",
-      "image": "/uploads/3f07036e-8838-4eec-a0ca-6d7a66b34f5f.jpg",
+      "image": "/uploads/full-photo.jpg",
       "deliveryEstimate": "",
-      "description": "3 Piece Velvet Bridal Dress\n",
+      "description": "3 Piece Burgundy Bridal Dress\n*Jewelry Sold Separately",
       "category": "Bridal",
-      "fitInfo": "*Jewelry Sold Separately"
+      "fitInfo": ""
     },
     {
       "fabric": "Banaras",
@@ -198,6 +195,7 @@
       "description": "White velvet dress with wide-leg pants, featuring handmade silver cheerma.",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39in "
+<<<<<<< HEAD
     },
     {
       "fabric": "Velvet",
@@ -254,6 +252,8 @@
       "image": "/uploads/img_8963.jpg",
       "description": "3 piece pink banaras dress with handmade cheerma.",
       "category": "Party Wear"
+=======
+>>>>>>> ed9f995e78a5c5828c99d6f6cbd5a3eeeaeaa008
     }
   ]
 }
