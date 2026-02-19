@@ -222,8 +222,17 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       });
 
       if (!updatedOrder.confirmationEmailSentAt) {
-        await sendOrderConfirmationEmail(updatedOrder);
-        await markConfirmationEmailSent(updatedOrder.id);
+        try {
+          await sendOrderConfirmationEmail(updatedOrder);
+          await markConfirmationEmailSent(updatedOrder.id);
+        } catch (emailError) {
+          console.error("[clover-webhook] confirmation email failed", {
+            requestId,
+            orderId: updatedOrder.id,
+            eventId: parsed.eventId,
+            error: safeErrorMessage(emailError),
+          });
+        }
       }
     } else if (parsed.eventType.includes("fail") || parsed.eventType.includes("cancel")) {
       await markOrderFailed({

@@ -175,9 +175,18 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           });
 
           if (!order.confirmationEmailSentAt) {
-            await sendOrderConfirmationEmail(order);
-            await markConfirmationEmailSent(order.id);
-            order = (await findOrderById(order.id)) || order;
+            try {
+              await sendOrderConfirmationEmail(order);
+              await markConfirmationEmailSent(order.id);
+              order = (await findOrderById(order.id)) || order;
+            } catch (emailError) {
+              console.error("[order-status] confirmation email failed", {
+                requestId,
+                orderId: order.id,
+                checkoutId: targetCheckoutId,
+                error: safeErrorMessage(emailError),
+              });
+            }
           }
         }
       } catch (error) {
