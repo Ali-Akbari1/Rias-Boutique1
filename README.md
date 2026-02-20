@@ -96,7 +96,8 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
 - `CLOVER_DEBUG_LOGS`: Optional `true`/`false` to enable verbose Clover diagnostics in Vercel logs.
 - `MERCHANT_ORDER_EMAIL`: Store inbox that receives new paid order alerts.
-- `RESEND_API_KEY`: Optional Resend API key to send real merchant emails.
+- `CUSTOMER_ORDER_EMAIL_ENABLED`: Optional `true`/`false` (default `true`) to send customer order confirmation emails after payment.
+- `RESEND_API_KEY`: Optional Resend API key to send real merchant/customer emails.
 - `RESEND_FROM_EMAIL`: Optional sender identity for Resend, e.g. `Ria's Boutique <orders@riasboutique.com>`.
 - `SUPABASE_URL`: Supabase project URL for server-side order persistence.
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key used by serverless checkout/webhook/order endpoints.
