@@ -147,7 +147,18 @@ export const checkoutRequestSchema = z
     cartToken: z.string().trim().min(16).max(256).optional(),
     cartTimestamp: z.number().int().optional(),
     website: z.string().trim().max(0).optional(), // honeypot
-    promoCode: z.string().trim().max(40).optional(),
+    discountCode: z
+      .string()
+      .trim()
+      .max(40)
+      .regex(/^[A-Za-z0-9_-]*$/, "Discount code format is invalid.")
+      .optional(),
+    promoCode: z
+      .string()
+      .trim()
+      .max(40)
+      .regex(/^[A-Za-z0-9_-]*$/, "Promo code format is invalid.")
+      .optional(),
   })
   .strict();
 

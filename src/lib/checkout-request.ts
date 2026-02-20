@@ -27,16 +27,18 @@ export const buildCheckoutItems = (items: CartItem[]): CheckoutItemPayload[] =>
 export const buildClientIdempotencyKey = ({
   email,
   postalCode,
+  discountCode,
   items,
   timeBucket = Math.floor(Date.now() / (15 * 60 * 1000)),
 }: {
   email: string;
   postalCode: string;
+  discountCode?: string;
   items: CheckoutItemPayload[];
   timeBucket?: number;
 }) => {
   const normalized = normalizeLineItems(items);
-  const payload = `${email.trim().toLowerCase()}|${postalCode.trim().toLowerCase()}|${JSON.stringify(normalized)}|${timeBucket}`;
+  const payload = `${email.trim().toLowerCase()}|${postalCode.trim().toLowerCase()}|${(discountCode || "").trim().toUpperCase()}|${JSON.stringify(normalized)}|${timeBucket}`;
 
   let hash = 5381;
   for (let index = 0; index < payload.length; index += 1) {

@@ -59,6 +59,8 @@ const initialForm: CheckoutForm = {
 const SHIPPING_FLAT_RATE = 30;
 const FREE_SHIPPING_THRESHOLD = 400;
 const TAX_RATE = 0.05;
+const LAUNCH_DISCOUNT_CODE = "LAUNCH10";
+const LAUNCH_DISCOUNT_RATE = 0.1;
 const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
 const isShippingChargesEnabled = () => toBoolean(import.meta.env.VITE_ENABLE_SHIPPING_CHARGES as string | undefined);
 
@@ -66,6 +68,7 @@ const Checkout = () => {
   const { items, totalPrice } = useCart();
   const { toast } = useToast();
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(initialForm);
+  const [discountCode, setDiscountCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const googleReviewsUrl = getGoogleReviewsUrl();
   const pickupDetails = getStorePickupDetails();
@@ -74,12 +77,16 @@ const Checkout = () => {
   const checkoutTimeoutRef = useRef<number | null>(null);
 
   const subtotalMinor = Math.round(totalPrice * 100);
+  const normalizedDiscountCode = discountCode.trim().toUpperCase();
+  const discountMinor = normalizedDiscountCode === LAUNCH_DISCOUNT_CODE ? Math.round(subtotalMinor * LAUNCH_DISCOUNT_RATE) : 0;
+  const discountedSubtotalMinor = Math.max(0, subtotalMinor - discountMinor);
   const isPickupInStore = checkoutForm.deliveryMethod === "pickup";
   const shippingMinor =
     !isPickupInStore && shippingChargesEnabled && subtotalMinor < FREE_SHIPPING_THRESHOLD * 100 ? SHIPPING_FLAT_RATE * 100 : 0;
-  const taxMinor = Math.round((subtotalMinor + shippingMinor) * TAX_RATE);
-  const totalMinor = subtotalMinor + shippingMinor + taxMinor;
+  const taxMinor = Math.round((discountedSubtotalMinor + shippingMinor) * TAX_RATE);
+  const totalMinor = discountedSubtotalMinor + shippingMinor + taxMinor;
   const subtotal = subtotalMinor / 100;
+  const discount = discountMinor / 100;
   const shipping = shippingMinor / 100;
   const tax = taxMinor / 100;
   const total = totalMinor / 100;
@@ -139,6 +146,7 @@ const Checkout = () => {
       const idempotencyKey = buildClientIdempotencyKey({
         email: checkoutForm.email,
         postalCode: checkoutForm.deliveryMethod === "pickup" ? "pickup" : checkoutForm.postalCode,
+        discountCode: normalizedDiscountCode,
         items: checkoutItems,
       });
       const { cartToken, cartTimestamp } = await requestOptionalCartToken(checkoutItems).catch(() => ({
@@ -159,6 +167,7 @@ const Checkout = () => {
         body: JSON.stringify({
           customer: checkoutForm,
           items: checkoutItems,
+          discountCode: normalizedDiscountCode,
           idempotencyKey,
           cartToken,
           cartTimestamp,
@@ -308,6 +317,27 @@ const Checkout = () => {
                         onChange={handleFormChange("phone")}
                         autoComplete="tel"
                       />
+                    </div>
+
+                    <div className="space-y-2 sm:col-span-2">
+                      <label htmlFor="discountCode" className="font-body text-sm font-semibold text-foreground">
+                        Discount code
+                      </label>
+                      <Input
+                        id="discountCode"
+                        maxLength={40}
+                        value={discountCode}
+                        onChange={(event) => setDiscountCode(event.target.value)}
+                        placeholder="Enter discount code"
+                        autoComplete="off"
+                      />
+                      {discountCode.trim() ? (
+                        <p className="text-xs text-muted-foreground">
+                          {normalizedDiscountCode === LAUNCH_DISCOUNT_CODE
+                            ? `${LAUNCH_DISCOUNT_CODE} applied (10% off).`
+                            : `Invalid code.`}
+                        </p>
+                      ) : null}
                     </div>
 
                     {isPickupInStore ? (
@@ -551,6 +581,12 @@ const Checkout = () => {
                     <span>Subtotal</span>
                     <span>{formatCad(subtotal)}</span>
                   </div>
+                  {discountMinor > 0 ? (
+                    <div className="flex items-center justify-between text-muted-foreground">
+                      <span>Discount ({LAUNCH_DISCOUNT_CODE})</span>
+                      <span>-{formatCad(discount)}</span>
+                    </div>
+                  ) : null}
                   <div className="flex items-center justify-between text-muted-foreground">
                     <span>{isPickupInStore ? "Pickup" : "Shipping"}</span>
                     <span>{isPickupInStore ? "In store" : shipping === 0 ? "Free" : formatCad(shipping)}</span>

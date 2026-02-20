@@ -33,6 +33,8 @@ const DEFAULT_RATE_WINDOW_MS = 60_000;
 const SHIPPING_FLAT_RATE_MINOR = 3_000; // CA$30.00
 const FREE_SHIPPING_THRESHOLD_MINOR = 40_000; // CA$400.00
 const TAX_RATE = 0.05; // 5%
+const LAUNCH_DISCOUNT_CODE = "LAUNCH10";
+const LAUNCH_DISCOUNT_RATE = 0.1; // 10%
 const isDebugLoggingEnabled = () => process.env.CLOVER_DEBUG_LOGS?.trim().toLowerCase() === "true";
 const createRequestId = () => createDeterministicHash(`${Date.now()}|${Math.random()}`).slice(0, 12);
 const maskValue = (value: string, keepStart = 3, keepEnd = 4) => {
@@ -156,8 +158,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const payload = bodyResult.data;
-  if ((payload.promoCode || "").trim()) {
-    sendError(res, 400, "PROMO_NOT_SUPPORTED", "Promo codes are not supported for this checkout.");
+  const requestedDiscountCode = (payload.discountCode || payload.promoCode || "").trim().toUpperCase();
+  if (requestedDiscountCode && requestedDiscountCode !== LAUNCH_DISCOUNT_CODE) {
+    sendError(res, 400, "INVALID_DISCOUNT_CODE", "Invalid discount code.");
     return;
   }
 
@@ -238,13 +241,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const subtotalMinor = lineItems.reduce((sum, item) => sum + item.lineTotalMinor, 0);
+  const discountMinor = requestedDiscountCode === LAUNCH_DISCOUNT_CODE ? Math.round(subtotalMinor * LAUNCH_DISCOUNT_RATE) : 0;
+  const discountedSubtotalMinor = Math.max(0, subtotalMinor - discountMinor);
   const isPickupInStore = payload.customer.deliveryMethod === "pickup";
   const shippingMinor =
     !isPickupInStore && isShippingChargesEnabled() && subtotalMinor < FREE_SHIPPING_THRESHOLD_MINOR
       ? SHIPPING_FLAT_RATE_MINOR
       : 0;
-  const taxMinor = Math.round((subtotalMinor + shippingMinor) * TAX_RATE);
-  const totalMinor = subtotalMinor + shippingMinor + taxMinor;
+  const taxMinor = Math.round((discountedSubtotalMinor + shippingMinor) * TAX_RATE);
+  const totalMinor = discountedSubtotalMinor + shippingMinor + taxMinor;
 
   const shippingFingerprint = toShippingFingerprint(payload.customer);
   const idempotencyKey =
@@ -285,6 +290,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       price: item.unitAmountMinor,
       unitQty: item.quantity,
     })),
+    ...(discountMinor > 0
+      ? [
+          {
+            name: `Discount (${LAUNCH_DISCOUNT_CODE})`,
+            price: -discountMinor,
+            unitQty: 1,
+          },
+        ]
+      : []),
     ...(shippingMinor > 0
       ? [
           {
@@ -332,6 +346,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       itemCount: lineItems.length,
       subtotalMinor,
       shippingMinor,
+      discountMinor,
       taxMinor,
       totalMinor,
       apiBaseUrl: config.apiBaseUrl,

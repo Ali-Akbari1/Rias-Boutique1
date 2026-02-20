@@ -181,6 +181,73 @@ describe("clover checkout endpoint", () => {
     });
   });
 
+  it("rejects invalid discount codes", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const request = createMockRequest({
+      method: "POST",
+      headers: {
+        origin: "https://www.riasboutique.com",
+        "user-agent": "Mozilla/5.0",
+      },
+      body: JSON.stringify({
+        ...makeCheckoutBody(),
+        discountCode: "NOTVALID",
+      }),
+    });
+    const response = createMockResponse();
+
+    await handler(request, response);
+
+    expect(response.statusCode).toBe(400);
+    expect(response.jsonBody).toMatchObject({
+      error: {
+        code: "INVALID_DISCOUNT_CODE",
+      },
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("applies LAUNCH10 discount to checkout line items", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_launch10", href: "https://checkout.clover.com/pay/checkout_launch10" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const request = createMockRequest({
+      method: "POST",
+      headers: {
+        origin: "https://www.riasboutique.com",
+        "user-agent": "Mozilla/5.0",
+      },
+      body: JSON.stringify({
+        ...makeCheckoutBody(),
+        discountCode: "launch10",
+      }),
+    });
+    const response = createMockResponse();
+
+    await handler(request, response);
+
+    expect(response.statusCode).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const fetchPayload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body || "{}")) as {
+      shoppingCart?: { lineItems?: Array<{ name: string; price: number; unitQty: number }> };
+    };
+    const lineItems = fetchPayload.shoppingCart?.lineItems || [];
+    const discountLine = lineItems.find((lineItem) => lineItem.name === "Discount (LAUNCH10)");
+    const taxLine = lineItems.find((lineItem) => lineItem.name === "GST (5%)");
+
+    expect(discountLine?.price).toBe(-5000);
+    expect(discountLine?.unitQty).toBe(1);
+    expect(taxLine?.price).toBe(2250);
+  });
+
   it("uses trusted server pricing instead of client price", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "checkout_123", href: "https://checkout.clover.com/pay/checkout_123" }), {
