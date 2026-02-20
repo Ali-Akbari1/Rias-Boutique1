@@ -24,7 +24,7 @@ const DEPARTMENT_LABELS: Record<ProductDepartment, string> = {
   jewelry: "Jewelry",
 };
 
-const WOMEN_DEFAULT_CATEGORIES = ["Party Wear", "Bridal", "Casual", "Formal"];
+const WOMEN_DEFAULT_CATEGORIES = ["Party Wear", "Bridal", "Formal"];
 const MEN_DEFAULT_CATEGORIES = ["Handmade", "Machine Made"];
 const JEWELRY_DEFAULT_CATEGORIES = ["Artificial", "925 Silver"];
 const ALL_DEFAULT_CATEGORIES = [

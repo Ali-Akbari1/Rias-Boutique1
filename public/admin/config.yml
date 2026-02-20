@@ -68,7 +68,7 @@ collections:
                   label: "Category",
                   name: "category",
                   widget: "select",
-                  options: ["Party Wear", "Bridal", "Casual", "Formal", "Handmade", "Machine Made", "Artificial", "925 Silver"]
+                  options: ["Party Wear", "Bridal", "Formal", "Handmade", "Machine Made", "Artificial", "925 Silver"]
                 }
               - { label: "Main Image", name: "image", widget: "image", choose_url: false }
               - label: "Gallery Images"
