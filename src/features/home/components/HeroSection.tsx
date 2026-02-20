@@ -1,4 +1,5 @@
 import heroBg from "@/assets/hero-bg.png";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -27,12 +28,12 @@ const HeroSection = () => {
           <p className="mb-8 max-w-md text-lg font-body leading-relaxed text-white sm:text-xl">
             Exquisite Afghan clothing adorned with centuries-old embroidery traditions. Each piece tells a story.
           </p>
-          <a
-            href="#collection"
+          <Link
+            to="/collection"
             className="inline-flex items-center rounded-sm border-2 border-foreground bg-background px-7 py-3.5 text-base font-body font-semibold tracking-wide text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.28)] transition-colors hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground sm:px-8 sm:py-4 sm:text-lg"
           >
             Explore Collection
-          </a>
+          </Link>
         </div>
       </div>
     </section>
