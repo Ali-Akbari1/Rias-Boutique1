@@ -114,6 +114,93 @@ const toShippingFingerprint = (customer: {
     .map((part) => part.trim().toLowerCase())
     .join("|");
 
+const buildCloverLineItems = ({
+  lineItems,
+  discountMinor,
+  shippingMinor,
+  taxMinor,
+}: {
+  lineItems: OrderLineItem[];
+  discountMinor: number;
+  shippingMinor: number;
+  taxMinor: number;
+}) => {
+  const subtotalMinor = lineItems.reduce((sum, item) => sum + item.lineTotalMinor, 0);
+  const discountTarget = Math.max(0, Math.min(discountMinor, subtotalMinor));
+
+  const allocatedDiscounts = lineItems.map((item) =>
+    discountTarget > 0 ? Math.floor((discountTarget * item.lineTotalMinor) / subtotalMinor) : 0,
+  );
+  let remainingDiscount = discountTarget - allocatedDiscounts.reduce((sum, value) => sum + value, 0);
+
+  if (remainingDiscount > 0) {
+    const sortedIndexes = lineItems
+      .map((item, index) => ({ index, lineTotalMinor: item.lineTotalMinor }))
+      .sort((a, b) => b.lineTotalMinor - a.lineTotalMinor)
+      .map((entry) => entry.index);
+
+    let cursor = 0;
+    while (remainingDiscount > 0 && sortedIndexes.length > 0) {
+      const targetIndex = sortedIndexes[cursor % sortedIndexes.length] ?? 0;
+      allocatedDiscounts[targetIndex] = (allocatedDiscounts[targetIndex] || 0) + 1;
+      remainingDiscount -= 1;
+      cursor += 1;
+    }
+  }
+
+  const checkoutLineItems: Array<{ name: string; price: number; unitQty: number }> = [];
+
+  for (let index = 0; index < lineItems.length; index += 1) {
+    const item = lineItems[index];
+    if (!item) {
+      continue;
+    }
+
+    const itemDiscount = Math.max(0, Math.min(allocatedDiscounts[index] || 0, item.lineTotalMinor));
+    const quantity = Math.max(1, item.quantity);
+    const basePerUnitDiscount = Math.floor(itemDiscount / quantity);
+    const extraUnitDiscountCount = itemDiscount % quantity;
+
+    const regularUnitPrice = Math.max(1, item.unitAmountMinor - basePerUnitDiscount);
+    const extraDiscountedUnitPrice = Math.max(1, regularUnitPrice - 1);
+
+    const regularUnitCount = quantity - extraUnitDiscountCount;
+    if (regularUnitCount > 0) {
+      checkoutLineItems.push({
+        name: item.name,
+        price: regularUnitPrice,
+        unitQty: regularUnitCount,
+      });
+    }
+
+    if (extraUnitDiscountCount > 0) {
+      checkoutLineItems.push({
+        name: item.name,
+        price: extraDiscountedUnitPrice,
+        unitQty: extraUnitDiscountCount,
+      });
+    }
+  }
+
+  if (shippingMinor > 0) {
+    checkoutLineItems.push({
+      name: "Shipping",
+      price: shippingMinor,
+      unitQty: 1,
+    });
+  }
+
+  if (taxMinor > 0) {
+    checkoutLineItems.push({
+      name: "GST (5%)",
+      price: taxMinor,
+      unitQty: 1,
+    });
+  }
+
+  return checkoutLineItems;
+};
+
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "POST") {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
@@ -284,40 +371,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const checkoutLineItems = [
-    ...lineItems.map((item) => ({
-      name: item.name,
-      price: item.unitAmountMinor,
-      unitQty: item.quantity,
-    })),
-    ...(discountMinor > 0
-      ? [
-          {
-            name: `Discount (${LAUNCH_DISCOUNT_CODE})`,
-            price: -discountMinor,
-            unitQty: 1,
-          },
-        ]
-      : []),
-    ...(shippingMinor > 0
-      ? [
-          {
-            name: "Shipping",
-            price: shippingMinor,
-            unitQty: 1,
-          },
-        ]
-      : []),
-    ...(taxMinor > 0
-      ? [
-          {
-            name: "GST (5%)",
-            price: taxMinor,
-            unitQty: 1,
-          },
-        ]
-      : []),
-  ];
+  const checkoutLineItems = buildCloverLineItems({
+    lineItems,
+    discountMinor,
+    shippingMinor,
+    taxMinor,
+  });
 
   const order =
     existingOrder ||

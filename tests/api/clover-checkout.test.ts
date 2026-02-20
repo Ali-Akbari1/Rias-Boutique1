@@ -240,12 +240,13 @@ describe("clover checkout endpoint", () => {
       shoppingCart?: { lineItems?: Array<{ name: string; price: number; unitQty: number }> };
     };
     const lineItems = fetchPayload.shoppingCart?.lineItems || [];
-    const discountLine = lineItems.find((lineItem) => lineItem.name === "Discount (LAUNCH10)");
     const taxLine = lineItems.find((lineItem) => lineItem.name === "GST (5%)");
+    const lineItemsTotal = lineItems.reduce((sum, lineItem) => sum + lineItem.price * lineItem.unitQty, 0);
 
-    expect(discountLine?.price).toBe(-5000);
-    expect(discountLine?.unitQty).toBe(1);
+    expect(lineItems.every((lineItem) => lineItem.price > 0)).toBe(true);
+    expect(lineItems.some((lineItem) => lineItem.name.includes("Discount"))).toBe(false);
     expect(taxLine?.price).toBe(2250);
+    expect(lineItemsTotal).toBe(47250);
   });
 
   it("uses trusted server pricing instead of client price", async () => {

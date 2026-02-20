@@ -109,6 +109,39 @@ const pullNestedString = (payload: Record<string, unknown>, keys: string[]) => {
   return "";
 };
 
+const extractCloverErrorDetails = (payload: unknown) => {
+  const record = asObject(payload);
+  if (!record) {
+    return "";
+  }
+
+  const errors = Array.isArray(record.errors) ? record.errors : [];
+  if (errors.length === 0) {
+    return "";
+  }
+
+  const messages = errors
+    .map((entry) => {
+      if (typeof entry === "string") {
+        return entry.trim();
+      }
+      const errorRecord = asObject(entry);
+      if (!errorRecord) {
+        return "";
+      }
+      const field = toStringValue(errorRecord.field || errorRecord.name || errorRecord.path);
+      const message = toStringValue(errorRecord.message || errorRecord.error || errorRecord.reason);
+      if (field && message) {
+        return `${field}: ${message}`;
+      }
+      return message || field;
+    })
+    .filter(Boolean)
+    .slice(0, 3);
+
+  return messages.join("; ");
+};
+
 const isPaidStatus = (status: string) => {
   const normalized = status.trim().toLowerCase().replace(/[\s-]+/g, "_");
   const paidStatuses = new Set(["paid", "succeeded", "success", "completed", "captured", "settled"]);
@@ -183,12 +216,17 @@ export const createCloverCheckoutSession = async ({
     const data = (await response.json().catch(() => null)) as unknown;
     if (!response.ok) {
       const message = normalizeErrorMessage(data, `Clover API request failed with status ${response.status}.`);
-      throw new CloverApiError(message, {
+      const details = extractCloverErrorDetails(data);
+      const combinedMessage = details ? `${message} (${details})` : message;
+      throw new CloverApiError(combinedMessage, {
         apiBaseUrl: normalizedApiBase,
         endpoint,
         statusCode: response.status,
         responseRequestId: getCloverResponseRequestId(response),
-        responseBody: data,
+        responseBody: {
+          ...(asObject(data) || {}),
+          details,
+        },
       });
     }
 
