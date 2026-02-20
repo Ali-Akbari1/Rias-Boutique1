@@ -13,7 +13,7 @@
         "Red",
         "Burgundy"
       ],
-      "sizes": [],
+      "sizes": ["M"],
       "popularity": "",
       "careInstructions": [
         "Dry Clean Only"
@@ -39,7 +39,7 @@
       "name": "Green Bridal Dress",
       "slug": "Green-Bridal-Dress",
       "sizes": [
-        "Large (44in)"
+        "L"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -60,6 +60,9 @@
         "/uploads/img_0666.jpg"
       ],
       "name": "Blue Long Cheerma Dozi Dress",
+      "sizes": [
+        "M"
+      ],
       "slug": "Blue-Cheerma-Dozi",
       "careInstructions": [
         "Dry Clean Only"
@@ -81,7 +84,7 @@
       "name": "Royal Blue 3 Piece Suit ",
       "slug": "Royal-Blue",
       "sizes": [
-        "Small (40in)"
+        "S"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -105,7 +108,7 @@
       "name": "Handmade Hazaragi Dress",
       "slug": "Handmade-Hazaragi-Dress",
       "sizes": [
-        "Small "
+        "S "
       ],
       "careInstructions": [
         "Dry Clean Only "
@@ -132,7 +135,7 @@
         "White "
       ],
       "sizes": [
-        "Medium (42in) "
+        "M "
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -159,7 +162,7 @@
         "Black with Gold "
       ],
       "sizes": [
-        "Large (44in)"
+        "L"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -186,7 +189,7 @@
         "White and Silver "
       ],
       "sizes": [
-        "Large (44in)"
+        "L"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -215,10 +218,10 @@
         "Blue (Pre-order)"
       ],
       "sizes": [
-        "SM (40in)",
-        "M (42in)",
-        "L (44in)",
-        "XL (46in)"
+        "S",
+        "M",
+        "L",
+        "XL"
       ],
       "popularity": 100,
       "id": "Cheerma-dozi-3-piece",
@@ -243,7 +246,7 @@
         "Pink"
       ],
       "sizes": [
-        "SM"
+        "S"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -267,7 +270,7 @@
         "Green "
       ],
       "sizes": [
-        "SM",
+        "S",
         "M",
         "L",
         "XL"
@@ -296,7 +299,7 @@
         "Purple"
       ],
       "sizes": [
-        "SM"
+        "S"
       ],
       "careInstructions": [
         "Dry Clean Only "
@@ -323,7 +326,7 @@
         "Red"
       ],
       "sizes": [
-        "M (42in)"
+        "M"
       ],
       "id": "red-gharara- bridal dress",
       "image": "/uploads/img_0738.jpg",

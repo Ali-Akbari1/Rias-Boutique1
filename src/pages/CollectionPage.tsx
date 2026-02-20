@@ -1,14 +1,27 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ProductGrid from "@/features/catalog/components/ProductGrid";
 import CartDrawer from "@/features/cart/components/CartDrawer";
 import Footer from "@/features/navigation/components/Footer";
 import { useCart } from "@/features/cart/context/CartContext";
+import { type ProductDepartment, PRODUCT_DEPARTMENTS } from "@/features/catalog/data/products";
 
 const CollectionPage = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const { totalItems } = useCart();
+  const { department } = useParams<{ department?: string }>();
+
+  const initialDepartment = useMemo<"all" | ProductDepartment>(() => {
+    if (!department) {
+      return "all";
+    }
+
+    const normalized = department.trim().toLowerCase();
+    return PRODUCT_DEPARTMENTS.includes(normalized as ProductDepartment)
+      ? (normalized as ProductDepartment)
+      : "all";
+  }, [department]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,7 +52,7 @@ const CollectionPage = () => {
       </header>
 
       <main>
-        <ProductGrid />
+        <ProductGrid initialDepartment={initialDepartment} />
       </main>
 
       <Footer />

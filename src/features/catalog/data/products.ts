@@ -1,5 +1,8 @@
 import rawProductContent from "@/content/products.json";
 
+export const PRODUCT_DEPARTMENTS = ["women", "men", "jewelry"] as const;
+export type ProductDepartment = (typeof PRODUCT_DEPARTMENTS)[number];
+
 export interface Product {
   id: string;
   slug: string;
@@ -7,6 +10,7 @@ export interface Product {
   price: number;
   compareAtPrice?: number;
   salePercent?: number;
+  department: ProductDepartment;
   image: string;
   galleryImages: string[];
   category: string;
@@ -30,6 +34,7 @@ interface RawProduct {
   image?: string;
   galleryImages?: string[];
   category?: string;
+  department?: string;
   description?: string;
   inventory?: number | string | null;
   availability?: string;
@@ -132,6 +137,32 @@ const normalizeAvailability = (value: unknown): "available" | "sold_out" => {
   return "available";
 };
 
+const normalizeDepartment = (value: unknown, fallbackCategory: string): ProductDepartment => {
+  const normalized = getString(value).toLowerCase().replace(/[^a-z]+/g, "");
+
+  if (["men", "mens", "man", "male", "gents", "gentlemen"].includes(normalized)) {
+    return "men";
+  }
+
+  if (["jewelry", "jewellery", "accessory", "accessories"].includes(normalized)) {
+    return "jewelry";
+  }
+
+  if (["women", "womens", "woman", "female", "ladies", "lady"].includes(normalized)) {
+    return "women";
+  }
+
+  const fallback = fallbackCategory.toLowerCase();
+  if (fallback.includes("men")) {
+    return "men";
+  }
+  if (fallback.includes("jewel") || fallback.includes("accessor")) {
+    return "jewelry";
+  }
+
+  return "women";
+};
+
 const roundToTwoDecimals = (value: number) => Math.round(value * 100) / 100;
 
 const normalizeSaleData = (
@@ -190,6 +221,8 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
   const colors = getStringArray(product.colors, ["color", "label", "value", "name"]);
   const careInstructions = getStringArray(product.careInstructions, ["instruction", "text", "value"]);
   const createdAt = getString(product.createdAt) || new Date().toISOString().slice(0, 10);
+  const category = getString(product.category) || "Party Wear";
+  const department = normalizeDepartment(product.department, category);
   const availability = normalizeAvailability(product.availability ?? product.inventory);
   const price = Math.max(0, getNumber(product.price, 0));
   const saleData = normalizeSaleData(price, product.salePercent, product.compareAtPrice);
@@ -201,9 +234,10 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
     price,
     compareAtPrice: saleData.compareAtPrice,
     salePercent: saleData.salePercent,
+    department,
     image,
     galleryImages: galleryImages.length > 0 ? galleryImages : [image],
-    category: getString(product.category) || "Party Wear",
+    category,
     description: getString(product.description),
     availability,
     sizes: sizes.length > 0 ? sizes : ["One Size"],
