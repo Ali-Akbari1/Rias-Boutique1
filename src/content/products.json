@@ -311,7 +311,7 @@
     },
     {
       "fabric": "Velvet",
-      "price": 450,
+      "price": 1,
       "galleryImages": [
         "/uploads/img_0735.jpg",
         "/uploads/img_0736.jpg",
@@ -323,7 +323,7 @@
         "Red"
       ],
       "sizes": [
-        "M (42in)"
+        "M"
       ],
       "id": "red-gharara- bridal dress",
       "image": "/uploads/img_0738.jpg",
