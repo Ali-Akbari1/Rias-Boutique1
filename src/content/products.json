@@ -13,7 +13,7 @@
         "Red",
         "Burgundy"
       ],
-      "sizes": ["M"],
+      "sizes": [],
       "popularity": "",
       "careInstructions": [
         "Dry Clean Only"
@@ -39,7 +39,7 @@
       "name": "Green Bridal Dress",
       "slug": "Green-Bridal-Dress",
       "sizes": [
-        "L"
+        "Large (44in)"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -60,9 +60,6 @@
         "/uploads/img_0666.jpg"
       ],
       "name": "Blue Long Cheerma Dozi Dress",
-      "sizes": [
-        "M"
-      ],
       "slug": "Blue-Cheerma-Dozi",
       "careInstructions": [
         "Dry Clean Only"
@@ -84,7 +81,7 @@
       "name": "Royal Blue 3 Piece Suit ",
       "slug": "Royal-Blue",
       "sizes": [
-        "S"
+        "Small (40in)"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -108,7 +105,7 @@
       "name": "Handmade Hazaragi Dress",
       "slug": "Handmade-Hazaragi-Dress",
       "sizes": [
-        "S "
+        "Small "
       ],
       "careInstructions": [
         "Dry Clean Only "
@@ -135,7 +132,7 @@
         "White "
       ],
       "sizes": [
-        "M "
+        "Medium (42in) "
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -162,7 +159,7 @@
         "Black with Gold "
       ],
       "sizes": [
-        "L"
+        "Large (44in)"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -189,7 +186,7 @@
         "White and Silver "
       ],
       "sizes": [
-        "L"
+        "Large (44in)"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -218,10 +215,10 @@
         "Blue (Pre-order)"
       ],
       "sizes": [
-        "S",
-        "M",
-        "L",
-        "XL"
+        "SM (40in)",
+        "M (42in)",
+        "L (44in)",
+        "XL (46in)"
       ],
       "popularity": 100,
       "id": "Cheerma-dozi-3-piece",
@@ -246,7 +243,7 @@
         "Pink"
       ],
       "sizes": [
-        "S"
+        "SM"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -270,7 +267,7 @@
         "Green "
       ],
       "sizes": [
-        "S",
+        "SM",
         "M",
         "L",
         "XL"
@@ -289,7 +286,7 @@
       "fabric": "Banaras",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_0728-2.jpg",
+        "/uploads/img_0750.jpg",
         "/uploads/img_0730.jpg",
         "/uploads/img_0731.jpg"
       ],
@@ -299,14 +296,14 @@
         "Purple"
       ],
       "sizes": [
-        "S"
+        "SM"
       ],
       "careInstructions": [
         "Dry Clean Only "
       ],
       "id": "Purple-Banaras-Dress ",
       "createdAt": "2026-02-19",
-      "image": "/uploads/img_0728-2.jpg",
+      "image": "/uploads/img_0751.jpg",
       "inventory": 1,
       "description": "Purple banaras dress with kochi pants and beautiful beaded scarf",
       "category": "Party Wear",
@@ -314,21 +311,21 @@
     },
     {
       "fabric": "Velvet",
-      "price": 450,
+      "price": 1,
       "galleryImages": [
         "/uploads/img_0735.jpg",
         "/uploads/img_0736.jpg",
         "/uploads/img_0740.jpg"
       ],
       "name": "Red Bridal Velvet Dress",
-      "slug": "red-gharara- bridal dress",
+      "slug": "red-gharara-bridal dress",
       "colors": [
         "Red"
       ],
       "sizes": [
         "M"
       ],
-      "id": "red-gharara- bridal dress",
+      "id": "red-gharara-bridal dress",
       "image": "/uploads/img_0738.jpg",
       "inventory": 1,
       "description": "Bridal red velvet dress with wide-legged pants and beautiful beaded scarf. ",
