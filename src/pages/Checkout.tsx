@@ -312,7 +312,7 @@ const Checkout = () => {
                         type="tel"
                         required
                         maxLength={22}
-                        pattern="[0-9()+. -]{7,22}"
+                        pattern="[0-9+\\(\\)\\.\\- ]{7,22}"
                         value={checkoutForm.phone}
                         onChange={handleFormChange("phone")}
                         autoComplete="tel"
