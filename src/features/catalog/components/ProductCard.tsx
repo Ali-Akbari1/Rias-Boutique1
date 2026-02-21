@@ -66,7 +66,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="group relative mx-auto flex h-full min-w-0 w-full max-w-[26rem] flex-col overflow-hidden rounded-sm bg-card shadow-boutique transition-all duration-500 hover:shadow-boutique">
+    <div className="group relative mx-auto flex h-full min-w-0 w-full max-w-[23.5rem] flex-col overflow-hidden rounded-sm bg-card shadow-boutique transition-all duration-500 hover:shadow-boutique">
       <div className="aspect-[3/4] overflow-hidden">
         {isSoldOut ? (
           <span className="absolute left-3 top-3 z-10 rounded-sm bg-foreground/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-background">

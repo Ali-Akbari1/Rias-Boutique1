@@ -250,18 +250,22 @@ const FeaturedProductsCarousel = () => {
     <section id="collection" className="bg-background py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="mb-10 grid grid-cols-1 gap-4 px-1 sm:mb-12 md:grid-cols-3 md:gap-8">
-          <div className="md:col-span-2">
-            <p className="mb-3 text-sm font-body uppercase tracking-[0.3em] text-gold">Handcrafted with Love</p>
-            <h2 className="text-3xl font-display font-bold text-foreground sm:text-4xl md:text-5xl">Featured Collection</h2>
-            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-              Curated looks from our collection.
-            </p>
+          <div className="md:col-span-2 md:grid md:grid-cols-2 md:gap-8">
+            <div className="w-full md:max-w-[23.5rem] md:justify-self-center">
+              <p className="mb-3 text-sm font-body uppercase tracking-[0.3em] text-gold">Handcrafted with Love</p>
+              <h2 className="text-3xl font-display font-bold text-foreground sm:text-4xl md:text-5xl md:whitespace-nowrap">Featured Collection</h2>
+              <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+                Curated looks from our collection.
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-end justify-start md:justify-end">
-            <Button asChild className="h-12 px-8 text-base font-semibold sm:px-10 sm:text-lg">
-              <Link to="/collection">Go to Collection</Link>
-            </Button>
+          <div className="flex items-end justify-start md:justify-center">
+            <div className="w-full md:max-w-[23.5rem] md:flex md:justify-end">
+              <Button asChild className="h-11 px-7 text-sm font-semibold sm:px-9 sm:text-base">
+                <Link to="/collection">Go to Collection</Link>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -285,7 +289,7 @@ const FeaturedProductsCarousel = () => {
                 <button
                   type="button"
                   onClick={handlePrevious}
-                  className="absolute -left-12 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex lg:-left-16 xl:-left-20"
+                  className="absolute -left-5 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex lg:-left-7 xl:-left-9"
                   aria-label="Previous products"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -293,7 +297,7 @@ const FeaturedProductsCarousel = () => {
                 <button
                   type="button"
                   onClick={() => handleNext(true)}
-                  className="absolute -right-12 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex lg:-right-16 xl:-right-20"
+                  className="absolute -right-5 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex lg:-right-7 xl:-right-9"
                   aria-label="Next products"
                 >
                   <ChevronRight className="h-4 w-4" />
