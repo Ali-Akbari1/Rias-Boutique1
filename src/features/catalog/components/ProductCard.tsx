@@ -66,7 +66,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="group relative mx-auto w-full max-w-[27.5rem] overflow-hidden rounded-sm bg-card shadow-boutique transition-all duration-500 hover:shadow-card-hover">
+    <div className="group relative mx-auto flex h-full min-w-0 w-full max-w-[27.5rem] flex-col overflow-hidden rounded-sm bg-card shadow-boutique transition-all duration-500 hover:shadow-boutique">
       <div className="aspect-[3/4] overflow-hidden">
         {isSoldOut ? (
           <span className="absolute left-3 top-3 z-10 rounded-sm bg-foreground/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-background">
@@ -87,12 +87,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </Link>
       </div>
 
-      <div className="p-3.5 sm:p-4">
+      <div className="flex min-w-0 flex-1 flex-col p-3.5 sm:p-4">
         <p className="mb-1 text-xs font-body uppercase tracking-[0.2em] text-gold">{product.category}</p>
-        <h3 className="mb-1 font-display text-base font-semibold text-foreground sm:text-lg">{product.name}</h3>
-        <p className="mb-2 line-clamp-2 text-xs font-body text-muted-foreground sm:text-sm">{product.description}</p>
+        <h3 className="mb-0.5 line-clamp-2 break-words font-display text-base font-semibold leading-tight text-foreground sm:text-lg">
+          {product.name}
+        </h3>
+        <p className="mb-1 line-clamp-2 break-words text-xs font-body leading-snug text-muted-foreground sm:text-sm">
+          {product.description}
+        </p>
 
-        <div className="mb-3 flex items-end gap-2">
+        <div className="mb-1.5 flex items-end gap-2">
           <p className="font-display text-lg font-bold text-foreground sm:text-xl">{formatCad(product.price)}</p>
           {isOnSale ? (
             <p className="text-xs font-body text-muted-foreground line-through sm:text-sm">
@@ -101,20 +105,21 @@ const ProductCard = ({ product }: ProductCardProps) => {
           ) : null}
         </div>
 
-        <div className="space-y-1.5">
-          <p className="text-xs font-body text-muted-foreground">Select size and color on product page</p>
-          <div className="flex items-center gap-2">
+        <p className="mb-1 text-left text-xs font-body text-muted-foreground">Select size and color on product page</p>
+
+        <div className="mt-auto pt-1.5">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <button
               type="button"
               onClick={handleAddToBag}
-              className="inline-flex items-center gap-1 rounded-sm border border-border px-2.5 py-1.5 text-xs font-body font-semibold text-foreground transition-colors hover:bg-secondary sm:text-sm"
+              className="inline-flex h-9 items-center gap-1 rounded-sm border border-border px-2.5 py-1.5 text-xs font-body font-semibold text-foreground transition-colors hover:bg-secondary sm:text-sm"
             >
               <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               {isSoldOut ? "Sold Out" : "Add to Bag"}
             </button>
             <Link
               to={`/products/${product.id}`}
-              className="inline-flex items-center gap-1 rounded-sm bg-primary px-2.5 py-1.5 text-xs font-body text-primary-foreground transition-colors hover:bg-burgundy-light sm:text-sm"
+              className="inline-flex h-9 items-center gap-1 rounded-sm bg-primary px-2.5 py-1.5 text-xs font-body text-primary-foreground transition-colors hover:bg-burgundy-light sm:text-sm"
             >
               View Details
               <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

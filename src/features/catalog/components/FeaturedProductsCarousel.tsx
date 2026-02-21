@@ -7,7 +7,7 @@ import ProductCard from "./ProductCard";
 
 const MOBILE_GROUP_SIZE = 1;
 const DESKTOP_GROUP_SIZE = 3;
-const MOBILE_MEDIA_QUERY = "(max-width: 639px)";
+const MOBILE_MEDIA_QUERY = "(max-width: 767px)";
 const MOBILE_ROTATION_INTERVAL_MS = 5000;
 const DESKTOP_ROTATION_INTERVAL_MS = 8000;
 const USER_INTERACTION_PAUSE_MS = 10000;
@@ -31,9 +31,9 @@ interface ProductSlideProps {
 
 const ProductSlide = memo(({ productsChunk, slideIndex }: ProductSlideProps) => (
   <div className="min-w-full">
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
+    <div className="grid grid-cols-1 gap-6 px-1 pb-3 md:grid-cols-3 md:gap-8">
       {productsChunk.map((product) => (
-        <div key={`${slideIndex}-${product.id}`} className="h-full">
+        <div key={`${slideIndex}-${product.id}`} className="h-full min-w-0">
           <ProductCard product={product} />
         </div>
       ))}
@@ -68,7 +68,16 @@ const FeaturedProductsCarousel = () => {
 
   const groupSize = isMobile ? MOBILE_GROUP_SIZE : DESKTOP_GROUP_SIZE;
   const rotationIntervalMs = isMobile ? MOBILE_ROTATION_INTERVAL_MS : DESKTOP_ROTATION_INTERVAL_MS;
-  const groupedProducts = useMemo(() => chunkProducts(products, groupSize), [groupSize]);
+  const sortedProducts = useMemo(
+    () =>
+      [...products].sort((a, b) => {
+        const aTime = Number.isNaN(Date.parse(a.createdAt)) ? 0 : Date.parse(a.createdAt);
+        const bTime = Number.isNaN(Date.parse(b.createdAt)) ? 0 : Date.parse(b.createdAt);
+        return bTime - aTime;
+      }),
+    [],
+  );
+  const groupedProducts = useMemo(() => chunkProducts(sortedProducts, groupSize), [groupSize, sortedProducts]);
   const canRotate = groupedProducts.length > 1;
 
   const carouselSlides = useMemo(() => {

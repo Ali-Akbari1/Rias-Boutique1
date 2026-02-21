@@ -8,11 +8,7 @@ const HeroSection = () => {
         src={heroBg}
         alt=""
         aria-hidden="true"
-        className="absolute bottom-0 h-[112%] max-w-none object-cover object-[55%_88%] sm:h-full sm:object-[55%_86%] lg:object-[55%_88%]"
-        style={{
-          width: "calc(100% + 80px)",
-          left: "-1px",
-        }}
+        className="absolute inset-0 h-full w-full object-cover object-[55%_88%]"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/0 to-transparent" />
       

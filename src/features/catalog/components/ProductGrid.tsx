@@ -505,7 +505,11 @@ const ProductGrid = ({ initialDepartment = "all" }: ProductGridProps) => {
           <>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
               {paginatedProducts.map((product, index) => (
-                <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.08}s` }}>
+                <div
+                  key={product.id}
+                  className="h-full min-w-0 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.08}s` }}
+                >
                   <ProductCard product={product} />
                 </div>
               ))}
