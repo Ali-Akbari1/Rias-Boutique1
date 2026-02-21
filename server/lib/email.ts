@@ -4,6 +4,13 @@ import { getSupabaseAdminClient, hasSupabaseAdminConfig } from "./supabase-admin
 const isMemoryEmailLogEnabled = () => process.env.ORDER_STORE_ADAPTER?.trim().toLowerCase() === "memory";
 const isCustomerOrderEmailEnabled = () => process.env.CUSTOMER_ORDER_EMAIL_ENABLED?.trim().toLowerCase() !== "false";
 const formatMinorCad = (minor: number) => `CA$${(minor / 100).toFixed(2)}`;
+const formatSignedMinorCad = (minor: number) => {
+  if (minor === 0) {
+    return formatMinorCad(0);
+  }
+  const abs = formatMinorCad(Math.abs(minor));
+  return minor > 0 ? abs : `-${abs}`;
+};
 const escapeHtml = (value: string) =>
   value
     .replace(/&/g, "&amp;")
@@ -13,6 +20,35 @@ const escapeHtml = (value: string) =>
     .replace(/'/g, "&#39;");
 const safeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 const isLikelyEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+const formatDateTime = (value: string) => {
+  const asDate = new Date(value);
+  if (Number.isNaN(asDate.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-CA", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(asDate);
+};
+const toOrderNumber = (orderId: string) => {
+  const normalized = orderId.replace(/[^a-z0-9]/gi, "").toUpperCase();
+  if (normalized.length >= 8) {
+    return normalized.slice(-8);
+  }
+  return normalized || orderId.slice(0, 8).toUpperCase();
+};
+const cleanUrl = (value: string, fallback: string) => {
+  const candidate = value.trim();
+  if (!candidate) {
+    return fallback;
+  }
+  try {
+    return new URL(candidate).toString();
+  } catch {
+    return fallback;
+  }
+};
 const toSingleLineAddress = (order: StoredOrder) =>
   `${order.customer.address}, ${order.customer.city}, ${order.customer.state}, ${order.customer.postalCode}, ${order.customer.country}`;
 const formatLineItemsText = (order: StoredOrder) =>
@@ -26,12 +62,29 @@ const formatLineItemsHtml = (order: StoredOrder) =>
         `<li>${escapeHtml(item.name)} x${item.quantity} (${escapeHtml(formatMinorCad(item.lineTotalMinor))})</li>`,
     )
     .join("");
+const formatLineItemsTableHtml = (order: StoredOrder) =>
+  order.lineItems
+    .map((item) => {
+      const unitPrice = item.quantity > 0 ? Math.round(item.lineTotalMinor / item.quantity) : item.unitAmountMinor;
+      return `
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;">${escapeHtml(item.name)}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#6b7280;">${escapeHtml(item.productId || "-")}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;text-align:center;">${item.quantity}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;text-align:right;">${escapeHtml(
+            formatMinorCad(unitPrice),
+          )}</td>
+        </tr>
+      `;
+    })
+    .join("");
 
 interface ResendDispatchInput {
   to: string;
   subject: string;
   text: string;
   html: string;
+  replyTo?: string;
 }
 
 interface DispatchResult {
@@ -55,7 +108,7 @@ interface EmailDispatchRecord {
   timestamp: string;
 }
 
-const sendWithResend = async ({ to, subject, text, html }: ResendDispatchInput): Promise<DispatchResult | null> => {
+const sendWithResend = async ({ to, subject, text, html, replyTo }: ResendDispatchInput): Promise<DispatchResult | null> => {
   const apiKey = process.env.RESEND_API_KEY?.trim() || "";
   if (!apiKey) {
     return null;
@@ -71,6 +124,7 @@ const sendWithResend = async ({ to, subject, text, html }: ResendDispatchInput):
     body: JSON.stringify({
       from: fromEmail,
       to: [to],
+      ...(replyTo ? { reply_to: replyTo } : {}),
       subject,
       html,
       text,
@@ -151,43 +205,200 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
   const merchantRecipient =
     process.env.MERCHANT_ORDER_EMAIL?.trim() || process.env.ORDER_ALERT_EMAIL?.trim() || order.customer.email;
   const customerRecipient = order.customer.email.trim();
+  const explicitReplyTo = process.env.RESEND_REPLY_TO_EMAIL?.trim() || "";
+  const replyToRecipient = isLikelyEmail(explicitReplyTo)
+    ? explicitReplyTo
+    : isLikelyEmail(merchantRecipient)
+      ? merchantRecipient
+      : "";
+  const brandName = process.env.STORE_BRAND_NAME?.trim() || "Ria's Boutique";
+  const supportEmail = isLikelyEmail((process.env.SUPPORT_EMAIL || "").trim())
+    ? (process.env.SUPPORT_EMAIL || "").trim()
+    : replyToRecipient;
+  const websiteUrl = cleanUrl(process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "", "https://www.riasboutique.com");
+  const instagramUrl = cleanUrl(
+    process.env.VITE_INSTAGRAM_PROFILE_URL?.trim() || "",
+    "https://www.instagram.com/riasboutique__",
+  );
+  const logoUrl = cleanUrl(process.env.EMAIL_LOGO_URL?.trim() || "", "");
+  const storeLocation = process.env.STORE_LOCATION_DISPLAY?.trim() || "Calgary, AB";
+  const pickupAddress =
+    process.env.VITE_STORE_PICKUP_ADDRESS?.trim() || "260300 Writing Creek Cres Floor 1, Unit H31, Balzac, AB T4A 0X8";
+  const pickupHours = process.env.VITE_STORE_PICKUP_HOURS?.trim() || "Regular store hours are 11:00 AM - 6:00 PM.";
+  const orderNumber = toOrderNumber(order.id);
+  const orderDate = formatDateTime(order.createdAt || new Date().toISOString());
   const deliveryMethod = order.customer.deliveryMethod === "pickup" ? "Pick up in store" : "Shipping";
   const fulfillmentText =
     order.customer.deliveryMethod === "pickup"
       ? "Pickup in store selected. Customer will collect from store."
       : `${order.customer.fullName}, ${order.customer.phone || "-"}, ${toSingleLineAddress(order)}`;
+  const adjustmentsMinor = order.totalMinor - order.subtotalMinor;
+  const variantLabel = order.lineItems.some((item) => item.productId)
+    ? "Style / Variant"
+    : "Variant";
 
   const messages: OrderEmailMessage[] = [];
+
+  const merchantSummaryTable = `
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;border:1px solid #ececec;border-radius:8px;overflow:hidden;">
+      <thead>
+        <tr style="background:#f8fafc;">
+          <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Item</th>
+          <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">${escapeHtml(
+            variantLabel,
+          )}</th>
+          <th align="center" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Qty</th>
+          <th align="right" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${formatLineItemsTableHtml(order)}
+      </tbody>
+    </table>
+  `;
 
   messages.push({
     recipientType: "merchant",
     to: merchantRecipient,
-    subject: `New Paid Order - ${order.id}`,
+    subject: `New Paid Order - ${brandName} (Order #${orderNumber})`,
     text: [
-      "A new order was paid on Ria's Boutique.",
+      `New paid order received for ${brandName}.`,
       "",
-      `Order ID: ${order.id}`,
+      `Order Number: ${orderNumber}`,
+      `Order Date: ${orderDate}`,
+      `Payment Method: Clover hosted checkout`,
+      "",
       `Customer: ${order.customer.fullName} <${order.customer.email}>`,
       `Phone: ${order.customer.phone || "-"}`,
       `Fulfillment: ${deliveryMethod}`,
-      `Shipping: ${fulfillmentText}`,
+      order.customer.deliveryMethod === "pickup"
+        ? `Pickup Address: ${pickupAddress}`
+        : `Shipping Address: ${toSingleLineAddress(order)}`,
       `Total: ${formatMinorCad(order.totalMinor)}`,
       "",
       "Items:",
       formatLineItemsText(order),
+      "",
+      `Subtotal: ${formatMinorCad(order.subtotalMinor)}`,
+      `Shipping/Tax/Discounts (net): ${formatSignedMinorCad(adjustmentsMinor)}`,
+      `Total: ${formatMinorCad(order.totalMinor)}`,
+      "",
+      `Admin: ${websiteUrl.replace(/\/+$/, "")}/orders-admin`,
     ].join("\n"),
     html: `
-      <h2>New paid order</h2>
-      <p><strong>Order ID:</strong> ${escapeHtml(order.id)}</p>
-      <p><strong>Customer:</strong> ${escapeHtml(order.customer.fullName)} (${escapeHtml(order.customer.email)})</p>
-      <p><strong>Phone:</strong> ${escapeHtml(order.customer.phone || "-")}</p>
-      <p><strong>Fulfillment:</strong> ${escapeHtml(deliveryMethod)}</p>
-      <p><strong>Shipping:</strong> ${escapeHtml(fulfillmentText)}</p>
-      <p><strong>Total:</strong> ${escapeHtml(formatMinorCad(order.totalMinor))}</p>
-      <p><strong>Items:</strong></p>
-      <ul>
-        ${formatLineItemsHtml(order)}
-      </ul>
+      <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;color:#111827;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f5f5;padding:24px 12px;">
+          <tr>
+            <td align="center">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:640px;background:#ffffff;border:1px solid #ececec;border-radius:10px;overflow:hidden;">
+                <tr>
+                  <td style="padding:24px 24px 16px 24px;border-bottom:1px solid #ececec;background:#ffffff;">
+                    ${logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(brandName)}" style="height:34px;display:block;margin-bottom:12px;" />` : ""}
+                    <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">${escapeHtml(
+                      brandName,
+                    )}</p>
+                    <h1 style="margin:8px 0 6px 0;font-size:24px;line-height:1.25;color:#111827;">New paid order received</h1>
+                    <p style="margin:0;font-size:15px;color:#4b5563;">A customer has completed checkout. Review and process this order.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                      <tr>
+                        <td style="padding:4px 0;font-size:14px;color:#6b7280;">Order Number</td>
+                        <td align="right" style="padding:4px 0;font-size:14px;font-weight:600;color:#111827;">#${escapeHtml(
+                          orderNumber,
+                        )}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:4px 0;font-size:14px;color:#6b7280;">Order Date</td>
+                        <td align="right" style="padding:4px 0;font-size:14px;color:#111827;">${escapeHtml(orderDate)}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:4px 0;font-size:14px;color:#6b7280;">Payment Method</td>
+                        <td align="right" style="padding:4px 0;font-size:14px;color:#111827;">Clover hosted checkout</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:4px 0;font-size:14px;color:#6b7280;">Order ID</td>
+                        <td align="right" style="padding:4px 0;font-size:14px;color:#111827;">${escapeHtml(order.id)}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 24px 20px 24px;">
+                    <h2 style="margin:0 0 8px 0;font-size:18px;color:#111827;">Customer</h2>
+                    <p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Name:</strong> ${escapeHtml(
+                      order.customer.fullName,
+                    )}</p>
+                    <p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Email:</strong> ${escapeHtml(
+                      order.customer.email,
+                    )}</p>
+                    <p style="margin:0;font-size:14px;color:#4b5563;"><strong>Phone:</strong> ${escapeHtml(
+                      order.customer.phone || "-",
+                    )}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 24px 20px 24px;">
+                    <h2 style="margin:0 0 8px 0;font-size:18px;color:#111827;">${
+                      order.customer.deliveryMethod === "pickup" ? "Pickup Details" : "Shipping Details"
+                    }</h2>
+                    ${
+                      order.customer.deliveryMethod === "pickup"
+                        ? `<p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Method:</strong> Pick up in store</p>
+                           <p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Address:</strong> ${escapeHtml(
+                             pickupAddress,
+                           )}</p>
+                           <p style="margin:0;font-size:14px;color:#4b5563;"><strong>Hours:</strong> ${escapeHtml(pickupHours)}</p>`
+                        : `<p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Method:</strong> Shipping</p>
+                           <p style="margin:0;font-size:14px;color:#4b5563;"><strong>Address:</strong> ${escapeHtml(
+                             toSingleLineAddress(order),
+                           )}</p>`
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 24px 20px 24px;">
+                    <h2 style="margin:0 0 10px 0;font-size:18px;color:#111827;">Order Summary</h2>
+                    ${merchantSummaryTable}
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:12px;border-collapse:collapse;">
+                      <tr>
+                        <td style="padding:6px 0;font-size:14px;color:#6b7280;">Subtotal</td>
+                        <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
+                          formatMinorCad(order.subtotalMinor),
+                        )}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:14px;color:#6b7280;">Shipping, taxes & discounts (net)</td>
+                        <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
+                          formatSignedMinorCad(adjustmentsMinor),
+                        )}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:10px 0 0 0;font-size:16px;font-weight:700;color:#111827;border-top:1px solid #ececec;">Total</td>
+                        <td align="right" style="padding:10px 0 0 0;font-size:16px;font-weight:700;color:#111827;border-top:1px solid #ececec;">${escapeHtml(
+                          formatMinorCad(order.totalMinor),
+                        )}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:16px 24px;border-top:1px solid #ececec;background:#fafafa;">
+                    <p style="margin:0 0 4px 0;font-size:13px;color:#6b7280;">
+                      <a href="${escapeHtml(
+                        `${websiteUrl.replace(/\/+$/, "")}/orders-admin`,
+                      )}" style="color:#111827;text-decoration:underline;">Open Orders Dashboard</a>
+                    </p>
+                    <p style="margin:0;font-size:13px;color:#6b7280;">${escapeHtml(brandName)} | ${escapeHtml(storeLocation)}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
     `,
   });
 
@@ -196,36 +407,180 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
       order.customer.deliveryMethod === "pickup"
         ? "Pickup in store selected. We will contact you when your order is ready for collection."
         : `Shipping to ${toSingleLineAddress(order)}.`;
+    const supportLine = supportEmail ? `reply to this email or contact ${supportEmail}` : "reply to this email";
+
+    const customerSummaryTable = `
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;border:1px solid #ececec;border-radius:8px;overflow:hidden;">
+        <thead>
+          <tr style="background:#f8fafc;">
+            <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Item</th>
+            <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">${escapeHtml(
+              variantLabel,
+            )}</th>
+            <th align="center" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Qty</th>
+            <th align="right" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${formatLineItemsTableHtml(order)}
+        </tbody>
+      </table>
+    `;
 
     messages.push({
       recipientType: "customer",
       to: customerRecipient,
-      subject: `Order Confirmation - ${order.id}`,
+      subject: `Order Confirmation - ${brandName} (Order #${orderNumber})`,
       text: [
-        `Thank you for your order with Ria's Boutique, ${order.customer.fullName}.`,
+        `Hi ${order.customer.fullName},`,
         "",
-        `Order ID: ${order.id}`,
-        `Fulfillment: ${deliveryMethod}`,
-        customerFulfillmentText,
-        `Total Paid: ${formatMinorCad(order.totalMinor)}`,
+        "Thank you for your purchase. We've received your order and are preparing it now.",
+        "",
+        `Order Number: ${orderNumber}`,
+        `Order Date: ${orderDate}`,
+        "Payment Method: Clover hosted checkout",
+        `Shipping Method: ${deliveryMethod}`,
         "",
         "Items:",
         formatLineItemsText(order),
         "",
-        "If you have any questions, reply to this email.",
+        `Subtotal: ${formatMinorCad(order.subtotalMinor)}`,
+        `Shipping/Tax/Discounts (net): ${formatSignedMinorCad(adjustmentsMinor)}`,
+        `Total: ${formatMinorCad(order.totalMinor)}`,
+        "",
+        order.customer.deliveryMethod === "pickup"
+          ? `Pickup: ${pickupAddress} (${pickupHours})`
+          : `Shipping Address: ${toSingleLineAddress(order)}`,
+        order.customer.deliveryMethod === "pickup"
+          ? "We'll email you when your order is ready for pickup."
+          : "You will receive another email once your order ships with tracking details.",
+        "",
+        `Questions? Please ${supportLine}.`,
+        `${brandName} | ${storeLocation}`,
+        `Website: ${websiteUrl}`,
+        `Instagram: ${instagramUrl}`,
       ].join("\n"),
       html: `
-        <h2>Thank you for your order</h2>
-        <p>Hi ${escapeHtml(order.customer.fullName)},</p>
-        <p>We have received your payment for order <strong>${escapeHtml(order.id)}</strong>.</p>
-        <p><strong>Fulfillment:</strong> ${escapeHtml(deliveryMethod)}</p>
-        <p>${escapeHtml(customerFulfillmentText)}</p>
-        <p><strong>Total Paid:</strong> ${escapeHtml(formatMinorCad(order.totalMinor))}</p>
-        <p><strong>Items:</strong></p>
-        <ul>
-          ${formatLineItemsHtml(order)}
-        </ul>
-        <p>If you have any questions, reply to this email.</p>
+        <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;color:#111827;">
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f5f5;padding:24px 12px;">
+            <tr>
+              <td align="center">
+                <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:640px;background:#ffffff;border:1px solid #ececec;border-radius:10px;overflow:hidden;">
+                  <tr>
+                    <td style="padding:24px 24px 16px 24px;border-bottom:1px solid #ececec;background:#ffffff;">
+                      ${logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(brandName)}" style="height:34px;display:block;margin-bottom:12px;" />` : ""}
+                      <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">${escapeHtml(
+                        brandName,
+                      )}</p>
+                      <h1 style="margin:8px 0 6px 0;font-size:24px;line-height:1.25;color:#111827;">Thank you for your order</h1>
+                      <p style="margin:0;font-size:15px;color:#4b5563;">Hi ${escapeHtml(
+                        order.customer.fullName,
+                      )}, we've received your order and are preparing it now.</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:20px 24px;">
+                      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                        <tr>
+                          <td style="padding:4px 0;font-size:14px;color:#6b7280;">Order Number</td>
+                          <td align="right" style="padding:4px 0;font-size:14px;font-weight:600;color:#111827;">#${escapeHtml(
+                            orderNumber,
+                          )}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:4px 0;font-size:14px;color:#6b7280;">Order Date</td>
+                          <td align="right" style="padding:4px 0;font-size:14px;color:#111827;">${escapeHtml(orderDate)}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:4px 0;font-size:14px;color:#6b7280;">Payment Method</td>
+                          <td align="right" style="padding:4px 0;font-size:14px;color:#111827;">Clover hosted checkout</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:4px 0;font-size:14px;color:#6b7280;">Shipping Method</td>
+                          <td align="right" style="padding:4px 0;font-size:14px;color:#111827;">${escapeHtml(deliveryMethod)}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0 24px 20px 24px;">
+                      <h2 style="margin:0 0 10px 0;font-size:18px;color:#111827;">Order Summary</h2>
+                      ${customerSummaryTable}
+                      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:12px;border-collapse:collapse;">
+                        <tr>
+                          <td style="padding:6px 0;font-size:14px;color:#6b7280;">Subtotal</td>
+                          <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
+                            formatMinorCad(order.subtotalMinor),
+                          )}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:6px 0;font-size:14px;color:#6b7280;">Shipping, taxes & discounts (net)</td>
+                          <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
+                            formatSignedMinorCad(adjustmentsMinor),
+                          )}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:10px 0 0 0;font-size:16px;font-weight:700;color:#111827;border-top:1px solid #ececec;">Total</td>
+                          <td align="right" style="padding:10px 0 0 0;font-size:16px;font-weight:700;color:#111827;border-top:1px solid #ececec;">${escapeHtml(
+                            formatMinorCad(order.totalMinor),
+                          )}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0 24px 20px 24px;">
+                      <h2 style="margin:0 0 8px 0;font-size:18px;color:#111827;">${
+                        order.customer.deliveryMethod === "pickup" ? "Pickup Information" : "Shipping Information"
+                      }</h2>
+                      ${
+                        order.customer.deliveryMethod === "pickup"
+                          ? `<p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Pickup Address:</strong> ${escapeHtml(
+                              pickupAddress,
+                            )}</p>
+                             <p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Store Hours:</strong> ${escapeHtml(
+                               pickupHours,
+                             )}</p>
+                             <p style="margin:0;font-size:14px;color:#4b5563;">We'll email you when your order is ready for pickup.</p>`
+                          : `<p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Shipping Address:</strong> ${escapeHtml(
+                              toSingleLineAddress(order),
+                            )}</p>
+                             <p style="margin:0;font-size:14px;color:#4b5563;">You will receive another email once your order ships with tracking details.</p>`
+                      }
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0 24px 20px 24px;">
+                      <h2 style="margin:0 0 8px 0;font-size:18px;color:#111827;">Need help?</h2>
+                      <p style="margin:0;font-size:14px;color:#4b5563;">
+                        Questions about your order?
+                        ${
+                          supportEmail
+                            ? `Reply to this email or contact us at <a href="mailto:${escapeHtml(
+                                supportEmail,
+                              )}" style="color:#111827;text-decoration:underline;">${escapeHtml(supportEmail)}</a>.`
+                            : "Reply to this email and our team will help you."
+                        }
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:16px 24px;border-top:1px solid #ececec;background:#fafafa;">
+                      <p style="margin:0 0 4px 0;font-size:13px;color:#6b7280;">${escapeHtml(brandName)} | ${escapeHtml(
+                        storeLocation,
+                      )}</p>
+                      <p style="margin:0;font-size:13px;color:#6b7280;">
+                        <a href="${escapeHtml(websiteUrl)}" style="color:#111827;text-decoration:underline;">Website</a>
+                        &nbsp;|&nbsp;
+                        <a href="${escapeHtml(instagramUrl)}" style="color:#111827;text-decoration:underline;">Instagram</a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
       `,
     });
   }
@@ -239,6 +594,7 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
         subject: message.subject,
         text: message.text,
         html: message.html,
+        replyTo: replyToRecipient,
       })) || {
         provider: "mock" as const,
         status: "queued" as const,

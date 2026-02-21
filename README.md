@@ -99,6 +99,11 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `CUSTOMER_ORDER_EMAIL_ENABLED`: Optional `true`/`false` (default `true`) to send customer order confirmation emails after payment.
 - `RESEND_API_KEY`: Optional Resend API key to send real merchant/customer emails.
 - `RESEND_FROM_EMAIL`: Optional sender identity for Resend, e.g. `Ria's Boutique <orders@riasboutique.com>`.
+- `RESEND_REPLY_TO_EMAIL`: Optional reply destination for customer emails. If not set, replies default to `MERCHANT_ORDER_EMAIL`.
+- `SUPPORT_EMAIL`: Optional support contact shown in customer confirmation emails.
+- `EMAIL_LOGO_URL`: Optional logo URL rendered in customer confirmation email header.
+- `STORE_BRAND_NAME`: Optional brand label for transactional emails (default `Ria's Boutique`).
+- `STORE_LOCATION_DISPLAY`: Optional location text in email footer (default `Calgary, AB`).
 - `SUPABASE_URL`: Supabase project URL for server-side order persistence.
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key used by serverless checkout/webhook/order endpoints.
 - `VITE_SUPABASE_URL`: Optional client URL if frontend calls Supabase directly.
