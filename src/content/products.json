@@ -4,8 +4,8 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/img.jpg",
-        "/uploads/full-photo.jpg"
+        "/uploads/full-photo.jpg",
+        "/uploads/img.jpg"
       ],
       "name": "Burgundy Bridal Dress",
       "slug": "Burgundy-Bridal-Dress",
@@ -68,7 +68,8 @@
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0557.jpg",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
-      "category": "Party Wear"
+      "category": "Party Wear",
+      "salePercent": ""
     },
     {
       "fabric": "Velvet ",
@@ -286,6 +287,7 @@
       "fabric": "Banaras",
       "price": 450,
       "galleryImages": [
+        "/uploads/img_0751.jpg",
         "/uploads/img_0750.jpg",
         "/uploads/img_0730.jpg",
         "/uploads/img_0731.jpg"
@@ -313,6 +315,7 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
+        "/uploads/img_0738.jpg",
         "/uploads/img_0735.jpg",
         "/uploads/img_0736.jpg",
         "/uploads/img_0740.jpg"
