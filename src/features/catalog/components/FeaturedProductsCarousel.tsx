@@ -289,7 +289,7 @@ const FeaturedProductsCarousel = () => {
                 <button
                   type="button"
                   onClick={handlePrevious}
-                  className="absolute -left-5 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex lg:-left-7 xl:-left-9"
+                  className="absolute left-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex"
                   aria-label="Previous products"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -297,7 +297,7 @@ const FeaturedProductsCarousel = () => {
                 <button
                   type="button"
                   onClick={() => handleNext(true)}
-                  className="absolute -right-5 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex lg:-right-7 xl:-right-9"
+                  className="absolute right-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex"
                   aria-label="Next products"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -305,7 +305,7 @@ const FeaturedProductsCarousel = () => {
               </>
             ) : null}
 
-            <div className="overflow-hidden">
+            <div className="overflow-hidden md:mx-14 lg:mx-16">
               <div
                 className="flex"
                 style={{
