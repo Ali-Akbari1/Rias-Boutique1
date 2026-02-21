@@ -340,13 +340,15 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
         }}
       >
         <DialogClose asChild>
-          <button
+          <Button
             type="button"
-            className="absolute right-2 top-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-sm border border-border bg-background/90 text-foreground transition-colors hover:bg-secondary sm:right-3 sm:top-3"
+            variant="outline"
+            size="icon"
+            className="absolute right-2 top-2 z-20 rounded-sm bg-background/90 hover:bg-secondary sm:right-3 sm:top-3"
             aria-label="Close image preview"
           >
             <X className="h-4 w-4" />
-          </button>
+          </Button>
         </DialogClose>
 
         <div className="flex items-start justify-between gap-3 pr-11">
@@ -399,4 +401,3 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
 };
 
 export default ZoomableImageDialog;
-
