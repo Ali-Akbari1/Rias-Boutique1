@@ -249,8 +249,8 @@ const FeaturedProductsCarousel = () => {
   return (
     <section id="collection" className="bg-background py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="mb-10 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+        <div className="mb-10 grid grid-cols-1 gap-4 px-1 sm:mb-12 md:grid-cols-3 md:gap-8">
+          <div className="md:col-span-2">
             <p className="mb-3 text-sm font-body uppercase tracking-[0.3em] text-gold">Handcrafted with Love</p>
             <h2 className="text-3xl font-display font-bold text-foreground sm:text-4xl md:text-5xl">Featured Collection</h2>
             <p className="mt-2 text-sm text-muted-foreground sm:text-base">
@@ -258,29 +258,8 @@ const FeaturedProductsCarousel = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            {canRotate ? (
-              <>
-                <button
-                  type="button"
-                  onClick={handlePrevious}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-border text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
-                  aria-label="Previous products"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNext(true)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-border text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
-                  aria-label="Next products"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </>
-            ) : null}
-
-            <Button asChild>
+          <div className="flex items-end justify-start md:justify-end">
+            <Button asChild className="h-12 px-8 text-base font-semibold sm:px-10 sm:text-lg">
               <Link to="/collection">Go to Collection</Link>
             </Button>
           </div>
@@ -301,6 +280,27 @@ const FeaturedProductsCarousel = () => {
             aria-roledescription="carousel"
             aria-label="Featured products carousel"
           >
+            {canRotate ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handlePrevious}
+                  className="absolute -left-12 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex lg:-left-16 xl:-left-20"
+                  aria-label="Previous products"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleNext(true)}
+                  className="absolute -right-12 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 md:inline-flex lg:-right-16 xl:-right-20"
+                  aria-label="Next products"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </>
+            ) : null}
+
             <div className="overflow-hidden">
               <div
                 className="flex"
@@ -317,20 +317,41 @@ const FeaturedProductsCarousel = () => {
             </div>
 
             {canRotate ? (
-              <div className="mt-4 flex items-center justify-center gap-2" aria-label="Carousel position">
-                {groupedProducts.map((_, index) => (
+              <>
+                <div className="mt-4 flex items-center justify-center gap-3 md:hidden">
                   <button
                     type="button"
-                    key={`product-carousel-indicator-${index}`}
-                    className={`h-1.5 w-6 rounded-full ${
-                      activeGroupIndex === index ? "bg-foreground" : "bg-border"
-                    }`}
-                    onClick={() => goToGroup(index)}
-                    aria-label={`Go to product group ${index + 1}`}
-                    aria-current={activeGroupIndex === index ? "true" : undefined}
-                  />
-                ))}
-              </div>
+                    onClick={handlePrevious}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+                    aria-label="Previous products"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNext(true)}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-border bg-background/95 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+                    aria-label="Next products"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="mt-4 flex items-center justify-center gap-2" aria-label="Carousel position">
+                  {groupedProducts.map((_, index) => (
+                    <button
+                      type="button"
+                      key={`product-carousel-indicator-${index}`}
+                      className={`h-1.5 w-6 rounded-full ${
+                        activeGroupIndex === index ? "bg-foreground" : "bg-border"
+                      }`}
+                      onClick={() => goToGroup(index)}
+                      aria-label={`Go to product group ${index + 1}`}
+                      aria-current={activeGroupIndex === index ? "true" : undefined}
+                    />
+                  ))}
+                </div>
+              </>
             ) : null}
           </div>
         )}

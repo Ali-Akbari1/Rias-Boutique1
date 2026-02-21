@@ -66,7 +66,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="group relative mx-auto flex h-full min-w-0 w-full max-w-[27.5rem] flex-col overflow-hidden rounded-sm bg-card shadow-boutique transition-all duration-500 hover:shadow-boutique">
+    <div className="group relative mx-auto flex h-full min-w-0 w-full max-w-[26rem] flex-col overflow-hidden rounded-sm bg-card shadow-boutique transition-all duration-500 hover:shadow-boutique">
       <div className="aspect-[3/4] overflow-hidden">
         {isSoldOut ? (
           <span className="absolute left-3 top-3 z-10 rounded-sm bg-foreground/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-background">
@@ -108,18 +108,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <p className="mb-1 text-left text-xs font-body text-muted-foreground">Select size and color on product page</p>
 
         <div className="mt-auto pt-1.5">
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="grid w-full grid-cols-2 gap-2">
             <button
               type="button"
               onClick={handleAddToBag}
-              className="inline-flex h-9 items-center gap-1 rounded-sm border border-border px-2.5 py-1.5 text-xs font-body font-semibold text-foreground transition-colors hover:bg-secondary sm:text-sm"
+              className="inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm border border-border px-2.5 py-1.5 text-xs font-body font-semibold text-foreground transition-colors hover:bg-secondary sm:text-sm"
             >
               <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               {isSoldOut ? "Sold Out" : "Add to Bag"}
             </button>
             <Link
               to={`/products/${product.id}`}
-              className="inline-flex h-9 items-center gap-1 rounded-sm bg-primary px-2.5 py-1.5 text-xs font-body text-primary-foreground transition-colors hover:bg-burgundy-light sm:text-sm"
+              className="inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm bg-primary px-2.5 py-1.5 text-xs font-body text-primary-foreground transition-colors hover:bg-burgundy-light sm:text-sm"
             >
               View Details
               <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

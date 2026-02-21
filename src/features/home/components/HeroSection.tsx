@@ -8,10 +8,9 @@ const HeroSection = () => {
         src={heroBg}
         alt=""
         aria-hidden="true"
-        className="absolute inset-y-0 -right-100 h-full w-auto min-w-full max-w-none object-cover sm:right-0"
-        style={{ objectPosition: "100% 95%" }}
+        className="absolute inset-0 h-full w-full object-cover object-[70%_85%] sm:object-[60%_48%] lg:object-[60%_85%]"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/12 to-transparent" />
       
       <div className="relative z-10 container mx-auto flex flex-col items-start px-4 sm:px-6">
         <div className="max-w-xl animate-fade-in text-white">
