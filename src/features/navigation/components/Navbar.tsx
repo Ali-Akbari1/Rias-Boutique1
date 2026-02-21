@@ -31,9 +31,9 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         </Link>
 
         <div className="hidden md:flex items-center gap-8 font-body text-lg">
-          <a href="#collection" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/collection" className="text-muted-foreground hover:text-foreground transition-colors">
             Collection
-          </a>
+          </Link>
           <a href="#reviews" className="text-muted-foreground hover:text-foreground transition-colors">
             Reviews
           </a>
