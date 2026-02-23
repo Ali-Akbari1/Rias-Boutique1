@@ -14,6 +14,7 @@
         "Burgundy"
       ],
       "sizes": [],
+      "department": "women",
       "popularity": "",
       "careInstructions": [
         "Dry Clean Only"
@@ -41,6 +42,7 @@
       "sizes": [
         "Large "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -67,6 +69,7 @@
       "sizes": [
         "Medium"
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -91,6 +94,7 @@
       "sizes": [
         "Small "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -115,6 +119,7 @@
       "sizes": [
         "Small "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only "
       ],
@@ -142,6 +147,7 @@
       "sizes": [
         "Medium "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -169,6 +175,7 @@
       "sizes": [
         "Large "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -196,6 +203,7 @@
       "sizes": [
         "Large "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -228,6 +236,7 @@
         "L (44in)",
         "XL (46in)"
       ],
+      "department": "women",
       "popularity": 100,
       "id": "Cheerma-dozi-3-piece",
       "createdAt": "2026-02-18",
@@ -282,6 +291,7 @@
         "L",
         "XL"
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -309,6 +319,7 @@
       "sizes": [
         "SM"
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only "
       ],
@@ -337,6 +348,7 @@
       "sizes": [
         "M"
       ],
+      "department": "women",
       "id": "red-gharara-bridal-dress",
       "image": "/uploads/img_0738.jpg",
       "inventory": 1,
@@ -359,6 +371,7 @@
       "sizes": [
         "Large"
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
