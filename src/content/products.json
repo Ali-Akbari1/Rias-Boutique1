@@ -343,6 +343,32 @@
       "description": "Bridal red velvet dress with wide-legged pants and beautiful beaded scarf. ",
       "category": "Bridal",
       "fitInfo": "Bust: 42in \nSleeves: 22in\nDress Length: 25in\nPants Length: 40in\n"
+    },
+    {
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_0761.jpg",
+        "/uploads/img_0764.jpg",
+        "/uploads/img_0765.jpg"
+      ],
+      "name": "Burgundy Banaras Dress",
+      "slug": "Burgundy-Banaras-Dress",
+      "colors": [
+        "Burgundy"
+      ],
+      "sizes": [
+        "Large"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Burgundy-Banaras-Dress",
+      "createdAt": "2026-02-22",
+      "image": "/uploads/img_0761.jpg",
+      "inventory": 1,
+      "description": "Burgundy banaras dress with kochi pants and heavy embroidered scarf. ",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 44in "
     }
   ]
 }
