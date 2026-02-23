@@ -39,7 +39,7 @@
       "name": "Green Bridal Dress",
       "slug": "Green-Bridal-Dress",
       "sizes": [
-        "Large (44in)"
+        "Large "
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -61,6 +61,12 @@
       ],
       "name": "Blue Long Cheerma Dozi Dress",
       "slug": "Blue-Cheerma-Dozi",
+      "colors": [
+        "Blue"
+      ],
+      "sizes": [
+        "Medium"
+      ],
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -69,7 +75,8 @@
       "image": "/uploads/img_0557.jpg",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
       "category": "Party Wear",
-      "salePercent": ""
+      "salePercent": "",
+      "fitInfo": "Bust: 42in "
     },
     {
       "fabric": "Velvet ",
@@ -82,7 +89,7 @@
       "name": "Royal Blue 3 Piece Suit ",
       "slug": "Royal-Blue",
       "sizes": [
-        "Small (40in)"
+        "Small "
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -133,7 +140,7 @@
         "White "
       ],
       "sizes": [
-        "Medium (42in) "
+        "Medium "
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -160,7 +167,7 @@
         "Black with Gold "
       ],
       "sizes": [
-        "Large (44in)"
+        "Large "
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -168,7 +175,7 @@
       "id": "Black-Gulabatoon-dress",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_8937.jpg",
-      "inventory": "available",
+      "inventory": 1,
       "description": "Black velvet dress with wide-leg pants, featuring gulabatoon detailing.",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39th\n\n3 pieces: Dress, Pants, and Chadar"
@@ -187,7 +194,7 @@
         "White and Silver "
       ],
       "sizes": [
-        "Large (44in)"
+        "Large "
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -244,7 +251,7 @@
         "Pink"
       ],
       "sizes": [
-        "SM"
+        "Small"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -252,8 +259,10 @@
       "id": "pink-banaras-dress",
       "createdAt": "2026-02-18",
       "image": "/uploads/img_8963.jpg",
+      "inventory": 1,
       "description": "3 piece pink banaras dress with handmade cheerma.",
-      "category": "Party Wear"
+      "category": "Party Wear",
+      "fitInfo": "Bust: 40in"
     },
     {
       "fabric": "Banaras",
