@@ -382,6 +382,31 @@
       "description": "Burgundy banaras dress with kochi pants and heavy embroidered scarf. ",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in "
+    },
+    {
+      "fabric": "Velvet",
+      "price": 200,
+      "galleryImages": [
+        "/uploads/aa8031e8-9edd-46fc-ba4b-039a59c3ff6b.jpg"
+      ],
+      "name": "Dark Blue Chapan ",
+      "slug": "Chapan-blue-gulabatoon",
+      "colors": [
+        "Dark Blue "
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Chapan-blue-gulabatoon",
+      "createdAt": "2026-02-23",
+      "image": "/uploads/aa8031e8-9edd-46fc-ba4b-039a59c3ff6b.jpg",
+      "inventory": 1,
+      "description": "Dark blue chapan with gulabatoon detailing. ",
+      "category": "Casual",
+      "fitInfo": "Bust: 40in"
     }
   ]
 }
