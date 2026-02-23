@@ -298,6 +298,7 @@
       "id": "Bridal-green-banaras",
       "createdAt": "2026-02-19",
       "image": "/uploads/img_0724.jpg",
+      "inventory": "sold_out",
       "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
       "category": "Bridal",
       "fitInfo": "*Bridal Shawl sold separately"
@@ -407,6 +408,28 @@
       "description": "Dark blue chapan with gulabatoon detailing. ",
       "category": "Casual",
       "fitInfo": "Bust: 40in\n\n1 piece"
+    },
+    {
+      "fabric": "Velvet with handmade cheerma detailing. ",
+      "price": 650,
+      "galleryImages": [
+        "/uploads/img_0782.jpg"
+      ],
+      "name": "Burgundy Bridal Dress with Mens Vest",
+      "slug": "Burgundy-bridal-dress",
+      "colors": [
+        "Burgundy"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "id": "Burgundy-bridal-dress",
+      "image": "/uploads/img_0782.jpg",
+      "inventory": "sold_out",
+      "description": "Bridal burgundy dress with handmade cheerma and matching men's vest. ",
+      "category": "Bridal",
+      "fitInfo": "Bust: 42in \n\n*Price includes both dress and vest. \n*Men's paratoban and women's jewelry sold separately"
     }
   ]
 }
