@@ -439,6 +439,9 @@
       ],
       "name": "Black and Gold Men's Parantoban",
       "slug": "men-black-gold",
+      "colors": [
+        "Black"
+      ],
       "sizes": [
         "X-Large (46in)",
         "XX-Large (48in)"
