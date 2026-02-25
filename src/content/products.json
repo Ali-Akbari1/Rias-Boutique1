@@ -439,6 +439,9 @@
       ],
       "name": "Black and Gold Men's Parantoban",
       "slug": "men-black-gold",
+      "colors": [
+        "Black"
+      ],
       "sizes": [
         "X-Large (46in)",
         "XX-Large (48in)"
@@ -453,6 +456,33 @@
       "image": "/uploads/img_0786.jpg",
       "inventory": "available",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
+      "category": "Machine Made",
+      "fitInfo": "Please check our size chart for all specific measurements. "
+    },
+    {
+      "price": 224,
+      "galleryImages": [
+        "/uploads/img_0790.jpg",
+        "/uploads/img_0795.jpg",
+        "/uploads/img_0789.jpg"
+      ],
+      "name": "Handmade Mens Parantoban ",
+      "slug": "Handmade-mens-parantoban",
+      "colors": [
+        "Black"
+      ],
+      "sizes": [
+        "X-Large (46in) "
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Handmade-mens-parantoban",
+      "createdAt": "2026-02-24",
+      "image": "/uploads/img_0790.jpg",
+      "inventory": "available",
+      "description": "Handmade black mens parantoban",
       "category": "Machine Made",
       "fitInfo": "Please check our size chart for all specific measurements. "
     }
