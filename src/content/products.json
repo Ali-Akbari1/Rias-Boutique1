@@ -477,6 +477,7 @@
         "X-Large (46in) "
       ],
       "department": "men",
+      "popularity": "",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -484,8 +485,36 @@
       "createdAt": "2026-02-24",
       "image": "/uploads/img_0790.jpg",
       "inventory": "available",
-      "description": "Handmade black mens parantoban",
+      "description": "Handmade black mens parantoban with silver embroidery. ",
       "category": "Handmade",
+      "fitInfo": "Please check our size chart for all specific measurements. "
+    },
+    {
+      "price": 110,
+      "galleryImages": [
+        "/uploads/img_0797.jpg",
+        "/uploads/img_0802.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+      ],
+      "name": "Men's Parantoban ",
+      "slug": "mens-offwhite-with-gold",
+      "colors": [
+        "Off-white "
+      ],
+      "sizes": [
+        "Large",
+        "XX-Large "
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "mens-offwhite-with-gold",
+      "createdAt": "2026-02-25",
+      "image": "/uploads/img_0797.jpg",
+      "inventory": "available",
+      "description": "Off-white machine made men's parantoban with gold embroidery. ",
+      "category": "Machine Made",
       "fitInfo": "Please check our size chart for all specific measurements. "
     }
   ]
