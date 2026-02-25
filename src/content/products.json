@@ -430,6 +430,31 @@
       "description": "Bridal burgundy dress with handmade cheerma and matching men's vest. ",
       "category": "Bridal",
       "fitInfo": "Bust: 42in \n\n*Price includes both dress and vest. \n*Men's paratoban and women's jewelry sold separately"
+    },
+    {
+      "price": 110,
+      "galleryImages": [
+        "/uploads/img_0786.jpg",
+        "/uploads/img_0787.jpg"
+      ],
+      "name": "Black and Gold Men's Parantoban",
+      "slug": "men-black-gold",
+      "sizes": [
+        "X-Large (46in)",
+        "XX-Large (48in)"
+      ],
+      "department": "men",
+      "popularity": 100,
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "men-black-gold",
+      "createdAt": "2026-02-24",
+      "image": "/uploads/img_0786.jpg",
+      "inventory": "available",
+      "description": "Machine-made black men's parantoban with gold embroidery. ",
+      "category": "Machine Made",
+      "fitInfo": "Please check our size chart for all specific measurements. "
     }
   ]
 }
