@@ -516,6 +516,33 @@
       "description": "Off-white machine made men's parantoban with gold embroidery. ",
       "category": "Machine Made",
       "fitInfo": "Please check our size chart for all specific measurements. "
+    },
+    {
+      "price": 110,
+      "galleryImages": [
+        "/uploads/img_0812.jpg",
+        "/uploads/img_0811.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+      ],
+      "name": "Men's Grey Parantoban",
+      "slug": "mens-grey-parantoban",
+      "colors": [
+        "Grey"
+      ],
+      "sizes": [
+        "Large "
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clea Only"
+      ],
+      "id": "mens-grey-parantoban",
+      "createdAt": "2026-02-25",
+      "image": "/uploads/img_0812.jpg",
+      "inventory": "available",
+      "description": "Machine made men's grey parantoban with silver and grey embroidery. ",
+      "category": "Machine Made",
+      "fitInfo": "Please check our size chart for all specific measurements."
     }
   ]
 }
