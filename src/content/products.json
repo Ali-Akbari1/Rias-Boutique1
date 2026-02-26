@@ -13,7 +13,9 @@
         "Red",
         "Burgundy"
       ],
-      "sizes": [],
+      "sizes": [
+        "Medium"
+      ],
       "department": "women",
       "popularity": "",
       "careInstructions": [
@@ -240,7 +242,7 @@
         "Small",
         "Medium",
         "Large",
-        "XLarge"
+        "X-Large"
       ],
       "department": "women",
       "popularity": 100,
@@ -353,7 +355,7 @@
         "Red"
       ],
       "sizes": [
-        "M"
+        "Medium"
       ],
       "department": "women",
       "id": "red-gharara-bridal-dress",
