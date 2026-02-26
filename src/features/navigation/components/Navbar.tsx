@@ -31,19 +31,19 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         </Link>
 
         <div className="hidden md:flex items-center gap-8 font-body text-lg">
-          <Link to="/collection" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/collection" className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4">
             Collection
           </Link>
-          <a href="#reviews" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a href="#reviews" className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4">
             Reviews
           </a>
-          <a href="#instagram" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a href="#instagram" className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4">
             Instagram
           </a>
-          <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a href="#about" className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4">
             About
           </a>
-          <a href="#contact" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a href="#contact" className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4">
             Contact
           </a>
         </div>
@@ -66,4 +66,3 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
 };
 
 export default Navbar;
-
