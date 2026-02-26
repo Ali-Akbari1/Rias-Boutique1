@@ -292,10 +292,10 @@
         "Green "
       ],
       "sizes": [
-        "SM",
-        "M",
-        "L",
-        "XL"
+        "Small",
+        "Medium",
+        "Large",
+        "X-Large"
       ],
       "department": "women",
       "careInstructions": [
@@ -324,7 +324,7 @@
         "Purple"
       ],
       "sizes": [
-        "SM"
+        "Small"
       ],
       "department": "women",
       "careInstructions": [
