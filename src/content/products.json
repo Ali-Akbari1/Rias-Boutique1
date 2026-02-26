@@ -76,10 +76,11 @@
       "id": "Blue-Cheerma-Dozi",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0557.jpg",
+      "inventory": "available",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
       "category": "Party Wear",
       "salePercent": "",
-      "fitInfo": "Bust: 42in "
+      "fitInfo": "Bust: 42in \nLength of dress: 40in "
     },
     {
       "fabric": "Velvet ",
