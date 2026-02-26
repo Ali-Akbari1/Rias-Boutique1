@@ -237,10 +237,10 @@
         "Blue (Pre-order)"
       ],
       "sizes": [
-        "SM (40in)",
-        "M (42in)",
-        "L (44in)",
-        "XL (46in)"
+        "Small",
+        "Medium",
+        "Large",
+        "XLarge"
       ],
       "department": "women",
       "popularity": 100,
