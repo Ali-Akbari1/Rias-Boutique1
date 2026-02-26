@@ -14,6 +14,7 @@
         "Burgundy"
       ],
       "sizes": [],
+      "department": "women",
       "popularity": "",
       "careInstructions": [
         "Dry Clean Only"
@@ -23,7 +24,7 @@
       "image": "/uploads/full-photo.jpg",
       "deliveryEstimate": "",
       "inventory": "sold_out",
-      "description": "3 Piece Burgundy Bridal Dress\n*Jewelry Sold Separately",
+      "description": "3 Piece Burgundy Bridal Dress\n",
       "category": "Bridal",
       "fitInfo": "*Jewelry Sold Separately"
     },
@@ -39,8 +40,9 @@
       "name": "Green Bridal Dress",
       "slug": "Green-Bridal-Dress",
       "sizes": [
-        "Large (44in)"
+        "Large "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -61,15 +63,24 @@
       ],
       "name": "Blue Long Cheerma Dozi Dress",
       "slug": "Blue-Cheerma-Dozi",
+      "colors": [
+        "Blue"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
       "id": "Blue-Cheerma-Dozi",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0557.jpg",
+      "inventory": "available",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
       "category": "Party Wear",
-      "salePercent": ""
+      "salePercent": "",
+      "fitInfo": "Bust: 42in \nLength of dress: 40in "
     },
     {
       "fabric": "Velvet ",
@@ -82,14 +93,16 @@
       "name": "Royal Blue 3 Piece Suit ",
       "slug": "Royal-Blue",
       "sizes": [
-        "Small (40in)"
+        "Small "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
       "id": "Royal-Blue",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0667.jpg",
+      "inventory": "available",
       "description": "3 piece velvet suit with gulabatoon embroidery\n",
       "category": "Party Wear",
       "fitInfo": "Bust: 40in\nTop Length: 36in\nPants Length: 38in\n"
@@ -105,16 +118,21 @@
       ],
       "name": "Handmade Hazaragi Dress",
       "slug": "Handmade-Hazaragi-Dress",
+      "colors": [
+        "Teal"
+      ],
       "sizes": [
         "Small "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only "
       ],
       "id": "Handmade-Hazaragi-Dress",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0628.jpg",
-      "description": "Handmade Hazaragi dress with mirror work\n\n2 pieces\n",
+      "inventory": "available",
+      "description": "Handmade Hazaragi dress with black embroidery mirror work. \n\n2 pieces: Dress and pants \n",
       "category": "Formal",
       "fitInfo": "Bust: 36in \nWaist: 32in \nLength of Pants: 35in"
     },
@@ -133,8 +151,9 @@
         "White "
       ],
       "sizes": [
-        "Medium (42in) "
+        "Medium "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -160,15 +179,16 @@
         "Black with Gold "
       ],
       "sizes": [
-        "Large (44in)"
+        "Large "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
       "id": "Black-Gulabatoon-dress",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_8937.jpg",
-      "inventory": "available",
+      "inventory": 1,
       "description": "Black velvet dress with wide-leg pants, featuring gulabatoon detailing.",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39th\n\n3 pieces: Dress, Pants, and Chadar"
@@ -187,8 +207,9 @@
         "White and Silver "
       ],
       "sizes": [
-        "Large (44in)"
+        "Large "
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
@@ -197,7 +218,7 @@
       "image": "/uploads/img_8861.jpg",
       "description": "White velvet dress with wide-leg pants, featuring handmade silver cheerma.",
       "category": "Party Wear",
-      "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39in "
+      "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39in \n\n3 pieces: dress, pants, and scarf "
     },
     {
       "fabric": "Velvet",
@@ -216,16 +237,17 @@
         "Blue (Pre-order)"
       ],
       "sizes": [
-        "SM (40in)",
-        "M (42in)",
-        "L (44in)",
-        "XL (46in)"
+        "Small",
+        "Medium",
+        "Large",
+        "XLarge"
       ],
+      "department": "women",
       "popularity": 100,
       "id": "Cheerma-dozi-3-piece",
       "createdAt": "2026-02-18",
       "image": "/uploads/12665fda-357f-442c-bea4-4b06977b5b1b.jpg",
-      "deliveryEstimate": "Custom Order: Minimum 4 weeks needed outside of shipping time ",
+      "deliveryEstimate": "Custom Order: Minimum 4-6 weeks needed outside of shipping time. Please contact us for more details.",
       "inventory": "available",
       "description": "Handmade cheerma dozi dress with wide legged pants.",
       "category": "Party Wear"
@@ -244,7 +266,7 @@
         "Pink"
       ],
       "sizes": [
-        "SM"
+        "Small"
       ],
       "careInstructions": [
         "Dry Clean Only"
@@ -252,8 +274,10 @@
       "id": "pink-banaras-dress",
       "createdAt": "2026-02-18",
       "image": "/uploads/img_8963.jpg",
+      "inventory": 1,
       "description": "3 piece pink banaras dress with handmade cheerma.",
-      "category": "Party Wear"
+      "category": "Party Wear",
+      "fitInfo": "Bust: 40in"
     },
     {
       "fabric": "Banaras",
@@ -273,12 +297,14 @@
         "L",
         "XL"
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
       "id": "Bridal-green-banaras",
       "createdAt": "2026-02-19",
       "image": "/uploads/img_0724.jpg",
+      "inventory": "sold_out",
       "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
       "category": "Bridal",
       "fitInfo": "*Bridal Shawl sold separately"
@@ -300,13 +326,14 @@
       "sizes": [
         "SM"
       ],
+      "department": "women",
       "careInstructions": [
         "Dry Clean Only "
       ],
       "id": "Purple-Banaras-Dress ",
       "createdAt": "2026-02-19",
       "image": "/uploads/img_0751.jpg",
-      "inventory": 1,
+      "inventory": "sold_out",
       "description": "Purple banaras dress with kochi pants and beautiful beaded scarf",
       "category": "Party Wear",
       "fitInfo": "Bust: 40in \nSleeves: 23in\nDress Length: 24in"
@@ -328,12 +355,232 @@
       "sizes": [
         "M"
       ],
+      "department": "women",
       "id": "red-gharara-bridal-dress",
       "image": "/uploads/img_0738.jpg",
       "inventory": 1,
       "description": "Bridal red velvet dress with wide-legged pants and beautiful beaded scarf. ",
       "category": "Bridal",
       "fitInfo": "Bust: 42in \nSleeves: 22in\nDress Length: 25in\nPants Length: 40in\n"
+    },
+    {
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_0761.jpg",
+        "/uploads/img_0764.jpg",
+        "/uploads/img_0765.jpg"
+      ],
+      "name": "Burgundy Banaras Dress",
+      "slug": "Burgundy-Banaras-Dress",
+      "colors": [
+        "Burgundy"
+      ],
+      "sizes": [
+        "Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Burgundy-Banaras-Dress",
+      "createdAt": "2026-02-22",
+      "image": "/uploads/img_0761.jpg",
+      "inventory": 1,
+      "description": "Burgundy banaras dress with kochi pants and heavy embroidered scarf. ",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 44in "
+    },
+    {
+      "fabric": "Velvet",
+      "price": 200,
+      "galleryImages": [
+        "/uploads/aa8031e8-9edd-46fc-ba4b-039a59c3ff6b.jpg"
+      ],
+      "name": "Dark Blue Chapan ",
+      "slug": "Chapan-blue-gulabatoon",
+      "colors": [
+        "Dark Blue "
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Chapan-blue-gulabatoon",
+      "createdAt": "2026-02-23",
+      "image": "/uploads/aa8031e8-9edd-46fc-ba4b-039a59c3ff6b.jpg",
+      "inventory": 1,
+      "description": "Dark blue chapan with gulabatoon detailing. ",
+      "category": "Casual",
+      "fitInfo": "Bust: 40in\n\n1 piece"
+    },
+    {
+      "fabric": "Velvet with handmade cheerma detailing. ",
+      "price": 650,
+      "galleryImages": [
+        "/uploads/img_0782.jpg"
+      ],
+      "name": "Burgundy Bridal Dress with Mens Vest",
+      "slug": "Burgundy-bridal-dress",
+      "colors": [
+        "Burgundy"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "id": "Burgundy-bridal-dress",
+      "image": "/uploads/img_0782.jpg",
+      "inventory": "sold_out",
+      "description": "Bridal burgundy dress with handmade cheerma and matching men's vest. ",
+      "category": "Bridal",
+      "fitInfo": "Bust: 42in \n\n*Price includes both dress and vest. \n*Men's paratoban and women's jewelry sold separately"
+    },
+    {
+      "price": 110,
+      "galleryImages": [
+        "/uploads/img_0786.jpg",
+        "/uploads/img_0787.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+      ],
+      "name": "Black and Gold Men's Parantoban",
+      "slug": "men-black-gold",
+      "colors": [
+        "Black"
+      ],
+      "sizes": [
+        "X-Large ",
+        "XX-Large ",
+        "Small "
+      ],
+      "department": "men",
+      "popularity": 100,
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "men-black-gold",
+      "createdAt": "2026-02-24",
+      "image": "/uploads/img_0786.jpg",
+      "inventory": "available",
+      "description": "Machine-made black men's parantoban with gold embroidery. ",
+      "category": "Machine Made",
+      "fitInfo": "Please check our size chart for all specific measurements. "
+    },
+    {
+      "price": 225,
+      "galleryImages": [
+        "/uploads/img_0790.jpg",
+        "/uploads/img_0795.jpg",
+        "/uploads/img_0789.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+      ],
+      "name": "Handmade Mens Parantoban ",
+      "slug": "Handmade-mens-parantoban",
+      "colors": [
+        "Black"
+      ],
+      "sizes": [
+        "X-Large (46in) "
+      ],
+      "department": "men",
+      "popularity": "",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "Handmade-mens-parantoban",
+      "createdAt": "2026-02-24",
+      "image": "/uploads/img_0790.jpg",
+      "inventory": "available",
+      "description": "Handmade black mens parantoban with silver embroidery. ",
+      "category": "Handmade",
+      "fitInfo": "Please check our size chart for all specific measurements. "
+    },
+    {
+      "price": 110,
+      "galleryImages": [
+        "/uploads/img_0797.jpg",
+        "/uploads/img_0802.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+      ],
+      "name": "Men's Parantoban Off-White ",
+      "slug": "mens-offwhite-with-gold",
+      "colors": [
+        "Off-white "
+      ],
+      "sizes": [
+        "Large",
+        "XX-Large ",
+        "Small"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "mens-offwhite-with-gold",
+      "createdAt": "2026-02-25",
+      "image": "/uploads/img_0797.jpg",
+      "inventory": "available",
+      "description": "Off-white machine made men's parantoban with gold embroidery. ",
+      "category": "Machine Made",
+      "fitInfo": "Please check our size chart for all specific measurements. "
+    },
+    {
+      "price": 110,
+      "galleryImages": [
+        "/uploads/img_0812.jpg",
+        "/uploads/img_0811.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+      ],
+      "name": "Men's Grey Parantoban",
+      "slug": "mens-grey-parantoban",
+      "colors": [
+        "Grey"
+      ],
+      "sizes": [
+        "Large "
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clea Only"
+      ],
+      "id": "mens-grey-parantoban",
+      "createdAt": "2026-02-25",
+      "image": "/uploads/img_0812.jpg",
+      "inventory": "available",
+      "description": "Machine made men's grey parantoban with silver and grey embroidery. ",
+      "category": "Machine Made",
+      "fitInfo": "Please check our size chart for all specific measurements."
+    },
+    {
+      "fabric": "*Mirror work is handmade ",
+      "price": 225,
+      "galleryImages": [
+        "/uploads/img_0821.jpg",
+        "/uploads/img_0815.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+      ],
+      "name": "Men's White Handmade Parantoban",
+      "slug": "mens-white-handmade-parantoban",
+      "colors": [
+        "White"
+      ],
+      "sizes": [
+        "Large",
+        "Medium",
+        "X-Large"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "mens-white-handmade-parantoban",
+      "createdAt": "2026-02-25",
+      "image": "/uploads/img_0821.jpg",
+      "inventory": "available",
+      "description": "Handmade men's white parantoban with silver embroidery and mirror work. ",
+      "category": "Handmade",
+      "fitInfo": "Please check our size chart for all specific measurements.\n\nPlease measure before ordering. \n\n"
     }
   ]
 }
