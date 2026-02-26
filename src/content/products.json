@@ -551,6 +551,36 @@
       "description": "Machine made men's grey parantoban with silver and grey embroidery. ",
       "category": "Machine Made",
       "fitInfo": "Please check our size chart for all specific measurements."
+    },
+    {
+      "fabric": "*Mirror work is handmade ",
+      "price": 225,
+      "galleryImages": [
+        "/uploads/img_0821.jpg",
+        "/uploads/img_0815.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+      ],
+      "name": "Men's White Handmade Parantoban",
+      "slug": "mens-white-handmade-parantoban",
+      "colors": [
+        "White"
+      ],
+      "sizes": [
+        "Large",
+        "Medium",
+        "X-Large"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "mens-white-handmade-parantoban",
+      "createdAt": "2026-02-25",
+      "image": "/uploads/img_0821.jpg",
+      "inventory": "available",
+      "description": "Handmade men's white parantoban with silver embroidery and mirror work. ",
+      "category": "Handmade",
+      "fitInfo": "Please check our size chart for all specific measurements.\n\nPlease measure before ordering. \n\n"
     }
   ]
 }
