@@ -1,7 +1,10 @@
-import heroBg from "@/assets/hero-bg.png";
+import heroBg from "@/assets/hero-bg.webp";
 import { Link } from "react-router-dom";
 
 const HeroSection = () => {
+  const heroCtaClass =
+    "inline-flex h-10 w-40 items-center justify-center rounded-sm border-2 border-foreground bg-background px-4 text-sm font-body font-semibold tracking-wide text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.28)] transition-colors hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground sm:h-auto sm:w-auto sm:px-7 sm:py-3.5 sm:text-base";
+
   return (
     <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden pt-16 sm:min-h-[80vh]">
       <img
@@ -24,12 +27,20 @@ const HeroSection = () => {
           <p className="mb-8 max-w-md text-lg font-body leading-relaxed text-white sm:text-xl">
             Exquisite Afghan clothing adorned with centuries-old embroidery traditions. Each piece tells a story.
           </p>
-          <Link
-            to="/collection"
-            className="inline-flex items-center rounded-sm border-2 border-foreground bg-background px-7 py-3.5 text-base font-body font-semibold tracking-wide text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.28)] transition-colors hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground sm:px-8 sm:py-4 sm:text-lg"
-          >
-            Explore Collection
-          </Link>
+          <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-4">
+            <Link
+              to="/collection?department=women"
+              className={heroCtaClass}
+            >
+              Shop Women's
+            </Link>
+            <Link
+              to="/collection?department=men"
+              className={heroCtaClass}
+            >
+              Shop Men's
+            </Link>
+          </div>
         </div>
       </div>
     </section>

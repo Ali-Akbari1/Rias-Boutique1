@@ -11,6 +11,10 @@ const MOBILE_MEDIA_QUERY = "(max-width: 767px)";
 const MOBILE_ROTATION_INTERVAL_MS = 5000;
 const DESKTOP_ROTATION_INTERVAL_MS = 8000;
 const USER_INTERACTION_PAUSE_MS = 10000;
+const MAX_FEATURED_ITEMS = 12;
+const NEWEST_PRIORITY_COUNT = 4;
+const TRENDING_PRIORITY_COUNT = 4;
+const POPULARITY_THRESHOLD = 70;
 
 const chunkProducts = (items: Product[], chunkSize: number): Product[][] => {
   if (items.length === 0) {
@@ -22,6 +26,54 @@ const chunkProducts = (items: Product[], chunkSize: number): Product[][] => {
     chunks.push(items.slice(index, index + chunkSize));
   }
   return chunks;
+};
+
+const getTimestamp = (value: string) => {
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const getWeeklySeedKey = () => {
+  const today = new Date();
+  const utcDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+  const dayOfWeek = utcDate.getUTCDay() || 7;
+  utcDate.setUTCDate(utcDate.getUTCDate() + 4 - dayOfWeek);
+
+  const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
+  const weekNumber = Math.ceil((((utcDate.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+
+  return `${utcDate.getUTCFullYear()}-W${String(weekNumber).padStart(2, "0")}`;
+};
+
+const hashToSeed = (value: string) => {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+};
+
+const createSeededRandom = (seed: number) => {
+  let state = seed || 1;
+  return () => {
+    state = (state + 0x6d2b79f5) | 0;
+    let value = Math.imul(state ^ (state >>> 15), 1 | state);
+    value ^= value + Math.imul(value ^ (value >>> 7), 61 | value);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
+const seededShuffle = <T,>(items: T[], seed: number) => {
+  const output = [...items];
+  const random = createSeededRandom(seed);
+
+  for (let index = output.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [output[index], output[swapIndex]] = [output[swapIndex], output[index]];
+  }
+
+  return output;
 };
 
 interface ProductSlideProps {
@@ -68,16 +120,40 @@ const FeaturedProductsCarousel = () => {
 
   const groupSize = isMobile ? MOBILE_GROUP_SIZE : DESKTOP_GROUP_SIZE;
   const rotationIntervalMs = isMobile ? MOBILE_ROTATION_INTERVAL_MS : DESKTOP_ROTATION_INTERVAL_MS;
-  const sortedProducts = useMemo(
-    () =>
-      [...products].sort((a, b) => {
-        const aTime = Number.isNaN(Date.parse(a.createdAt)) ? 0 : Date.parse(a.createdAt);
-        const bTime = Number.isNaN(Date.parse(b.createdAt)) ? 0 : Date.parse(b.createdAt);
-        return bTime - aTime;
-      }),
-    [],
-  );
-  const groupedProducts = useMemo(() => chunkProducts(sortedProducts, groupSize), [groupSize, sortedProducts]);
+  const featuredProducts = useMemo(() => {
+    const availableProducts = products.filter((product) => product.availability === "available");
+
+    if (availableProducts.length <= MAX_FEATURED_ITEMS) {
+      return [...availableProducts].sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt));
+    }
+
+    const newestProducts = [...availableProducts]
+      .sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt))
+      .slice(0, NEWEST_PRIORITY_COUNT);
+
+    const trendingProducts = [...availableProducts]
+      .filter((product) => (product.salePercent ?? 0) > 0 || product.popularity >= POPULARITY_THRESHOLD)
+      .sort((a, b) => {
+        const aTrendingScore = ((a.salePercent ?? 0) > 0 ? 1000 : 0) + a.popularity;
+        const bTrendingScore = ((b.salePercent ?? 0) > 0 ? 1000 : 0) + b.popularity;
+        if (aTrendingScore !== bTrendingScore) {
+          return bTrendingScore - aTrendingScore;
+        }
+        return getTimestamp(b.createdAt) - getTimestamp(a.createdAt);
+      })
+      .slice(0, TRENDING_PRIORITY_COUNT);
+
+    const selectedById = new Map<string, Product>();
+    newestProducts.forEach((product) => selectedById.set(product.id, product));
+    trendingProducts.forEach((product) => selectedById.set(product.id, product));
+
+    const remainingProducts = availableProducts.filter((product) => !selectedById.has(product.id));
+    const seededRemaining = seededShuffle(remainingProducts, hashToSeed(getWeeklySeedKey()));
+
+    return [...selectedById.values(), ...seededRemaining].slice(0, MAX_FEATURED_ITEMS);
+  }, []);
+
+  const groupedProducts = useMemo(() => chunkProducts(featuredProducts, groupSize), [featuredProducts, groupSize]);
   const canRotate = groupedProducts.length > 1;
 
   const carouselSlides = useMemo(() => {

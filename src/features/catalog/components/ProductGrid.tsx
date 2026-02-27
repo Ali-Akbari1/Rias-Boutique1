@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { type ProductDepartment, PRODUCT_DEPARTMENTS, products } from "@/features/catalog/data/products";
 import ProductCard from "./ProductCard";
+import { normalizeSearchText, normalizedTextMatchesQuery } from "@/lib/search";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
@@ -16,6 +18,7 @@ const PRODUCTS_PER_PAGE = 9;
 
 interface ProductGridProps {
   initialDepartment?: DepartmentOption;
+  initialQuery?: string;
 }
 
 const DEPARTMENT_LABELS: Record<ProductDepartment, string> = {
@@ -56,6 +59,18 @@ const parsePriceInput = (value: string): number | null => {
 };
 
 const normalizeSizeToken = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+const toPositiveInt = (value: string | null, fallback: number) => {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return fallback;
+  }
+
+  return parsed;
+};
 
 const getSizeRank = (value: string) => {
   const normalized = value.trim().toLowerCase();
@@ -110,18 +125,42 @@ const getSizeRank = (value: string) => {
   return 99;
 };
 
-const ProductGrid = ({ initialDepartment = "all" }: ProductGridProps) => {
-  const [queryInput, setQueryInput] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGridProps) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const normalizedInitialQuery = initialQuery.trim();
+  const initialCategory = searchParams.get("category")?.trim() || "all";
+  const initialAvailability = searchParams.get("availability")?.trim() || "all";
+  const initialSaleFilter = searchParams.get("sale")?.trim() || "all";
+  const initialSize = searchParams.get("size")?.trim() || "all";
+  const initialMinPrice = searchParams.get("min")?.trim() || "";
+  const initialMaxPrice = searchParams.get("max")?.trim() || "";
+  const initialSortBy = searchParams.get("sort")?.trim() || "newest";
+  const initialPage = toPositiveInt(searchParams.get("page"), 1);
+  const [queryInput, setQueryInput] = useState(normalizedInitialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(normalizeSearchText(normalizedInitialQuery));
   const [department, setDepartment] = useState<DepartmentOption>(initialDepartment);
-  const [category, setCategory] = useState("all");
-  const [availability, setAvailability] = useState<AvailabilityOption>("all");
-  const [saleFilter, setSaleFilter] = useState<SaleOption>("all");
-  const [size, setSize] = useState("all");
-  const [minPriceInput, setMinPriceInput] = useState("");
-  const [maxPriceInput, setMaxPriceInput] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>("newest");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [category, setCategory] = useState(initialCategory);
+  const [availability, setAvailability] = useState<AvailabilityOption>(
+    initialAvailability === "available" || initialAvailability === "sold_out" ? initialAvailability : "all",
+  );
+  const [saleFilter, setSaleFilter] = useState<SaleOption>(
+    initialSaleFilter === "on-sale" || initialSaleFilter === "regular-price" ? initialSaleFilter : "all",
+  );
+  const [size, setSize] = useState(initialSize);
+  const [minPriceInput, setMinPriceInput] = useState(initialMinPrice);
+  const [maxPriceInput, setMaxPriceInput] = useState(initialMaxPrice);
+  const [sortBy, setSortBy] = useState<SortOption>(
+    initialSortBy === "alphabetical" ||
+      initialSortBy === "price-low" ||
+      initialSortBy === "price-high" ||
+      initialSortBy === "popular"
+      ? initialSortBy
+      : "newest",
+  );
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const didMountPageResetEffectRef = useRef(false);
+  const didMountDepartmentResetEffectRef = useRef(false);
+  const didMountSizeResetEffectRef = useRef(false);
 
   const departments = useMemo(() => ["all", ...PRODUCT_DEPARTMENTS] as DepartmentOption[], []);
   const minPrice = useMemo(() => parsePriceInput(minPriceInput), [minPriceInput]);
@@ -144,8 +183,13 @@ const ProductGrid = ({ initialDepartment = "all" }: ProductGridProps) => {
   }, [initialDepartment]);
 
   useEffect(() => {
+    setQueryInput(normalizedInitialQuery);
+    setDebouncedQuery(normalizeSearchText(normalizedInitialQuery));
+  }, [normalizedInitialQuery]);
+
+  useEffect(() => {
     const debounceTimer = window.setTimeout(() => {
-      setDebouncedQuery(queryInput.trim().toLowerCase());
+      setDebouncedQuery(normalizeSearchText(queryInput.trim()));
     }, SEARCH_DEBOUNCE_MS);
 
     return () => {
@@ -187,6 +231,12 @@ const ProductGrid = ({ initialDepartment = "all" }: ProductGridProps) => {
   }, [department, departmentScopedProducts]);
 
   useEffect(() => {
+    // Keep initial category from URL on first render.
+    if (!didMountDepartmentResetEffectRef.current) {
+      didMountDepartmentResetEffectRef.current = true;
+      return;
+    }
+
     setCategory("all");
   }, [department]);
 
@@ -229,6 +279,12 @@ const ProductGrid = ({ initialDepartment = "all" }: ProductGridProps) => {
   }, [category, departmentScopedProducts]);
 
   useEffect(() => {
+    // Keep initial size from URL on first render.
+    if (!didMountSizeResetEffectRef.current) {
+      didMountSizeResetEffectRef.current = true;
+      return;
+    }
+
     setSize("all");
   }, [department, category]);
 
@@ -266,12 +322,11 @@ const ProductGrid = ({ initialDepartment = "all" }: ProductGridProps) => {
         product.fitInfo,
         product.colors.join(" "),
       ]
-        .join(" ")
-        .toLowerCase();
+        .join(" ");
 
       const matchesQuery =
         !debouncedQuery ||
-        searchableKeywords.includes(debouncedQuery);
+        normalizedTextMatchesQuery(normalizeSearchText(searchableKeywords), debouncedQuery);
 
       return inDepartment && inCategory && inAvailability && inSaleFilter && inSize && inPriceRange && matchesQuery;
     });
@@ -295,6 +350,12 @@ const ProductGrid = ({ initialDepartment = "all" }: ProductGridProps) => {
   }, [availability, category, debouncedQuery, department, resolvedMaxPrice, resolvedMinPrice, saleFilter, size, sortBy]);
 
   useEffect(() => {
+    // Keep initial page from URL on first render (for return-to-collection behavior).
+    if (!didMountPageResetEffectRef.current) {
+      didMountPageResetEffectRef.current = true;
+      return;
+    }
+
     setCurrentPage(1);
   }, [availability, category, debouncedQuery, department, resolvedMaxPrice, resolvedMinPrice, saleFilter, size, sortBy]);
 
@@ -307,6 +368,61 @@ const ProductGrid = ({ initialDepartment = "all" }: ProductGridProps) => {
     }
   }, [currentPage, safePage]);
 
+  useEffect(() => {
+    const nextParams = new URLSearchParams();
+
+    if (department !== "all") {
+      nextParams.set("department", department);
+    }
+    if (queryInput.trim()) {
+      nextParams.set("search", queryInput.trim());
+    }
+    if (category !== "all") {
+      nextParams.set("category", category);
+    }
+    if (availability !== "all") {
+      nextParams.set("availability", availability);
+    }
+    if (saleFilter !== "all") {
+      nextParams.set("sale", saleFilter);
+    }
+    if (size !== "all") {
+      nextParams.set("size", size);
+    }
+    if (minPriceInput.trim()) {
+      nextParams.set("min", minPriceInput.trim());
+    }
+    if (maxPriceInput.trim()) {
+      nextParams.set("max", maxPriceInput.trim());
+    }
+    if (sortBy !== "newest") {
+      nextParams.set("sort", sortBy);
+    }
+    if (safePage > 1) {
+      nextParams.set("page", String(safePage));
+    }
+
+    const currentQuery = searchParams.toString();
+    const nextQuery = nextParams.toString();
+    if (currentQuery !== nextQuery) {
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [
+    availability,
+    category,
+    currentPage,
+    department,
+    maxPriceInput,
+    minPriceInput,
+    queryInput,
+    safePage,
+    saleFilter,
+    searchParams,
+    setSearchParams,
+    size,
+    sortBy,
+  ]);
+
   const paginatedProducts = useMemo(() => {
     const startIndex = (safePage - 1) * PRODUCTS_PER_PAGE;
     return filteredProducts.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
@@ -318,7 +434,7 @@ const ProductGrid = ({ initialDepartment = "all" }: ProductGridProps) => {
   const resetFilters = () => {
     setQueryInput("");
     setDebouncedQuery("");
-    setDepartment(initialDepartment);
+    setDepartment("all");
     setCategory("all");
     setAvailability("all");
     setSaleFilter("all");

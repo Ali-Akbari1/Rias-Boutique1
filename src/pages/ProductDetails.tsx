@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
 import { getProductById } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
@@ -14,6 +14,7 @@ import ZoomableImageDialog from "@/features/product/components/ZoomableImageDial
 
 const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
+  const location = useLocation();
   const product = getProductById(productId ?? "");
   const { addToCart, totalItems } = useCart();
   const { toast } = useToast();
@@ -22,6 +23,13 @@ const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState(product?.galleryImages?.[0] ?? product?.image ?? "");
   const [cartOpen, setCartOpen] = useState(false);
   const checkoutEnabled = isCheckoutEnabled();
+  const backToCollectionHref = useMemo(() => {
+    const candidate = new URLSearchParams(location.search).get("returnTo")?.trim() || "";
+    if (candidate.startsWith("/collection")) {
+      return candidate;
+    }
+    return "/collection";
+  }, [location.search]);
 
   const handleAddToCart = () => {
     if (!product) {
@@ -123,11 +131,11 @@ const ProductDetails = () => {
       <header className="border-b border-border bg-background/95 backdrop-blur">
         <div className="container mx-auto flex items-center justify-between px-4 py-4 sm:px-6">
           <Link
-            to="/"
+            to={backToCollectionHref}
             className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            Back to Collection
           </Link>
           <button
             type="button"

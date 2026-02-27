@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import { type Product } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
@@ -11,11 +11,14 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const location = useLocation();
   const isSoldOut = product.availability === "sold_out";
   const isOnSale = !isSoldOut && Boolean(product.salePercent && product.compareAtPrice);
   const checkoutEnabled = isCheckoutEnabled();
   const { addToCart } = useCart();
   const { toast } = useToast();
+  const returnTo = `${location.pathname}${location.search}`;
+  const detailsPath = `/products/${product.id}?returnTo=${encodeURIComponent(returnTo)}`;
 
   const canDirectAdd = product.sizes.length === 1 && product.colors.length === 1;
 
@@ -77,7 +80,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             Sale {product.salePercent}% OFF
           </span>
         ) : null}
-        <Link to={`/products/${product.id}`} className="block h-full w-full">
+        <Link to={detailsPath} className="block h-full w-full">
           <img
             src={product.image}
             alt={product.name}
@@ -118,7 +121,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               {isSoldOut ? "Sold Out" : "Add to Bag"}
             </button>
             <Link
-              to={`/products/${product.id}`}
+              to={detailsPath}
               className="inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm bg-primary px-2.5 py-1.5 text-xs font-body text-primary-foreground transition-colors hover:bg-burgundy-light sm:text-sm"
             >
               View Details

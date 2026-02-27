@@ -92,6 +92,7 @@
 
   html {
     scroll-behavior: smooth;
+    scrollbar-gutter: stable;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -114,6 +115,34 @@
 }
 
 @layer utilities {
+  @keyframes searchPanelDrop {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -56px, 0) scaleY(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scaleY(1);
+    }
+  }
+
+  @keyframes searchOverlayFade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-search-panel-drop {
+    animation: searchPanelDrop 170ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .animate-search-overlay-fade {
+    animation: searchOverlayFade 10ms ease-out;
+  }
+
   .font-display {
     font-family: 'Playfair Display', serif;
   }

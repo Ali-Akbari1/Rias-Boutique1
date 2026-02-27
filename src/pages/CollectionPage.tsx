@@ -1,27 +1,43 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import ProductGrid from "@/features/catalog/components/ProductGrid";
 import CartDrawer from "@/features/cart/components/CartDrawer";
 import Footer from "@/features/navigation/components/Footer";
 import { useCart } from "@/features/cart/context/CartContext";
 import { type ProductDepartment, PRODUCT_DEPARTMENTS } from "@/features/catalog/data/products";
 
+const normalizeDepartment = (value?: string | null): ProductDepartment | null => {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  return PRODUCT_DEPARTMENTS.includes(normalized as ProductDepartment)
+    ? (normalized as ProductDepartment)
+    : null;
+};
+
 const CollectionPage = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const { totalItems } = useCart();
   const { department } = useParams<{ department?: string }>();
+  const [searchParams] = useSearchParams();
 
   const initialDepartment = useMemo<"all" | ProductDepartment>(() => {
-    if (!department) {
-      return "all";
+    const queryDepartment = normalizeDepartment(searchParams.get("department"));
+    if (queryDepartment) {
+      return queryDepartment;
     }
 
-    const normalized = department.trim().toLowerCase();
-    return PRODUCT_DEPARTMENTS.includes(normalized as ProductDepartment)
-      ? (normalized as ProductDepartment)
-      : "all";
-  }, [department]);
+    const routeDepartment = normalizeDepartment(department);
+    return routeDepartment ?? "all";
+  }, [department, searchParams]);
+
+  const initialSearch = useMemo(() => {
+    const searchQuery = searchParams.get("search");
+    return searchQuery ? searchQuery.trim() : "";
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +68,7 @@ const CollectionPage = () => {
       </header>
 
       <main>
-        <ProductGrid initialDepartment={initialDepartment} />
+        <ProductGrid initialDepartment={initialDepartment} initialQuery={initialSearch} />
       </main>
 
       <Footer />
