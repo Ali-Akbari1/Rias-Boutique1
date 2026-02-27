@@ -72,6 +72,17 @@ const toPositiveInt = (value: string | null, fallback: number) => {
   return parsed;
 };
 
+const normalizeDepartmentParam = (value: string | null): ProductDepartment | null => {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  return PRODUCT_DEPARTMENTS.includes(normalized as ProductDepartment)
+    ? (normalized as ProductDepartment)
+    : null;
+};
+
 const getSizeRank = (value: string) => {
   const normalized = value.trim().toLowerCase();
   const firstToken = normalizeSizeToken(normalized.split(/[\s(/-]+/)[0] || "");
@@ -161,6 +172,7 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   const didMountPageResetEffectRef = useRef(false);
   const didMountDepartmentResetEffectRef = useRef(false);
   const didMountSizeResetEffectRef = useRef(false);
+  const isDepartmentUserDrivenRef = useRef(false);
 
   const departments = useMemo(() => ["all", ...PRODUCT_DEPARTMENTS] as DepartmentOption[], []);
   const minPrice = useMemo(() => parsePriceInput(minPriceInput), [minPriceInput]);
@@ -178,7 +190,13 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
     return Math.max(minPrice, maxPrice);
   }, [maxPrice, minPrice]);
 
+  const setDepartmentFromUser = (value: DepartmentOption) => {
+    isDepartmentUserDrivenRef.current = true;
+    setDepartment(value);
+  };
+
   useEffect(() => {
+    isDepartmentUserDrivenRef.current = false;
     setDepartment(initialDepartment);
   }, [initialDepartment]);
 
@@ -369,6 +387,15 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   }, [currentPage, safePage]);
 
   useEffect(() => {
+    const urlDepartment = normalizeDepartmentParam(searchParams.get("department"));
+    const localDepartment = department === "all" ? null : department;
+
+    // Prevent external route changes (e.g. navbar Women's -> Men's) from being
+    // overwritten by stale local state during the same effect cycle.
+    if (!isDepartmentUserDrivenRef.current && urlDepartment !== localDepartment) {
+      return;
+    }
+
     const nextParams = new URLSearchParams();
 
     if (department !== "all") {
@@ -407,6 +434,7 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
     if (currentQuery !== nextQuery) {
       setSearchParams(nextParams, { replace: true });
     }
+    isDepartmentUserDrivenRef.current = false;
   }, [
     availability,
     category,
@@ -434,7 +462,7 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   const resetFilters = () => {
     setQueryInput("");
     setDebouncedQuery("");
-    setDepartment("all");
+    setDepartmentFromUser("all");
     setCategory("all");
     setAvailability("all");
     setSaleFilter("all");
@@ -479,7 +507,7 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
 
             <div className="flex flex-col gap-1.5">
               <p className="text-xs font-body uppercase tracking-[0.08em] leading-none text-muted-foreground">Department</p>
-              <Select value={department} onValueChange={(value) => setDepartment(value as DepartmentOption)}>
+              <Select value={department} onValueChange={(value) => setDepartmentFromUser(value as DepartmentOption)}>
                 <SelectTrigger className="h-10 w-full">
                   <SelectValue placeholder="Department" />
                 </SelectTrigger>

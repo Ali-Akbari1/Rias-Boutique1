@@ -1,4 +1,5 @@
 import { getStorePickupDetails } from "@/features/store/data/store-content";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const googleReviewsUrl =
@@ -27,29 +28,34 @@ const Footer = () => {
             <h4 className="mb-4 font-display text-lg font-semibold">Quick Links</h4>
             <ul className="space-y-2 font-body text-white/80">
               <li>
-                <a href="#collection" className="transition-colors hover:text-white">
+                <Link to="/collection" className="transition-colors hover:text-white">
                   Collection
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#reviews" className="transition-colors hover:text-white">
+                <Link to="/#reviews" className="transition-colors hover:text-white">
                   Reviews
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#instagram" className="transition-colors hover:text-white">
+                <Link to="/#instagram" className="transition-colors hover:text-white">
                   Instagram
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#about" className="transition-colors hover:text-white">
-                  About Us
-                </a>
+                <Link to="/about" className="transition-colors hover:text-white">
+                  About
+                </Link>
               </li>
               <li>
-                <a href="#contact" className="transition-colors hover:text-white">
+                <Link to="/faq" className="transition-colors hover:text-white">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link to="/#contact" className="transition-colors hover:text-white">
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

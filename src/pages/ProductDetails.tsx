@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useLocation, useParams } from "react-router-dom";
-import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
+import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, Truck } from "lucide-react";
 import { getProductById } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
 import CartDrawer from "@/features/cart/components/CartDrawer";
+import Navbar from "@/features/navigation/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/money";
@@ -16,7 +17,7 @@ const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
   const location = useLocation();
   const product = getProductById(productId ?? "");
-  const { addToCart, totalItems } = useCart();
+  const { addToCart } = useCart();
   const { toast } = useToast();
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -128,32 +129,16 @@ const ProductDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-background/95 backdrop-blur">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4 sm:px-6">
-          <Link
-            to={backToCollectionHref}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Collection
-          </Link>
-          <button
-            type="button"
-            onClick={() => setCartOpen(true)}
-            className="relative rounded-sm p-2 text-foreground transition-colors hover:text-gold"
-            aria-label="Shopping cart"
-          >
-            <ShoppingBag className="w-6 h-6" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-body font-semibold">
-                {totalItems}
-              </span>
-            )}
-          </button>
-        </div>
-      </header>
+      <Navbar onCartClick={() => setCartOpen(true)} />
+      <main className="container mx-auto space-y-8 px-4 pb-6 pt-20 sm:px-6 sm:pb-8 sm:pt-24">
+        <Link
+          to={backToCollectionHref}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Collection
+        </Link>
 
-      <main className="container mx-auto space-y-8 px-4 py-6 sm:px-6 sm:py-8">
         <section className="grid gap-8 lg:grid-cols-[1fr_1fr]">
           <div className="space-y-4">
             <div className="overflow-hidden rounded-md border border-border bg-card">

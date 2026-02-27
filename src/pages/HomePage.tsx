@@ -4,7 +4,6 @@ import HeroSection from "@/features/home/components/HeroSection";
 import FeaturedProductsCarousel from "@/features/catalog/components/FeaturedProductsCarousel";
 import TrustSection from "@/features/home/components/TrustSection";
 import InstagramSection from "@/features/home/components/InstagramSection";
-import AboutSection from "@/features/home/components/AboutSection";
 import Footer from "@/features/navigation/components/Footer";
 import CartDrawer from "@/features/cart/components/CartDrawer";
 
@@ -18,7 +17,6 @@ const Index = () => {
       <FeaturedProductsCarousel />
       <TrustSection />
       <InstagramSection />
-      <AboutSection />
       <Footer />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </div>

@@ -40,9 +40,19 @@ const toTimestamp = (value: string) => {
   return Number.isNaN(parsed) ? 0 : parsed;
 };
 
+const desktopNavLinkClass = (isActive: boolean) =>
+  `transition-colors hover:text-foreground hover:underline underline-offset-4 ${
+    isActive ? "text-foreground underline" : "text-muted-foreground"
+  }`;
+
+const mobileNavLinkClass = (isActive: boolean) =>
+  `rounded-sm px-2 py-2 font-body text-base transition-colors hover:bg-secondary hover:text-foreground ${
+    isActive ? "bg-secondary text-foreground" : "text-muted-foreground"
+  }`;
+
 const Navbar = ({ onCartClick }: NavbarProps) => {
   const { totalItems } = useCart();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -113,10 +123,32 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
     ).slice(0, 8);
   }, [availableProducts, normalizedSearchQuery]);
 
+  const activeDepartment = useMemo<"women" | "men" | null>(() => {
+    const queryDepartment = new URLSearchParams(search).get("department")?.trim().toLowerCase();
+    if (queryDepartment === "women" || queryDepartment === "men") {
+      return queryDepartment;
+    }
+
+    if (pathname.startsWith("/collection/")) {
+      const routeDepartment = pathname.split("/")[2]?.trim().toLowerCase();
+      if (routeDepartment === "women" || routeDepartment === "men") {
+        return routeDepartment;
+      }
+    }
+
+    return null;
+  }, [pathname, search]);
+
+  const isCollectionRoute = pathname.startsWith("/collection");
+  const isWomensActive = isCollectionRoute && activeDepartment === "women";
+  const isMensActive = isCollectionRoute && activeDepartment === "men";
+  const isAboutActive = pathname === "/about";
+  const isFaqActive = pathname === "/faq";
+
   useEffect(() => {
     setMobileMenuOpen(false);
     setSearchOpen(false);
-  }, [pathname]);
+  }, [pathname, search]);
 
   useEffect(() => {
     if (!searchOpen) {
@@ -200,40 +232,22 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         <div className="justify-self-center hidden items-center gap-8 font-body text-lg md:flex">
           <Link
             to="/collection?department=women"
-            className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4"
+            className={desktopNavLinkClass(isWomensActive)}
           >
             Women's
           </Link>
           <Link
             to="/collection?department=men"
-            className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4"
+            className={desktopNavLinkClass(isMensActive)}
           >
             Men's
           </Link>
-          <a
-            href="#reviews"
-            className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4"
-          >
-            Reviews
-          </a>
-          <a
-            href="#instagram"
-            className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4"
-          >
-            Instagram
-          </a>
-          <a
-            href="#about"
-            className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4"
-          >
+          <Link to="/about" className={desktopNavLinkClass(isAboutActive)}>
             About
-          </a>
-          <a
-            href="#contact"
-            className="text-muted-foreground transition-colors hover:text-foreground hover:underline underline-offset-4"
-          >
-            Contact
-          </a>
+          </Link>
+          <Link to="/faq" className={desktopNavLinkClass(isFaqActive)}>
+            FAQ
+          </Link>
         </div>
 
         <div className="flex items-center gap-1 md:justify-self-end">
@@ -282,45 +296,27 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
             <Link
               to="/collection?department=women"
               onClick={closeMobileMenu}
-              className="rounded-sm px-2 py-2 font-body text-base text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className={mobileNavLinkClass(isWomensActive)}
             >
               Women's
             </Link>
             <Link
               to="/collection?department=men"
               onClick={closeMobileMenu}
-              className="rounded-sm px-2 py-2 font-body text-base text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className={mobileNavLinkClass(isMensActive)}
             >
               Men's
             </Link>
-            <a
-              href="#reviews"
+            <Link
+              to="/about"
               onClick={closeMobileMenu}
-              className="rounded-sm px-2 py-2 font-body text-base text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              Reviews
-            </a>
-            <a
-              href="#instagram"
-              onClick={closeMobileMenu}
-              className="rounded-sm px-2 py-2 font-body text-base text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              Instagram
-            </a>
-            <a
-              href="#about"
-              onClick={closeMobileMenu}
-              className="rounded-sm px-2 py-2 font-body text-base text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className={mobileNavLinkClass(isAboutActive)}
             >
               About
-            </a>
-            <a
-              href="#contact"
-              onClick={closeMobileMenu}
-              className="rounded-sm px-2 py-2 font-body text-base text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              Contact
-            </a>
+            </Link>
+            <Link to="/faq" onClick={closeMobileMenu} className={mobileNavLinkClass(isFaqActive)}>
+              FAQ
+            </Link>
           </div>
         </div>
       ) : null}

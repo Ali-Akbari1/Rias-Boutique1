@@ -1,3 +1,4 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/shared/ui/toaster";
 import { Toaster as Sonner } from "@/shared/ui/sonner";
 import { TooltipProvider } from "@/shared/ui/tooltip";
@@ -16,6 +17,8 @@ import CollectionPage from "./pages/CollectionPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const FaqPage = lazy(() => import("./pages/FaqPage"));
 
 const App = () => {
   const checkoutEnabled = isCheckoutEnabled();
@@ -32,6 +35,22 @@ const App = () => {
               <Route path="/" element={<HomePage />} />
               <Route path="/collection" element={<CollectionPage />} />
               <Route path="/collection/:department" element={<CollectionPage />} />
+              <Route
+                path="/about"
+                element={
+                  <Suspense fallback={null}>
+                    <AboutPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/faq"
+                element={
+                  <Suspense fallback={null}>
+                    <FaqPage />
+                  </Suspense>
+                }
+              />
               <Route path="/products/:productId" element={<ProductDetails />} />
               <Route
                 path="/checkout"
