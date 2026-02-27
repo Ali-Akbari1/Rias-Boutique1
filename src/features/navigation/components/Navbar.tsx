@@ -12,10 +12,11 @@ interface NavbarProps {
 }
 
 const POPULAR_SEARCH_TERMS = [
+  "Women's",
+  "Men's",
   "Bridal",
   "Party wear",
   "Handmade",
-  "Mens",
   "Formal",
 ] as const;
 
@@ -88,6 +89,13 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
       return [...POPULAR_SEARCH_TERMS];
     }
 
+    const departmentMatches = availableProducts
+      .map((product) => product.department)
+      .map((department) => (department === "women" ? "Women's" : department === "men" ? "Men's" : "Jewelry"))
+      .filter((departmentLabel) =>
+        normalizedTextMatchesQuery(normalizeSearchText(departmentLabel), normalizedSearchQuery),
+      );
+
     const productNameMatches = availableProducts
       .map((product) => product.name)
       .filter((name) => normalizedTextMatchesQuery(normalizeSearchText(name), normalizedSearchQuery));
@@ -100,7 +108,9 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
       normalizedTextMatchesQuery(normalizeSearchText(term), normalizedSearchQuery),
     );
 
-    return Array.from(new Set([...productNameMatches, ...categoryMatches, ...popularMatches])).slice(0, 8);
+    return Array.from(
+      new Set([...departmentMatches, ...productNameMatches, ...categoryMatches, ...popularMatches]),
+    ).slice(0, 8);
   }, [availableProducts, normalizedSearchQuery]);
 
   useEffect(() => {
