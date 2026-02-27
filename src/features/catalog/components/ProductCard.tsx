@@ -1,10 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, ShoppingBag } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { type Product } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/money";
+import BagIcon from "@/shared/ui/BagIcon";
 
 interface ProductCardProps {
   product: Product;
@@ -117,7 +118,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               onClick={handleAddToBag}
               className="inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm border border-border px-2.5 py-1.5 text-xs font-body font-semibold text-foreground transition-colors hover:bg-secondary sm:text-sm"
             >
-              <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <BagIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               {isSoldOut ? "Sold Out" : "Add to Bag"}
             </button>
             <Link

@@ -1,8 +1,9 @@
-import { X, Minus, Plus, ShoppingBag } from "lucide-react";
+import { X, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/features/cart/context/CartContext";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/money";
+import BagIcon from "@/shared/ui/BagIcon";
 
 interface CartDrawerProps {
   open: boolean;
@@ -37,7 +38,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center text-muted-foreground">
-            <ShoppingBag className="w-16 h-16 opacity-30" />
+            <BagIcon className="h-16 w-16 opacity-30" />
             <p className="font-body text-lg">Your bag is empty</p>
           </div>
         ) : (

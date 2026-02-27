@@ -1,10 +1,11 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { type Product, products } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
 import { formatCad } from "@/lib/money";
 import { normalizeSearchText, normalizedTextMatchesQuery } from "@/lib/search";
+import BagIcon from "@/shared/ui/BagIcon";
 import { Input } from "@/shared/ui/input";
 
 interface NavbarProps {
@@ -266,7 +267,7 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
             className="relative rounded-sm p-2 text-foreground transition-colors hover:text-gold"
             aria-label="Shopping cart"
           >
-            <ShoppingBag className="h-6 w-6" />
+            <BagIcon className="h-6 w-6" />
             {totalItems > 0 ? (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
                 {totalItems}
