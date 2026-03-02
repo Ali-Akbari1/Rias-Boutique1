@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { type ProductDepartment, PRODUCT_DEPARTMENTS, products } from "@/features/catalog/data/products";
 import ProductCard from "./ProductCard";
-import { normalizeSearchText, normalizedTextMatchesQuery } from "@/lib/search";
+import { normalizeSearchText, scoreWeightedSearchDocument } from "@/lib/search";
 import { normalizeToStandardSizeKey, STANDARD_SIZE_KEYS, standardSizeLabel } from "@/lib/size";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
@@ -83,6 +83,18 @@ const normalizeDepartmentParam = (value: string | null): ProductDepartment | nul
     ? (normalized as ProductDepartment)
     : null;
 };
+
+const scoreProductSearchMatch = (normalizedQuery: string, product: (typeof products)[number]) =>
+  scoreWeightedSearchDocument(
+    {
+      name: product.name,
+      category: product.category,
+      department: product.department,
+      description: product.description,
+      keywords: [product.fabric, product.fitInfo, product.colors.join(" ")].join(" "),
+    },
+    normalizedQuery,
+  );
 
 const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGridProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -265,54 +277,53 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   }, [size, sizeOptions]);
 
   const filteredProducts = useMemo(() => {
-    const filtered = products.filter((product) => {
-      const inDepartment = department === "all" || product.department === department;
-      const inCategory = category === "all" || categoryKey(product.category) === category;
-      const inAvailability = availability === "all" || product.availability === availability;
-      const isOnSale = Boolean(product.salePercent && product.compareAtPrice);
-      const inSaleFilter =
-        saleFilter === "all" ||
-        (saleFilter === "on-sale" && isOnSale) ||
-        (saleFilter === "regular-price" && !isOnSale);
-      const inSize = size === "all" || product.sizes.some((productSize) => sizeKey(productSize) === size);
-      const inPriceRange =
-        (resolvedMinPrice === null || product.price >= resolvedMinPrice) &&
-        (resolvedMaxPrice === null || product.price <= resolvedMaxPrice);
+    const filtered = products
+      .map((product) => ({
+        product,
+        searchScore: debouncedQuery ? scoreProductSearchMatch(debouncedQuery, product) : 0,
+      }))
+      .filter(({ product, searchScore }) => {
+        const inDepartment = department === "all" || product.department === department;
+        const inCategory = category === "all" || categoryKey(product.category) === category;
+        const inAvailability = availability === "all" || product.availability === availability;
+        const isOnSale = Boolean(product.salePercent && product.compareAtPrice);
+        const inSaleFilter =
+          saleFilter === "all" ||
+          (saleFilter === "on-sale" && isOnSale) ||
+          (saleFilter === "regular-price" && !isOnSale);
+        const inSize = size === "all" || product.sizes.some((productSize) => sizeKey(productSize) === size);
+        const inPriceRange =
+          (resolvedMinPrice === null || product.price >= resolvedMinPrice) &&
+          (resolvedMaxPrice === null || product.price <= resolvedMaxPrice);
+        const matchesQuery = !debouncedQuery || searchScore > 0;
 
-      const searchableKeywords = [
-        product.name,
-        product.department,
-        product.category,
-        product.description,
-        product.fabric,
-        product.fitInfo,
-        product.colors.join(" "),
-      ]
-        .join(" ");
+        return (
+          inDepartment && inCategory && inAvailability && inSaleFilter && inSize && inPriceRange && matchesQuery
+        );
+      });
 
-      const matchesQuery =
-        !debouncedQuery ||
-        normalizedTextMatchesQuery(normalizeSearchText(searchableKeywords), debouncedQuery);
+    return filtered
+      .sort((a, b) => {
+        if (debouncedQuery && b.searchScore !== a.searchScore) {
+          return b.searchScore - a.searchScore;
+        }
 
-      return inDepartment && inCategory && inAvailability && inSaleFilter && inSize && inPriceRange && matchesQuery;
-    });
+        if (sortBy === "alphabetical") {
+          return a.product.name.localeCompare(b.product.name, undefined, { sensitivity: "base" });
+        }
+        if (sortBy === "price-low") {
+          return a.product.price - b.product.price;
+        }
+        if (sortBy === "price-high") {
+          return b.product.price - a.product.price;
+        }
+        if (sortBy === "popular") {
+          return b.product.popularity - a.product.popularity;
+        }
 
-    return filtered.sort((a, b) => {
-      if (sortBy === "alphabetical") {
-        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
-      }
-      if (sortBy === "price-low") {
-        return a.price - b.price;
-      }
-      if (sortBy === "price-high") {
-        return b.price - a.price;
-      }
-      if (sortBy === "popular") {
-        return b.popularity - a.popularity;
-      }
-
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+        return new Date(b.product.createdAt).getTime() - new Date(a.product.createdAt).getTime();
+      })
+      .map((entry) => entry.product);
   }, [availability, category, debouncedQuery, department, resolvedMaxPrice, resolvedMinPrice, saleFilter, size, sortBy]);
 
   useEffect(() => {

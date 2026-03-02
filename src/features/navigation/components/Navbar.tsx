@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { type Product, products } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
 import { formatCad } from "@/lib/money";
-import { normalizeSearchText, normalizedTextMatchesQuery } from "@/lib/search";
+import { normalizeSearchText, normalizedTextMatchesQuery, scoreWeightedSearchDocument } from "@/lib/search";
 import BagIcon from "@/shared/ui/BagIcon";
 import { Input } from "@/shared/ui/input";
 
@@ -24,22 +24,22 @@ const POPULAR_SEARCH_TERMS = [
 const SEARCH_RESULTS_LIMIT = 8;
 const TRENDING_PRODUCTS_LIMIT = 6;
 
-const buildProductSearchText = (product: Product) =>
-  normalizeSearchText(
-    [
-      product.name,
-      product.category,
-      product.department,
-      product.description,
-      product.fabric,
-      product.colors.join(" "),
-    ].join(" "),
-  );
-
 const toTimestamp = (value: string) => {
   const parsed = Date.parse(value);
   return Number.isNaN(parsed) ? 0 : parsed;
 };
+
+const scoreProductSearchResult = (product: Product, normalizedQuery: string) =>
+  scoreWeightedSearchDocument(
+    {
+      name: product.name,
+      category: product.category,
+      department: product.department,
+      description: product.description,
+      keywords: [product.fabric, product.colors.join(" ")].join(" "),
+    },
+    normalizedQuery,
+  );
 
 const desktopNavLinkClass = (isActive: boolean) =>
   `transition-colors hover:text-foreground hover:underline underline-offset-4 ${
@@ -76,8 +76,19 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
     }
 
     return availableProducts
-      .filter((product) => normalizedTextMatchesQuery(buildProductSearchText(product), normalizedSearchQuery))
-      .slice(0, SEARCH_RESULTS_LIMIT);
+      .map((product) => ({
+        product,
+        score: scoreProductSearchResult(product, normalizedSearchQuery),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort(
+        (a, b) =>
+          b.score - a.score ||
+          b.product.popularity - a.product.popularity ||
+          toTimestamp(b.product.createdAt) - toTimestamp(a.product.createdAt),
+      )
+      .slice(0, SEARCH_RESULTS_LIMIT)
+      .map((entry) => entry.product);
   }, [availableProducts, normalizedSearchQuery]);
 
   const trendingProducts = useMemo(
