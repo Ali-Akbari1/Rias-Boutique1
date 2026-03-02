@@ -4,8 +4,8 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/full-photo.jpg",
-        "/uploads/img.jpg"
+        "/uploads/full-photo.webp",
+        "/uploads/img.webp"
       ],
       "name": "Burgundy Bridal Dress",
       "slug": "Burgundy-Bridal-Dress",
@@ -23,7 +23,7 @@
       ],
       "id": "Burgundy-Bridal-Dress",
       "createdAt": "2026-02-14",
-      "image": "/uploads/full-photo.jpg",
+      "image": "/uploads/full-photo.webp",
       "deliveryEstimate": "",
       "inventory": "sold_out",
       "description": "3 Piece Burgundy Bridal Dress\n",
@@ -34,10 +34,10 @@
       "fabric": "Banaras",
       "price": 550,
       "galleryImages": [
-        "/uploads/bridalgreencover.jpg",
-        "/uploads/bridalgreen.jpg",
-        "/uploads/bridalgreen2.jpg",
-        "/uploads/bridalgreen3.jpg"
+        "/uploads/bridalgreencover.webp",
+        "/uploads/bridalgreen.webp",
+        "/uploads/bridalgreen2.webp",
+        "/uploads/bridalgreen3.webp"
       ],
       "name": "Green Bridal Dress",
       "slug": "Green-Bridal-Dress",
@@ -50,7 +50,7 @@
       ],
       "id": "Green-Bridal-Dress",
       "createdAt": "2026-02-16",
-      "image": "/uploads/bridalgreencover.jpg",
+      "image": "/uploads/bridalgreencover.webp",
       "inventory": 1,
       "description": "Green bridal banaras dress with handmade cheerma",
       "category": "Bridal",
@@ -60,8 +60,8 @@
       "fabric": "Velvet ",
       "price": 400,
       "galleryImages": [
-        "/uploads/img_0557.jpg",
-        "/uploads/img_0666.jpg"
+        "/uploads/img_0557.webp",
+        "/uploads/img_0666.webp"
       ],
       "name": "Blue Long Cheerma Dozi Dress",
       "slug": "Blue-Cheerma-Dozi",
@@ -77,7 +77,7 @@
       ],
       "id": "Blue-Cheerma-Dozi",
       "createdAt": "2026-02-17",
-      "image": "/uploads/img_0557.jpg",
+      "image": "/uploads/img_0557.webp",
       "inventory": "available",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
       "category": "Party Wear",
@@ -88,9 +88,9 @@
       "fabric": "Velvet ",
       "price": 250,
       "galleryImages": [
-        "/uploads/img_0667.jpg",
-        "/uploads/img_0668.jpg",
-        "/uploads/img_0669.jpg"
+        "/uploads/img_0667.webp",
+        "/uploads/img_0668.webp",
+        "/uploads/img_0669.webp"
       ],
       "name": "Royal Blue 3 Piece Suit ",
       "slug": "Royal-Blue",
@@ -103,7 +103,7 @@
       ],
       "id": "Royal-Blue",
       "createdAt": "2026-02-17",
-      "image": "/uploads/img_0667.jpg",
+      "image": "/uploads/img_0667.webp",
       "inventory": "sold_out",
       "description": "3 piece velvet suit with gulabatoon embroidery\n",
       "category": "Party Wear",
@@ -113,10 +113,10 @@
       "fabric": "Shawl",
       "price": 350,
       "galleryImages": [
-        "/uploads/img_0628.jpg",
-        "/uploads/img_0670.jpg",
-        "/uploads/img_0675.jpg",
-        "/uploads/img_0674.jpg"
+        "/uploads/img_0628.webp",
+        "/uploads/img_0670.webp",
+        "/uploads/img_0675.webp",
+        "/uploads/img_0674.webp"
       ],
       "name": "Handmade Hazaragi Dress",
       "slug": "Handmade-Hazaragi-Dress",
@@ -132,7 +132,7 @@
       ],
       "id": "Handmade-Hazaragi-Dress",
       "createdAt": "2026-02-17",
-      "image": "/uploads/img_0628.jpg",
+      "image": "/uploads/img_0628.webp",
       "inventory": "available",
       "description": "Handmade Hazaragi dress with black embroidery mirror work. \n\n2 pieces: Dress and pants \n",
       "category": "Formal",
@@ -142,10 +142,10 @@
       "fabric": "Velvet",
       "price": 400,
       "galleryImages": [
-        "/uploads/img_8832-2.jpg",
-        "/uploads/whitecheerma.jpg",
-        "/uploads/img_8831-2.jpg",
-        "/uploads/img_8834-2.jpg"
+        "/uploads/img_8832-2.webp",
+        "/uploads/whitecheerma.webp",
+        "/uploads/img_8831-2.webp",
+        "/uploads/img_8834-2.webp"
       ],
       "name": "White Cheerma Dress",
       "slug": "White-cheerma",
@@ -161,7 +161,7 @@
       ],
       "id": "White-cheerma-with-gold",
       "createdAt": "2026-02-17",
-      "image": "/uploads/img_8832-2.jpg",
+      "image": "/uploads/img_8832-2.webp",
       "inventory": "available",
       "description": "White velvet dress with wide-leg pants, featuring handmade cheerma. \n",
       "category": "Party Wear",
@@ -171,9 +171,9 @@
       "fabric": "Velvet",
       "price": 380,
       "galleryImages": [
-        "/uploads/img_8937.jpg",
-        "/uploads/8adc8535-3f0b-45b6-bebb-95e59dad9d57.jpg",
-        "/uploads/1b047b84-020c-4504-85a1-d6f348628fd1.jpg"
+        "/uploads/img_8937.webp",
+        "/uploads/8adc8535-3f0b-45b6-bebb-95e59dad9d57.webp",
+        "/uploads/1b047b84-020c-4504-85a1-d6f348628fd1.webp"
       ],
       "name": "Black Velvet Gulabatoon Dress",
       "slug": "Black-Gulabatoon-dress",
@@ -189,7 +189,7 @@
       ],
       "id": "Black-Gulabatoon-dress",
       "createdAt": "2026-02-17",
-      "image": "/uploads/img_8937.jpg",
+      "image": "/uploads/img_8937.webp",
       "inventory": 1,
       "description": "Black velvet dress with wide-leg pants, featuring gulabatoon detailing.",
       "category": "Party Wear",
@@ -199,9 +199,9 @@
       "fabric": "Velvet",
       "price": 400,
       "galleryImages": [
-        "/uploads/img_8861.jpg",
-        "/uploads/img_8859.jpg",
-        "/uploads/img_8857.jpg"
+        "/uploads/img_8861.webp",
+        "/uploads/img_8859.webp",
+        "/uploads/img_8857.webp"
       ],
       "name": "White Velvet Cheerma Dress",
       "slug": "White-cheerma-white",
@@ -217,7 +217,7 @@
       ],
       "id": "White-cheerma-white",
       "createdAt": "2026-02-17",
-      "image": "/uploads/img_8861.jpg",
+      "image": "/uploads/img_8861.webp",
       "description": "White velvet dress with wide-leg pants, featuring handmade silver cheerma.",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in\nSleeves: 22in\nShoulders: 16in\nLength of Pants: 39in \n\n3 pieces: dress, pants, and scarf "
@@ -226,9 +226,9 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/12665fda-357f-442c-bea4-4b06977b5b1b.jpg",
-        "/uploads/img_0643.jpg",
-        "/uploads/img_0712.jpg"
+        "/uploads/12665fda-357f-442c-bea4-4b06977b5b1b.webp",
+        "/uploads/img_0643.webp",
+        "/uploads/img_0712.webp"
       ],
       "name": "Handmade Cheerma Dozi Dress (Pre-Order Only)",
       "slug": "Cheerma-dozi-3-piece",
@@ -248,7 +248,7 @@
       "popularity": 100,
       "id": "Cheerma-dozi-3-piece",
       "createdAt": "2026-02-18",
-      "image": "/uploads/12665fda-357f-442c-bea4-4b06977b5b1b.jpg",
+      "image": "/uploads/12665fda-357f-442c-bea4-4b06977b5b1b.webp",
       "deliveryEstimate": "Custom Order: Minimum 4-6 weeks needed outside of shipping time. Please contact us for more details.",
       "inventory": "available",
       "description": "Handmade cheerma dozi dress with wide legged pants.",
@@ -258,9 +258,9 @@
       "fabric": "Banaras ",
       "price": 380,
       "galleryImages": [
-        "/uploads/img_8963.jpg",
-        "/uploads/img_8967.jpg",
-        "/uploads/img_8966.jpg"
+        "/uploads/img_8963.webp",
+        "/uploads/img_8967.webp",
+        "/uploads/img_8966.webp"
       ],
       "name": "Pink Banaras Dress",
       "slug": "pink-banaras-dress",
@@ -275,7 +275,7 @@
       ],
       "id": "pink-banaras-dress",
       "createdAt": "2026-02-18",
-      "image": "/uploads/img_8963.jpg",
+      "image": "/uploads/img_8963.webp",
       "inventory": 1,
       "description": "3 piece pink banaras dress with handmade cheerma.",
       "category": "Party Wear",
@@ -285,8 +285,8 @@
       "fabric": "Banaras",
       "price": 650,
       "galleryImages": [
-        "/uploads/img_0724.jpg",
-        "/uploads/img_0723.jpg"
+        "/uploads/img_0724.webp",
+        "/uploads/img_0723.webp"
       ],
       "name": "Bridal Green Banaras Dress (Pre-Order Only)",
       "slug": "Bridal-green-banaras",
@@ -305,7 +305,7 @@
       ],
       "id": "Bridal-green-banaras",
       "createdAt": "2026-02-19",
-      "image": "/uploads/img_0724.jpg",
+      "image": "/uploads/img_0724.webp",
       "inventory": "sold_out",
       "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
       "category": "Bridal",
@@ -315,10 +315,10 @@
       "fabric": "Banaras",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_0751.jpg",
-        "/uploads/img_0750.jpg",
-        "/uploads/img_0730.jpg",
-        "/uploads/img_0731.jpg"
+        "/uploads/img_0751.webp",
+        "/uploads/img_0750.webp",
+        "/uploads/img_0730.webp",
+        "/uploads/img_0731.webp"
       ],
       "name": "Purple Banaras Dress ",
       "slug": "Purple-Banaras-Dress ",
@@ -334,7 +334,7 @@
       ],
       "id": "Purple-Banaras-Dress ",
       "createdAt": "2026-02-19",
-      "image": "/uploads/img_0751.jpg",
+      "image": "/uploads/img_0751.webp",
       "inventory": "sold_out",
       "description": "Purple banaras dress with kochi pants and beautiful beaded scarf",
       "category": "Party Wear",
@@ -344,10 +344,10 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_0738.jpg",
-        "/uploads/img_0735.jpg",
-        "/uploads/img_0736.jpg",
-        "/uploads/img_0740.jpg"
+        "/uploads/img_0738.webp",
+        "/uploads/img_0735.webp",
+        "/uploads/img_0736.webp",
+        "/uploads/img_0740.webp"
       ],
       "name": "Red Bridal Velvet Dress",
       "slug": "red-gharara-bridal-dress",
@@ -359,7 +359,7 @@
       ],
       "department": "women",
       "id": "red-gharara-bridal-dress",
-      "image": "/uploads/img_0738.jpg",
+      "image": "/uploads/img_0738.webp",
       "inventory": 1,
       "description": "Bridal red velvet dress with wide-legged pants and beautiful beaded scarf. ",
       "category": "Bridal",
@@ -368,9 +368,9 @@
     {
       "price": 450,
       "galleryImages": [
-        "/uploads/img_0761.jpg",
-        "/uploads/img_0764.jpg",
-        "/uploads/img_0765.jpg"
+        "/uploads/img_0761.webp",
+        "/uploads/img_0764.webp",
+        "/uploads/img_0765.webp"
       ],
       "name": "Burgundy Banaras Dress",
       "slug": "Burgundy-Banaras-Dress",
@@ -386,7 +386,7 @@
       ],
       "id": "Burgundy-Banaras-Dress",
       "createdAt": "2026-02-22",
-      "image": "/uploads/img_0761.jpg",
+      "image": "/uploads/img_0761.webp",
       "inventory": 1,
       "description": "Burgundy banaras dress with kochi pants and heavy embroidered scarf. ",
       "category": "Party Wear",
@@ -396,7 +396,7 @@
       "fabric": "Velvet",
       "price": 200,
       "galleryImages": [
-        "/uploads/aa8031e8-9edd-46fc-ba4b-039a59c3ff6b.jpg"
+        "/uploads/aa8031e8-9edd-46fc-ba4b-039a59c3ff6b.webp"
       ],
       "name": "Dark Blue Chapan ",
       "slug": "Chapan-blue-gulabatoon",
@@ -411,7 +411,7 @@
       ],
       "id": "Chapan-blue-gulabatoon",
       "createdAt": "2026-02-23",
-      "image": "/uploads/aa8031e8-9edd-46fc-ba4b-039a59c3ff6b.jpg",
+      "image": "/uploads/aa8031e8-9edd-46fc-ba4b-039a59c3ff6b.webp",
       "inventory": 1,
       "description": "Dark blue chapan with gulabatoon detailing. ",
       "category": "Casual",
@@ -421,7 +421,7 @@
       "fabric": "Velvet with handmade cheerma detailing. ",
       "price": 650,
       "galleryImages": [
-        "/uploads/img_0782.jpg"
+        "/uploads/img_0782.webp"
       ],
       "name": "Burgundy Bridal Dress with Mens Vest",
       "slug": "Burgundy-bridal-dress",
@@ -433,7 +433,7 @@
       ],
       "department": "women",
       "id": "Burgundy-bridal-dress",
-      "image": "/uploads/img_0782.jpg",
+      "image": "/uploads/img_0782.webp",
       "inventory": "sold_out",
       "description": "Bridal burgundy dress with handmade cheerma and matching men's vest. ",
       "category": "Bridal",
@@ -442,9 +442,9 @@
     {
       "price": 110,
       "galleryImages": [
-        "/uploads/img_0786.jpg",
-        "/uploads/img_0787.jpg",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+        "/uploads/img_0786.webp",
+        "/uploads/img_0787.webp",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
       ],
       "name": "Black and Gold Men's Parantoban",
       "slug": "men-black-gold",
@@ -463,7 +463,7 @@
       ],
       "id": "men-black-gold",
       "createdAt": "2026-02-24",
-      "image": "/uploads/img_0786.jpg",
+      "image": "/uploads/img_0786.webp",
       "inventory": "available",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
       "category": "Machine Made",
@@ -472,10 +472,10 @@
     {
       "price": 225,
       "galleryImages": [
-        "/uploads/img_0790.jpg",
-        "/uploads/img_0795.jpg",
-        "/uploads/img_0789.jpg",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+        "/uploads/img_0790.webp",
+        "/uploads/img_0795.webp",
+        "/uploads/img_0789.webp",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
       ],
       "name": "Handmade Mens Parantoban ",
       "slug": "Handmade-mens-parantoban",
@@ -492,7 +492,7 @@
       ],
       "id": "Handmade-mens-parantoban",
       "createdAt": "2026-02-24",
-      "image": "/uploads/img_0790.jpg",
+      "image": "/uploads/img_0790.webp",
       "inventory": "available",
       "description": "Handmade black mens parantoban with silver embroidery. ",
       "category": "Handmade",
@@ -501,9 +501,9 @@
     {
       "price": 110,
       "galleryImages": [
-        "/uploads/img_0797.jpg",
-        "/uploads/img_0802.jpg",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+        "/uploads/img_0797.webp",
+        "/uploads/img_0802.webp",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
       ],
       "name": "Men's Parantoban Off-White ",
       "slug": "mens-offwhite-with-gold",
@@ -521,7 +521,7 @@
       ],
       "id": "mens-offwhite-with-gold",
       "createdAt": "2026-02-25",
-      "image": "/uploads/img_0797.jpg",
+      "image": "/uploads/img_0797.webp",
       "inventory": "available",
       "description": "Off-white machine made men's parantoban with gold embroidery. ",
       "category": "Machine Made",
@@ -530,9 +530,9 @@
     {
       "price": 110,
       "galleryImages": [
-        "/uploads/img_0812.jpg",
-        "/uploads/img_0811.jpg",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+        "/uploads/img_0812.webp",
+        "/uploads/img_0811.webp",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
       ],
       "name": "Men's Grey Parantoban",
       "slug": "mens-grey-parantoban",
@@ -548,7 +548,7 @@
       ],
       "id": "mens-grey-parantoban",
       "createdAt": "2026-02-25",
-      "image": "/uploads/img_0812.jpg",
+      "image": "/uploads/img_0812.webp",
       "inventory": "sold_out",
       "description": "Machine made men's grey parantoban with silver and grey embroidery. ",
       "category": "Machine Made",
@@ -558,9 +558,9 @@
       "fabric": "*Mirror work is handmade ",
       "price": 225,
       "galleryImages": [
-        "/uploads/img_0815.jpg",
+        "/uploads/img_0815.webp",
         "/uploads/img_0821.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
       ],
       "name": "Men's White Handmade Parantoban",
       "slug": "mens-white-handmade-parantoban",
@@ -578,7 +578,7 @@
       ],
       "id": "mens-white-handmade-parantoban",
       "createdAt": "2026-02-25",
-      "image": "/uploads/img_0815.jpg",
+      "image": "/uploads/img_0815.webp",
       "inventory": "available",
       "description": "Handmade men's white parantoban with silver embroidery and mirror work. ",
       "category": "Handmade",

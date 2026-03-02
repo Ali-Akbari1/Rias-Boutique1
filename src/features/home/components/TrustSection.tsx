@@ -10,18 +10,28 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 
+const isGoogleReviewsApiEnabled = () =>
+  (import.meta.env.VITE_ENABLE_GOOGLE_REVIEWS_API as string | undefined)?.trim().toLowerCase() === "true";
+
 const TrustSection = () => {
   const fallbackReviews = useMemo(() => featuredStoreReviews, []);
+  const googleReviewsApiEnabled = isGoogleReviewsApiEnabled();
   const [reviews, setReviews] = useState<StoreReview[]>(fallbackReviews);
   const [reviewStartIndex, setReviewStartIndex] = useState(0);
   const [googleMapsUri, setGoogleMapsUri] = useState<string>("");
   const [placeName, setPlaceName] = useState<string>("Ria's Boutique");
   const [overallRating, setOverallRating] = useState<number | null>(null);
   const [totalRatings, setTotalRatings] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(googleReviewsApiEnabled);
   const defaultGoogleUrl = getGoogleReviewsUrl();
 
   useEffect(() => {
+    if (!googleReviewsApiEnabled) {
+      setReviews(fallbackReviews);
+      setIsLoading(false);
+      return;
+    }
+
     let isMounted = true;
 
     const fetchGoogleReviews = async () => {
@@ -67,7 +77,7 @@ const TrustSection = () => {
     return () => {
       isMounted = false;
     };
-  }, [fallbackReviews]);
+  }, [fallbackReviews, googleReviewsApiEnabled]);
 
   useEffect(() => {
     if (reviews.length <= 1) {
@@ -160,7 +170,11 @@ const TrustSection = () => {
             </a>
           </Button>
           <p className="text-xs text-muted-foreground">
-            {isLoading ? "Loading live Google reviews..." : "Live Google reviews loaded when available."}
+            {googleReviewsApiEnabled
+              ? isLoading
+                ? "Loading live Google reviews..."
+                : "Live Google reviews loaded when available."
+              : "Showing curated customer reviews."}
           </p>
         </div>
       </div>
