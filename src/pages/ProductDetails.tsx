@@ -8,6 +8,7 @@ import Navbar from "@/features/navigation/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/money";
+import { STANDARD_SIZE_KEYS, standardSizeLabel, type StandardSizeKey, normalizeToStandardSizeKey } from "@/lib/size";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
@@ -54,7 +55,7 @@ const ProductDetails = () => {
       return;
     }
 
-    const chosenSize = selectedSize || (sizeOptions.length === 1 ? sizeOptions[0] || "" : "");
+    const chosenSize = selectedSize || singleAvailableSizeLabel;
     const chosenColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
 
     if (!chosenSize || !chosenColor) {
@@ -81,10 +82,24 @@ const ProductDetails = () => {
     [product?.galleryImages, product?.image],
   );
 
-  const sizeOptions = useMemo(
-    () => (Array.isArray(product?.sizes) && product.sizes.length > 0 ? product.sizes : ["One Size"]),
-    [product?.sizes],
-  );
+  const availableSizeKeys = useMemo<StandardSizeKey[]>(() => {
+    const keys = new Set<StandardSizeKey>();
+    if (!Array.isArray(product?.sizes)) {
+      return [];
+    }
+
+    for (const size of product.sizes) {
+      const normalizedKey = normalizeToStandardSizeKey(size);
+      if (normalizedKey) {
+        keys.add(normalizedKey);
+      }
+    }
+
+    return STANDARD_SIZE_KEYS.filter((sizeKey) => keys.has(sizeKey));
+  }, [product?.sizes]);
+
+  const singleAvailableSizeLabel =
+    availableSizeKeys.length === 1 ? standardSizeLabel(availableSizeKeys[0]) : "";
 
   const colorOptions = useMemo(
     () => (Array.isArray(product?.colors) && product.colors.length > 0 ? product.colors : ["Default"]),
@@ -110,11 +125,11 @@ const ProductDetails = () => {
       return;
     }
 
-    if (sizeOptions.length === 1 && colorOptions.length === 1) {
-      setSelectedSize((current) => current || sizeOptions[0] || "");
+    if (availableSizeKeys.length === 1 && colorOptions.length === 1) {
+      setSelectedSize((current) => current || singleAvailableSizeLabel);
       setSelectedColor((current) => current || colorOptions[0] || "");
     }
-  }, [product, sizeOptions, colorOptions]);
+  }, [product, availableSizeKeys.length, singleAvailableSizeLabel, colorOptions]);
 
   if (!product) {
     return <Navigate to="/" replace />;
@@ -122,7 +137,7 @@ const ProductDetails = () => {
 
   const isSoldOut = product.availability === "sold_out";
   const isOnSale = !isSoldOut && Boolean(product.salePercent && product.compareAtPrice);
-  const resolvedSize = selectedSize || (sizeOptions.length === 1 ? sizeOptions[0] || "" : "");
+  const resolvedSize = selectedSize || singleAvailableSizeLabel;
   const resolvedColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
   const canAddToCart = !isSoldOut && Boolean(resolvedSize && resolvedColor);
   const primaryImage = selectedImage || galleryImages[0] || product.image || "/placeholder.svg";
@@ -211,20 +226,33 @@ const ProductDetails = () => {
               <div>
                 <p className="mb-2 text-sm font-semibold text-foreground">Choose size</p>
                 <div className="flex flex-wrap gap-2">
-                  {sizeOptions.map((size) => (
+                  {STANDARD_SIZE_KEYS.map((sizeKey) => {
+                    const label = standardSizeLabel(sizeKey);
+                    const isAvailable = availableSizeKeys.includes(sizeKey);
+                    const isSelected = isAvailable && selectedSize === label;
+
+                    return (
                     <button
-                      key={size}
+                      key={sizeKey}
                       type="button"
-                      onClick={() => setSelectedSize(size)}
-                      className={`min-w-12 rounded-sm border px-3 py-2 text-sm font-medium transition ${
-                        selectedSize === size
+                      onClick={() => {
+                        if (isAvailable) {
+                          setSelectedSize(label);
+                        }
+                      }}
+                      disabled={!isAvailable}
+                      className={`relative min-w-12 rounded-sm border px-3 py-2 text-sm font-medium transition ${
+                        isSelected
                           ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-background text-foreground hover:bg-secondary"
+                          : isAvailable
+                            ? "border-border bg-background text-foreground hover:bg-secondary"
+                            : "cursor-not-allowed border-border/60 bg-muted/30 text-muted-foreground/80 line-through decoration-muted-foreground/80"
                       }`}
                     >
-                      {size}
+                      {label}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 

@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { type ProductDepartment, PRODUCT_DEPARTMENTS, products } from "@/features/catalog/data/products";
 import ProductCard from "./ProductCard";
 import { normalizeSearchText, normalizedTextMatchesQuery } from "@/lib/search";
+import { normalizeToStandardSizeKey, STANDARD_SIZE_KEYS, standardSizeLabel } from "@/lib/size";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
@@ -37,7 +38,8 @@ const ALL_DEFAULT_CATEGORIES = [
 ];
 
 const categoryKey = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
-const sizeKey = (value: string) => value.trim().toLowerCase().replace(/\s+/g, " ");
+const sizeKey = (value: string) =>
+  normalizeToStandardSizeKey(value) ?? value.trim().toLowerCase().replace(/\s+/g, " ");
 
 const toFacetOption = (label: string): FacetOption => ({
   value: categoryKey(label),
@@ -58,7 +60,6 @@ const parsePriceInput = (value: string): number | null => {
   return parsed;
 };
 
-const normalizeSizeToken = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
 const toPositiveInt = (value: string | null, fallback: number) => {
   if (!value) {
     return fallback;
@@ -81,59 +82,6 @@ const normalizeDepartmentParam = (value: string | null): ProductDepartment | nul
   return PRODUCT_DEPARTMENTS.includes(normalized as ProductDepartment)
     ? (normalized as ProductDepartment)
     : null;
-};
-
-const getSizeRank = (value: string) => {
-  const normalized = value.trim().toLowerCase();
-  const firstToken = normalizeSizeToken(normalized.split(/[\s(/-]+/)[0] || "");
-
-  const exactRankMap: Record<string, number> = {
-    xxs: 0,
-    xs: 1,
-    xsmall: 1,
-    s: 2,
-    sm: 2,
-    small: 2,
-    m: 3,
-    md: 3,
-    medium: 3,
-    l: 4,
-    lg: 4,
-    large: 4,
-    xl: 5,
-    xlarge: 5,
-    xxl: 6,
-    xxlrg: 6,
-    xxxl: 7,
-  };
-
-  if (exactRankMap[firstToken] !== undefined) {
-    return exactRankMap[firstToken];
-  }
-
-  if (/\bxxs\b|extra\s*small/.test(normalized)) {
-    return 1;
-  }
-  if (/\bsm\b|\bsmall\b|\bs\b/.test(normalized)) {
-    return 2;
-  }
-  if (/\bmd\b|\bmedium\b|\bm\b/.test(normalized)) {
-    return 3;
-  }
-  if (/\blg\b|\blarge\b|\bl\b/.test(normalized)) {
-    return 4;
-  }
-  if (/\bxl\b|extra\s*large/.test(normalized)) {
-    return 5;
-  }
-  if (/\bxxl\b/.test(normalized)) {
-    return 6;
-  }
-  if (/\bxxxl\b/.test(normalized)) {
-    return 7;
-  }
-
-  return 99;
 };
 
 const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGridProps) => {
@@ -222,6 +170,11 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
     return products.filter((product) => product.department === department);
   }, [department]);
 
+  const purchasableDepartmentProducts = useMemo(
+    () => departmentScopedProducts.filter((product) => product.availability === "available"),
+    [departmentScopedProducts],
+  );
+
   const categoryOptions = useMemo(() => {
     const seededLabels =
       department === "all"
@@ -271,30 +224,25 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   const sizeOptions = useMemo(() => {
     const optionMap = new Map<string, string>();
 
-    for (const product of departmentScopedProducts) {
+    for (const product of purchasableDepartmentProducts) {
       if (category !== "all" && categoryKey(product.category) !== category) {
         continue;
       }
 
       for (const productSize of product.sizes) {
-        const normalizedSize = sizeKey(productSize);
+        const normalizedSize = normalizeToStandardSizeKey(productSize);
         if (!normalizedSize || optionMap.has(normalizedSize)) {
           continue;
         }
-        optionMap.set(normalizedSize, productSize);
+        optionMap.set(normalizedSize, standardSizeLabel(normalizedSize));
       }
     }
 
-    return Array.from(optionMap.entries())
-      .map(([value, label]) => ({ value, label }))
-      .sort((a, b) => {
-        const rankDiff = getSizeRank(a.label) - getSizeRank(b.label);
-        if (rankDiff !== 0) {
-          return rankDiff;
-        }
-        return a.label.localeCompare(b.label, undefined, { numeric: true, sensitivity: "base" });
-      });
-  }, [category, departmentScopedProducts]);
+    return STANDARD_SIZE_KEYS.filter((sizeOptionKey) => optionMap.has(sizeOptionKey)).map((sizeOptionKey) => ({
+      value: sizeOptionKey,
+      label: standardSizeLabel(sizeOptionKey),
+    }));
+  }, [category, purchasableDepartmentProducts]);
 
   useEffect(() => {
     // Keep initial size from URL on first render.

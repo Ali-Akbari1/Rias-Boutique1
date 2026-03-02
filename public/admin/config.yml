@@ -81,7 +81,16 @@ collections:
                 name: "sizes"
                 widget: "list"
                 required: false
-                field: { label: "Size", name: "size", widget: "string" }
+                field:
+                  label: "Size"
+                  name: "size"
+                  widget: "select"
+                  options:
+                    - "Small"
+                    - "Medium"
+                    - "Large"
+                    - "X-Large"
+                    - "XX-Large"
               - label: "Available Colors"
                 name: "colors"
                 widget: "list"
