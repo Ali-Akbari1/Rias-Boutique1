@@ -5,6 +5,22 @@
       "destination": "/RAb.png"
     },
     {
+      "source": "/collection",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/collection/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/faq",
+      "destination": "/index.html"
+    },
+    {
       "source": "/checkout",
       "destination": "/index.html"
     },
