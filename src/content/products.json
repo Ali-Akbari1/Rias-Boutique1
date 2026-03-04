@@ -505,7 +505,7 @@
         "/uploads/img_0802.webp",
         "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
       ],
-      "name": "Men's Parantoban Off-White ",
+      "name": "Men's Off-White Parantoban ",
       "slug": "mens-offwhite-with-gold",
       "colors": [
         "Off-white "
@@ -583,6 +583,31 @@
       "description": "Handmade men's white parantoban with silver embroidery and mirror work. ",
       "category": "Handmade",
       "fitInfo": "Please check our size chart for all specific measurements.\n\nPlease measure before ordering. \n\n"
+    },
+    {
+      "price": 110,
+      "galleryImages": [
+        "/uploads/img_0837.heic",
+        "/uploads/img_0832.heic"
+      ],
+      "name": "Men's Off-White Parantoban ",
+      "slug": "mens-offwhite-with-white",
+      "colors": [
+        "Off-White"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "mens-offwhite-with-white",
+      "createdAt": "2026-03-04",
+      "image": "/uploads/img_0837.heic",
+      "inventory": "available",
+      "description": "Men's off-white parantoban with white embroidery. ",
+      "category": "Machine Made"
     }
   ]
 }
