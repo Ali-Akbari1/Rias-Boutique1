@@ -609,6 +609,30 @@
       "inventory": "available",
       "description": "Men's off-white parantoban with white embroidery. ",
       "category": "Machine Made"
+    },
+    {
+      "fabric": "Hazaragi (Du-Domina) ",
+      "price": 179,
+      "galleryImages": [
+        "/uploads/chatgpt-image-mar-5-2026-03_09_44-pm.png"
+      ],
+      "name": "Hazaragi Dress Sage Green",
+      "slug": "hazaragi-dress-sage-green",
+      "sizes": [
+        "Small",
+        "Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only "
+      ],
+      "id": "hazaragi-dress-sage-green",
+      "createdAt": "2026-03-05",
+      "image": "/uploads/chatgpt-image-mar-5-2026-03_09_44-pm.png",
+      "inventory": "available",
+      "description": "3 pieces Hazaragi Dress in Sage Green",
+      "category": "Party Wear",
+      "fitInfo": "Small \n- Bust: 40in \nLarge\n- Bust: 42in "
     }
   ]
 }
