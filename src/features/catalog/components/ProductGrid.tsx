@@ -129,6 +129,7 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   const didMountPageResetEffectRef = useRef(false);
   const didMountDepartmentResetEffectRef = useRef(false);
   const didMountSizeResetEffectRef = useRef(false);
+  const isDepartmentUserDrivenRef = useRef(false);
 
   const departments = useMemo(() => ["all", ...PRODUCT_DEPARTMENTS] as DepartmentOption[], []);
   const minPrice = useMemo(() => parsePriceInput(minPriceInput), [minPriceInput]);
@@ -147,10 +148,12 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   }, [maxPrice, minPrice]);
 
   const setDepartmentFromUser = (value: DepartmentOption) => {
+    isDepartmentUserDrivenRef.current = true;
     setDepartment(value);
   };
 
   useEffect(() => {
+    isDepartmentUserDrivenRef.current = false;
     setDepartment(initialDepartment);
   }, [initialDepartment]);
 
@@ -342,7 +345,12 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   useEffect(() => {
     const nextPath = buildCollectionPath(department);
     const currentPath = normalizeCollectionPath(location.pathname);
+    if (!isDepartmentUserDrivenRef.current && currentPath !== nextPath) {
+      return;
+    }
+
     if (currentPath === nextPath) {
+      isDepartmentUserDrivenRef.current = false;
       return;
     }
 

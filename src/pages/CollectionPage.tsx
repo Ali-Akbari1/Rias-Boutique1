@@ -23,13 +23,13 @@ const CollectionPage = () => {
   const [searchParams] = useSearchParams();
 
   const initialDepartment = useMemo<"all" | ProductDepartment>(() => {
-    const queryDepartment = normalizeDepartment(searchParams.get("department"));
-    if (queryDepartment) {
-      return queryDepartment;
+    const routeDepartment = normalizeDepartment(department);
+    if (routeDepartment) {
+      return routeDepartment;
     }
 
-    const routeDepartment = normalizeDepartment(department);
-    return routeDepartment ?? "all";
+    const queryDepartment = normalizeDepartment(searchParams.get("department"));
+    return queryDepartment ?? "all";
   }, [department, searchParams]);
 
   const initialSearch = useMemo(() => {

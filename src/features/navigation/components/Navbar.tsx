@@ -136,16 +136,16 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
   }, [availableProducts, normalizedSearchQuery]);
 
   const activeDepartment = useMemo<"women" | "men" | null>(() => {
-    const queryDepartment = new URLSearchParams(search).get("department")?.trim().toLowerCase();
-    if (queryDepartment === "women" || queryDepartment === "men") {
-      return queryDepartment;
-    }
-
     if (pathname.startsWith("/collection/")) {
       const routeDepartment = pathname.split("/")[2]?.trim().toLowerCase();
       if (routeDepartment === "women" || routeDepartment === "men") {
         return routeDepartment;
       }
+    }
+
+    const queryDepartment = new URLSearchParams(search).get("department")?.trim().toLowerCase();
+    if (queryDepartment === "women" || queryDepartment === "men") {
+      return queryDepartment;
     }
 
     return null;
