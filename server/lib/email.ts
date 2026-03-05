@@ -241,7 +241,7 @@ export const sendLaunchDiscountEmail = async ({
   const text = [
     `Hi ${greetingName},`,
     "",
-    `Welcome to ${brandName}. In honour of our website launch, enjoy 10% off any purchase with code ${code}.`,
+    `In honour of our website launch, enjoy 10% off any purchase with code ${code}.`,
     `Offer valid until ${expiresAtDisplay}.`,
     "",
     `Start shopping: ${websiteUrl.replace(/\/+$/, "")}/collection`,
@@ -258,7 +258,7 @@ export const sendLaunchDiscountEmail = async ({
               <tr>
                 <td style="padding:24px 24px 12px 24px;border-bottom:1px solid #ececec;background:#ffffff;text-align:center;">
                   <img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(brandName)}" style="height:42px;display:block;margin:0 auto 12px;" />
-                  <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">Welcome to ${escapeHtml(
+                  <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">${escapeHtml(
                     brandName,
                   )}</p>
                   <h1 style="margin:10px 0 0 0;font-size:34px;line-height:1.15;color:#111827;">Enjoy 10% Off</h1>

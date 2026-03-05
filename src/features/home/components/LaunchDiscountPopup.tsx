@@ -141,9 +141,11 @@ const LaunchDiscountPopup = () => {
             className="mx-auto h-11 w-auto object-contain"
             loading="eager"
           />
-          <p className="mt-3 text-xs uppercase tracking-[0.28em] text-muted-foreground">
-            Welcome to Ria&apos;s Boutique
-          </p>
+          {!isSuccess ? (
+            <p className="mt-3 text-xs uppercase tracking-[0.28em] text-muted-foreground">
+              Welcome to Ria&apos;s Boutique
+            </p>
+          ) : null}
           <DialogTitle className="mt-4 text-center font-display font-bold text-foreground">
             {isSuccess ? (
               <span className="text-5xl leading-none sm:text-6xl">Thank You</span>
