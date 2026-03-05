@@ -58,7 +58,7 @@ create table if not exists discount_subscribers (
   email text not null unique,
   full_name text not null default '',
   source text not null default 'launch-popup',
-  campaign text not null default 'launch10_2026_03_17',
+  campaign text not null default 'launch10_2026_03_20',
   code text not null default 'LAUNCH10',
   metadata_json jsonb not null default '{}'::jsonb,
   subscribed_at timestamptz not null default now(),

@@ -243,13 +243,13 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
 
         <div className="justify-self-center hidden items-center gap-8 font-body text-lg md:flex">
           <Link
-            to="/collection?department=women"
+            to="/collection/women"
             className={desktopNavLinkClass(isWomensActive)}
           >
             Women's
           </Link>
           <Link
-            to="/collection?department=men"
+            to="/collection/men"
             className={desktopNavLinkClass(isMensActive)}
           >
             Men's
@@ -306,14 +306,14 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         <div id="mobile-navbar-menu" className="border-t border-border bg-background/95 backdrop-blur md:hidden">
           <div className="container mx-auto flex flex-col gap-1 px-4 py-3 sm:px-6">
             <Link
-              to="/collection?department=women"
+              to="/collection/women"
               onClick={closeMobileMenu}
               className={mobileNavLinkClass(isWomensActive)}
             >
               Women's
             </Link>
             <Link
-              to="/collection?department=men"
+              to="/collection/men"
               onClick={closeMobileMenu}
               className={mobileNavLinkClass(isMensActive)}
             >

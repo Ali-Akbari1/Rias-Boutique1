@@ -14,9 +14,9 @@
     />
     <meta name="author" content="Ria's Boutique" />
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
-    <link rel="canonical" href="https://www.riasboutique.com/" />
-    <link rel="alternate" hreflang="en-CA" href="https://www.riasboutique.com/" />
-    <link rel="alternate" hreflang="x-default" href="https://www.riasboutique.com/" />
+    <link id="rb-canonical" rel="canonical" href="https://www.riasboutique.com/" />
+    <link id="rb-alternate-en-ca" rel="alternate" hreflang="en-CA" href="https://www.riasboutique.com/" />
+    <link id="rb-alternate-x-default" rel="alternate" hreflang="x-default" href="https://www.riasboutique.com/" />
     <link rel="icon" type="image/png" sizes="256x256" href="/RAb.png?v=rb2" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/RAb.png?v=rb2" />
@@ -37,10 +37,47 @@
       content="Shop handcrafted Afghan dresses, bridal wear, and traditional Afghan clothing at Ria's Boutique in Calgary."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.riasboutique.com/" />
+    <meta id="rb-og-url" property="og:url" content="https://www.riasboutique.com/" />
     <meta property="og:locale" content="en_CA" />
     <meta property="og:image" content="https://www.riasboutique.com/RAb.png" />
     <meta property="og:image:alt" content="Ria's Boutique Afghan clothing collection in Calgary" />
+
+    <script>
+      (() => {
+        const siteUrl = "https://www.riasboutique.com";
+        const collectionDepartments = new Set(["women", "men", "jewelry"]);
+        const searchParams = new URLSearchParams(window.location.search);
+        const queryDepartment = (searchParams.get("department") || "").trim().toLowerCase();
+        const pathname = window.location.pathname || "/";
+        const normalizedPath =
+          pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+
+        let canonicalPath = normalizedPath || "/";
+        if (canonicalPath === "/collection" && collectionDepartments.has(queryDepartment)) {
+          canonicalPath = `/collection/${queryDepartment}`;
+        } else if (canonicalPath.startsWith("/collection/")) {
+          const routeDepartment = canonicalPath.split("/")[2]?.trim().toLowerCase() || "";
+          if (!collectionDepartments.has(routeDepartment)) {
+            canonicalPath = "/collection";
+          } else {
+            canonicalPath = `/collection/${routeDepartment}`;
+          }
+        }
+
+        const canonicalUrl =
+          canonicalPath === "/" ? `${siteUrl}/` : `${siteUrl}${canonicalPath}`;
+
+        const canonicalLink = document.getElementById("rb-canonical");
+        const alternateEnCaLink = document.getElementById("rb-alternate-en-ca");
+        const alternateDefaultLink = document.getElementById("rb-alternate-x-default");
+        const ogUrlTag = document.getElementById("rb-og-url");
+
+        if (canonicalLink) canonicalLink.setAttribute("href", canonicalUrl);
+        if (alternateEnCaLink) alternateEnCaLink.setAttribute("href", canonicalUrl);
+        if (alternateDefaultLink) alternateDefaultLink.setAttribute("href", canonicalUrl);
+        if (ogUrlTag) ogUrlTag.setAttribute("content", canonicalUrl);
+      })();
+    </script>
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Ria's Boutique | Afghan Clothing & Dresses" />
@@ -90,17 +127,17 @@
             {
               "@type": "OfferCatalog",
               "name": "Womens Collection",
-              "url": "https://www.riasboutique.com/collection?department=women"
+              "url": "https://www.riasboutique.com/collection/women"
             },
             {
               "@type": "OfferCatalog",
               "name": "Mens Collection",
-              "url": "https://www.riasboutique.com/collection?department=men"
+              "url": "https://www.riasboutique.com/collection/men"
             },
             {
               "@type": "OfferCatalog",
               "name": "Accessories Collection",
-              "url": "https://www.riasboutique.com/collection?department=jewelry"
+              "url": "https://www.riasboutique.com/collection/jewelry"
             }
           ]
         },

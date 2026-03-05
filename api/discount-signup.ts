@@ -24,7 +24,7 @@ import { sendLaunchDiscountEmail } from "../server/lib/email.js";
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
-const DEFAULT_CAMPAIGN_NAME = "launch10_2026_03_17";
+const DEFAULT_CAMPAIGN_NAME = "launch10_2026_03_20";
 const maskEmail = (email: string) => {
   const [local, domain] = email.split("@");
   if (!local || !domain) {

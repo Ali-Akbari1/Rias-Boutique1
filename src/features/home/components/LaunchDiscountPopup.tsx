@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -30,7 +31,11 @@ const writeLocalStorageState = (value: string) => {
   }
 };
 
+const shouldHidePopupOnPath = (pathname: string) =>
+  pathname.startsWith("/checkout") || pathname.startsWith("/orders-admin");
+
 const LaunchDiscountPopup = () => {
+  const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,10 +43,17 @@ const LaunchDiscountPopup = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const launchDiscountActive = isLaunchDiscountActive();
   const launchDiscountEndsLabel = getLaunchDiscountExpiryDateLabel();
+  const shouldHidePopup = shouldHidePopupOnPath(pathname);
 
   useEffect(() => {
     if (!launchDiscountActive) {
+      setOpen(false);
       writeLocalStorageState("");
+      return;
+    }
+
+    if (shouldHidePopup) {
+      setOpen(false);
       return;
     }
 
@@ -57,7 +69,7 @@ const LaunchDiscountPopup = () => {
     return () => {
       window.clearTimeout(timer);
     };
-  }, [launchDiscountActive]);
+  }, [launchDiscountActive, shouldHidePopup]);
 
   const canSubmit = useMemo(() => {
     if (!launchDiscountActive || isSubmitting || isSuccess) {
@@ -124,7 +136,7 @@ const LaunchDiscountPopup = () => {
     }
   };
 
-  if (!launchDiscountActive) {
+  if (!launchDiscountActive || shouldHidePopup) {
     return null;
   }
 

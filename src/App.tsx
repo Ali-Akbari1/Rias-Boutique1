@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/shared/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { CartProvider } from "@/features/cart/context/CartContext";
+import LaunchDiscountPopup from "@/features/home/components/LaunchDiscountPopup";
+import RouteMetadata from "@/features/navigation/components/RouteMetadata";
 import ScrollToTop from "@/features/navigation/components/ScrollToTop";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import HomePage from "./pages/HomePage";
@@ -30,6 +32,8 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <LaunchDiscountPopup />
+            <RouteMetadata />
             <ScrollToTop />
             <Routes>
               <Route path="/" element={<HomePage />} />

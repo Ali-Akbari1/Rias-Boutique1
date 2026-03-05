@@ -95,7 +95,7 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `CLOVER_ENABLE_TIPS`: Optional `true`/`false` to enable tips in hosted checkout.
 - `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
 - `CLOVER_DEBUG_LOGS`: Optional `true`/`false` to enable verbose Clover diagnostics in Vercel logs.
-- `LAUNCH10_EXPIRES_AT`: Optional ISO timestamp for launch discount expiry (default `2026-03-18T05:59:59.999Z`, which is March 17, 2026 at 11:59 PM in Calgary).
+- `LAUNCH10_EXPIRES_AT`: Optional ISO timestamp for launch discount expiry (default `2026-03-21T05:59:59.999Z`, which is March 20, 2026 at 11:59 PM in Calgary).
 - `MERCHANT_ORDER_EMAIL`: Store inbox that receives new paid order alerts.
 - `CUSTOMER_ORDER_EMAIL_ENABLED`: Optional `true`/`false` (default `true`) to send customer order confirmation emails after payment.
 - `RESEND_API_KEY`: Optional Resend API key to send real merchant/customer emails.
@@ -115,7 +115,7 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `ALLOWED_PROMO_ORIGINS`: Optional CSV list of allowed browser origins for `/api/discount-signup`.
 - `DISCOUNT_SIGNUP_RATE_LIMIT`: Optional rate limit for `/api/discount-signup` (default `20`).
 - `DISCOUNT_SIGNUP_RATE_WINDOW_MS`: Optional rate limit window in milliseconds for `/api/discount-signup` (default `60000`).
-- `DISCOUNT_CAMPAIGN_NAME`: Optional campaign label stored with popup signups (default `launch10_2026_03_17`).
+- `DISCOUNT_CAMPAIGN_NAME`: Optional campaign label stored with popup signups (default `launch10_2026_03_20`).
 - `GITHUB_OAUTH_CLIENT_ID`: For Decap GitHub auth.
 - `GITHUB_OAUTH_CLIENT_SECRET`: For Decap GitHub auth.
 - `CMS_BASE_URL`: Base URL used by OAuth callbacks, e.g. `https://www.riasboutique.com`.

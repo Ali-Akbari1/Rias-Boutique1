@@ -1,4 +1,4 @@
-const DEFAULT_LAUNCH_DISCOUNT_EXPIRES_AT = "2026-03-18T05:59:59.999Z";
+const DEFAULT_LAUNCH_DISCOUNT_EXPIRES_AT = "2026-03-21T05:59:59.999Z";
 
 export const LAUNCH_DISCOUNT_CODE = "LAUNCH10";
 export const LAUNCH_DISCOUNT_RATE = 0.1;
@@ -24,4 +24,3 @@ export const getLaunchDiscountExpiryDisplay = () =>
     timeStyle: "short",
     timeZone: "America/Edmonton",
   }).format(getLaunchDiscountExpiryDate());
-

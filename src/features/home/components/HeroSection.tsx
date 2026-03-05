@@ -29,13 +29,13 @@ const HeroSection = () => {
           </p>
           <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-4">
             <Link
-              to="/collection?department=women"
+              to="/collection/women"
               className={heroCtaClass}
             >
               Shop Women's
             </Link>
             <Link
-              to="/collection?department=men"
+              to="/collection/men"
               className={heroCtaClass}
             >
               Shop Men's
