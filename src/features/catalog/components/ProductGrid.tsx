@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { type ProductDepartment, PRODUCT_DEPARTMENTS, products } from "@/features/catalog/data/products";
 import ProductCard from "./ProductCard";
 import { normalizeSearchText, scoreWeightedSearchDocument } from "@/lib/search";
@@ -73,17 +73,6 @@ const toPositiveInt = (value: string | null, fallback: number) => {
   return parsed;
 };
 
-const normalizeDepartmentParam = (value: string | null): ProductDepartment | null => {
-  if (!value) {
-    return null;
-  }
-
-  const normalized = value.trim().toLowerCase();
-  return PRODUCT_DEPARTMENTS.includes(normalized as ProductDepartment)
-    ? (normalized as ProductDepartment)
-    : null;
-};
-
 const scoreProductSearchMatch = (normalizedQuery: string, product: (typeof products)[number]) =>
   scoreWeightedSearchDocument(
     {
@@ -96,7 +85,15 @@ const scoreProductSearchMatch = (normalizedQuery: string, product: (typeof produ
     normalizedQuery,
   );
 
+const normalizeCollectionPath = (pathname: string) =>
+  pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+
+const buildCollectionPath = (department: DepartmentOption) =>
+  department === "all" ? "/collection" : `/collection/${department}`;
+
 const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGridProps) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const normalizedInitialQuery = initialQuery.trim();
   const initialCategory = searchParams.get("category")?.trim() || "all";
@@ -132,7 +129,6 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   const didMountPageResetEffectRef = useRef(false);
   const didMountDepartmentResetEffectRef = useRef(false);
   const didMountSizeResetEffectRef = useRef(false);
-  const isDepartmentUserDrivenRef = useRef(false);
 
   const departments = useMemo(() => ["all", ...PRODUCT_DEPARTMENTS] as DepartmentOption[], []);
   const minPrice = useMemo(() => parsePriceInput(minPriceInput), [minPriceInput]);
@@ -151,12 +147,10 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   }, [maxPrice, minPrice]);
 
   const setDepartmentFromUser = (value: DepartmentOption) => {
-    isDepartmentUserDrivenRef.current = true;
     setDepartment(value);
   };
 
   useEffect(() => {
-    isDepartmentUserDrivenRef.current = false;
     setDepartment(initialDepartment);
   }, [initialDepartment]);
 
@@ -346,20 +340,18 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   }, [currentPage, safePage]);
 
   useEffect(() => {
-    const urlDepartment = normalizeDepartmentParam(searchParams.get("department"));
-    const localDepartment = department === "all" ? null : department;
-
-    // Prevent external route changes (e.g. navbar Women's -> Men's) from being
-    // overwritten by stale local state during the same effect cycle.
-    if (!isDepartmentUserDrivenRef.current && urlDepartment !== localDepartment) {
+    const nextPath = buildCollectionPath(department);
+    const currentPath = normalizeCollectionPath(location.pathname);
+    if (currentPath === nextPath) {
       return;
     }
 
+    navigate({ pathname: nextPath, search: location.search }, { replace: true });
+  }, [department, location.pathname, location.search, navigate]);
+
+  useEffect(() => {
     const nextParams = new URLSearchParams();
 
-    if (department !== "all") {
-      nextParams.set("department", department);
-    }
     if (queryInput.trim()) {
       nextParams.set("search", queryInput.trim());
     }
@@ -388,17 +380,16 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
       nextParams.set("page", String(safePage));
     }
 
-    const currentQuery = searchParams.toString();
+    const currentParams = new URLSearchParams(searchParams);
+    currentParams.delete("department");
+    const currentQuery = currentParams.toString();
     const nextQuery = nextParams.toString();
     if (currentQuery !== nextQuery) {
       setSearchParams(nextParams, { replace: true });
     }
-    isDepartmentUserDrivenRef.current = false;
   }, [
     availability,
     category,
-    currentPage,
-    department,
     maxPriceInput,
     minPriceInput,
     queryInput,
