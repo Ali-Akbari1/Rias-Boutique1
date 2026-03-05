@@ -145,50 +145,65 @@ const LaunchDiscountPopup = () => {
             Welcome to Ria&apos;s Boutique
           </p>
           <DialogTitle className="mt-4 text-center font-display font-bold text-foreground">
-            <span className="text-7xl leading-none sm:text-7xl">10%</span>
-            <span className="ml-2 text-4xl align-baseline sm:text-6xl">Off</span>
+            {isSuccess ? (
+              <span className="text-5xl leading-none sm:text-6xl">Thank You</span>
+            ) : (
+              <>
+                <span className="text-7xl leading-none sm:text-7xl">10%</span>
+                <span className="ml-2 text-4xl align-baseline sm:text-6xl">Off</span>
+              </>
+            )}
           </DialogTitle>
           <DialogDescription className="mt-3 text-center text-sm leading-relaxed text-muted-foreground sm:text-base">
-            In honour of our website dropping, enjoy 10% off on any purchase from now until{" "} <br />
-            {launchDiscountEndsLabel}. Enter your email to receive your launch offer code.
+            {isSuccess ? (
+              <>Your launch code has been emailed. Check your inbox (and spam folder) to use it at checkout.</>
+            ) : (
+              <>
+                In honour of our website dropping, enjoy 10% off on any purchase from now until{" "}
+                <br />
+                {launchDiscountEndsLabel}. Enter your email to receive your launch offer code.
+              </>
+            )}
           </DialogDescription>
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-3 text-left">
-            <label htmlFor="launch-discount-email" className="block text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-              Email address
-            </label>
-            <Input
-              id="launch-discount-email"
-              type="email"
-              maxLength={160}
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
-              autoComplete="email"
-              disabled={isSubmitting || isSuccess}
-            />
+          {!isSuccess ? (
+            <form onSubmit={handleSubmit} className="mt-6 space-y-3 text-left">
+              <label htmlFor="launch-discount-email" className="block text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                Email address
+              </label>
+              <Input
+                id="launch-discount-email"
+                type="email"
+                maxLength={160}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
+                disabled={isSubmitting}
+              />
 
-            <Button type="submit" className="h-11 w-full text-sm font-semibold" disabled={!canSubmit}>
-              {submitButtonLabel}
+              <Button type="submit" className="h-11 w-full text-sm font-semibold" disabled={!canSubmit}>
+                {submitButtonLabel}
+              </Button>
+            </form>
+          ) : (
+            <Button type="button" className="mt-6 h-11 w-full text-sm font-semibold" onClick={() => setOpen(false)}>
+              Close
             </Button>
-          </form>
+          )}
 
           {errorMessage ? (
             <p className="mt-3 text-sm text-destructive">{errorMessage}</p>
           ) : null}
-          {isSuccess ? (
-            <p className="mt-3 text-sm text-muted-foreground">
-              Your launch code has been emailed. Check your inbox (and spam folder) to use it at checkout.
-            </p>
+          {!isSuccess ? (
+            <button
+              type="button"
+              onClick={closeWithoutOffer}
+              className="mt-5 text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+            >
+              Continue without the 10% off coupon
+            </button>
           ) : null}
-
-          <button
-            type="button"
-            onClick={closeWithoutOffer}
-            className="mt-5 text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-          >
-            Continue without the 10% off coupon
-          </button>
         </div>
       </DialogContent>
     </Dialog>
