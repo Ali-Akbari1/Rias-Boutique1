@@ -350,7 +350,7 @@ const Checkout = () => {
                         </p>
                       ) : launchDiscountActive ? (
                         <p className="text-xs text-muted-foreground">
-                          {`Use ${LAUNCH_DISCOUNT_CODE} for 10% off until ${launchDiscountEndsLabel}.`}
+                          Have a launch discount code? Enter it above to get 10% off. Offer ends {launchDiscountEndsLabel}.
                         </p>
                       ) : (
                         <p className="text-xs text-muted-foreground">
