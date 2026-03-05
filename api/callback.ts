@@ -16,7 +16,15 @@ const buildBaseUrl = (req: any) => {
   return `${proto}://${host}`;
 };
 
-const popupHtml = (message: string, title: string, details: string) => `<!doctype html>
+const resolveTargetOrigin = (baseUrl: string) => {
+  try {
+    return new URL(baseUrl).origin;
+  } catch {
+    return "";
+  }
+};
+
+const popupHtml = (message: string, title: string, details: string, targetOrigin: string) => `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -59,10 +67,17 @@ const popupHtml = (message: string, title: string, details: string) => `<!doctyp
       (function () {
         var authMessage = ${JSON.stringify(message)};
         var fallback = ${JSON.stringify(details)};
+        var targetOrigin = ${JSON.stringify(targetOrigin)};
         var statusEl = document.getElementById("status");
         try {
           if (window.opener && typeof window.opener.postMessage === "function") {
-            window.opener.postMessage(authMessage, "*");
+            if (!targetOrigin) {
+              if (statusEl) {
+                statusEl.textContent = "Unable to securely return authentication result. Please retry login.";
+              }
+              return;
+            }
+            window.opener.postMessage(authMessage, targetOrigin);
             window.close();
             return;
           }
@@ -87,9 +102,9 @@ const setPopupHeaders = (res: any) => {
   res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
 };
 
-const sendPopup = (res: any, status: number, message: string, title: string, details: string) => {
+const sendPopup = (res: any, status: number, message: string, title: string, details: string, targetOrigin: string) => {
   setPopupHeaders(res);
-  res.status(status).send(popupHtml(message, title, details));
+  res.status(status).send(popupHtml(message, title, details, targetOrigin));
 };
 
 export default async function handler(req: any, res: any) {
@@ -98,10 +113,13 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
+  const baseUrl = buildBaseUrl(req);
+  const targetOrigin = resolveTargetOrigin(baseUrl);
+
   const provider = asSingle(req.query.provider) || "github";
   if (provider !== "github") {
     const message = "authorization:github:error:Invalid provider";
-    sendPopup(res, 400, message, "CMS Login Failed", "Invalid OAuth provider.");
+    sendPopup(res, 400, message, "CMS Login Failed", "Invalid OAuth provider.", targetOrigin);
     return;
   }
 
@@ -109,7 +127,7 @@ export default async function handler(req: any, res: any) {
   if (!code) {
     const oauthError = asSingle(req.query.error_description) || asSingle(req.query.error) || "Missing OAuth code.";
     const message = `authorization:github:error:${oauthError}`;
-    sendPopup(res, 400, message, "CMS Login Failed", String(oauthError));
+    sendPopup(res, 400, message, "CMS Login Failed", String(oauthError), targetOrigin);
     return;
   }
 
@@ -124,12 +142,12 @@ export default async function handler(req: any, res: any) {
       message,
       "CMS Login Failed",
       "Missing GITHUB_OAUTH_CLIENT_ID or GITHUB_OAUTH_CLIENT_SECRET on the server.",
+      targetOrigin,
     );
     return;
   }
 
   try {
-    const baseUrl = buildBaseUrl(req);
     const redirectUri = `${baseUrl}/api/callback`;
     const state = asSingle(req.query.state);
 
@@ -157,7 +175,7 @@ export default async function handler(req: any, res: any) {
     if (!tokenResponse.ok || !tokenPayload.access_token) {
       const reason = tokenPayload.error_description || tokenPayload.error || "GitHub token exchange failed.";
       const message = `authorization:github:error:${reason}`;
-      sendPopup(res, 502, message, "CMS Login Failed", reason);
+      sendPopup(res, 502, message, "CMS Login Failed", reason, targetOrigin);
       return;
     }
 
@@ -166,10 +184,17 @@ export default async function handler(req: any, res: any) {
       provider: "github",
     })}`;
 
-    sendPopup(res, 200, successMessage, "CMS Login Successful", "Authentication complete. You can close this window.");
+    sendPopup(
+      res,
+      200,
+      successMessage,
+      "CMS Login Successful",
+      "Authentication complete. You can close this window.",
+      targetOrigin,
+    );
   } catch (error) {
     const reason = error instanceof Error ? error.message : "Unexpected server error.";
     const message = `authorization:github:error:${reason}`;
-    sendPopup(res, 500, message, "CMS Login Failed", reason);
+    sendPopup(res, 500, message, "CMS Login Failed", reason, targetOrigin);
   }
 }

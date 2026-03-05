@@ -27,14 +27,18 @@ import {
   type OrderLineItem,
 } from "../server/lib/order-store.js";
 import { CloverApiError, createCloverCheckoutSession } from "../server/lib/clover.js";
+import {
+  getLaunchDiscountExpiryDisplay,
+  isLaunchDiscountActive,
+  LAUNCH_DISCOUNT_CODE,
+  LAUNCH_DISCOUNT_RATE,
+} from "../server/lib/launch-discount.js";
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
 const SHIPPING_FLAT_RATE_MINOR = 3_000; // CA$30.00
 const FREE_SHIPPING_THRESHOLD_MINOR = 40_000; // CA$400.00
 const TAX_RATE = 0.05; // 5%
-const LAUNCH_DISCOUNT_CODE = "LAUNCH10";
-const LAUNCH_DISCOUNT_RATE = 0.1; // 10%
 const isDebugLoggingEnabled = () => process.env.CLOVER_DEBUG_LOGS?.trim().toLowerCase() === "true";
 const createRequestId = () => createDeterministicHash(`${Date.now()}|${Math.random()}`).slice(0, 12);
 const maskValue = (value: string, keepStart = 3, keepEnd = 4) => {
@@ -214,7 +218,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     getCheckoutBaseUrl(),
     process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
   );
-  if (!validateOrigin(req, allowedOrigins)) {
+  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
@@ -246,8 +250,18 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const payload = bodyResult.data;
   const requestedDiscountCode = (payload.discountCode || payload.promoCode || "").trim().toUpperCase();
+  const launchDiscountActive = isLaunchDiscountActive();
   if (requestedDiscountCode && requestedDiscountCode !== LAUNCH_DISCOUNT_CODE) {
     sendError(res, 400, "INVALID_DISCOUNT_CODE", "Invalid discount code.");
+    return;
+  }
+  if (requestedDiscountCode === LAUNCH_DISCOUNT_CODE && !launchDiscountActive) {
+    sendError(
+      res,
+      400,
+      "DISCOUNT_CODE_EXPIRED",
+      `LAUNCH10 expired on ${getLaunchDiscountExpiryDisplay()}.`,
+    );
     return;
   }
 
@@ -328,7 +342,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const subtotalMinor = lineItems.reduce((sum, item) => sum + item.lineTotalMinor, 0);
-  const discountMinor = requestedDiscountCode === LAUNCH_DISCOUNT_CODE ? Math.round(subtotalMinor * LAUNCH_DISCOUNT_RATE) : 0;
+  const discountMinor =
+    requestedDiscountCode === LAUNCH_DISCOUNT_CODE && launchDiscountActive
+      ? Math.round(subtotalMinor * LAUNCH_DISCOUNT_RATE)
+      : 0;
   const discountedSubtotalMinor = Math.max(0, subtotalMinor - discountMinor);
   const isPickupInStore = payload.customer.deliveryMethod === "pickup";
   const shippingMinor =

@@ -53,6 +53,21 @@ create table if not exists email_logs (
 create index if not exists idx_email_logs_order_id on email_logs (order_id);
 create index if not exists idx_email_logs_sent_at on email_logs (sent_at);
 
+create table if not exists discount_subscribers (
+  id bigserial primary key,
+  email text not null unique,
+  full_name text not null default '',
+  source text not null default 'launch-popup',
+  campaign text not null default 'launch10_2026_03_17',
+  code text not null default 'LAUNCH10',
+  metadata_json jsonb not null default '{}'::jsonb,
+  subscribed_at timestamptz not null default now(),
+  last_email_sent_at timestamptz
+);
+
+create index if not exists idx_discount_subscribers_subscribed_at on discount_subscribers (subscribed_at);
+create index if not exists idx_discount_subscribers_campaign on discount_subscribers (campaign);
+
 create or replace function mark_order_paid_and_decrement_inventory(
   p_order_id text,
   p_payment_reference text

@@ -9,6 +9,12 @@ import { Input } from "@/shared/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/shared/ui/accordion";
 import { formatCad } from "@/lib/money";
 import {
+  getLaunchDiscountExpiryDateLabel,
+  isLaunchDiscountActive,
+  LAUNCH_DISCOUNT_CODE,
+  LAUNCH_DISCOUNT_RATE,
+} from "@/lib/launch-discount";
+import {
   buildCheckoutItems,
   buildClientIdempotencyKey,
   redirectToCheckout,
@@ -59,8 +65,6 @@ const initialForm: CheckoutForm = {
 const SHIPPING_FLAT_RATE = 30;
 const FREE_SHIPPING_THRESHOLD = 400;
 const TAX_RATE = 0.05;
-const LAUNCH_DISCOUNT_CODE = "LAUNCH10";
-const LAUNCH_DISCOUNT_RATE = 0.1;
 const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
 const isShippingChargesEnabled = () => toBoolean(import.meta.env.VITE_ENABLE_SHIPPING_CHARGES as string | undefined);
 
@@ -73,12 +77,17 @@ const Checkout = () => {
   const googleReviewsUrl = getGoogleReviewsUrl();
   const pickupDetails = getStorePickupDetails();
   const shippingChargesEnabled = isShippingChargesEnabled();
+  const launchDiscountActive = isLaunchDiscountActive();
+  const launchDiscountEndsLabel = getLaunchDiscountExpiryDateLabel();
   const checkoutControllerRef = useRef<AbortController | null>(null);
   const checkoutTimeoutRef = useRef<number | null>(null);
 
   const subtotalMinor = Math.round(totalPrice * 100);
   const normalizedDiscountCode = discountCode.trim().toUpperCase();
-  const discountMinor = normalizedDiscountCode === LAUNCH_DISCOUNT_CODE ? Math.round(subtotalMinor * LAUNCH_DISCOUNT_RATE) : 0;
+  const discountMinor =
+    launchDiscountActive && normalizedDiscountCode === LAUNCH_DISCOUNT_CODE
+      ? Math.round(subtotalMinor * LAUNCH_DISCOUNT_RATE)
+      : 0;
   const discountedSubtotalMinor = Math.max(0, subtotalMinor - discountMinor);
   const isPickupInStore = checkoutForm.deliveryMethod === "pickup";
   const shippingMinor =
@@ -333,11 +342,21 @@ const Checkout = () => {
                       />
                       {discountCode.trim() ? (
                         <p className="text-xs text-muted-foreground">
-                          {normalizedDiscountCode === LAUNCH_DISCOUNT_CODE
-                            ? `${LAUNCH_DISCOUNT_CODE} applied (10% off).`
-                            : `Invalid code.`}
+                          {normalizedDiscountCode !== LAUNCH_DISCOUNT_CODE
+                            ? `Invalid code.`
+                            : !launchDiscountActive
+                            ? `${LAUNCH_DISCOUNT_CODE} expired on ${launchDiscountEndsLabel}.`
+                            : `${LAUNCH_DISCOUNT_CODE} applied (10% off).`}
                         </p>
-                      ) : null}
+                      ) : launchDiscountActive ? (
+                        <p className="text-xs text-muted-foreground">
+                          {`Use ${LAUNCH_DISCOUNT_CODE} for 10% off until ${launchDiscountEndsLabel}.`}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          Promotional launch discount has ended.
+                        </p>
+                      )}
                     </div>
 
                     {isPickupInStore ? (

@@ -93,6 +93,10 @@ interface DispatchResult {
   externalId: string;
 }
 
+export interface PromotionalEmailResult extends DispatchResult {
+  recipient: string;
+}
+
 interface OrderEmailMessage extends ResendDispatchInput {
   recipientType: "merchant" | "customer";
 }
@@ -144,7 +148,7 @@ const sendWithResend = async ({ to, subject, text, html, replyTo }: ResendDispat
   };
 };
 
-const persistEmailLog = async ({ orderId, attempt }: { orderId: string; attempt: EmailDispatchRecord }) => {
+const persistEmailLog = async ({ orderId, attempt }: { orderId?: string; attempt: EmailDispatchRecord }) => {
   if (isMemoryEmailLogEnabled()) {
     return;
   }
@@ -162,7 +166,7 @@ const persistEmailLog = async ({ orderId, attempt }: { orderId: string; attempt:
   try {
     const supabase = getSupabaseAdminClient();
     const { error } = await supabase.from("email_logs").insert({
-      order_id: orderId,
+      order_id: orderId || null,
       to_email: attempt.to,
       subject: attempt.subject,
       payload_json: {
@@ -198,6 +202,140 @@ const persistEmailLog = async ({ orderId, attempt }: { orderId: string; attempt:
       status: attempt.status,
       error: safeErrorMessage(error),
     });
+  }
+};
+
+export const sendLaunchDiscountEmail = async ({
+  to,
+  fullName,
+  code,
+  expiresAtDisplay,
+}: {
+  to: string;
+  fullName?: string;
+  code: string;
+  expiresAtDisplay: string;
+}): Promise<PromotionalEmailResult> => {
+  const recipient = to.trim().toLowerCase();
+  if (!isLikelyEmail(recipient)) {
+    throw new Error("A valid recipient email is required.");
+  }
+
+  const apiKey = process.env.RESEND_API_KEY?.trim() || "";
+  if (!apiKey) {
+    throw new Error("Promotional email is not configured. Set RESEND_API_KEY.");
+  }
+
+  const brandName = process.env.STORE_BRAND_NAME?.trim() || "Ria's Boutique";
+  const websiteUrl = cleanUrl(process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "", "https://www.riasboutique.com");
+  const logoUrl = cleanUrl(process.env.EMAIL_LOGO_URL?.trim() || "", `${websiteUrl.replace(/\/+$/, "")}/RAb.png`);
+  const explicitReplyTo = process.env.RESEND_REPLY_TO_EMAIL?.trim() || "";
+  const fallbackReplyTo = process.env.MERCHANT_ORDER_EMAIL?.trim() || "";
+  const replyTo = isLikelyEmail(explicitReplyTo)
+    ? explicitReplyTo
+    : isLikelyEmail(fallbackReplyTo)
+      ? fallbackReplyTo
+      : "";
+  const greetingName = fullName?.trim() || "there";
+  const subject = `${brandName} Launch Offer - 10% Off with ${code}`;
+  const text = [
+    `Hi ${greetingName},`,
+    "",
+    `Welcome to ${brandName}. In honour of our website launch, enjoy 10% off any purchase with code ${code}.`,
+    `Offer valid until ${expiresAtDisplay}.`,
+    "",
+    `Start shopping: ${websiteUrl.replace(/\/+$/, "")}/collection`,
+    "",
+    `Need help? Reply to this email${replyTo ? ` or contact ${replyTo}` : ""}.`,
+  ].join("\n");
+
+  const html = `
+    <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;color:#111827;">
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f5f5;padding:24px 12px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:620px;background:#ffffff;border:1px solid #ececec;border-radius:10px;overflow:hidden;">
+              <tr>
+                <td style="padding:24px 24px 12px 24px;border-bottom:1px solid #ececec;background:#ffffff;text-align:center;">
+                  <img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(brandName)}" style="height:42px;display:block;margin:0 auto 12px;" />
+                  <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">Welcome to ${escapeHtml(
+                    brandName,
+                  )}</p>
+                  <h1 style="margin:10px 0 0 0;font-size:34px;line-height:1.15;color:#111827;">Enjoy 10% Off</h1>
+                  <p style="margin:8px 0 0 0;font-size:15px;color:#4b5563;">In honour of our website launch, use your exclusive code below.</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:22px 24px;text-align:center;">
+                  <div style="display:inline-block;padding:10px 20px;border:1px dashed #111827;border-radius:8px;font-size:26px;letter-spacing:0.08em;font-weight:700;color:#111827;">
+                    ${escapeHtml(code)}
+                  </div>
+                  <p style="margin:14px 0 0 0;font-size:14px;color:#6b7280;">Valid until ${escapeHtml(expiresAtDisplay)}</p>
+                  <p style="margin:18px 0 0 0;">
+                    <a href="${escapeHtml(
+                      `${websiteUrl.replace(/\/+$/, "")}/collection`,
+                    )}" style="display:inline-block;padding:11px 18px;background:#111827;color:#ffffff;text-decoration:none;border-radius:4px;font-size:14px;font-weight:600;">
+                      Shop the Collection
+                    </a>
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:14px 24px;border-top:1px solid #ececec;background:#fafafa;text-align:center;">
+                  <p style="margin:0;font-size:13px;color:#6b7280;">If you have questions, reply to this email.</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+
+  const timestamp = new Date().toISOString();
+  try {
+    const dispatch = await sendWithResend({
+      to: recipient,
+      subject,
+      text,
+      html,
+      replyTo,
+    });
+
+    if (!dispatch) {
+      throw new Error("Promotional email could not be sent because Resend is not configured.");
+    }
+
+    await persistEmailLog({
+      attempt: {
+        recipientType: "customer",
+        to: recipient,
+        subject,
+        provider: dispatch.provider,
+        status: dispatch.status,
+        externalId: dispatch.externalId,
+        timestamp,
+      },
+    });
+
+    return {
+      ...dispatch,
+      recipient,
+    };
+  } catch (error) {
+    await persistEmailLog({
+      attempt: {
+        recipientType: "customer",
+        to: recipient,
+        subject,
+        provider: "resend",
+        status: "failed",
+        externalId: "",
+        error: safeErrorMessage(error),
+        timestamp,
+      },
+    });
+    throw error;
   }
 };
 

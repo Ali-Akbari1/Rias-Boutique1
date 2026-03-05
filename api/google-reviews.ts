@@ -1,3 +1,7 @@
+import { sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
+import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
+
 type GoogleAuthorAttribution = {
   displayName?: string;
   uri?: string;
@@ -22,9 +26,32 @@ type GooglePlaceDetailsResponse = {
   error?: { message?: string };
 };
 
-export default async function handler(req: any, res: any) {
+const DEFAULT_RATE_LIMIT = 60;
+const DEFAULT_RATE_WINDOW_MS = 60_000;
+
+export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "GET") {
-    res.status(405).json({ error: "Method not allowed" });
+    sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
+    return;
+  }
+
+  const allowedOrigins = buildAllowedOrigins(
+    process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
+    process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
+  );
+  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+    sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
+    return;
+  }
+
+  const rateResult = checkRateLimit({
+    key: `google-reviews:${getClientIp(req)}`,
+    limit: Number(process.env.GOOGLE_REVIEWS_RATE_LIMIT || DEFAULT_RATE_LIMIT),
+    windowMs: Number(process.env.GOOGLE_REVIEWS_RATE_WINDOW_MS || DEFAULT_RATE_WINDOW_MS),
+  });
+  applyRateLimitHeaders(res.setHeader.bind(res), rateResult);
+  if (!rateResult.allowed) {
+    sendError(res, 429, "RATE_LIMITED", "Too many review requests.");
     return;
   }
 
@@ -32,9 +59,7 @@ export default async function handler(req: any, res: any) {
   const placeId = process.env.GOOGLE_PLACE_ID;
 
   if (!apiKey || !placeId) {
-    res.status(500).json({
-      error: "Missing GOOGLE_PLACES_API_KEY or GOOGLE_PLACE_ID on the server.",
-    });
+    sendError(res, 500, "GOOGLE_REVIEWS_NOT_CONFIGURED", "Google reviews are not configured right now.");
     return;
   }
 
@@ -50,9 +75,7 @@ export default async function handler(req: any, res: any) {
     const payload = (await response.json()) as GooglePlaceDetailsResponse;
 
     if (!response.ok) {
-      res.status(response.status).json({
-        error: payload?.error?.message || "Google Places API request failed.",
-      });
+      sendError(res, response.status, "GOOGLE_REVIEWS_PROVIDER_ERROR", payload?.error?.message || "Google Places API request failed.");
       return;
     }
 
@@ -76,8 +99,6 @@ export default async function handler(req: any, res: any) {
       reviews,
     });
   } catch (error) {
-    res.status(500).json({
-      error: error instanceof Error ? error.message : "Unexpected server error.",
-    });
+    sendError(res, 500, "GOOGLE_REVIEWS_SERVER_ERROR", error instanceof Error ? error.message : "Unexpected server error.");
   }
 }

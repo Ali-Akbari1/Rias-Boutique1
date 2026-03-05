@@ -46,10 +46,27 @@ export const buildAllowedOrigins = (baseUrl: string, customCsv = "") => {
   return allowed;
 };
 
-export const validateOrigin = (req: ApiRequest, allowedOrigins: Set<string>) => {
+interface ValidateOriginOptions {
+  allowMissingOrigin?: boolean;
+  allowRefererFallback?: boolean;
+}
+
+export const validateOrigin = (
+  req: ApiRequest,
+  allowedOrigins: Set<string>,
+  options: ValidateOriginOptions = {},
+) => {
+  const { allowMissingOrigin = true, allowRefererFallback = true } = options;
   const origin = getRequestOrigin(req);
   if (!origin) {
-    return true;
+    if (allowRefererFallback) {
+      const refererOrigin = parseOrigin(toTrimmed(getHeader(req, "referer")));
+      if (refererOrigin) {
+        return allowedOrigins.has(refererOrigin);
+      }
+    }
+
+    return allowMissingOrigin;
   }
 
   return allowedOrigins.has(parseOrigin(origin));
