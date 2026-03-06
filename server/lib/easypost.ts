@@ -19,6 +19,20 @@ interface QuoteLineItem {
   productId: string;
   name?: string;
   quantity: number;
+  unitPriceMinor?: number;
+}
+
+export interface VerifiedShippingAddress {
+  normalizedAddress: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    countryCode: string;
+  };
+  residential: boolean | null;
+  message: string;
 }
 
 export interface ShippingRateOption {
@@ -115,6 +129,30 @@ interface EasyPostShipmentResponse {
   postage_label?: EasyPostPostageLabel | null;
 }
 
+interface EasyPostVerificationDetails {
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
+interface EasyPostDeliveryVerification {
+  success?: boolean | null;
+  errors?: Array<{ message?: string | null }> | null;
+  details?: EasyPostVerificationDetails | null;
+}
+
+interface EasyPostAddressResponse {
+  id?: string;
+  street1?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip?: string | null;
+  country?: string | null;
+  residential?: boolean | null;
+  verifications?: {
+    delivery?: EasyPostDeliveryVerification | null;
+  } | null;
+}
+
 interface ShippingQuoteTokenPayload {
   v: 1;
   provider: "easypost";
@@ -155,6 +193,31 @@ const DEFAULT_ITEM_WEIGHT_OZ = 24;
 const DEFAULT_ADDITIONAL_ITEM_WEIGHT_OZ = 12;
 const DEFAULT_ADDITIONAL_ITEM_HEIGHT_IN = 0.75;
 const DEFAULT_PREFERRED_CARRIERS = ["canada post"];
+const DEFAULT_STORE_CURRENCY = "CAD";
+
+class EasyPostApiError extends Error {
+  statusCode: number;
+  endpoint: string;
+  responseBody: unknown;
+
+  constructor({
+    endpoint,
+    statusCode,
+    message,
+    responseBody,
+  }: {
+    endpoint: string;
+    statusCode: number;
+    message: string;
+    responseBody: unknown;
+  }) {
+    super(message);
+    this.name = "EasyPostApiError";
+    this.statusCode = statusCode;
+    this.endpoint = endpoint;
+    this.responseBody = responseBody;
+  }
+}
 
 const safeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 const toNumber = (value: string | undefined, fallback: number) => {
@@ -172,6 +235,11 @@ const toMinor = (value: string | undefined, fallbackValue: string | undefined, f
   return fallbackMinor;
 };
 const normalizeString = (value: string | undefined) => value?.trim() || "";
+const parseCsvList = (value: string | undefined) =>
+  (value || "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 const normalizePreferenceValue = (value: string) =>
   value
     .trim()
@@ -192,6 +260,47 @@ const getQuoteSecret = () =>
 const getPreferredCarriers = () =>
   parsePreferenceList(process.env.EASYPOST_PREFERRED_CARRIERS, DEFAULT_PREFERRED_CARRIERS);
 const getPreferredServices = () => parsePreferenceList(process.env.EASYPOST_PREFERRED_SERVICES);
+const getCarrierAccountIds = () => parseCsvList(process.env.EASYPOST_CARRIER_ACCOUNT_IDS);
+const getStoreCurrency = () => normalizeString(process.env.STORE_CURRENCY).toUpperCase() || DEFAULT_STORE_CURRENCY;
+
+const normalizeCountryCode = (value: string | undefined) => {
+  const normalized = normalizeString(value);
+  if (!normalized) {
+    return "";
+  }
+
+  const compact = normalized.replace(/[^a-zA-Z]/g, "").toLowerCase();
+  const knownCountries: Record<string, string> = {
+    ca: "CA",
+    can: "CA",
+    canada: "CA",
+    us: "US",
+    usa: "US",
+    unitedstates: "US",
+    unitedstatesofamerica: "US",
+  };
+
+  if (knownCountries[compact]) {
+    return knownCountries[compact];
+  }
+
+  if (normalized.length === 2) {
+    return normalized.toUpperCase();
+  }
+
+  return normalized.toUpperCase();
+};
+
+const toCountryDisplayName = (countryCode: string) => {
+  switch (countryCode) {
+    case "CA":
+      return "Canada";
+    case "US":
+      return "United States";
+    default:
+      return countryCode;
+  }
+};
 
 const getOriginAddress = () => ({
   name: normalizeString(process.env.EASYPOST_FROM_NAME) || normalizeString(process.env.STORE_BRAND_NAME) || "Ria's Boutique",
@@ -252,13 +361,11 @@ const buildShippingContextHash = ({ customer, items, subtotalMinor }: EasyPostCo
 
   const shippingFingerprint = [
     customer.deliveryMethod || "shipping",
-    customer.fullName,
-    customer.email,
     customer.address,
     customer.city,
     customer.state,
     customer.postalCode,
-    customer.country,
+    normalizeCountryCode(customer.country),
   ]
     .map((part) => normalizeString(part).toLowerCase())
     .join("|");
@@ -346,8 +453,30 @@ const easypostRequest = async <T>({
   });
 
   if (!response.ok) {
-    const errorBody = await response.text().catch(() => "");
-    throw new Error(`EasyPost API failed (${response.status}) on ${endpoint}: ${errorBody || response.statusText}`);
+    const errorBodyText = await response.text().catch(() => "");
+    let parsedBody: unknown = errorBodyText;
+    if (errorBodyText) {
+      try {
+        parsedBody = JSON.parse(errorBodyText);
+      } catch {
+        parsedBody = errorBodyText;
+      }
+    }
+
+    const extractedMessage =
+      typeof parsedBody === "object" &&
+      parsedBody !== null &&
+      "error" in parsedBody &&
+      typeof (parsedBody as { error?: { message?: unknown } }).error?.message === "string"
+        ? (parsedBody as { error: { message: string } }).error.message
+        : errorBodyText || response.statusText;
+
+    throw new EasyPostApiError({
+      endpoint,
+      statusCode: response.status,
+      message: `EasyPost API failed (${response.status}) on ${endpoint}: ${extractedMessage}`,
+      responseBody: parsedBody,
+    });
   }
 
   return (await response.json()) as T;
@@ -420,6 +549,95 @@ const selectDisplayRates = ({
   return rankedRates.slice(0, 3);
 };
 
+const buildVerifiedRecipientAddress = (customer: QuoteCustomer, verifiedAddress: VerifiedShippingAddress) => ({
+  name: normalizeString(customer.fullName) || undefined,
+  street1: verifiedAddress.normalizedAddress.address,
+  city: verifiedAddress.normalizedAddress.city,
+  state: verifiedAddress.normalizedAddress.state,
+  zip: verifiedAddress.normalizedAddress.postalCode,
+  country: verifiedAddress.normalizedAddress.countryCode,
+  phone: normalizeString(customer.phone) || undefined,
+  email: normalizeString(customer.email) || undefined,
+  residential: typeof verifiedAddress.residential === "boolean" ? verifiedAddress.residential : undefined,
+});
+
+const buildInternationalCustomsInfo = ({
+  items,
+  originCountryCode,
+  originName,
+}: {
+  items: QuoteLineItem[];
+  originCountryCode: string;
+  originName: string;
+}) => {
+  const hsTariffNumber = normalizeString(process.env.EASYPOST_DEFAULT_HS_TARIFF_NUMBER);
+  if (!hsTariffNumber) {
+    throw new Error(
+      "International shipping quotes require EASYPOST_DEFAULT_HS_TARIFF_NUMBER to be configured before rates can be returned.",
+    );
+  }
+
+  const productOriginCountry = normalizeCountryCode(process.env.EASYPOST_PRODUCT_ORIGIN_COUNTRY) || originCountryCode;
+  const unitWeightOz = toNumber(process.env.EASYPOST_ITEM_WEIGHT_OZ, DEFAULT_ITEM_WEIGHT_OZ);
+
+  return {
+    customs_certify: true,
+    customs_signer: normalizeString(process.env.EASYPOST_CUSTOMS_SIGNER) || originName || "Ria's Boutique",
+    contents_type: normalizeString(process.env.EASYPOST_CUSTOMS_CONTENTS_TYPE) || "merchandise",
+    restriction_type: normalizeString(process.env.EASYPOST_CUSTOMS_RESTRICTION_TYPE) || "none",
+    non_delivery_option: normalizeString(process.env.EASYPOST_CUSTOMS_NON_DELIVERY_OPTION) || "return",
+    customs_items: items.map((item) => ({
+      description: normalizeString(item.name) || item.productId,
+      quantity: Math.max(1, item.quantity),
+      value: Number(((item.unitPriceMinor || 0) / 100).toFixed(2)),
+      weight: Number(unitWeightOz.toFixed(2)),
+      origin_country: productOriginCountry,
+      hs_tariff_number: hsTariffNumber,
+      currency: getStoreCurrency(),
+    })),
+  };
+};
+
+export const verifyShippingAddress = async (customer: QuoteCustomer): Promise<VerifiedShippingAddress> => {
+  const countryCode = normalizeCountryCode(customer.country);
+  const address = await easypostRequest<EasyPostAddressResponse>({
+    endpoint: "/addresses/create_and_verify",
+    body: {
+      address: {
+        name: normalizeString(customer.fullName) || undefined,
+        street1: normalizeString(customer.address),
+        city: normalizeString(customer.city),
+        state: normalizeString(customer.state),
+        zip: normalizeString(customer.postalCode),
+        country: countryCode,
+        phone: normalizeString(customer.phone) || undefined,
+        email: normalizeString(customer.email) || undefined,
+      },
+    },
+  });
+
+  const deliveryVerification = address.verifications?.delivery;
+  if (deliveryVerification && deliveryVerification.success === false) {
+    const verificationMessage = deliveryVerification.errors?.find((entry) => normalizeString(entry?.message))?.message;
+    throw new Error(normalizeString(verificationMessage) || "EasyPost could not verify this shipping address.");
+  }
+
+  const verifiedCountryCode = normalizeCountryCode(address.country || countryCode || customer.country);
+
+  return {
+    normalizedAddress: {
+      address: normalizeString(address.street1 || customer.address),
+      city: normalizeString(address.city || customer.city),
+      state: normalizeString(address.state || customer.state),
+      postalCode: normalizeString(address.zip || customer.postalCode),
+      country: toCountryDisplayName(verifiedCountryCode),
+      countryCode: verifiedCountryCode,
+    },
+    residential: typeof address.residential === "boolean" ? address.residential : null,
+    message: "Address verified. Carrier rates are ready to load.",
+  };
+};
+
 export const createShippingRatesQuote = async ({
   customer,
   items,
@@ -427,25 +645,30 @@ export const createShippingRatesQuote = async ({
   freeShippingThresholdMinor,
 }: CreateShippingRatesQuoteInput): Promise<ShippingRatesQuoteResult> => {
   const { quoteSecret, origin, quoteTtlMs } = validateEasyPostConfig();
+  const verifiedAddress = await verifyShippingAddress(customer);
   const totalQuantity = items.reduce((sum, item) => sum + Math.max(1, item.quantity), 0);
   const createdAt = new Date();
   const quoteExpiresAt = new Date(createdAt.getTime() + quoteTtlMs).toISOString();
+  const originCountryCode = normalizeCountryCode(origin.country);
+  const destinationCountryCode = verifiedAddress.normalizedAddress.countryCode;
+  const carrierAccounts = getCarrierAccountIds();
   const shipment = await easypostRequest<EasyPostShipmentResponse>({
     endpoint: "/shipments",
     body: {
       shipment: {
-        to_address: {
-          name: customer.fullName,
-          street1: customer.address,
-          city: customer.city,
-          state: customer.state,
-          zip: customer.postalCode,
-          country: customer.country,
-          phone: customer.phone || undefined,
-          email: customer.email,
-        },
+        to_address: buildVerifiedRecipientAddress(customer, verifiedAddress),
         from_address: origin,
         parcel: buildParcel(totalQuantity),
+        ...(carrierAccounts.length > 0 ? { carrier_accounts: carrierAccounts } : {}),
+        ...(originCountryCode && destinationCountryCode && originCountryCode !== destinationCountryCode
+          ? {
+              customs_info: buildInternationalCustomsInfo({
+                items,
+                originCountryCode,
+                originName: normalizeString(origin.name) || normalizeString(origin.company),
+              }),
+            }
+          : {}),
         options: {
           currency: "CAD",
           label_file_type: "image/png",
@@ -466,6 +689,11 @@ export const createShippingRatesQuote = async ({
     freeShippingThresholdMinor,
   });
   if (displayRates.length === 0) {
+    if (originCountryCode && destinationCountryCode && originCountryCode !== destinationCountryCode) {
+      throw new Error(
+        "No shipping rates were returned for this international address. Confirm your EasyPost carrier setup and customs configuration for cross-border shipments.",
+      );
+    }
     throw new Error("No EasyPost shipping rates were returned for this address.");
   }
 
@@ -618,4 +846,17 @@ export const isEasyPostConfigured = () => {
   }
 };
 
-export const describeEasyPostError = (error: unknown) => safeErrorMessage(error);
+export const isEasyPostApiError = (error: unknown): error is EasyPostApiError => error instanceof EasyPostApiError;
+
+export const describeEasyPostError = (error: unknown) => {
+  if (isEasyPostApiError(error)) {
+    return {
+      message: error.message,
+      statusCode: error.statusCode,
+      endpoint: error.endpoint,
+      responseBody: error.responseBody,
+    };
+  }
+
+  return safeErrorMessage(error);
+};

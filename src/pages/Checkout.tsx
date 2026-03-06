@@ -1,6 +1,6 @@
 import { type ChangeEvent, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowLeft, Loader2, Lock, RotateCcw, ShieldCheck, Truck } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, Lock, RotateCcw, Search, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/features/cart/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/shared/ui/button";
@@ -17,10 +17,12 @@ import {
 import {
   buildCheckoutItems,
   buildClientIdempotencyKey,
-  redirectToCheckout,
+  redirectToCheckout, requestAddressAutocomplete,
+  requestAddressVerification,
   extractApiErrorMessage,
   requestOptionalCartToken,
   requestShippingRates,
+  type AddressAutocompleteSuggestion,
   type ShippingRateOption,
 } from "@/lib/checkout-request";
 import {
@@ -32,6 +34,7 @@ import {
 } from "@/features/store/data/store-content";
 
 type DeliveryMethod = "shipping" | "pickup";
+type AddressVerificationStatus = "idle" | "verifying" | "verified" | "invalid" | "skipped";
 
 interface CheckoutForm {
   deliveryMethod: DeliveryMethod;
@@ -69,16 +72,28 @@ const TAX_RATE = 0.05;
 const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
 const isShippingChargesEnabled = () => toBoolean(import.meta.env.VITE_ENABLE_SHIPPING_CHARGES as string | undefined);
 const looksLikeEmail = (value: string) => /\S+@\S+\.\S+/.test(value.trim());
-const isShippingAddressComplete = (form: CheckoutForm) =>
+const isAddressFieldsComplete = (form: CheckoutForm) =>
   form.deliveryMethod === "shipping" &&
-  form.fullName.trim().length >= 2 &&
-  looksLikeEmail(form.email) &&
-  form.phone.trim().length >= 7 &&
   form.address.trim().length >= 4 &&
   form.city.trim().length >= 2 &&
   form.state.trim().length >= 2 &&
   form.postalCode.trim().length >= 3 &&
   form.country.trim().length >= 2;
+const isShippingAddressComplete = (form: CheckoutForm) =>
+  isAddressFieldsComplete(form) &&
+  form.fullName.trim().length >= 2 &&
+  looksLikeEmail(form.email) &&
+  form.phone.trim().length >= 7;
+const buildAddressFingerprint = (form: CheckoutForm) =>
+  [
+    form.address,
+    form.city,
+    form.state,
+    form.postalCode,
+    form.country,
+  ]
+    .map((value) => value.trim().toLowerCase())
+    .join("|");
 
 const Checkout = () => {
   const { items, totalPrice } = useCart();
@@ -91,6 +106,15 @@ const Checkout = () => {
   const [shippingMessage, setShippingMessage] = useState("");
   const [shippingError, setShippingError] = useState("");
   const [isShippingLoading, setIsShippingLoading] = useState(false);
+  const [addressSuggestions, setAddressSuggestions] = useState<AddressAutocompleteSuggestion[]>([]);
+  const [isAddressSuggestionsOpen, setIsAddressSuggestionsOpen] = useState(false);
+  const [isAddressAutocompleteLoading, setIsAddressAutocompleteLoading] = useState(false);
+  const [addressAutocompleteAvailable, setAddressAutocompleteAvailable] = useState(true);
+  const [addressVerificationStatus, setAddressVerificationStatus] = useState<AddressVerificationStatus>("idle");
+  const [addressVerificationMessage, setAddressVerificationMessage] = useState("");
+  const [addressVerificationError, setAddressVerificationError] = useState("");
+  const [verifiedAddressFingerprint, setVerifiedAddressFingerprint] = useState("");
+  const [lastVerifiedAddressFingerprint, setLastVerifiedAddressFingerprint] = useState("");
   const googleReviewsUrl = getGoogleReviewsUrl();
   const pickupDetails = getStorePickupDetails();
   const shippingChargesEnabled = isShippingChargesEnabled();
@@ -100,6 +124,11 @@ const Checkout = () => {
   const checkoutTimeoutRef = useRef<number | null>(null);
   const shippingControllerRef = useRef<AbortController | null>(null);
   const shippingTimeoutRef = useRef<number | null>(null);
+  const addressAutocompleteControllerRef = useRef<AbortController | null>(null);
+  const addressAutocompleteTimeoutRef = useRef<number | null>(null);
+  const addressVerificationControllerRef = useRef<AbortController | null>(null);
+  const addressVerificationTimeoutRef = useRef<number | null>(null);
+  const addressBlurTimeoutRef = useRef<number | null>(null);
 
   const checkoutItems = useMemo(() => buildCheckoutItems(items), [items]);
   const subtotalMinor = Math.round(totalPrice * 100);
@@ -122,11 +151,22 @@ const Checkout = () => {
   const shipping = shippingMinor / 100;
   const tax = taxMinor / 100;
   const total = totalMinor / 100;
+  const addressFieldsReady = isAddressFieldsComplete(checkoutForm);
   const shippingAddressReady = isShippingAddressComplete(checkoutForm);
+  const currentAddressFingerprint = useMemo(() => buildAddressFingerprint(checkoutForm), [checkoutForm]);
+  const isAddressVerified =
+    !isPickupInStore &&
+    addressVerificationStatus === "verified" &&
+    verifiedAddressFingerprint === currentAddressFingerprint;
   const canSubmitCheckout =
     !isLoading &&
     (isPickupInStore ||
-      (shippingChargesEnabled && shippingAddressReady && Boolean(selectedShippingOption) && !isShippingLoading && !shippingError));
+      (shippingChargesEnabled &&
+        shippingAddressReady &&
+        isAddressVerified &&
+        Boolean(selectedShippingOption) &&
+        !isShippingLoading &&
+        !shippingError));
   const freeShippingThresholdNote =
     isPickupInStore
       ? "Pick up in store selected. No shipping fee will be charged."
@@ -138,6 +178,32 @@ const Checkout = () => {
 
   const handleFormChange = (field: keyof CheckoutForm) => (event: ChangeEvent<HTMLInputElement>) => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));
+  };
+
+  const handleAddressInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextValue = event.target.value;
+    setCheckoutForm((current) => ({ ...current, address: nextValue }));
+    setIsAddressSuggestionsOpen(true);
+  };
+
+  const applySuggestedAddress = (suggestion: AddressAutocompleteSuggestion) => {
+    clearPendingAddressAutocompleteRequest();
+    clearAddressBlurTimeout();
+    setCheckoutForm((current) => ({
+      ...current,
+      address: suggestion.address,
+      city: suggestion.city,
+      state: suggestion.state,
+      postalCode: suggestion.postalCode,
+      country: suggestion.country,
+    }));
+    setAddressSuggestions([]);
+    setIsAddressSuggestionsOpen(false);
+    setAddressVerificationStatus("idle");
+    setAddressVerificationMessage("");
+    setAddressVerificationError("");
+    setVerifiedAddressFingerprint("");
+    setLastVerifiedAddressFingerprint("");
   };
 
   const clearPendingCheckoutRequest = () => {
@@ -164,6 +230,37 @@ const Checkout = () => {
     }
   };
 
+  const clearPendingAddressAutocompleteRequest = () => {
+    if (addressAutocompleteTimeoutRef.current !== null) {
+      window.clearTimeout(addressAutocompleteTimeoutRef.current);
+      addressAutocompleteTimeoutRef.current = null;
+    }
+
+    if (addressAutocompleteControllerRef.current) {
+      addressAutocompleteControllerRef.current.abort();
+      addressAutocompleteControllerRef.current = null;
+    }
+  };
+
+  const clearPendingAddressVerificationRequest = () => {
+    if (addressVerificationTimeoutRef.current !== null) {
+      window.clearTimeout(addressVerificationTimeoutRef.current);
+      addressVerificationTimeoutRef.current = null;
+    }
+
+    if (addressVerificationControllerRef.current) {
+      addressVerificationControllerRef.current.abort();
+      addressVerificationControllerRef.current = null;
+    }
+  };
+
+  const clearAddressBlurTimeout = () => {
+    if (addressBlurTimeoutRef.current !== null) {
+      window.clearTimeout(addressBlurTimeoutRef.current);
+      addressBlurTimeoutRef.current = null;
+    }
+  };
+
   useEffect(() => {
     const handlePageShow = () => {
       setIsLoading(false);
@@ -172,6 +269,9 @@ const Checkout = () => {
     const handlePageHide = () => {
       clearPendingCheckoutRequest();
       clearPendingShippingRequest();
+      clearPendingAddressAutocompleteRequest();
+      clearPendingAddressVerificationRequest();
+      clearAddressBlurTimeout();
       setIsLoading(false);
       setIsShippingLoading(false);
     };
@@ -184,8 +284,222 @@ const Checkout = () => {
       window.removeEventListener("pagehide", handlePageHide);
       clearPendingCheckoutRequest();
       clearPendingShippingRequest();
+      clearPendingAddressAutocompleteRequest();
+      clearPendingAddressVerificationRequest();
+      clearAddressBlurTimeout();
     };
   }, []);
+
+  useEffect(() => {
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (!viewport) {
+      return undefined;
+    }
+
+    const previousContent = viewport.getAttribute("content") || "";
+    viewport.setAttribute(
+      "content",
+      "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
+    );
+
+    return () => {
+      viewport.setAttribute("content", previousContent || "width=device-width, initial-scale=1.0");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isPickupInStore || !addressAutocompleteAvailable) {
+      clearPendingAddressAutocompleteRequest();
+      setAddressSuggestions([]);
+      setIsAddressSuggestionsOpen(false);
+      setIsAddressAutocompleteLoading(false);
+      return;
+    }
+
+    const query = checkoutForm.address.trim();
+    if (query.length < 3) {
+      clearPendingAddressAutocompleteRequest();
+      setAddressSuggestions([]);
+      setIsAddressSuggestionsOpen(false);
+      setIsAddressAutocompleteLoading(false);
+      return;
+    }
+
+    clearPendingAddressAutocompleteRequest();
+    setIsAddressAutocompleteLoading(true);
+
+    const controller = new AbortController();
+    addressAutocompleteControllerRef.current = controller;
+    const timeout = window.setTimeout(() => {
+      void requestAddressAutocomplete({
+        query,
+        country: checkoutForm.country,
+        signal: controller.signal,
+      })
+        .then((payload) => {
+          setAddressAutocompleteAvailable(payload.configured);
+          setAddressSuggestions(payload.suggestions);
+          setIsAddressSuggestionsOpen(payload.suggestions.length > 0);
+        })
+        .catch((error) => {
+          if (error instanceof Error && error.name === "AbortError") {
+            return;
+          }
+
+          setAddressSuggestions([]);
+          setIsAddressSuggestionsOpen(false);
+          if (error instanceof Error && error.message.includes("not configured")) {
+            setAddressAutocompleteAvailable(false);
+          }
+        })
+        .finally(() => {
+          if (addressAutocompleteControllerRef.current === controller) {
+            addressAutocompleteControllerRef.current = null;
+          }
+          if (addressAutocompleteTimeoutRef.current !== null) {
+            window.clearTimeout(addressAutocompleteTimeoutRef.current);
+            addressAutocompleteTimeoutRef.current = null;
+          }
+          setIsAddressAutocompleteLoading(false);
+        });
+    }, 180);
+
+    addressAutocompleteTimeoutRef.current = timeout;
+
+    return () => {
+      controller.abort();
+      if (addressAutocompleteTimeoutRef.current !== null) {
+        window.clearTimeout(addressAutocompleteTimeoutRef.current);
+        addressAutocompleteTimeoutRef.current = null;
+      }
+      if (addressAutocompleteControllerRef.current === controller) {
+        addressAutocompleteControllerRef.current = null;
+      }
+    };
+  }, [addressAutocompleteAvailable, checkoutForm.address, checkoutForm.country, isPickupInStore]);
+
+  useEffect(() => {
+    if (isPickupInStore) {
+      clearPendingAddressVerificationRequest();
+      setAddressVerificationStatus("skipped");
+      setAddressVerificationMessage("");
+      setAddressVerificationError("");
+      setVerifiedAddressFingerprint("");
+      setLastVerifiedAddressFingerprint("");
+      return;
+    }
+
+    if (!addressFieldsReady) {
+      clearPendingAddressVerificationRequest();
+      setAddressVerificationStatus("idle");
+      setAddressVerificationMessage("");
+      setAddressVerificationError("");
+      setVerifiedAddressFingerprint("");
+      setLastVerifiedAddressFingerprint("");
+      return;
+    }
+
+    if (
+      lastVerifiedAddressFingerprint === currentAddressFingerprint &&
+      (addressVerificationStatus === "verified" || addressVerificationStatus === "invalid")
+    ) {
+      return;
+    }
+
+    clearPendingAddressVerificationRequest();
+    setAddressVerificationStatus("verifying");
+    setAddressVerificationError("");
+    setAddressVerificationMessage("Verifying your shipping address with the carrier.");
+
+    const controller = new AbortController();
+    addressVerificationControllerRef.current = controller;
+    const timeout = window.setTimeout(() => {
+      void requestAddressVerification({
+        customer: checkoutForm,
+        signal: controller.signal,
+      })
+        .then((payload) => {
+          const normalizedAddress = payload.normalizedAddress;
+          const nextForm = normalizedAddress
+            ? {
+                ...checkoutForm,
+                address: normalizedAddress.address,
+                city: normalizedAddress.city,
+                state: normalizedAddress.state,
+                postalCode: normalizedAddress.postalCode,
+                country: normalizedAddress.country,
+              }
+            : checkoutForm;
+          const nextFingerprint = buildAddressFingerprint(nextForm);
+
+          setCheckoutForm((current) => {
+            if (
+              current.address === nextForm.address &&
+              current.city === nextForm.city &&
+              current.state === nextForm.state &&
+              current.postalCode === nextForm.postalCode &&
+              current.country === nextForm.country
+            ) {
+              return current;
+            }
+
+            return {
+              ...current,
+              address: nextForm.address,
+              city: nextForm.city,
+              state: nextForm.state,
+              postalCode: nextForm.postalCode,
+              country: nextForm.country,
+            };
+          });
+          setVerifiedAddressFingerprint(nextFingerprint);
+          setLastVerifiedAddressFingerprint(nextFingerprint);
+          setAddressVerificationStatus("verified");
+          setAddressVerificationMessage(payload.message || "Address verified. Carrier rates are ready to load.");
+          setAddressVerificationError("");
+        })
+        .catch((error) => {
+          if (error instanceof Error && error.name === "AbortError") {
+            return;
+          }
+
+          setVerifiedAddressFingerprint("");
+          setLastVerifiedAddressFingerprint(currentAddressFingerprint);
+          setAddressVerificationStatus("invalid");
+          setAddressVerificationMessage("");
+          setAddressVerificationError(extractApiErrorMessage(error, "Unable to verify this shipping address."));
+        })
+        .finally(() => {
+          if (addressVerificationControllerRef.current === controller) {
+            addressVerificationControllerRef.current = null;
+          }
+          if (addressVerificationTimeoutRef.current !== null) {
+            window.clearTimeout(addressVerificationTimeoutRef.current);
+            addressVerificationTimeoutRef.current = null;
+          }
+        });
+    }, 350);
+
+    addressVerificationTimeoutRef.current = timeout;
+
+    return () => {
+      controller.abort();
+      if (addressVerificationTimeoutRef.current !== null) {
+        window.clearTimeout(addressVerificationTimeoutRef.current);
+        addressVerificationTimeoutRef.current = null;
+      }
+      if (addressVerificationControllerRef.current === controller) {
+        addressVerificationControllerRef.current = null;
+      }
+    };
+  }, [
+    addressFieldsReady,
+    addressVerificationStatus,
+    checkoutForm,
+    currentAddressFingerprint,
+    isPickupInStore,
+    lastVerifiedAddressFingerprint,
+  ]);
 
   useEffect(() => {
     if (items.length === 0 || isPickupInStore) {
@@ -208,11 +522,41 @@ const Checkout = () => {
       return;
     }
 
+    if (!addressFieldsReady) {
+      clearPendingShippingRequest();
+      setShippingOptions([]);
+      setSelectedShippingToken("");
+      setShippingMessage("Complete your shipping address to verify it before loading live carrier rates.");
+      setShippingError("");
+      setIsShippingLoading(false);
+      return;
+    }
+
+    if (addressVerificationStatus === "verifying") {
+      clearPendingShippingRequest();
+      setShippingOptions([]);
+      setSelectedShippingToken("");
+      setShippingMessage("Verifying your shipping address before requesting carrier pricing.");
+      setShippingError("");
+      setIsShippingLoading(false);
+      return;
+    }
+
+    if (!isAddressVerified) {
+      clearPendingShippingRequest();
+      setShippingOptions([]);
+      setSelectedShippingToken("");
+      setShippingMessage(addressVerificationMessage || "Verify your shipping address before loading live rates.");
+      setShippingError(addressVerificationStatus === "invalid" ? addressVerificationError : "");
+      setIsShippingLoading(false);
+      return;
+    }
+
     if (!shippingAddressReady) {
       clearPendingShippingRequest();
       setShippingOptions([]);
       setSelectedShippingToken("");
-      setShippingMessage("Enter your shipping address to load live carrier rates.");
+      setShippingMessage("Enter your contact details to finalize live carrier rates for this verified address.");
       setShippingError("");
       setIsShippingLoading(false);
       return;
@@ -275,7 +619,19 @@ const Checkout = () => {
         shippingControllerRef.current = null;
       }
     };
-  }, [checkoutForm, checkoutItems, isPickupInStore, items.length, shippingAddressReady, shippingChargesEnabled]);
+  }, [
+    addressFieldsReady,
+    addressVerificationError,
+    addressVerificationMessage,
+    addressVerificationStatus,
+    checkoutForm,
+    checkoutItems,
+    isAddressVerified,
+    isPickupInStore,
+    items.length,
+    shippingAddressReady,
+    shippingChargesEnabled,
+  ]);
 
   const handleCloverCheckout = async (event: FormEvent) => {
     event.preventDefault();
@@ -284,10 +640,37 @@ const Checkout = () => {
     }
 
     if (!isPickupInStore) {
-      if (!shippingAddressReady) {
+      if (!addressFieldsReady) {
         toast({
           title: "Shipping address required",
-          description: "Enter your shipping address to load live carrier rates before checkout.",
+          description: "Enter your shipping address so we can verify it before loading carrier rates.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (addressVerificationStatus === "verifying") {
+        toast({
+          title: "Address still verifying",
+          description: "Wait for address verification to finish before continuing to payment.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!isAddressVerified) {
+        toast({
+          title: "Address verification required",
+          description: addressVerificationError || "Verify your shipping address before continuing to payment.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!shippingAddressReady) {
+        toast({
+          title: "Contact details required",
+          description: "Enter your full name, email, and phone number to load live carrier rates before checkout.",
           variant: "destructive",
         });
         return;
@@ -570,14 +953,62 @@ const Checkout = () => {
                           <label htmlFor="address" className="font-body text-sm font-semibold text-foreground">
                             Address
                           </label>
-                          <Input
-                            id="address"
-                            required
-                            maxLength={200}
-                            value={checkoutForm.address}
-                            onChange={handleFormChange("address")}
-                            autoComplete="street-address"
-                          />
+                          <div className="relative">
+                            <Input
+                              id="address"
+                              required
+                              maxLength={200}
+                              value={checkoutForm.address}
+                              onChange={handleAddressInputChange}
+                              onFocus={() => {
+                                clearAddressBlurTimeout();
+                                if (addressSuggestions.length > 0) {
+                                  setIsAddressSuggestionsOpen(true);
+                                }
+                              }}
+                              onBlur={() => {
+                                clearAddressBlurTimeout();
+                                addressBlurTimeoutRef.current = window.setTimeout(() => {
+                                  setIsAddressSuggestionsOpen(false);
+                                }, 120);
+                              }}
+                              autoComplete="street-address"
+                              placeholder="Start typing your street address"
+                              className="pr-10"
+                            />
+                            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted-foreground">
+                              {isAddressAutocompleteLoading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Search className="h-4 w-4" />
+                              )}
+                            </div>
+                            {isAddressSuggestionsOpen && addressSuggestions.length > 0 ? (
+                              <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-64 overflow-auto rounded-md border border-border bg-background shadow-lg">
+                                {addressSuggestions.map((suggestion) => (
+                                  <button
+                                    key={suggestion.id}
+                                    type="button"
+                                    onMouseDown={(event) => event.preventDefault()}
+                                    onClick={() => applySuggestedAddress(suggestion)}
+                                    className="flex w-full flex-col items-start gap-1 px-3 py-3 text-left transition hover:bg-secondary/60"
+                                  >
+                                    <span className="font-medium text-foreground">{suggestion.address}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {[suggestion.city, suggestion.state, suggestion.postalCode, suggestion.country]
+                                        .filter(Boolean)
+                                        .join(", ")}
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
+                            ) : null}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {addressAutocompleteAvailable
+                              ? "Select a suggested address to autofill the rest of the form, or continue entering it manually."
+                              : "Enter your full shipping address manually. Autocomplete is currently unavailable."}
+                          </p>
                         </div>
 
                         <div className="space-y-2">
@@ -638,18 +1069,44 @@ const Checkout = () => {
                         </div>
 
                         <div className="space-y-3 rounded-md border border-border bg-muted/20 p-3 sm:col-span-2">
+                          {addressVerificationStatus === "verified" ? (
+                            <div className="rounded-sm border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground">
+                              <p className="inline-flex items-center gap-2 font-medium">
+                                <CheckCircle2 className="h-4 w-4 text-primary" />
+                                Address verified
+                              </p>
+                              <p className="mt-1 text-xs text-muted-foreground">{addressVerificationMessage}</p>
+                            </div>
+                          ) : null}
+                          {addressVerificationStatus === "invalid" ? (
+                            <div className="rounded-sm border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                              <p className="inline-flex items-center gap-2 font-medium">
+                                <AlertTriangle className="h-4 w-4" />
+                                Address needs attention
+                              </p>
+                              <p className="mt-1 text-xs">{addressVerificationError}</p>
+                            </div>
+                          ) : null}
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <p className="font-body text-sm font-semibold text-foreground">Shipping method</p>
                               <p className="mt-1 text-xs text-muted-foreground">
-                                Live carrier rates appear here after your shipping address is complete.
+                                Live carrier rates appear here after your address is verified for delivery.
                               </p>
                             </div>
                             {isShippingLoading ? <Loader2 className="mt-0.5 h-4 w-4 animate-spin text-muted-foreground" /> : null}
                           </div>
 
-                          {!shippingAddressReady ? (
-                            <p className="text-sm text-muted-foreground">Enter your shipping address to view live rates.</p>
+                          {!addressFieldsReady ? (
+                            <p className="text-sm text-muted-foreground">Complete your shipping address to start verification.</p>
+                          ) : addressVerificationStatus === "verifying" ? (
+                            <p className="text-sm text-muted-foreground">Verifying your address with the carrier before loading rates.</p>
+                          ) : addressVerificationStatus === "invalid" ? (
+                            <p className="text-sm text-destructive">{addressVerificationError}</p>
+                          ) : !shippingAddressReady ? (
+                            <p className="text-sm text-muted-foreground">
+                              Enter your full name, email, and phone number to load live carrier rates for this verified address.
+                            </p>
                           ) : shippingError ? (
                             <p className="text-sm text-destructive">{shippingError}</p>
                           ) : shippingOptions.length === 0 ? (

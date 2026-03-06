@@ -8,7 +8,12 @@ import {
   validateOrigin,
 } from "../server/lib/security.js";
 import { getCatalogMap } from "../server/lib/product-catalog.js";
-import { createShippingRatesQuote, describeEasyPostError, isEasyPostConfigured } from "../server/lib/easypost.js";
+import {
+  createShippingRatesQuote,
+  describeEasyPostError,
+  isEasyPostApiError,
+  isEasyPostConfigured,
+} from "../server/lib/easypost.js";
 import { getFreeShippingThresholdMinor, isShippingChargesEnabled } from "../server/lib/checkout-pricing.js";
 import { z } from "zod";
 
@@ -111,6 +116,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       productId: product.id,
       name: product.name,
       quantity: item.quantity,
+      unitPriceMinor: product.priceMinor,
     });
   }
 
@@ -130,6 +136,26 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       destinationPostalCode: customer.postalCode,
       lineItemCount: normalizedItems.length,
     });
+
+    if (isEasyPostApiError(error) && error.statusCode >= 400 && error.statusCode < 500) {
+      sendError(
+        res,
+        422,
+        "ADDRESS_UNVERIFIED",
+        error.message.replace(/^EasyPost API failed \(\d+\) on [^:]+:\s*/, ""),
+        error.responseBody,
+      );
+      return;
+    }
+
+    if (
+      error instanceof Error &&
+      error.message.includes("International shipping quotes require EASYPOST_DEFAULT_HS_TARIFF_NUMBER")
+    ) {
+      sendError(res, 503, "INTERNATIONAL_SHIPPING_NOT_CONFIGURED", error.message);
+      return;
+    }
+
     sendError(
       res,
       502,

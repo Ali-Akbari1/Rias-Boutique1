@@ -113,6 +113,7 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `EASYPOST_API_BASE_URL`: Optional EasyPost API base URL (default `https://api.easypost.com/v2`).
 - `EASYPOST_QUOTE_SECRET`: Optional dedicated HMAC secret for signed shipping quote tokens. If omitted, server falls back to `CART_TOKEN_SECRET` or `SUPABASE_SERVICE_ROLE_KEY`.
 - `EASYPOST_QUOTE_TTL_MS`: Optional shipping quote lifetime in milliseconds (default `1800000` = 30 minutes).
+- `EASYPOST_CARRIER_ACCOUNT_IDS`: Optional comma-separated EasyPost carrier account IDs to constrain rating to your connected carrier accounts.
 - `EASYPOST_PREFERRED_CARRIERS`: Optional comma-separated carrier preference list. Defaults to `Canada Post`, and matching carriers are prioritized before all others.
 - `EASYPOST_PREFERRED_SERVICES`: Optional comma-separated service preference list used inside the preferred carrier set.
 - `EASYPOST_FROM_*`: Origin address/contact used for EasyPost shipments (`NAME`, `COMPANY`, `STREET1`, `STREET2`, `CITY`, `STATE`, `ZIP`, `COUNTRY`, `PHONE`, `EMAIL`).
@@ -120,6 +121,11 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `EASYPOST_ITEM_WEIGHT_OZ`: Estimated first-item parcel weight in ounces.
 - `EASYPOST_ADDITIONAL_ITEM_WEIGHT_OZ`: Additional estimated weight per extra item in ounces.
 - `EASYPOST_ADDITIONAL_ITEM_HEIGHT_IN`: Additional estimated parcel height per extra item.
+- `EASYPOST_PRODUCT_ORIGIN_COUNTRY`: Optional ISO country code used on EasyPost customs items for international quotes.
+- `EASYPOST_DEFAULT_HS_TARIFF_NUMBER`: Required if you want to quote cross-border shipments through EasyPost.
+- `EASYPOST_CUSTOMS_SIGNER`, `EASYPOST_CUSTOMS_CONTENTS_TYPE`, `EASYPOST_CUSTOMS_RESTRICTION_TYPE`, `EASYPOST_CUSTOMS_NON_DELIVERY_OPTION`: Optional EasyPost customs metadata overrides.
+- `MAPBOX_ACCESS_TOKEN`: Server-side token used by `/api/address-autocomplete` for checkout address suggestions.
+- `MAPBOX_AUTOCOMPLETE_COUNTRIES`: Optional comma-separated country filter for checkout address suggestions (default `CA,US`).
 - `SUPABASE_URL`: Supabase project URL for server-side order persistence.
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key used by serverless checkout/webhook/order endpoints.
 - `VITE_SUPABASE_URL`: Optional client URL if frontend calls Supabase directly.
@@ -131,6 +137,10 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `DISCOUNT_SIGNUP_RATE_LIMIT`: Optional rate limit for `/api/discount-signup` (default `20`).
 - `DISCOUNT_SIGNUP_RATE_WINDOW_MS`: Optional rate limit window in milliseconds for `/api/discount-signup` (default `60000`).
 - `DISCOUNT_CAMPAIGN_NAME`: Optional campaign label stored with popup signups (default `launch10_2026_03_20`).
+- `ADDRESS_AUTOCOMPLETE_RATE_LIMIT`: Optional rate limit for `/api/address-autocomplete` (default `60`).
+- `ADDRESS_AUTOCOMPLETE_RATE_WINDOW_MS`: Optional rate limit window for `/api/address-autocomplete` (default `60000`).
+- `ADDRESS_VERIFY_RATE_LIMIT`: Optional rate limit for `/api/address-verify` (default `40`).
+- `ADDRESS_VERIFY_RATE_WINDOW_MS`: Optional rate limit window for `/api/address-verify` (default `60000`).
 - `SHIPPING_RATES_RATE_LIMIT`: Optional rate limit for `/api/shipping-rates` (default `40`).
 - `SHIPPING_RATES_RATE_WINDOW_MS`: Optional rate limit window for `/api/shipping-rates` (default `60000`).
 - `GITHUB_OAUTH_CLIENT_ID`: For Decap GitHub auth.
@@ -152,7 +162,7 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
    - `SUPABASE_SERVICE_ROLE_KEY`
 4. Restart/redeploy.
 
-When checkout starts, frontend first requests live shipping rates from `api/shipping-rates`. The selected EasyPost quote is signed by the server, posted to `api/clover-checkout`, and used to create the Clover checkout session. After payment confirmation, the server buys the EasyPost label, stores tracking/QR details, and includes tracking information in merchant/customer order emails when available.
+When checkout starts, the frontend can request server-side Mapbox suggestions from `api/address-autocomplete`, then verifies the completed address through `api/address-verify`. Only verified shipping addresses are allowed to request live rates from `api/shipping-rates`. The selected EasyPost quote is signed by the server, posted to `api/clover-checkout`, and used to create the Clover checkout session. After payment confirmation, the server buys the EasyPost label, stores tracking/QR details, and includes tracking information in merchant/customer order emails when available.
 
 Before first live checkout, run `server/db/schema.sql` in your Supabase SQL Editor. Existing projects should rerun it so the new `pricing_json`, `shipping_quote_json`, and `shipment_json` columns are added to `orders`.
 

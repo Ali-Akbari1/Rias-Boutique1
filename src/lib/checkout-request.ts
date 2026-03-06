@@ -35,6 +35,31 @@ export interface ShippingRateOption {
   shipmentId: string;
 }
 
+export interface AddressAutocompleteSuggestion {
+  id: string;
+  label: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  countryCode: string;
+}
+
+export interface AddressVerificationResponse {
+  verificationStatus?: "verified" | "skipped";
+  message?: string;
+  normalizedAddress?: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    countryCode: string;
+  };
+  residential?: boolean | null;
+}
+
 export interface ShippingRatesResponse {
   provider?: "easypost";
   requiresSelection?: boolean;
@@ -156,6 +181,68 @@ export const requestShippingRates = async ({
   const payload = (await response.json().catch(() => ({}))) as ShippingRatesResponse;
   if (!response.ok) {
     throw new Error(extractApiErrorMessage(payload, "Unable to calculate shipping right now."));
+  }
+
+  return payload;
+};
+
+export const requestAddressAutocomplete = async ({
+  query,
+  country,
+  signal,
+}: {
+  query: string;
+  country?: string;
+  signal?: AbortSignal;
+}) => {
+  const response = await fetch("/api/address-autocomplete", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    signal,
+    body: JSON.stringify({
+      query,
+      country,
+    }),
+  });
+
+  const payload = (await response.json().catch(() => ({}))) as {
+    configured?: boolean;
+    suggestions?: AddressAutocompleteSuggestion[];
+  };
+
+  if (!response.ok) {
+    throw new Error(extractApiErrorMessage(payload, "Unable to load address suggestions right now."));
+  }
+
+  return {
+    configured: payload.configured !== false,
+    suggestions: Array.isArray(payload.suggestions) ? payload.suggestions : [],
+  };
+};
+
+export const requestAddressVerification = async ({
+  customer,
+  signal,
+}: {
+  customer: ShippingCustomerPayload;
+  signal?: AbortSignal;
+}) => {
+  const response = await fetch("/api/address-verify", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    signal,
+    body: JSON.stringify({
+      customer,
+    }),
+  });
+
+  const payload = (await response.json().catch(() => ({}))) as AddressVerificationResponse;
+  if (!response.ok) {
+    throw new Error(extractApiErrorMessage(payload, "Unable to verify this shipping address right now."));
   }
 
   return payload;
