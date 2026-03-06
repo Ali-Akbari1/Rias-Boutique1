@@ -27,6 +27,7 @@ import {
   upsertWebhookEvent,
 } from "../server/lib/order-store.js";
 import { sendOrderConfirmationEmail } from "../server/lib/email.js";
+import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
 
 const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
@@ -216,10 +217,23 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   try {
     if (parsed.isPaidEvent) {
-      const updatedOrder = await markOrderPaidAndDecrementInventory({
+      let updatedOrder = await markOrderPaidAndDecrementInventory({
         orderId: order.id,
         paymentReference: parsed.paymentReference || parsed.checkoutId || parsed.eventId,
       });
+
+      if (updatedOrder.customer.deliveryMethod === "shipping" && !updatedOrder.shipment) {
+        try {
+          updatedOrder = await ensureShipmentForOrder(updatedOrder);
+        } catch (shipmentError) {
+          console.error("[clover-webhook] shipment purchase failed", {
+            requestId,
+            orderId: updatedOrder.id,
+            eventId: parsed.eventId,
+            error: safeErrorMessage(shipmentError),
+          });
+        }
+      }
 
       if (!updatedOrder.confirmationEmailSentAt) {
         try {

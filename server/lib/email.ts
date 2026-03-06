@@ -4,13 +4,6 @@ import { getSupabaseAdminClient, hasSupabaseAdminConfig } from "./supabase-admin
 const isMemoryEmailLogEnabled = () => process.env.ORDER_STORE_ADAPTER?.trim().toLowerCase() === "memory";
 const isCustomerOrderEmailEnabled = () => process.env.CUSTOMER_ORDER_EMAIL_ENABLED?.trim().toLowerCase() !== "false";
 const formatMinorCad = (minor: number) => `CA$${(minor / 100).toFixed(2)}`;
-const formatSignedMinorCad = (minor: number) => {
-  if (minor === 0) {
-    return formatMinorCad(0);
-  }
-  const abs = formatMinorCad(Math.abs(minor));
-  return minor > 0 ? abs : `-${abs}`;
-};
 const escapeHtml = (value: string) =>
   value
     .replace(/&/g, "&amp;")
@@ -55,13 +48,6 @@ const formatLineItemsText = (order: StoredOrder) =>
   order.lineItems
     .map((item) => `- ${item.name} x${item.quantity} (${formatMinorCad(item.lineTotalMinor)})`)
     .join("\n");
-const formatLineItemsHtml = (order: StoredOrder) =>
-  order.lineItems
-    .map(
-      (item) =>
-        `<li>${escapeHtml(item.name)} x${item.quantity} (${escapeHtml(formatMinorCad(item.lineTotalMinor))})</li>`,
-    )
-    .join("");
 const formatLineItemsTableHtml = (order: StoredOrder) =>
   order.lineItems
     .map((item) => {
@@ -78,6 +64,107 @@ const formatLineItemsTableHtml = (order: StoredOrder) =>
       `;
     })
     .join("");
+const getOrderPricing = (order: StoredOrder) => ({
+  discountCode: order.pricing?.discountCode || "",
+  discountMinor: order.pricing?.discountMinor || 0,
+  shippingMinor: order.pricing?.shippingMinor || 0,
+  quotedShippingMinor: order.pricing?.quotedShippingMinor || 0,
+  taxMinor: order.pricing?.taxMinor || 0,
+  freeShippingApplied: Boolean(order.pricing?.freeShippingApplied),
+});
+const getShippingLineLabel = (order: StoredOrder) => {
+  if (order.customer.deliveryMethod === "pickup") {
+    return "Pickup";
+  }
+
+  if (order.shipment?.carrier && order.shipment?.service) {
+    return `${order.shipment.carrier} ${order.shipment.service}`;
+  }
+
+  if (order.shippingQuote?.carrier && order.shippingQuote?.service) {
+    return `${order.shippingQuote.carrier} ${order.shippingQuote.service}`;
+  }
+
+  return "Shipping";
+};
+const buildTrackingText = (order: StoredOrder) => {
+  if (!order.shipment || order.customer.deliveryMethod === "pickup") {
+    return [];
+  }
+
+  const lines = [
+    `Carrier / Service: ${getShippingLineLabel(order)}`,
+    `Tracking Number: ${order.shipment.trackingCode || "-"}`,
+  ];
+
+  if (order.shipment.trackingUrl) {
+    lines.push(`Track your order: ${order.shipment.trackingUrl}`);
+  }
+  if (order.shipment.labelPdfUrl || order.shipment.labelUrl) {
+    lines.push(`Label: ${order.shipment.labelPdfUrl || order.shipment.labelUrl}`);
+  }
+
+  return lines;
+};
+const buildTrackingHtml = ({
+  order,
+  includeLabelLink = false,
+  includeQr = false,
+}: {
+  order: StoredOrder;
+  includeLabelLink?: boolean;
+  includeQr?: boolean;
+}) => {
+  if (!order.shipment || order.customer.deliveryMethod === "pickup") {
+    return "";
+  }
+
+  const labelUrl = order.shipment.labelPdfUrl || order.shipment.labelUrl;
+
+  return `
+    <div style="padding:0 24px 20px 24px;">
+      <h2 style="margin:0 0 8px 0;font-size:18px;color:#111827;">Tracking</h2>
+      <p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Carrier / Service:</strong> ${escapeHtml(
+        getShippingLineLabel(order),
+      )}</p>
+      <p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Tracking Number:</strong> ${escapeHtml(
+        order.shipment.trackingCode || "-",
+      )}</p>
+      ${
+        order.shipment.trackingUrl
+          ? `<p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;">
+               <a href="${escapeHtml(order.shipment.trackingUrl)}" style="color:#111827;text-decoration:underline;">Track shipment</a>
+             </p>`
+          : ""
+      }
+      ${
+        includeLabelLink && labelUrl
+          ? `<p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;">
+               <a href="${escapeHtml(labelUrl)}" style="color:#111827;text-decoration:underline;">Download shipping label</a>
+             </p>`
+          : ""
+      }
+      ${
+        includeQr && order.shipment.trackingQrCodeDataUrl
+          ? `<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:16px;">
+               <div style="text-align:center;">
+                 <img src="${escapeHtml(order.shipment.trackingQrCodeDataUrl)}" alt="Tracking QR code" style="width:140px;height:140px;border:1px solid #ececec;border-radius:8px;" />
+                 <p style="margin:8px 0 0 0;font-size:12px;color:#6b7280;">Track shipment</p>
+               </div>
+               ${
+                 includeLabelLink && order.shipment.labelQrCodeDataUrl
+                   ? `<div style="text-align:center;">
+                        <img src="${escapeHtml(order.shipment.labelQrCodeDataUrl)}" alt="Shipping label QR code" style="width:140px;height:140px;border:1px solid #ececec;border-radius:8px;" />
+                        <p style="margin:8px 0 0 0;font-size:12px;color:#6b7280;">Open label</p>
+                      </div>`
+                   : ""
+               }
+             </div>`
+          : ""
+      }
+    </div>
+  `;
+};
 
 interface ResendDispatchInput {
   to: string;
@@ -366,11 +453,7 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
   const orderNumber = toOrderNumber(order.id);
   const orderDate = formatDateTime(order.createdAt || new Date().toISOString());
   const deliveryMethod = order.customer.deliveryMethod === "pickup" ? "Pick up in store" : "Shipping";
-  const fulfillmentText =
-    order.customer.deliveryMethod === "pickup"
-      ? "Pickup in store selected. Customer will collect from store."
-      : `${order.customer.fullName}, ${order.customer.phone || "-"}, ${toSingleLineAddress(order)}`;
-  const adjustmentsMinor = order.totalMinor - order.subtotalMinor;
+  const pricing = getOrderPricing(order);
   const variantLabel = order.lineItems.some((item) => item.productId)
     ? "Style / Variant"
     : "Variant";
@@ -418,11 +501,16 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
       formatLineItemsText(order),
       "",
       `Subtotal: ${formatMinorCad(order.subtotalMinor)}`,
-      `Shipping/Tax/Discounts (net): ${formatSignedMinorCad(adjustmentsMinor)}`,
+      pricing.discountMinor > 0 ? `Discount${pricing.discountCode ? ` (${pricing.discountCode})` : ""}: -${formatMinorCad(pricing.discountMinor)}` : "",
+      `Shipping: ${order.customer.deliveryMethod === "pickup" ? "Pickup in store" : formatMinorCad(pricing.shippingMinor)}`,
+      `Tax: ${formatMinorCad(pricing.taxMinor)}`,
       `Total: ${formatMinorCad(order.totalMinor)}`,
+      ...buildTrackingText(order),
       "",
       `Admin: ${websiteUrl.replace(/\/+$/, "")}/orders-admin`,
-    ].join("\n"),
+    ]
+      .filter(Boolean)
+      .join("\n"),
     html: `
       <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;color:#111827;">
         <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f5f5;padding:24px 12px;">
@@ -507,10 +595,30 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
                           formatMinorCad(order.subtotalMinor),
                         )}</td>
                       </tr>
+                      ${
+                        pricing.discountMinor > 0
+                          ? `<tr>
+                               <td style="padding:6px 0;font-size:14px;color:#6b7280;">Discount${
+                                 pricing.discountCode ? ` (${escapeHtml(pricing.discountCode)})` : ""
+                               }</td>
+                               <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">-${escapeHtml(
+                                 formatMinorCad(pricing.discountMinor),
+                               )}</td>
+                             </tr>`
+                          : ""
+                      }
                       <tr>
-                        <td style="padding:6px 0;font-size:14px;color:#6b7280;">Shipping, taxes & discounts (net)</td>
+                        <td style="padding:6px 0;font-size:14px;color:#6b7280;">Shipping</td>
+                        <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${
+                          order.customer.deliveryMethod === "pickup"
+                            ? "Pickup in store"
+                            : escapeHtml(formatMinorCad(pricing.shippingMinor))
+                        }</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:14px;color:#6b7280;">Tax</td>
                         <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
-                          formatSignedMinorCad(adjustmentsMinor),
+                          formatMinorCad(pricing.taxMinor),
                         )}</td>
                       </tr>
                       <tr>
@@ -521,6 +629,9 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
                       </tr>
                     </table>
                   </td>
+                </tr>
+                <tr>
+                  <td>${buildTrackingHtml({ order, includeLabelLink: true, includeQr: true })}</td>
                 </tr>
                 <tr>
                   <td style="padding:16px 24px;border-top:1px solid #ececec;background:#fafafa;">
@@ -541,10 +652,6 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
   });
 
   if (isCustomerOrderEmailEnabled() && isLikelyEmail(customerRecipient)) {
-    const customerFulfillmentText =
-      order.customer.deliveryMethod === "pickup"
-        ? "Pickup in store selected. We will contact you when your order is ready for collection."
-        : `Shipping to ${toSingleLineAddress(order)}.`;
     const supportLine = supportEmail ? `reply to this email or contact ${supportEmail}` : "reply to this email";
 
     const customerSummaryTable = `
@@ -583,7 +690,9 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
         formatLineItemsText(order),
         "",
         `Subtotal: ${formatMinorCad(order.subtotalMinor)}`,
-        `Shipping/Tax/Discounts (net): ${formatSignedMinorCad(adjustmentsMinor)}`,
+        pricing.discountMinor > 0 ? `Discount${pricing.discountCode ? ` (${pricing.discountCode})` : ""}: -${formatMinorCad(pricing.discountMinor)}` : "",
+        `Shipping: ${order.customer.deliveryMethod === "pickup" ? "Pickup in store" : formatMinorCad(pricing.shippingMinor)}`,
+        `Tax: ${formatMinorCad(pricing.taxMinor)}`,
         `Total: ${formatMinorCad(order.totalMinor)}`,
         "",
         order.customer.deliveryMethod === "pickup"
@@ -591,13 +700,18 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
           : `Shipping Address: ${toSingleLineAddress(order)}`,
         order.customer.deliveryMethod === "pickup"
           ? "We'll email you when your order is ready for pickup."
-          : "You will receive another email once your order ships with tracking details.",
+          : order.shipment
+          ? "Your shipment details are ready below."
+          : "We will email you with tracking details as soon as your shipment is ready.",
+        ...buildTrackingText(order).filter((line) => !line.startsWith("Label:")),
         "",
         `Questions? Please ${supportLine}.`,
         `${brandName} | ${storeLocation}`,
         `Website: ${websiteUrl}`,
         `Instagram: ${instagramUrl}`,
-      ].join("\n"),
+      ]
+        .filter(Boolean)
+        .join("\n"),
       html: `
         <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;color:#111827;">
           <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f5f5;padding:24px 12px;">
@@ -651,10 +765,30 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
                             formatMinorCad(order.subtotalMinor),
                           )}</td>
                         </tr>
+                        ${
+                          pricing.discountMinor > 0
+                            ? `<tr>
+                                 <td style="padding:6px 0;font-size:14px;color:#6b7280;">Discount${
+                                   pricing.discountCode ? ` (${escapeHtml(pricing.discountCode)})` : ""
+                                 }</td>
+                                 <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">-${escapeHtml(
+                                   formatMinorCad(pricing.discountMinor),
+                                 )}</td>
+                               </tr>`
+                            : ""
+                        }
                         <tr>
-                          <td style="padding:6px 0;font-size:14px;color:#6b7280;">Shipping, taxes & discounts (net)</td>
+                          <td style="padding:6px 0;font-size:14px;color:#6b7280;">Shipping</td>
+                          <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${
+                            order.customer.deliveryMethod === "pickup"
+                              ? "Pickup in store"
+                              : escapeHtml(formatMinorCad(pricing.shippingMinor))
+                          }</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:6px 0;font-size:14px;color:#6b7280;">Tax</td>
                           <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
-                            formatSignedMinorCad(adjustmentsMinor),
+                            formatMinorCad(pricing.taxMinor),
                           )}</td>
                         </tr>
                         <tr>
@@ -683,9 +817,16 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
                           : `<p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Shipping Address:</strong> ${escapeHtml(
                               toSingleLineAddress(order),
                             )}</p>
-                             <p style="margin:0;font-size:14px;color:#4b5563;">You will receive another email once your order ships with tracking details.</p>`
+                             <p style="margin:0;font-size:14px;color:#4b5563;">${
+                               order.shipment
+                                 ? "Your shipment details are ready below."
+                                 : "We will email you with tracking details as soon as your shipment is ready."
+                             }</p>`
                       }
                     </td>
+                  </tr>
+                  <tr>
+                    <td>${buildTrackingHtml({ order, includeQr: true })}</td>
                   </tr>
                   <tr>
                     <td style="padding:0 24px 20px 24px;">

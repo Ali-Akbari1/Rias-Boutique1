@@ -1,4 +1,7 @@
+import { createHmac } from "node:crypto";
 import type { ApiRequest, ApiResponse } from "../../../server/lib/http.js";
+import { createDeterministicHash } from "../../../server/lib/http.js";
+import { canonicalizeCartItems } from "../../../server/lib/security.js";
 
 export interface MockResponse extends ApiResponse {
   statusCode: number;
@@ -46,4 +49,88 @@ export const createMockResponse = (): MockResponse => {
   };
 
   return response;
+};
+
+export const createSignedShippingQuoteToken = ({
+  customer,
+  items,
+  subtotalMinor,
+  shipmentId = "shp_test_123",
+  rateId = "rate_test_123",
+  carrier = "Canada Post",
+  service = "Expedited Parcel",
+  quotedRateMinor = 1800,
+  customerRateMinor = 1800,
+  currency = "CAD",
+  freeShippingApplied = false,
+}: {
+  customer: {
+    deliveryMethod?: "shipping" | "pickup";
+    fullName: string;
+    email: string;
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  items: Array<{ productId: string; quantity: number }>;
+  subtotalMinor: number;
+  shipmentId?: string;
+  rateId?: string;
+  carrier?: string;
+  service?: string;
+  quotedRateMinor?: number;
+  customerRateMinor?: number;
+  currency?: string;
+  freeShippingApplied?: boolean;
+}) => {
+  const secret =
+    process.env.EASYPOST_QUOTE_SECRET?.trim() ||
+    process.env.CART_TOKEN_SECRET?.trim() ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
+    "test_shipping_quote_secret";
+  const canonicalCart =
+    canonicalizeCartItems(
+      items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      })),
+    ) || "";
+  const shippingFingerprint = [
+    customer.deliveryMethod || "shipping",
+    customer.fullName,
+    customer.email,
+    customer.address,
+    customer.city,
+    customer.state,
+    customer.postalCode,
+    customer.country,
+  ]
+    .map((part) => part.trim().toLowerCase())
+    .join("|");
+  const contextHash = createDeterministicHash(`${shippingFingerprint}|${canonicalCart}|${subtotalMinor}`);
+  const selectedAt = new Date(Date.now() - 60_000).toISOString();
+  const expiresAt = new Date(Date.now() + 30 * 60_000).toISOString();
+  const payload = {
+    v: 1,
+    provider: "easypost",
+    shipmentId,
+    rateId,
+    carrier,
+    service,
+    quotedRateMinor,
+    customerRateMinor,
+    currency,
+    deliveryDays: 4,
+    deliveryDate: "",
+    freeShippingApplied,
+    selectedAt,
+    expiresAt,
+    contextHash,
+  };
+
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const signature = createHmac("sha256", secret).update(body).digest("base64url");
+  return `${body}.${signature}`;
 };

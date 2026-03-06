@@ -25,6 +25,52 @@ export interface OrderLineItem {
   lineTotalMinor: number;
 }
 
+export interface OrderPricing {
+  discountCode: string;
+  discountMinor: number;
+  shippingMinor: number;
+  quotedShippingMinor: number;
+  taxMinor: number;
+  freeShippingApplied: boolean;
+}
+
+export interface StoredShippingQuote {
+  provider: "easypost";
+  shipmentId: string;
+  rateId: string;
+  carrier: string;
+  service: string;
+  quotedRateMinor: number;
+  customerRateMinor: number;
+  currency: string;
+  deliveryDays: number | null;
+  deliveryDate: string;
+  freeShippingApplied: boolean;
+  selectedAt: string;
+  expiresAt: string;
+  contextHash: string;
+  tokenHash: string;
+}
+
+export interface StoredShipment {
+  provider: "easypost";
+  shipmentId: string;
+  rateId: string;
+  carrier: string;
+  service: string;
+  quotedRateMinor: number;
+  customerRateMinor: number;
+  currency: string;
+  trackingCode: string;
+  trackingUrl: string;
+  labelUrl: string;
+  labelPdfUrl: string;
+  trackingQrCodeDataUrl: string;
+  labelQrCodeDataUrl: string;
+  status: string;
+  purchasedAt: string;
+}
+
 export interface StoredOrder {
   id: string;
   paymentStatus: PaymentStatus;
@@ -35,8 +81,11 @@ export interface StoredOrder {
   currency: string;
   subtotalMinor: number;
   totalMinor: number;
+  pricing: OrderPricing;
   customer: OrderCustomer;
   lineItems: OrderLineItem[];
+  shippingQuote: StoredShippingQuote | null;
+  shipment: StoredShipment | null;
   createdAt: string;
   updatedAt: string;
   paidAt: string;
@@ -50,6 +99,8 @@ interface CreatePendingOrderInput {
   lineItems: OrderLineItem[];
   subtotalMinor: number;
   totalMinor: number;
+  pricing: OrderPricing;
+  shippingQuote?: StoredShippingQuote | null;
 }
 
 interface SupabaseErrorLike {
@@ -83,8 +134,11 @@ const memoryWebhookEvents = new Map<string, WebhookEventRecord>();
 
 const cloneOrder = (order: StoredOrder): StoredOrder => ({
   ...order,
+  pricing: { ...order.pricing },
   customer: { ...order.customer },
   lineItems: order.lineItems.map((item) => ({ ...item })),
+  shippingQuote: order.shippingQuote ? { ...order.shippingQuote } : null,
+  shipment: order.shipment ? { ...order.shipment } : null,
 });
 
 const asString = (value: unknown) => (typeof value === "string" ? value : "");
@@ -122,6 +176,81 @@ const normalizeCustomer = (value: unknown): OrderCustomer => {
   };
 };
 
+const normalizePricing = (value: unknown): OrderPricing => {
+  const pricing = asJsonField<Partial<OrderPricing>>(value, {});
+  return {
+    discountCode: asString(pricing.discountCode).trim().toUpperCase(),
+    discountMinor: asNumber(pricing.discountMinor),
+    shippingMinor: asNumber(pricing.shippingMinor),
+    quotedShippingMinor: asNumber(pricing.quotedShippingMinor),
+    taxMinor: asNumber(pricing.taxMinor),
+    freeShippingApplied: Boolean(pricing.freeShippingApplied),
+  };
+};
+
+const normalizeShippingQuote = (value: unknown): StoredShippingQuote | null => {
+  const quote = asObject(asJsonField<Record<string, unknown> | null>(value, null));
+  if (!quote) {
+    return null;
+  }
+
+  const shipmentId = asString(quote.shipmentId);
+  const rateId = asString(quote.rateId);
+  if (!shipmentId || !rateId) {
+    return null;
+  }
+
+  return {
+    provider: "easypost",
+    shipmentId,
+    rateId,
+    carrier: asString(quote.carrier),
+    service: asString(quote.service),
+    quotedRateMinor: asNumber(quote.quotedRateMinor),
+    customerRateMinor: asNumber(quote.customerRateMinor),
+    currency: asString(quote.currency) || DEFAULT_CURRENCY,
+    deliveryDays: typeof quote.deliveryDays === "number" && Number.isFinite(quote.deliveryDays) ? quote.deliveryDays : null,
+    deliveryDate: asString(quote.deliveryDate),
+    freeShippingApplied: Boolean(quote.freeShippingApplied),
+    selectedAt: asString(quote.selectedAt),
+    expiresAt: asString(quote.expiresAt),
+    contextHash: asString(quote.contextHash),
+    tokenHash: asString(quote.tokenHash),
+  };
+};
+
+const normalizeShipment = (value: unknown): StoredShipment | null => {
+  const shipment = asObject(asJsonField<Record<string, unknown> | null>(value, null));
+  if (!shipment) {
+    return null;
+  }
+
+  const shipmentId = asString(shipment.shipmentId);
+  const rateId = asString(shipment.rateId);
+  if (!shipmentId || !rateId) {
+    return null;
+  }
+
+  return {
+    provider: "easypost",
+    shipmentId,
+    rateId,
+    carrier: asString(shipment.carrier),
+    service: asString(shipment.service),
+    quotedRateMinor: asNumber(shipment.quotedRateMinor),
+    customerRateMinor: asNumber(shipment.customerRateMinor),
+    currency: asString(shipment.currency) || DEFAULT_CURRENCY,
+    trackingCode: asString(shipment.trackingCode),
+    trackingUrl: asString(shipment.trackingUrl),
+    labelUrl: asString(shipment.labelUrl),
+    labelPdfUrl: asString(shipment.labelPdfUrl),
+    trackingQrCodeDataUrl: asString(shipment.trackingQrCodeDataUrl),
+    labelQrCodeDataUrl: asString(shipment.labelQrCodeDataUrl),
+    status: asString(shipment.status),
+    purchasedAt: asString(shipment.purchasedAt),
+  };
+};
+
 const parseOrderRow = (row: Record<string, unknown>): StoredOrder => ({
   id: asString(row.id),
   paymentStatus: (asString(row.payment_status) as PaymentStatus) || "pending",
@@ -132,8 +261,11 @@ const parseOrderRow = (row: Record<string, unknown>): StoredOrder => ({
   currency: asString(row.currency) || DEFAULT_CURRENCY,
   subtotalMinor: asNumber(row.subtotal_minor),
   totalMinor: asNumber(row.total_minor),
+  pricing: normalizePricing(row.pricing_json),
   customer: normalizeCustomer(row.customer_json),
   lineItems: asJsonField<OrderLineItem[]>(row.line_items_json, []),
+  shippingQuote: normalizeShippingQuote(row.shipping_quote_json),
+  shipment: normalizeShipment(row.shipment_json),
   createdAt: asString(row.created_at),
   updatedAt: asString(row.updated_at),
   paidAt: asString(row.paid_at),
@@ -236,8 +368,11 @@ export const createPendingOrder = async (input: CreatePendingOrderInput) => {
       currency: DEFAULT_CURRENCY,
       subtotalMinor: input.subtotalMinor,
       totalMinor: input.totalMinor,
+      pricing: { ...input.pricing },
       customer: { ...input.customer },
       lineItems: input.lineItems.map((lineItem) => ({ ...lineItem })),
+      shippingQuote: input.shippingQuote ? { ...input.shippingQuote } : null,
+      shipment: null,
       createdAt,
       updatedAt: createdAt,
       paidAt: "",
@@ -258,8 +393,11 @@ export const createPendingOrder = async (input: CreatePendingOrderInput) => {
     currency: DEFAULT_CURRENCY,
     subtotal_minor: input.subtotalMinor,
     total_minor: input.totalMinor,
+    pricing_json: input.pricing,
     customer_json: input.customer,
     line_items_json: input.lineItems,
+    shipping_quote_json: input.shippingQuote || null,
+    shipment_json: null,
     created_at: createdAt,
     updated_at: createdAt,
   });
@@ -481,6 +619,44 @@ export const markConfirmationEmailSent = async (orderId: string) => {
     })
     .eq("id", orderId);
   ensureNoSupabaseError(error, "mark confirmation email as sent");
+};
+
+export const saveOrderShipment = async ({
+  orderId,
+  shipment,
+}: {
+  orderId: string;
+  shipment: StoredShipment;
+}) => {
+  const updatedAt = nowIso();
+
+  if (isMemoryStoreEnabled()) {
+    const order = memoryOrders.get(orderId);
+    if (!order) {
+      throw new Error(`Order ${orderId} not found.`);
+    }
+
+    order.shipment = { ...shipment };
+    order.updatedAt = updatedAt;
+    memoryOrders.set(orderId, cloneOrder(order));
+    return cloneOrder(order);
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      shipment_json: shipment,
+      updated_at: updatedAt,
+    })
+    .eq("id", orderId);
+  ensureNoSupabaseError(error, "save shipment details");
+
+  const updatedOrder = await findOrderById(orderId);
+  if (!updatedOrder) {
+    throw new Error(`Order ${orderId} could not be loaded after shipment save.`);
+  }
+  return updatedOrder;
 };
 
 export const listOrders = async () => {

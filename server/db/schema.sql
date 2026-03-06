@@ -9,14 +9,21 @@ create table if not exists orders (
   currency text not null default 'CAD',
   subtotal_minor integer not null,
   total_minor integer not null,
+  pricing_json jsonb not null default '{}'::jsonb,
   customer_json jsonb not null,
   line_items_json jsonb not null,
+  shipping_quote_json jsonb,
+  shipment_json jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   paid_at timestamptz,
   confirmation_email_sent_at timestamptz,
   last_error text
 );
+
+alter table orders add column if not exists pricing_json jsonb not null default '{}'::jsonb;
+alter table orders add column if not exists shipping_quote_json jsonb;
+alter table orders add column if not exists shipment_json jsonb;
 
 create index if not exists idx_orders_payment_status on orders (payment_status);
 create index if not exists idx_orders_created_at on orders (created_at);

@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import adminOrdersHandler from "../../api/admin-orders";
 import checkoutHandler from "../../api/clover-checkout";
 import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
-import { createMockRequest, createMockResponse } from "./test-utils/utils";
+import { createMockRequest, createMockResponse, createSignedShippingQuoteToken } from "./test-utils/utils";
 
 const ADMIN_TOKEN = "admin-token-for-tests";
 
-const buildCheckoutBody = () => ({
-  customer: {
+const buildCheckoutBody = () => {
+  const customer = {
     fullName: "Admin Orders Customer",
     email: "admin-orders@example.com",
     phone: "+1 (403) 555-0101",
@@ -17,9 +17,23 @@ const buildCheckoutBody = () => ({
     state: "Alberta",
     postalCode: "T2X 1A1",
     country: "Canada",
-  },
-  items: [{ productId: "Royal-Blue", quantity: 1 }],
-});
+  };
+  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 1 }];
+
+  return {
+    customer,
+    items,
+    shippingQuote: {
+      token: createSignedShippingQuoteToken({
+        customer,
+        items,
+        subtotalMinor: 40_000,
+        customerRateMinor: 1_800,
+        quotedRateMinor: 1_800,
+      }),
+    },
+  };
+};
 
 describe("admin orders endpoint", () => {
   beforeEach(async () => {
@@ -30,6 +44,14 @@ describe("admin orders endpoint", () => {
     process.env.CLOVER_PRIVATE_TOKEN = "private_token_123";
     process.env.CLOVER_CHECKOUT_BASE_URL = "https://www.riasboutique.com";
     process.env.CLOVER_API_BASE_URL = "https://apisandbox.dev.clover.com";
+    process.env.ENABLE_SHIPPING_CHARGES = "true";
+    process.env.EASYPOST_QUOTE_SECRET = "test_shipping_quote_secret";
+    process.env.EASYPOST_API_KEY = "ezak_test_123";
+    process.env.EASYPOST_FROM_STREET1 = "260300 Writing Creek Cres Floor 1 Unit H31";
+    process.env.EASYPOST_FROM_CITY = "Balzac";
+    process.env.EASYPOST_FROM_STATE = "AB";
+    process.env.EASYPOST_FROM_ZIP = "T4A 0X8";
+    process.env.EASYPOST_FROM_COUNTRY = "CA";
     process.env.ADMIN_DASHBOARD_TOKEN = ADMIN_TOKEN;
     await resetOrderStoreForTests();
   });

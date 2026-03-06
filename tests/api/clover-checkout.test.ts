@@ -1,11 +1,11 @@
 /** @vitest-environment node */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import handler from "../../api/clover-checkout";
-import { createMockRequest, createMockResponse } from "./test-utils/utils";
+import { createMockRequest, createMockResponse, createSignedShippingQuoteToken } from "./test-utils/utils";
 import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
 
-const makeCheckoutBody = () => ({
-  customer: {
+const makeCheckoutBody = () => {
+  const customer = {
     fullName: "Test Customer",
     email: "test@example.com",
     phone: "+1 (403) 555-0101",
@@ -14,9 +14,24 @@ const makeCheckoutBody = () => ({
     state: "Alberta",
     postalCode: "T2X 1A1",
     country: "Canada",
-  },
-  items: [{ productId: "Royal-Blue", quantity: 2 }],
-});
+  };
+  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 2 }];
+
+  return {
+    customer,
+    items,
+    shippingQuote: {
+      token: createSignedShippingQuoteToken({
+        customer,
+        items,
+        subtotalMinor: 80_000,
+        customerRateMinor: 0,
+        quotedRateMinor: 1_800,
+        freeShippingApplied: true,
+      }),
+    },
+  };
+};
 
 describe("clover checkout endpoint", () => {
   beforeEach(async () => {
@@ -28,7 +43,14 @@ describe("clover checkout endpoint", () => {
     process.env.CLOVER_PRIVATE_TOKEN = "private_token_123";
     process.env.CLOVER_CHECKOUT_BASE_URL = "https://www.riasboutique.com";
     process.env.CLOVER_API_BASE_URL = "https://apisandbox.dev.clover.com";
-    process.env.ENABLE_SHIPPING_CHARGES = "";
+    process.env.ENABLE_SHIPPING_CHARGES = "true";
+    process.env.EASYPOST_QUOTE_SECRET = "test_shipping_quote_secret";
+    process.env.EASYPOST_API_KEY = "ezak_test_123";
+    process.env.EASYPOST_FROM_STREET1 = "260300 Writing Creek Cres Floor 1 Unit H31";
+    process.env.EASYPOST_FROM_CITY = "Balzac";
+    process.env.EASYPOST_FROM_STATE = "AB";
+    process.env.EASYPOST_FROM_ZIP = "T4A 0X8";
+    process.env.EASYPOST_FROM_COUNTRY = "CA";
 
     await resetOrderStoreForTests();
   });
@@ -142,7 +164,6 @@ describe("clover checkout endpoint", () => {
     const response = createMockResponse();
 
     await handler(request, response);
-
     expect(response.statusCode).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
@@ -166,7 +187,7 @@ describe("clover checkout endpoint", () => {
           ...makeCheckoutBody().customer,
           email: "not-an-email",
         },
-        items: [{ productId: "Royal-Blue", quantity: 11 }],
+        items: [{ productId: "Blue-Cheerma-Dozi", quantity: 11 }],
       }),
     });
     const response = createMockResponse();
@@ -245,8 +266,8 @@ describe("clover checkout endpoint", () => {
 
     expect(lineItems.every((lineItem) => lineItem.price > 0)).toBe(true);
     expect(lineItems.some((lineItem) => lineItem.name.includes("Discount"))).toBe(false);
-    expect(taxLine?.price).toBe(2250);
-    expect(lineItemsTotal).toBe(47250);
+    expect(taxLine?.price).toBe(3600);
+    expect(lineItemsTotal).toBe(75600);
   });
 
   it("uses trusted server pricing instead of client price", async () => {
@@ -266,7 +287,7 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        items: [{ productId: "Royal-Blue", quantity: 2, unitAmount: 1 }],
+        items: [{ productId: "Blue-Cheerma-Dozi", quantity: 2, unitAmount: 1 }],
       }),
     });
     const response = createMockResponse();
@@ -293,7 +314,7 @@ describe("clover checkout endpoint", () => {
     const fetchPayload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body || "{}")) as {
       shoppingCart?: { lineItems?: Array<{ price: number; unitQty: number }> };
     };
-    expect(fetchPayload.shoppingCart?.lineItems?.[0]?.price).toBe(25000);
+    expect(fetchPayload.shoppingCart?.lineItems?.[0]?.price).toBe(40000);
     expect(fetchPayload.shoppingCart?.lineItems?.[0]?.unitQty).toBe(2);
   });
 

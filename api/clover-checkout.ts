@@ -28,6 +28,12 @@ import {
 } from "../server/lib/order-store.js";
 import { CloverApiError, createCloverCheckoutSession } from "../server/lib/clover.js";
 import {
+  buildCheckoutPricing,
+  getFreeShippingThresholdMinor,
+  isShippingChargesEnabled,
+} from "../server/lib/checkout-pricing.js";
+import { verifyShippingQuoteToken } from "../server/lib/easypost.js";
+import {
   getLaunchDiscountExpiryDisplay,
   isLaunchDiscountActive,
   LAUNCH_DISCOUNT_CODE,
@@ -36,9 +42,6 @@ import {
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
-const SHIPPING_FLAT_RATE_MINOR = 3_000; // CA$30.00
-const FREE_SHIPPING_THRESHOLD_MINOR = 40_000; // CA$400.00
-const TAX_RATE = 0.05; // 5%
 const isDebugLoggingEnabled = () => process.env.CLOVER_DEBUG_LOGS?.trim().toLowerCase() === "true";
 const createRequestId = () => createDeterministicHash(`${Date.now()}|${Math.random()}`).slice(0, 12);
 const maskValue = (value: string, keepStart = 3, keepEnd = 4) => {
@@ -51,15 +54,6 @@ const maskValue = (value: string, keepStart = 3, keepEnd = 4) => {
   return `${value.slice(0, keepStart)}...${value.slice(-keepEnd)}`;
 };
 const safeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
-const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
-const isShippingChargesEnabled = () => {
-  const serverToggle = process.env.ENABLE_SHIPPING_CHARGES;
-  if (typeof serverToggle === "string" && serverToggle.trim().length > 0) {
-    return toBoolean(serverToggle);
-  }
-
-  return toBoolean(process.env.VITE_ENABLE_SHIPPING_CHARGES);
-};
 
 const getCheckoutBaseUrl = () => process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "";
 
@@ -346,14 +340,47 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     requestedDiscountCode === LAUNCH_DISCOUNT_CODE && launchDiscountActive
       ? Math.round(subtotalMinor * LAUNCH_DISCOUNT_RATE)
       : 0;
-  const discountedSubtotalMinor = Math.max(0, subtotalMinor - discountMinor);
   const isPickupInStore = payload.customer.deliveryMethod === "pickup";
-  const shippingMinor =
-    !isPickupInStore && isShippingChargesEnabled() && subtotalMinor < FREE_SHIPPING_THRESHOLD_MINOR
-      ? SHIPPING_FLAT_RATE_MINOR
-      : 0;
-  const taxMinor = Math.round((discountedSubtotalMinor + shippingMinor) * TAX_RATE);
-  const totalMinor = discountedSubtotalMinor + shippingMinor + taxMinor;
+  const freeShippingThresholdMinor = getFreeShippingThresholdMinor();
+  const freeShippingApplied = !isPickupInStore && subtotalMinor >= freeShippingThresholdMinor;
+  let verifiedShippingQuote = null;
+
+  if (!isPickupInStore) {
+    if (!isShippingChargesEnabled()) {
+      sendError(res, 503, "SHIPPING_NOT_AVAILABLE", "Shipping is not available right now. Please select pickup.");
+      return;
+    }
+
+    const shippingQuoteToken = payload.shippingQuote?.token?.trim() || "";
+    if (!shippingQuoteToken) {
+      sendError(res, 400, "SHIPPING_QUOTE_REQUIRED", "Select a shipping option before continuing to payment.");
+      return;
+    }
+
+    try {
+      verifiedShippingQuote = verifyShippingQuoteToken({
+        token: shippingQuoteToken,
+        customer: payload.customer,
+        items: payload.items,
+        subtotalMinor,
+      });
+    } catch (error) {
+      sendError(
+        res,
+        400,
+        "INVALID_SHIPPING_QUOTE",
+        error instanceof Error ? error.message : "Shipping quote is invalid. Please refresh rates and try again.",
+      );
+      return;
+    }
+  }
+
+  const shippingMinor = isPickupInStore ? 0 : verifiedShippingQuote?.customerRateMinor || 0;
+  const { taxMinor, totalMinor } = buildCheckoutPricing({
+    subtotalMinor,
+    discountMinor,
+    shippingMinor,
+  });
 
   const shippingFingerprint = toShippingFingerprint(payload.customer);
   const idempotencyKey =
@@ -413,6 +440,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       lineItems,
       subtotalMinor,
       totalMinor,
+      pricing: {
+        discountCode: requestedDiscountCode,
+        discountMinor,
+        shippingMinor,
+        quotedShippingMinor: verifiedShippingQuote?.quotedRateMinor || 0,
+        taxMinor,
+        freeShippingApplied,
+      },
+      shippingQuote: verifiedShippingQuote,
     });
 
   if (debugLogs) {
@@ -422,6 +458,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       itemCount: lineItems.length,
       subtotalMinor,
       shippingMinor,
+      quotedShippingMinor: verifiedShippingQuote?.quotedRateMinor || 0,
       discountMinor,
       taxMinor,
       totalMinor,

@@ -10,6 +10,7 @@ import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.
 import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
 import { CloverApiError, fetchCloverCheckoutStatus } from "../server/lib/clover.js";
 import { sendOrderConfirmationEmail } from "../server/lib/email.js";
+import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
 
 const DEFAULT_RATE_LIMIT = 120;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
@@ -173,6 +174,19 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
             orderId: order.id,
             paymentReference: cloverStatus.paymentReference || targetCheckoutId,
           });
+
+          if (order.customer.deliveryMethod === "shipping" && !order.shipment) {
+            try {
+              order = await ensureShipmentForOrder(order);
+            } catch (shipmentError) {
+              console.error("[order-status] shipment purchase failed", {
+                requestId,
+                orderId: order.id,
+                checkoutId: targetCheckoutId,
+                error: safeErrorMessage(shipmentError),
+              });
+            }
+          }
 
           if (!order.confirmationEmailSentAt) {
             try {

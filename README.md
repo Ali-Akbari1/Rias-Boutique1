@@ -10,7 +10,8 @@ Live site: `https://www.riasboutique.com`
 - Product detail pages with gallery, zoom, sizes, colors, and care details.
 - Cart drawer with quantity controls and subtotal.
 - Optional Clover Checkout flow (`/checkout`, `/checkout/success`, `/checkout/cancel`).
-- Admin orders dashboard (`/orders-admin`) for viewing paid/pending orders and shipping details.
+- EasyPost live shipping quotes in checkout, with free shipping over CA$400 still applied server-side.
+- Admin orders dashboard (`/orders-admin`) for viewing paid/pending orders, tracking details, label links, and QR codes.
 - Google Reviews section with live fetch fallback to curated reviews.
 - Instagram highlights driven by environment config.
 - Decap CMS for non-coder product editing and media uploads.
@@ -23,6 +24,7 @@ Live site: `https://www.riasboutique.com`
 - Tailwind CSS + shadcn/ui (Radix)
 - React Router
 - Clover Hosted Checkout API
+- EasyPost Shipping API
 - Decap CMS
 - Vitest + Testing Library
 
@@ -95,6 +97,8 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `CLOVER_ENABLE_TIPS`: Optional `true`/`false` to enable tips in hosted checkout.
 - `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
 - `CLOVER_DEBUG_LOGS`: Optional `true`/`false` to enable verbose Clover diagnostics in Vercel logs.
+- `FREE_SHIPPING_THRESHOLD_MINOR`: Optional shipping threshold in minor units (default `40000` = CA$400.00).
+- `CHECKOUT_TAX_RATE`: Optional checkout tax rate (default `0.05` for 5% GST).
 - `LAUNCH10_EXPIRES_AT`: Optional ISO timestamp for launch discount expiry (default `2026-03-21T05:59:59.999Z`, which is March 20, 2026 at 11:59 PM in Calgary).
 - `MERCHANT_ORDER_EMAIL`: Store inbox that receives new paid order alerts.
 - `CUSTOMER_ORDER_EMAIL_ENABLED`: Optional `true`/`false` (default `true`) to send customer order confirmation emails after payment.
@@ -105,6 +109,17 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `EMAIL_LOGO_URL`: Optional logo URL rendered in customer confirmation email header.
 - `STORE_BRAND_NAME`: Optional brand label for transactional emails (default `Ria's Boutique`).
 - `STORE_LOCATION_DISPLAY`: Optional location text in email footer (default `Calgary, AB`).
+- `EASYPOST_API_KEY`: Required to fetch live shipping rates and buy labels after payment.
+- `EASYPOST_API_BASE_URL`: Optional EasyPost API base URL (default `https://api.easypost.com/v2`).
+- `EASYPOST_QUOTE_SECRET`: Optional dedicated HMAC secret for signed shipping quote tokens. If omitted, server falls back to `CART_TOKEN_SECRET` or `SUPABASE_SERVICE_ROLE_KEY`.
+- `EASYPOST_QUOTE_TTL_MS`: Optional shipping quote lifetime in milliseconds (default `1800000` = 30 minutes).
+- `EASYPOST_PREFERRED_CARRIERS`: Optional comma-separated carrier preference list. Defaults to `Canada Post`, and matching carriers are prioritized before all others.
+- `EASYPOST_PREFERRED_SERVICES`: Optional comma-separated service preference list used inside the preferred carrier set.
+- `EASYPOST_FROM_*`: Origin address/contact used for EasyPost shipments (`NAME`, `COMPANY`, `STREET1`, `STREET2`, `CITY`, `STATE`, `ZIP`, `COUNTRY`, `PHONE`, `EMAIL`).
+- `EASYPOST_PARCEL_LENGTH_IN`, `EASYPOST_PARCEL_WIDTH_IN`, `EASYPOST_PARCEL_HEIGHT_IN`: Default parcel dimensions used for quotes.
+- `EASYPOST_ITEM_WEIGHT_OZ`: Estimated first-item parcel weight in ounces.
+- `EASYPOST_ADDITIONAL_ITEM_WEIGHT_OZ`: Additional estimated weight per extra item in ounces.
+- `EASYPOST_ADDITIONAL_ITEM_HEIGHT_IN`: Additional estimated parcel height per extra item.
 - `SUPABASE_URL`: Supabase project URL for server-side order persistence.
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key used by serverless checkout/webhook/order endpoints.
 - `VITE_SUPABASE_URL`: Optional client URL if frontend calls Supabase directly.
@@ -116,6 +131,8 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `DISCOUNT_SIGNUP_RATE_LIMIT`: Optional rate limit for `/api/discount-signup` (default `20`).
 - `DISCOUNT_SIGNUP_RATE_WINDOW_MS`: Optional rate limit window in milliseconds for `/api/discount-signup` (default `60000`).
 - `DISCOUNT_CAMPAIGN_NAME`: Optional campaign label stored with popup signups (default `launch10_2026_03_20`).
+- `SHIPPING_RATES_RATE_LIMIT`: Optional rate limit for `/api/shipping-rates` (default `40`).
+- `SHIPPING_RATES_RATE_WINDOW_MS`: Optional rate limit window for `/api/shipping-rates` (default `60000`).
 - `GITHUB_OAUTH_CLIENT_ID`: For Decap GitHub auth.
 - `GITHUB_OAUTH_CLIENT_SECRET`: For Decap GitHub auth.
 - `CMS_BASE_URL`: Base URL used by OAuth callbacks, e.g. `https://www.riasboutique.com`.
@@ -129,13 +146,15 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
    - `CLOVER_MERCHANT_ID`
    - `CLOVER_PRIVATE_TOKEN`
    - `CLOVER_CHECKOUT_BASE_URL` (must be `https://...`)
+   - `EASYPOST_API_KEY`
+   - `EASYPOST_FROM_*` origin address fields
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
 4. Restart/redeploy.
 
-When checkout starts, frontend posts cart/customer data to `api/clover-checkout`, the server creates a Clover checkout session, and the user is redirected to Clover's hosted payment page.
+When checkout starts, frontend first requests live shipping rates from `api/shipping-rates`. The selected EasyPost quote is signed by the server, posted to `api/clover-checkout`, and used to create the Clover checkout session. After payment confirmation, the server buys the EasyPost label, stores tracking/QR details, and includes tracking information in merchant/customer order emails when available.
 
-Before first live checkout, run `server/db/schema.sql` in your Supabase SQL Editor.
+Before first live checkout, run `server/db/schema.sql` in your Supabase SQL Editor. Existing projects should rerun it so the new `pricing_json`, `shipping_quote_json`, and `shipment_json` columns are added to `orders`.
 
 ## Product content model
 

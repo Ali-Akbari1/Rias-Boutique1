@@ -5,9 +5,45 @@ interface CheckoutItemPayload {
   quantity: number;
 }
 
+interface ShippingCustomerPayload {
+  deliveryMethod: "shipping" | "pickup";
+  fullName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
+
 interface CartTokenResponse {
   cartToken?: string;
   cartTimestamp?: number;
+}
+
+export interface ShippingRateOption {
+  token: string;
+  carrier: string;
+  service: string;
+  label: string;
+  quotedRateMinor: number;
+  customerRateMinor: number;
+  currency: string;
+  deliveryDays: number | null;
+  deliveryDate: string;
+  shipmentId: string;
+}
+
+export interface ShippingRatesResponse {
+  provider?: "easypost";
+  requiresSelection?: boolean;
+  freeShippingApplied?: boolean;
+  freeShippingThresholdMinor?: number;
+  options?: ShippingRateOption[];
+  selectedOptionToken?: string;
+  quoteExpiresAt?: string;
+  message?: string;
 }
 
 const normalizeLineItems = (items: CheckoutItemPayload[]) =>
@@ -29,16 +65,18 @@ export const buildClientIdempotencyKey = ({
   postalCode,
   discountCode,
   items,
+  shippingContext = "",
   timeBucket = Math.floor(Date.now() / (15 * 60 * 1000)),
 }: {
   email: string;
   postalCode: string;
   discountCode?: string;
   items: CheckoutItemPayload[];
+  shippingContext?: string;
   timeBucket?: number;
 }) => {
   const normalized = normalizeLineItems(items);
-  const payload = `${email.trim().toLowerCase()}|${postalCode.trim().toLowerCase()}|${(discountCode || "").trim().toUpperCase()}|${JSON.stringify(normalized)}|${timeBucket}`;
+  const payload = `${email.trim().toLowerCase()}|${postalCode.trim().toLowerCase()}|${(discountCode || "").trim().toUpperCase()}|${shippingContext.trim().toLowerCase()}|${JSON.stringify(normalized)}|${timeBucket}`;
 
   let hash = 5381;
   for (let index = 0; index < payload.length; index += 1) {
@@ -92,6 +130,35 @@ export const requestOptionalCartToken = async (items: CheckoutItemPayload[]) => 
     cartToken: typeof payload.cartToken === "string" ? payload.cartToken : "",
     cartTimestamp: typeof payload.cartTimestamp === "number" ? payload.cartTimestamp : 0,
   };
+};
+
+export const requestShippingRates = async ({
+  customer,
+  items,
+  signal,
+}: {
+  customer: ShippingCustomerPayload;
+  items: CheckoutItemPayload[];
+  signal?: AbortSignal;
+}) => {
+  const response = await fetch("/api/shipping-rates", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    signal,
+    body: JSON.stringify({
+      customer,
+      items,
+    }),
+  });
+
+  const payload = (await response.json().catch(() => ({}))) as ShippingRatesResponse;
+  if (!response.ok) {
+    throw new Error(extractApiErrorMessage(payload, "Unable to calculate shipping right now."));
+  }
+
+  return payload;
 };
 
 export const redirectToCheckout = (checkoutUrl: string) => {

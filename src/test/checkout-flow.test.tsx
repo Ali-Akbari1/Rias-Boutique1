@@ -11,6 +11,7 @@ const CART_STORAGE_KEY = "rias_boutique_cart_v1";
 describe("checkout flow", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.stubEnv("VITE_ENABLE_SHIPPING_CHARGES", "true");
     window.localStorage.clear();
   });
 
@@ -32,6 +33,38 @@ describe("checkout flow", () => {
       const url = String(input);
       if (url.includes("/api/cart-token")) {
         return new Response(JSON.stringify({ error: { code: "TOKEN_DISABLED", message: "disabled" } }), { status: 404 });
+      }
+
+      if (url.includes("/api/shipping-rates")) {
+        return new Response(
+          JSON.stringify({
+            provider: "easypost",
+            requiresSelection: false,
+            freeShippingApplied: false,
+            freeShippingThresholdMinor: 40000,
+            options: [
+              {
+                token: "quote_token_123",
+                carrier: "Canada Post",
+                service: "Expedited Parcel",
+                label: "Canada Post Expedited Parcel",
+                quotedRateMinor: 1800,
+                customerRateMinor: 1800,
+                currency: "CAD",
+                deliveryDays: 4,
+                deliveryDate: "",
+                shipmentId: "shp_test_123",
+              },
+            ],
+            selectedOptionToken: "quote_token_123",
+            quoteExpiresAt: "2026-03-21T05:59:59.999Z",
+            message: "Live shipping loaded.",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
       }
 
       return new Response(JSON.stringify({ checkoutUrl: "https://checkout.clover.com/pay/abc", orderId: "order_1" }), {
@@ -60,10 +93,14 @@ describe("checkout flow", () => {
     fireEvent.change(screen.getByLabelText(/zip \/ postal code/i), { target: { value: "T2X 1A1" } });
     fireEvent.change(screen.getByLabelText(/^country$/i), { target: { value: "Canada" } });
 
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /pay with clover/i })).toBeEnabled();
+    });
+
     fireEvent.click(screen.getByRole("button", { name: /pay with clover/i }));
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
       expect(redirectSpy).toHaveBeenCalledWith("https://checkout.clover.com/pay/abc");
     });
 
@@ -72,6 +109,9 @@ describe("checkout flow", () => {
 
     const requestPayload = JSON.parse(String(checkoutRequestCall?.[1]?.body || "{}")) as {
       items: Array<Record<string, unknown>>;
+      shippingQuote?: {
+        token?: string;
+      };
     };
     expect(requestPayload.items).toEqual([
       {
@@ -79,6 +119,7 @@ describe("checkout flow", () => {
         quantity: 2,
       },
     ]);
+    expect(requestPayload.shippingQuote).toEqual({ token: "quote_token_123" });
   });
 });
 

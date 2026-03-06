@@ -139,6 +139,12 @@ export const checkoutItemSchema = z
   })
   .strict();
 
+export const checkoutShippingQuoteSchema = z
+  .object({
+    token: z.string().trim().min(24).max(2048),
+  })
+  .strict();
+
 export const checkoutRequestSchema = z
   .object({
     customer: checkoutCustomerSchema,
@@ -159,9 +165,11 @@ export const checkoutRequestSchema = z
       .max(40)
       .regex(/^[A-Za-z0-9_-]*$/, "Promo code format is invalid.")
       .optional(),
+    shippingQuote: checkoutShippingQuoteSchema.optional(),
   })
   .strict();
 
 export type CheckoutCustomerInput = z.infer<typeof checkoutCustomerSchema>;
 export type CheckoutItemInput = z.infer<typeof checkoutItemSchema>;
+export type CheckoutShippingQuoteInput = z.infer<typeof checkoutShippingQuoteSchema>;
 export type CheckoutRequestInput = z.infer<typeof checkoutRequestSchema>;

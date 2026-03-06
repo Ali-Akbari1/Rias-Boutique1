@@ -4,12 +4,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import checkoutHandler from "../../api/clover-checkout";
 import webhookHandler from "../../api/clover-webhook";
 import orderStatusHandler from "../../api/order-status";
-import { createMockRequest, createMockResponse } from "./test-utils/utils";
+import { createMockRequest, createMockResponse, createSignedShippingQuoteToken } from "./test-utils/utils";
 import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
 const WEBHOOK_SECRET = "webhook_secret_test";
 
-const buildCheckoutRequestBody = () => ({
-  customer: {
+const buildCheckoutRequestBody = () => {
+  const customer = {
     fullName: "Webhook Customer",
     email: "webhook@example.com",
     phone: "+1 (403) 555-0101",
@@ -18,9 +18,54 @@ const buildCheckoutRequestBody = () => ({
     state: "Alberta",
     postalCode: "T2X 1A1",
     country: "Canada",
-  },
-  items: [{ productId: "Royal-Blue", quantity: 1 }],
-});
+  };
+  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 1 }];
+
+  return {
+    customer,
+    items,
+    shippingQuote: {
+      token: createSignedShippingQuoteToken({
+        customer,
+        items,
+        subtotalMinor: 40_000,
+        customerRateMinor: 1_800,
+        quotedRateMinor: 1_800,
+      }),
+    },
+  };
+};
+
+const createCheckoutAndShipmentFetchMock = (checkoutId: string) =>
+  vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes("/shipments/") && url.endsWith("/buy")) {
+      return new Response(
+        JSON.stringify({
+          id: "shp_test_123",
+          status: "purchased",
+          tracking_code: "TRACK123456",
+          tracker: {
+            public_url: "https://track.easypost.com/TRACK123456",
+            tracking_code: "TRACK123456",
+          },
+          postage_label: {
+            label_url: "https://example.com/label.png",
+            label_pdf_url: "https://example.com/label.pdf",
+          },
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    return new Response(JSON.stringify({ id: checkoutId, href: `https://checkout.clover.com/pay/${checkoutId}` }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  });
 
 describe("clover webhook flow", () => {
   beforeEach(async () => {
@@ -33,17 +78,20 @@ describe("clover webhook flow", () => {
     process.env.CLOVER_CHECKOUT_BASE_URL = "https://www.riasboutique.com";
     process.env.CLOVER_API_BASE_URL = "https://apisandbox.dev.clover.com";
     process.env.CLOVER_WEBHOOK_SECRET = WEBHOOK_SECRET;
+    process.env.ENABLE_SHIPPING_CHARGES = "true";
+    process.env.EASYPOST_QUOTE_SECRET = "test_shipping_quote_secret";
+    process.env.EASYPOST_API_KEY = "ezak_test_123";
+    process.env.EASYPOST_FROM_STREET1 = "260300 Writing Creek Cres Floor 1, Unit H31";
+    process.env.EASYPOST_FROM_CITY = "Balzac";
+    process.env.EASYPOST_FROM_STATE = "AB";
+    process.env.EASYPOST_FROM_ZIP = "T4A 0X8";
+    process.env.EASYPOST_FROM_COUNTRY = "CA";
 
     await resetOrderStoreForTests();
   });
 
   it("marks order as paid and is idempotent", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "checkout_abc", href: "https://checkout.clover.com/pay/checkout_abc" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    const fetchMock = createCheckoutAndShipmentFetchMock("checkout_abc");
     vi.stubGlobal("fetch", fetchMock);
 
     const checkoutResponse = createMockResponse();
@@ -100,7 +148,9 @@ describe("clover webhook flow", () => {
       createMockRequest({
         method: "GET",
         query: { orderId },
-        headers: {},
+        headers: {
+          origin: "https://www.riasboutique.com",
+        },
       }),
       statusResponse,
     );
@@ -154,12 +204,7 @@ describe("clover webhook flow", () => {
   });
 
   it("accepts signature headers that include timestamp inline (t=...,v1=...)", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "checkout_inline_1", href: "https://checkout.clover.com/pay/checkout_inline_1" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    const fetchMock = createCheckoutAndShipmentFetchMock("checkout_inline_1");
     vi.stubGlobal("fetch", fetchMock);
 
     const checkoutResponse = createMockResponse();
@@ -212,12 +257,7 @@ describe("clover webhook flow", () => {
   });
 
   it("accepts raw-body signatures even when timestamp header is present", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "checkout_rawsig_1", href: "https://checkout.clover.com/pay/checkout_rawsig_1" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    const fetchMock = createCheckoutAndShipmentFetchMock("checkout_rawsig_1");
     vi.stubGlobal("fetch", fetchMock);
 
     const checkoutResponse = createMockResponse();
@@ -271,12 +311,7 @@ describe("clover webhook flow", () => {
   });
 
   it("accepts base64 signatures in v1 format", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "checkout_b64_1", href: "https://checkout.clover.com/pay/checkout_b64_1" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    const fetchMock = createCheckoutAndShipmentFetchMock("checkout_b64_1");
     vi.stubGlobal("fetch", fetchMock);
 
     const checkoutResponse = createMockResponse();
@@ -329,12 +364,7 @@ describe("clover webhook flow", () => {
   });
 
   it("records failed payments without marking order as paid", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "checkout_fail_1", href: "https://checkout.clover.com/pay/checkout_fail_1" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    const fetchMock = createCheckoutAndShipmentFetchMock("checkout_fail_1");
     vi.stubGlobal("fetch", fetchMock);
 
     const checkoutResponse = createMockResponse();
@@ -390,7 +420,9 @@ describe("clover webhook flow", () => {
       createMockRequest({
         method: "GET",
         query: { orderId },
-        headers: {},
+        headers: {
+          origin: "https://www.riasboutique.com",
+        },
       }),
       statusResponse,
     );
@@ -404,12 +436,7 @@ describe("clover webhook flow", () => {
   });
 
   it("treats generic Clover payment events as paid when identifiers are present", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "checkout_generic_1", href: "https://checkout.clover.com/pay/checkout_generic_1" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    const fetchMock = createCheckoutAndShipmentFetchMock("checkout_generic_1");
     vi.stubGlobal("fetch", fetchMock);
 
     const checkoutResponse = createMockResponse();
@@ -465,7 +492,9 @@ describe("clover webhook flow", () => {
       createMockRequest({
         method: "GET",
         query: { orderId },
-        headers: {},
+        headers: {
+          origin: "https://www.riasboutique.com",
+        },
       }),
       statusResponse,
     );

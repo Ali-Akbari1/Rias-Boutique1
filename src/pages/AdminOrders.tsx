@@ -16,6 +16,14 @@ interface AdminOrder {
   paymentReference: string;
   subtotalMinor: number;
   totalMinor: number;
+  pricing?: {
+    discountCode?: string;
+    discountMinor?: number;
+    shippingMinor?: number;
+    quotedShippingMinor?: number;
+    taxMinor?: number;
+    freeShippingApplied?: boolean;
+  };
   customer: {
     deliveryMethod?: "shipping" | "pickup";
     fullName: string;
@@ -31,9 +39,26 @@ interface AdminOrder {
     productId: string;
     name: string;
     unitAmountMinor: number;
-    quantity: number;
-    lineTotalMinor: number;
-  }>;
+      quantity: number;
+      lineTotalMinor: number;
+    }>;
+  shippingQuote?: {
+    carrier?: string;
+    service?: string;
+    deliveryDays?: number | null;
+    expiresAt?: string;
+  } | null;
+  shipment?: {
+    carrier?: string;
+    service?: string;
+    trackingCode?: string;
+    trackingUrl?: string;
+    labelUrl?: string;
+    labelPdfUrl?: string;
+    trackingQrCodeDataUrl?: string;
+    labelQrCodeDataUrl?: string;
+    purchasedAt?: string;
+  } | null;
   createdAt: string;
   paidAt: string;
 }
@@ -60,6 +85,14 @@ const formatDate = (value: string) => {
 };
 
 const formatMinorCad = (value: number) => formatCad((Number(value) || 0) / 100);
+const getOrderPricing = (order: AdminOrder) => ({
+  discountCode: order.pricing?.discountCode?.trim().toUpperCase() || "",
+  discountMinor: Number(order.pricing?.discountMinor) || 0,
+  shippingMinor: Number(order.pricing?.shippingMinor) || 0,
+  quotedShippingMinor: Number(order.pricing?.quotedShippingMinor) || 0,
+  taxMinor: Number(order.pricing?.taxMinor) || 0,
+  freeShippingApplied: Boolean(order.pricing?.freeShippingApplied),
+});
 
 const statusBadgeVariant = (status: PaymentStatus): "default" | "secondary" | "destructive" | "outline" => {
   if (status === "paid") {
@@ -205,7 +238,10 @@ const AdminOrders = () => {
         ) : null}
 
         <div className="space-y-4">
-          {orders.map((order) => (
+          {orders.map((order) => {
+            const pricing = getOrderPricing(order);
+
+            return (
             <Card key={order.id}>
               <CardHeader className="gap-3 pb-4">
                 <div className="flex flex-wrap items-center gap-2">
@@ -243,6 +279,81 @@ const AdminOrders = () => {
                   )}
                 </div>
 
+                {order.customer.deliveryMethod === "shipping" ? (
+                  <div className="grid gap-2 rounded-md border border-border bg-background p-3 sm:grid-cols-2">
+                    <p>
+                      <span className="font-semibold text-foreground">Quoted Rate:</span>{" "}
+                      {pricing.quotedShippingMinor > 0 ? formatMinorCad(pricing.quotedShippingMinor) : "-"}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-foreground">Customer Charged:</span>{" "}
+                      {pricing.shippingMinor > 0 ? formatMinorCad(pricing.shippingMinor) : pricing.freeShippingApplied ? "Free" : "-"}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-foreground">Selected Service:</span>{" "}
+                      {order.shipment
+                        ? [order.shipment.carrier, order.shipment.service].filter(Boolean).join(" ") || "-"
+                        : order.shippingQuote
+                        ? [order.shippingQuote.carrier, order.shippingQuote.service].filter(Boolean).join(" ") || "-"
+                        : "-"}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-foreground">Tracking:</span>{" "}
+                      {order.shipment?.trackingCode || "Pending label purchase"}
+                    </p>
+                    {order.shipment?.trackingUrl ? (
+                      <p className="sm:col-span-2">
+                        <span className="font-semibold text-foreground">Tracking Link:</span>{" "}
+                        <a
+                          href={order.shipment.trackingUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline hover:text-foreground"
+                        >
+                          Open tracking
+                        </a>
+                      </p>
+                    ) : null}
+                    {order.shipment?.labelPdfUrl || order.shipment?.labelUrl ? (
+                      <p className="sm:col-span-2">
+                        <span className="font-semibold text-foreground">Label:</span>{" "}
+                        <a
+                          href={order.shipment.labelPdfUrl || order.shipment.labelUrl || "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline hover:text-foreground"
+                        >
+                          Download label
+                        </a>
+                      </p>
+                    ) : null}
+                    {order.shipment?.trackingQrCodeDataUrl || order.shipment?.labelQrCodeDataUrl ? (
+                      <div className="grid gap-3 pt-2 sm:col-span-2 sm:grid-cols-2">
+                        {order.shipment?.trackingQrCodeDataUrl ? (
+                          <div className="rounded-md border border-border bg-muted/20 p-3">
+                            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Tracking QR</p>
+                            <img
+                              src={order.shipment.trackingQrCodeDataUrl}
+                              alt={`Tracking QR for order ${order.id}`}
+                              className="h-32 w-32 rounded-sm border border-border bg-background p-2"
+                            />
+                          </div>
+                        ) : null}
+                        {order.shipment?.labelQrCodeDataUrl ? (
+                          <div className="rounded-md border border-border bg-muted/20 p-3">
+                            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Label QR</p>
+                            <img
+                              src={order.shipment.labelQrCodeDataUrl}
+                              alt={`Label QR for order ${order.id}`}
+                              className="h-32 w-32 rounded-sm border border-border bg-background p-2"
+                            />
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 <div className="space-y-2">
                   <p className="font-semibold text-foreground">Line Items</p>
                   {order.lineItems.map((item) => (
@@ -261,11 +372,15 @@ const AdminOrders = () => {
                 <div className="grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
                   <p>Checkout ID: {order.cloverCheckoutId || "-"}</p>
                   <p>Payment Reference: {order.paymentReference || "-"}</p>
+                  {pricing.discountMinor > 0 ? (
+                    <p>Discount{pricing.discountCode ? ` (${pricing.discountCode})` : ""}: -{formatMinorCad(pricing.discountMinor)}</p>
+                  ) : null}
+                  <p>Tax: {formatMinorCad(pricing.taxMinor)}</p>
                   <p className="font-semibold text-foreground sm:col-span-2">Order Total: {formatMinorCad(order.totalMinor)}</p>
                 </div>
               </CardContent>
             </Card>
-          ))}
+          )})}
         </div>
       </main>
     </div>
