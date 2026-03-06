@@ -247,7 +247,7 @@ export const requestAddressAutocompleteSelection = async ({
   sessionToken?: string;
   signal?: AbortSignal;
 }) => {
-  const response = await fetch("/api/address-autocomplete-retrieve", {
+  const response = await fetch("/api/address-autocomplete", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

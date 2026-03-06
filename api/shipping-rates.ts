@@ -13,6 +13,8 @@ import {
   describeEasyPostError,
   isEasyPostApiError,
   isEasyPostConfigured,
+  toQuoteCustomer,
+  type QuoteLineItem,
 } from "../server/lib/easypost.js";
 import { getFreeShippingThresholdMinor, isShippingChargesEnabled } from "../server/lib/checkout-pricing.js";
 import { z } from "zod";
@@ -98,7 +100,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const catalogMap = await getCatalogMap();
   let subtotalMinor = 0;
-  const normalizedItems = [];
+  const normalizedItems: QuoteLineItem[] = [];
   for (const item of items) {
     const product = catalogMap.get(item.productId);
     if (!product) {
@@ -122,7 +124,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   try {
     const quote = await createShippingRatesQuote({
-      customer,
+      customer: toQuoteCustomer(customer),
       items: normalizedItems,
       subtotalMinor,
       freeShippingThresholdMinor: getFreeShippingThresholdMinor(),

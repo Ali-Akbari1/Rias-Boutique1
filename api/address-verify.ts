@@ -11,6 +11,7 @@ import {
   describeEasyPostError,
   isEasyPostApiError,
   isEasyPostConfigured,
+  toQuoteCustomer,
   verifyShippingAddress,
 } from "../server/lib/easypost.js";
 
@@ -94,7 +95,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   try {
-    const verifiedAddress = await verifyShippingAddress(customer);
+    const verifiedAddress = await verifyShippingAddress(toQuoteCustomer(customer));
     res.status(200).json({
       verificationStatus: "verified",
       ...verifiedAddress,

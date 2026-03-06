@@ -32,7 +32,7 @@ import {
   getFreeShippingThresholdMinor,
   isShippingChargesEnabled,
 } from "../server/lib/checkout-pricing.js";
-import { verifyShippingQuoteToken } from "../server/lib/easypost.js";
+import { toQuoteCustomer, toQuoteLineItems, verifyShippingQuoteToken } from "../server/lib/easypost.js";
 import {
   getLaunchDiscountExpiryDisplay,
   isLaunchDiscountActive,
@@ -344,6 +344,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const freeShippingThresholdMinor = getFreeShippingThresholdMinor();
   const freeShippingApplied = !isPickupInStore && subtotalMinor >= freeShippingThresholdMinor;
   let verifiedShippingQuote = null;
+  const quoteCustomer = toQuoteCustomer(payload.customer);
+  const quoteItems = toQuoteLineItems(payload.items);
 
   if (!isPickupInStore) {
     if (!isShippingChargesEnabled()) {
@@ -360,8 +362,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     try {
       verifiedShippingQuote = verifyShippingQuoteToken({
         token: shippingQuoteToken,
-        customer: payload.customer,
-        items: payload.items,
+        customer: quoteCustomer,
+        items: quoteItems,
         subtotalMinor,
       });
     } catch (error) {

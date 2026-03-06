@@ -1,7 +1,6 @@
 /** @vitest-environment node */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import addressAutocompleteHandler from "../../api/address-autocomplete";
-import addressAutocompleteRetrieveHandler from "../../api/address-autocomplete-retrieve";
 import { createMockRequest, createMockResponse } from "./test-utils/utils";
 
 describe("address autocomplete endpoints", () => {
@@ -132,7 +131,7 @@ describe("address autocomplete endpoints", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const response = createMockResponse();
-    await addressAutocompleteRetrieveHandler(
+    await addressAutocompleteHandler(
       createMockRequest({
         method: "POST",
         headers: {

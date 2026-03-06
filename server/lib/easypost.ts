@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import { createDeterministicHash } from "./http.js";
 import { canonicalizeCartItems } from "./security.js";
 
-interface QuoteCustomer {
+export interface QuoteCustomer {
   deliveryMethod?: "shipping" | "pickup";
   fullName: string;
   email: string;
@@ -15,7 +15,7 @@ interface QuoteCustomer {
   country: string;
 }
 
-interface QuoteLineItem {
+export interface QuoteLineItem {
   productId: string;
   name?: string;
   quantity: number;
@@ -235,6 +235,25 @@ const toMinor = (value: string | undefined, fallbackValue: string | undefined, f
   return fallbackMinor;
 };
 const normalizeString = (value: string | undefined) => value?.trim() || "";
+export const toQuoteCustomer = (customer: Partial<QuoteCustomer>): QuoteCustomer => ({
+  deliveryMethod: customer.deliveryMethod === "pickup" ? "pickup" : "shipping",
+  fullName: normalizeString(customer.fullName),
+  email: normalizeString(customer.email),
+  phone: normalizeString(customer.phone),
+  address: normalizeString(customer.address),
+  city: normalizeString(customer.city),
+  state: normalizeString(customer.state),
+  postalCode: normalizeString(customer.postalCode),
+  country: normalizeString(customer.country),
+});
+export const toQuoteLineItems = (items: Array<Partial<QuoteLineItem>>): QuoteLineItem[] =>
+  items.map((item) => ({
+    productId: normalizeString(item.productId),
+    name: normalizeString(item.name) || undefined,
+    quantity: typeof item.quantity === "number" && Number.isFinite(item.quantity) ? item.quantity : 0,
+    unitPriceMinor:
+      typeof item.unitPriceMinor === "number" && Number.isFinite(item.unitPriceMinor) ? item.unitPriceMinor : undefined,
+  }));
 const parseCsvList = (value: string | undefined) =>
   (value || "")
     .split(",")
