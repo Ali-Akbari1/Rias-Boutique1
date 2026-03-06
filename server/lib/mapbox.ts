@@ -1,4 +1,6 @@
-const MAPBOX_API_BASE_URL = "https://api.mapbox.com/search/geocode/v6";
+import { randomUUID } from "node:crypto";
+
+const MAPBOX_SEARCHBOX_API_BASE_URL = "https://api.mapbox.com/search/searchbox/v1";
 const DEFAULT_AUTOCOMPLETE_LIMIT = 5;
 const DEFAULT_COUNTRIES = ["CA", "US"];
 
@@ -13,13 +15,25 @@ export interface AddressAutocompleteSuggestion {
   countryCode: string;
 }
 
-interface MapboxFeature {
+export interface ResolvedAddressFields {
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  countryCode: string;
+}
+
+interface MapboxSearchCandidate {
   id?: string;
   mapbox_id?: string;
   name?: string;
-  place_formatted?: string;
+  address?: string;
   full_address?: string;
+  place_formatted?: string;
+  feature_type?: string;
   properties?: Record<string, unknown>;
+  context?: Record<string, unknown>;
 }
 
 const normalizeString = (value: unknown) => (typeof value === "string" ? value.trim() : "");
@@ -54,6 +68,16 @@ const normalizeCountryCode = (value: string | undefined) => {
   return normalized.toUpperCase();
 };
 
+const normalizeRegionCode = (value: unknown) => {
+  const normalized = normalizeString(value).toUpperCase();
+  if (!normalized) {
+    return "";
+  }
+
+  const parts = normalized.split("-").filter(Boolean);
+  return parts[parts.length - 1] || normalized;
+};
+
 const toCountryDisplayName = (countryCode: string) => {
   switch (countryCode) {
     case "CA":
@@ -81,112 +105,228 @@ const getCountryFilter = (preferredCountry: string | undefined) => {
   return (configured.length > 0 ? configured : DEFAULT_COUNTRIES).join(",");
 };
 
-const extractContextRecord = (feature: MapboxFeature) => {
-  if (isRecord(feature.properties?.context)) {
-    return feature.properties?.context as Record<string, unknown>;
+const getPropertiesRecord = (candidate: MapboxSearchCandidate) =>
+  isRecord(candidate.properties) ? candidate.properties : {};
+
+const getContextRecord = (candidate: MapboxSearchCandidate) => {
+  if (isRecord(candidate.context)) {
+    return candidate.context;
   }
 
-  return isRecord((feature as Record<string, unknown>).context)
-    ? ((feature as Record<string, unknown>).context as Record<string, unknown>)
-    : {};
+  const propertiesContext = getPropertiesRecord(candidate).context;
+  return isRecord(propertiesContext) ? propertiesContext : {};
 };
 
-const getContextName = (context: Record<string, unknown>, key: string, nestedKey = "name") => {
-  const value = context[key];
-  if (!isRecord(value)) {
-    return "";
+const getCandidateString = (candidate: MapboxSearchCandidate, key: string) => {
+  const directValue = normalizeString((candidate as Record<string, unknown>)[key]);
+  if (directValue) {
+    return directValue;
   }
 
-  return normalizeString(value[nestedKey]);
+  return normalizeString(getPropertiesRecord(candidate)[key]);
 };
 
-const getStateValue = (context: Record<string, unknown>) =>
-  getContextName(context, "region", "region_code") || getContextName(context, "region");
+const getContextEntry = (context: Record<string, unknown>, key: string) => {
+  const entry = context[key];
+  return isRecord(entry) ? entry : {};
+};
 
-const getCountryCodeValue = (context: Record<string, unknown>) =>
-  normalizeCountryCode(getContextName(context, "country", "country_code") || getContextName(context, "country"));
-
-const getStreetAddress = (feature: MapboxFeature, context: Record<string, unknown>) => {
-  const addressContext = context.address;
-  if (isRecord(addressContext)) {
-    const addressNumber = normalizeString(addressContext.address_number);
-    const streetName = normalizeString(addressContext.street_name);
-    const combined = [addressNumber, streetName].filter(Boolean).join(" ");
-    if (combined) {
-      return combined;
+const getContextName = (context: Record<string, unknown>, key: string, nestedKeys: string[] = ["name"]) => {
+  const entry = getContextEntry(context, key);
+  for (const nestedKey of nestedKeys) {
+    const value = normalizeString(entry[nestedKey]);
+    if (value) {
+      return value;
     }
   }
 
-  const properties = isRecord(feature.properties) ? feature.properties : {};
-  return (
-    normalizeString(properties.address) ||
-    normalizeString(properties.name) ||
-    normalizeString(feature.name) ||
-    normalizeString(feature.full_address).split(",")[0] ||
-    ""
-  );
+  return "";
 };
 
-const toSuggestion = (feature: MapboxFeature): AddressAutocompleteSuggestion | null => {
-  const context = extractContextRecord(feature);
-  const countryCode = getCountryCodeValue(context);
-  const suggestion: AddressAutocompleteSuggestion = {
-    id: normalizeString(feature.mapbox_id) || normalizeString(feature.id),
-    label:
-      normalizeString(feature.full_address) ||
-      normalizeString(feature.place_formatted) ||
-      normalizeString(feature.name) ||
-      "",
-    address: getStreetAddress(feature, context),
-    city:
-      getContextName(context, "place") ||
-      getContextName(context, "locality") ||
-      getContextName(context, "district"),
-    state: getStateValue(context),
-    postalCode: getContextName(context, "postcode"),
-    country: toCountryDisplayName(countryCode),
-    countryCode,
-  };
+const combineAddressParts = (addressPart: string, namePart: string) => {
+  if (!addressPart) {
+    return namePart;
+  }
+  if (!namePart) {
+    return addressPart;
+  }
 
-  if (!suggestion.id || !suggestion.label || !suggestion.address || !suggestion.city || !suggestion.state) {
+  const normalizedAddress = addressPart.toLowerCase();
+  const normalizedName = namePart.toLowerCase();
+  if (normalizedName.includes(normalizedAddress)) {
+    return namePart;
+  }
+  if (normalizedAddress.includes(normalizedName)) {
+    return addressPart;
+  }
+  if (/^\d+[a-z]?$/i.test(addressPart)) {
+    return `${addressPart} ${namePart}`;
+  }
+
+  return addressPart;
+};
+
+const getStreetAddress = (candidate: MapboxSearchCandidate, context: Record<string, unknown>) => {
+  const addressContext = getContextEntry(context, "address");
+  const addressNumber = normalizeString(addressContext.address_number);
+  const streetName =
+    normalizeString(addressContext.street_name) ||
+    normalizeString(addressContext.name) ||
+    getContextName(context, "street");
+  const contextualAddress = [addressNumber, streetName].filter(Boolean).join(" ");
+  if (contextualAddress) {
+    return contextualAddress;
+  }
+
+  const combined = combineAddressParts(getCandidateString(candidate, "address"), getCandidateString(candidate, "name"));
+  if (combined) {
+    return combined;
+  }
+
+  return normalizeString(getCandidateString(candidate, "full_address")).split(",")[0] || "";
+};
+
+const getStateValue = (context: Record<string, unknown>) =>
+  normalizeRegionCode(getContextName(context, "region", ["region_code"])) ||
+  normalizeRegionCode(getContextName(context, "region", ["region_code_full"])) ||
+  getContextName(context, "region");
+
+const getCountryCodeValue = (context: Record<string, unknown>) =>
+  normalizeCountryCode(
+    getContextName(context, "country", ["country_code"]) ||
+      getContextName(context, "country", ["country_code_alpha_3"]) ||
+      getContextName(context, "country"),
+  );
+
+const toResolvedAddressFields = (
+  candidate: MapboxSearchCandidate,
+  preferredCountry?: string,
+): ResolvedAddressFields | null => {
+  const context = getContextRecord(candidate);
+  const countryCode = getCountryCodeValue(context) || normalizeCountryCode(preferredCountry);
+  const address = getStreetAddress(candidate, context);
+  const city =
+    getContextName(context, "place") ||
+    getContextName(context, "locality") ||
+    getContextName(context, "district") ||
+    getContextName(context, "neighborhood");
+  const state = getStateValue(context);
+  const postalCode = getContextName(context, "postcode");
+  const country = toCountryDisplayName(countryCode || normalizeCountryCode(preferredCountry));
+
+  if (!address) {
     return null;
   }
 
-  return suggestion;
+  return {
+    address,
+    city,
+    state,
+    postalCode,
+    country,
+    countryCode,
+  };
 };
 
-export const isMapboxConfigured = () => Boolean(getMapboxAccessToken());
+const buildSuggestionLabel = (candidate: MapboxSearchCandidate, fields: ResolvedAddressFields) =>
+  getCandidateString(candidate, "full_address") ||
+  [fields.address, getCandidateString(candidate, "place_formatted")]
+    .filter(Boolean)
+    .join(", ") ||
+  [fields.address, fields.city, fields.state, fields.postalCode, fields.country].filter(Boolean).join(", ");
 
-export const suggestAddressAutofill = async ({
-  query,
-  preferredCountry,
-}: {
-  query: string;
-  preferredCountry?: string;
-}): Promise<AddressAutocompleteSuggestion[]> => {
-  const accessToken = getMapboxAccessToken();
-  if (!accessToken) {
-    throw new Error("Mapbox autocomplete is not configured. Missing MAPBOX_ACCESS_TOKEN.");
+const toSuggestion = (candidate: MapboxSearchCandidate, preferredCountry?: string): AddressAutocompleteSuggestion | null => {
+  const fields = toResolvedAddressFields(candidate, preferredCountry);
+  if (!fields) {
+    return null;
   }
 
-  const url = new URL(`${MAPBOX_API_BASE_URL}/forward`);
-  url.searchParams.set("q", query.trim());
-  url.searchParams.set("autocomplete", "true");
-  url.searchParams.set("limit", String(DEFAULT_AUTOCOMPLETE_LIMIT));
-  url.searchParams.set("types", "address");
-  url.searchParams.set("language", "en");
-  url.searchParams.set("country", getCountryFilter(preferredCountry));
-  url.searchParams.set("access_token", accessToken);
+  const id = getCandidateString(candidate, "mapbox_id") || getCandidateString(candidate, "id");
+  const label = buildSuggestionLabel(candidate, fields);
+  if (!id || !label) {
+    return null;
+  }
 
+  return {
+    id,
+    label,
+    ...fields,
+  };
+};
+
+const mapboxRequest = async <T>(url: URL) => {
   const response = await fetch(url.toString());
   if (!response.ok) {
     const body = await response.text().catch(() => "");
     throw new Error(`Mapbox autocomplete failed (${response.status}): ${body || response.statusText}`);
   }
 
-  const payload = (await response.json().catch(() => ({}))) as { features?: MapboxFeature[] };
-  return (payload.features || [])
-    .map((feature) => toSuggestion(feature))
-    .filter((feature): feature is AddressAutocompleteSuggestion => feature !== null)
-    .slice(0, DEFAULT_AUTOCOMPLETE_LIMIT);
+  return (await response.json().catch(() => ({}))) as T;
+};
+
+export const isMapboxConfigured = () => Boolean(getMapboxAccessToken());
+
+export const createMapboxSessionToken = () => randomUUID();
+
+export const suggestAddressAutofill = async ({
+  query,
+  preferredCountry,
+  sessionToken = createMapboxSessionToken(),
+}: {
+  query: string;
+  preferredCountry?: string;
+  sessionToken?: string;
+}): Promise<{ sessionToken: string; suggestions: AddressAutocompleteSuggestion[] }> => {
+  const accessToken = getMapboxAccessToken();
+  if (!accessToken) {
+    throw new Error("Mapbox autocomplete is not configured. Missing MAPBOX_ACCESS_TOKEN.");
+  }
+
+  const url = new URL(`${MAPBOX_SEARCHBOX_API_BASE_URL}/suggest`);
+  url.searchParams.set("q", query.trim());
+  url.searchParams.set("limit", String(DEFAULT_AUTOCOMPLETE_LIMIT));
+  url.searchParams.set("language", "en");
+  url.searchParams.set("country", getCountryFilter(preferredCountry));
+  url.searchParams.set("types", "address,street");
+  url.searchParams.set("session_token", sessionToken.trim() || createMapboxSessionToken());
+  url.searchParams.set("access_token", accessToken);
+
+  const payload = await mapboxRequest<{ suggestions?: MapboxSearchCandidate[] }>(url);
+  return {
+    sessionToken: url.searchParams.get("session_token") || "",
+    suggestions: (payload.suggestions || [])
+      .map((candidate) => toSuggestion(candidate, preferredCountry))
+      .filter((candidate): candidate is AddressAutocompleteSuggestion => candidate !== null)
+      .slice(0, DEFAULT_AUTOCOMPLETE_LIMIT),
+  };
+};
+
+export const retrieveAddressAutofillSelection = async ({
+  mapboxId,
+  preferredCountry,
+  sessionToken = createMapboxSessionToken(),
+}: {
+  mapboxId: string;
+  preferredCountry?: string;
+  sessionToken?: string;
+}): Promise<ResolvedAddressFields> => {
+  const accessToken = getMapboxAccessToken();
+  if (!accessToken) {
+    throw new Error("Mapbox autocomplete is not configured. Missing MAPBOX_ACCESS_TOKEN.");
+  }
+
+  const url = new URL(`${MAPBOX_SEARCHBOX_API_BASE_URL}/retrieve/${encodeURIComponent(mapboxId.trim())}`);
+  url.searchParams.set("language", "en");
+  url.searchParams.set("session_token", sessionToken.trim() || createMapboxSessionToken());
+  url.searchParams.set("access_token", accessToken);
+
+  const payload = await mapboxRequest<{ features?: Array<{ properties?: MapboxSearchCandidate }> }>(url);
+  const firstFeature = payload.features?.[0];
+  const candidate = isRecord(firstFeature?.properties) ? (firstFeature?.properties as MapboxSearchCandidate) : null;
+  const resolved = candidate ? toResolvedAddressFields(candidate, preferredCountry) : null;
+  if (!resolved) {
+    throw new Error("Mapbox could not resolve this address selection.");
+  }
+
+  return resolved;
 };

@@ -2,14 +2,14 @@ import { z } from "zod";
 import { parseJsonBody, readRawBody, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
-import { isMapboxConfigured, suggestAddressAutofill } from "../server/lib/mapbox.js";
+import { isMapboxConfigured, retrieveAddressAutofillSelection } from "../server/lib/mapbox.js";
 
 const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
 
 const requestSchema = z
   .object({
-    query: z.string().trim().min(1).max(160),
+    mapboxId: z.string().trim().min(1).max(200),
     country: z.string().trim().max(80).optional(),
     sessionToken: z.string().trim().min(8).max(120).optional(),
   })
@@ -31,7 +31,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const rateResult = checkRateLimit({
-    key: `address-autocomplete:${getClientIp(req)}`,
+    key: `address-autocomplete-retrieve:${getClientIp(req)}`,
     limit: Number(process.env.ADDRESS_AUTOCOMPLETE_RATE_LIMIT || DEFAULT_RATE_LIMIT),
     windowMs: Number(process.env.ADDRESS_AUTOCOMPLETE_RATE_WINDOW_MS || DEFAULT_RATE_WINDOW_MS),
   });
@@ -50,43 +50,38 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const validation = requestSchema.safeParse(parsedBody);
   if (!validation.success) {
-    sendError(res, 400, "VALIDATION_ERROR", "Address lookup request is invalid.", validation.error.flatten());
-    return;
-  }
-
-  const { query, country, sessionToken } = validation.data;
-  if (query.trim().length < 3) {
-    res.status(200).json({ configured: isMapboxConfigured(), sessionToken: sessionToken || "", suggestions: [] });
+    sendError(res, 400, "VALIDATION_ERROR", "Address selection request is invalid.", validation.error.flatten());
     return;
   }
 
   if (!isMapboxConfigured()) {
-    res.status(200).json({ configured: false, suggestions: [] });
+    res.status(200).json({ configured: false, address: null });
     return;
   }
 
+  const { mapboxId, country, sessionToken } = validation.data;
+
   try {
-    const payload = await suggestAddressAutofill({
-      query,
+    const address = await retrieveAddressAutofillSelection({
+      mapboxId,
       preferredCountry: country,
       sessionToken,
     });
     res.status(200).json({
       configured: true,
-      sessionToken: payload.sessionToken,
-      suggestions: payload.suggestions,
+      address,
     });
   } catch (error) {
-    console.error("[address-autocomplete] lookup failed", {
+    console.error("[address-autocomplete-retrieve] lookup failed", {
       error: error instanceof Error ? error.message : String(error),
-      queryLength: query.trim().length,
+      mapboxId,
       country: country || "",
     });
     sendError(
       res,
       502,
-      "AUTOCOMPLETE_FAILED",
-      error instanceof Error ? error.message : "Unable to load address suggestions right now.",
+      "AUTOCOMPLETE_RETRIEVE_FAILED",
+      error instanceof Error ? error.message : "Unable to load this address selection right now.",
     );
   }
 }

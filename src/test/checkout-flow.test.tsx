@@ -67,6 +67,72 @@ describe("checkout flow", () => {
         );
       }
 
+      if (url.includes("/api/address-autocomplete-retrieve")) {
+        return new Response(
+          JSON.stringify({
+            configured: true,
+            address: {
+              address: "123 Main St",
+              city: "Calgary",
+              state: "Alberta",
+              postalCode: "T2X 1A1",
+              country: "Canada",
+              countryCode: "CA",
+            },
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      if (url.includes("/api/address-autocomplete")) {
+        return new Response(
+          JSON.stringify({
+            configured: true,
+            sessionToken: "session_test_123",
+            suggestions: [
+              {
+                id: "mbx-address-1",
+                label: "123 Main St, Calgary, Alberta T2X 1A1, Canada",
+                address: "123 Main St",
+                city: "Calgary",
+                state: "Alberta",
+                postalCode: "T2X 1A1",
+                country: "Canada",
+                countryCode: "CA",
+              },
+            ],
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      if (url.includes("/api/address-verify")) {
+        return new Response(
+          JSON.stringify({
+            verificationStatus: "verified",
+            message: "Address verified. Carrier rates are ready to load.",
+            normalizedAddress: {
+              address: "123 Main St",
+              city: "Calgary",
+              state: "Alberta",
+              postalCode: "T2X 1A1",
+              country: "Canada",
+              countryCode: "CA",
+            },
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
       return new Response(JSON.stringify({ checkoutUrl: "https://checkout.clover.com/pay/abc", orderId: "order_1" }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -100,7 +166,7 @@ describe("checkout flow", () => {
     fireEvent.click(screen.getByRole("button", { name: /pay with clover/i }));
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledTimes(3);
+      expect(fetchMock).toHaveBeenCalledTimes(5);
       expect(redirectSpy).toHaveBeenCalledWith("https://checkout.clover.com/pay/abc");
     });
 

@@ -46,6 +46,15 @@ export interface AddressAutocompleteSuggestion {
   countryCode: string;
 }
 
+export interface AddressAutocompleteResolvedAddress {
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  countryCode: string;
+}
+
 export interface AddressVerificationResponse {
   verificationStatus?: "verified" | "skipped";
   message?: string;
@@ -189,10 +198,12 @@ export const requestShippingRates = async ({
 export const requestAddressAutocomplete = async ({
   query,
   country,
+  sessionToken,
   signal,
 }: {
   query: string;
   country?: string;
+  sessionToken?: string;
   signal?: AbortSignal;
 }) => {
   const response = await fetch("/api/address-autocomplete", {
@@ -204,11 +215,13 @@ export const requestAddressAutocomplete = async ({
     body: JSON.stringify({
       query,
       country,
+      sessionToken,
     }),
   });
 
   const payload = (await response.json().catch(() => ({}))) as {
     configured?: boolean;
+    sessionToken?: string;
     suggestions?: AddressAutocompleteSuggestion[];
   };
 
@@ -218,7 +231,47 @@ export const requestAddressAutocomplete = async ({
 
   return {
     configured: payload.configured !== false,
+    sessionToken: typeof payload.sessionToken === "string" ? payload.sessionToken : "",
     suggestions: Array.isArray(payload.suggestions) ? payload.suggestions : [],
+  };
+};
+
+export const requestAddressAutocompleteSelection = async ({
+  mapboxId,
+  country,
+  sessionToken,
+  signal,
+}: {
+  mapboxId: string;
+  country?: string;
+  sessionToken?: string;
+  signal?: AbortSignal;
+}) => {
+  const response = await fetch("/api/address-autocomplete-retrieve", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    signal,
+    body: JSON.stringify({
+      mapboxId,
+      country,
+      sessionToken,
+    }),
+  });
+
+  const payload = (await response.json().catch(() => ({}))) as {
+    configured?: boolean;
+    address?: AddressAutocompleteResolvedAddress | null;
+  };
+
+  if (!response.ok) {
+    throw new Error(extractApiErrorMessage(payload, "Unable to load this address selection right now."));
+  }
+
+  return {
+    configured: payload.configured !== false,
+    address: payload.address || null,
   };
 };
 

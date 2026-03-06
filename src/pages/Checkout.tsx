@@ -17,7 +17,9 @@ import {
 import {
   buildCheckoutItems,
   buildClientIdempotencyKey,
-  redirectToCheckout, requestAddressAutocomplete,
+  redirectToCheckout,
+  requestAddressAutocomplete,
+  requestAddressAutocompleteSelection,
   requestAddressVerification,
   extractApiErrorMessage,
   requestOptionalCartToken,
@@ -95,6 +97,14 @@ const buildAddressFingerprint = (form: CheckoutForm) =>
     .map((value) => value.trim().toLowerCase())
     .join("|");
 
+const createAutocompleteSessionToken = () => {
+  if (typeof globalThis.crypto?.randomUUID === "function") {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `mapbox_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+};
+
 const Checkout = () => {
   const { items, totalPrice } = useCart();
   const { toast } = useToast();
@@ -126,6 +136,7 @@ const Checkout = () => {
   const shippingTimeoutRef = useRef<number | null>(null);
   const addressAutocompleteControllerRef = useRef<AbortController | null>(null);
   const addressAutocompleteTimeoutRef = useRef<number | null>(null);
+  const addressAutocompleteSessionTokenRef = useRef("");
   const addressVerificationControllerRef = useRef<AbortController | null>(null);
   const addressVerificationTimeoutRef = useRef<number | null>(null);
   const addressBlurTimeoutRef = useRef<number | null>(null);
@@ -183,19 +194,28 @@ const Checkout = () => {
   const handleAddressInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextValue = event.target.value;
     setCheckoutForm((current) => ({ ...current, address: nextValue }));
+    if (!nextValue.trim()) {
+      addressAutocompleteSessionTokenRef.current = "";
+    }
     setIsAddressSuggestionsOpen(true);
   };
 
-  const applySuggestedAddress = (suggestion: AddressAutocompleteSuggestion) => {
+  const applySuggestedAddressSelection = ({
+    address,
+    city,
+    state,
+    postalCode,
+    country,
+  }: Pick<CheckoutForm, "address" | "city" | "state" | "postalCode" | "country">) => {
     clearPendingAddressAutocompleteRequest();
     clearAddressBlurTimeout();
     setCheckoutForm((current) => ({
       ...current,
-      address: suggestion.address,
-      city: suggestion.city,
-      state: suggestion.state,
-      postalCode: suggestion.postalCode,
-      country: suggestion.country,
+      address,
+      city,
+      state,
+      postalCode,
+      country,
     }));
     setAddressSuggestions([]);
     setIsAddressSuggestionsOpen(false);
@@ -204,6 +224,48 @@ const Checkout = () => {
     setAddressVerificationError("");
     setVerifiedAddressFingerprint("");
     setLastVerifiedAddressFingerprint("");
+  };
+
+  const applySuggestedAddress = async (suggestion: AddressAutocompleteSuggestion) => {
+    clearPendingAddressAutocompleteRequest();
+    clearAddressBlurTimeout();
+    setIsAddressAutocompleteLoading(true);
+
+    const controller = new AbortController();
+    addressAutocompleteControllerRef.current = controller;
+    const sessionToken = addressAutocompleteSessionTokenRef.current || createAutocompleteSessionToken();
+    addressAutocompleteSessionTokenRef.current = sessionToken;
+
+    try {
+      const payload = await requestAddressAutocompleteSelection({
+        mapboxId: suggestion.id,
+        country: checkoutForm.country,
+        sessionToken,
+        signal: controller.signal,
+      });
+      const resolvedAddress = payload.address || suggestion;
+      setAddressAutocompleteAvailable(payload.configured);
+      applySuggestedAddressSelection({
+        address: resolvedAddress.address || suggestion.address,
+        city: resolvedAddress.city || suggestion.city,
+        state: resolvedAddress.state || suggestion.state,
+        postalCode: resolvedAddress.postalCode || suggestion.postalCode,
+        country: resolvedAddress.country || suggestion.country,
+      });
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        return;
+      }
+
+      setAddressAutocompleteAvailable(true);
+      applySuggestedAddressSelection(suggestion);
+    } finally {
+      if (addressAutocompleteControllerRef.current === controller) {
+        addressAutocompleteControllerRef.current = null;
+      }
+      setIsAddressAutocompleteLoading(false);
+      addressAutocompleteSessionTokenRef.current = "";
+    }
   };
 
   const clearPendingCheckoutRequest = () => {
@@ -270,6 +332,7 @@ const Checkout = () => {
       clearPendingCheckoutRequest();
       clearPendingShippingRequest();
       clearPendingAddressAutocompleteRequest();
+      addressAutocompleteSessionTokenRef.current = "";
       clearPendingAddressVerificationRequest();
       clearAddressBlurTimeout();
       setIsLoading(false);
@@ -285,6 +348,7 @@ const Checkout = () => {
       clearPendingCheckoutRequest();
       clearPendingShippingRequest();
       clearPendingAddressAutocompleteRequest();
+      addressAutocompleteSessionTokenRef.current = "";
       clearPendingAddressVerificationRequest();
       clearAddressBlurTimeout();
     };
@@ -330,13 +394,19 @@ const Checkout = () => {
 
     const controller = new AbortController();
     addressAutocompleteControllerRef.current = controller;
+    const sessionToken = addressAutocompleteSessionTokenRef.current || createAutocompleteSessionToken();
+    addressAutocompleteSessionTokenRef.current = sessionToken;
     const timeout = window.setTimeout(() => {
       void requestAddressAutocomplete({
         query,
         country: checkoutForm.country,
+        sessionToken,
         signal: controller.signal,
       })
         .then((payload) => {
+          if (payload.sessionToken) {
+            addressAutocompleteSessionTokenRef.current = payload.sessionToken;
+          }
           setAddressAutocompleteAvailable(payload.configured);
           setAddressSuggestions(payload.suggestions);
           setIsAddressSuggestionsOpen(payload.suggestions.length > 0);
@@ -990,7 +1060,9 @@ const Checkout = () => {
                                     key={suggestion.id}
                                     type="button"
                                     onMouseDown={(event) => event.preventDefault()}
-                                    onClick={() => applySuggestedAddress(suggestion)}
+                                    onClick={() => {
+                                      void applySuggestedAddress(suggestion);
+                                    }}
                                     className="flex w-full flex-col items-start gap-1 px-3 py-3 text-left transition hover:bg-secondary/60"
                                   >
                                     <span className="font-medium text-foreground">{suggestion.address}</span>
