@@ -46,7 +46,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const rateResult = checkRateLimit({
+  const rateResult = await checkRateLimit({
     key: `cart-token:${getClientIp(req)}`,
     limit: Number(process.env.CART_TOKEN_RATE_LIMIT || 60),
     windowMs: Number(process.env.CART_TOKEN_RATE_WINDOW_MS || 60_000),

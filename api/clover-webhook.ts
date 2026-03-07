@@ -62,7 +62,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const debugLogs = isDebugLoggingEnabled();
   res.setHeader("X-Request-Id", requestId);
 
-  const rateResult = checkRateLimit({
+  const rateResult = await checkRateLimit({
     key: `webhook:${getClientIp(req)}`,
     limit: Number(process.env.WEBHOOK_RATE_LIMIT || DEFAULT_RATE_LIMIT),
     windowMs: Number(process.env.WEBHOOK_RATE_WINDOW_MS || DEFAULT_RATE_WINDOW_MS),

@@ -75,6 +75,62 @@ create table if not exists discount_subscribers (
 create index if not exists idx_discount_subscribers_subscribed_at on discount_subscribers (subscribed_at);
 create index if not exists idx_discount_subscribers_campaign on discount_subscribers (campaign);
 
+revoke all on table orders from anon, authenticated;
+revoke all on table inventory from anon, authenticated;
+revoke all on table webhook_events from anon, authenticated;
+revoke all on table email_logs from anon, authenticated;
+revoke all on table discount_subscribers from anon, authenticated;
+
+alter table orders enable row level security;
+alter table orders force row level security;
+drop policy if exists orders_deny_client_access on orders;
+create policy orders_deny_client_access
+on orders
+for all
+to anon, authenticated
+using (false)
+with check (false);
+
+alter table inventory enable row level security;
+alter table inventory force row level security;
+drop policy if exists inventory_deny_client_access on inventory;
+create policy inventory_deny_client_access
+on inventory
+for all
+to anon, authenticated
+using (false)
+with check (false);
+
+alter table webhook_events enable row level security;
+alter table webhook_events force row level security;
+drop policy if exists webhook_events_deny_client_access on webhook_events;
+create policy webhook_events_deny_client_access
+on webhook_events
+for all
+to anon, authenticated
+using (false)
+with check (false);
+
+alter table email_logs enable row level security;
+alter table email_logs force row level security;
+drop policy if exists email_logs_deny_client_access on email_logs;
+create policy email_logs_deny_client_access
+on email_logs
+for all
+to anon, authenticated
+using (false)
+with check (false);
+
+alter table discount_subscribers enable row level security;
+alter table discount_subscribers force row level security;
+drop policy if exists discount_subscribers_deny_client_access on discount_subscribers;
+create policy discount_subscribers_deny_client_access
+on discount_subscribers
+for all
+to anon, authenticated
+using (false)
+with check (false);
+
 create or replace function mark_order_paid_and_decrement_inventory(
   p_order_id text,
   p_payment_reference text

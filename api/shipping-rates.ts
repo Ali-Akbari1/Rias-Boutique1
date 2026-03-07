@@ -49,7 +49,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const rateResult = checkRateLimit({
+  const rateResult = await checkRateLimit({
     key: `shipping-rates:${getClientIp(req)}`,
     limit: Number(process.env.SHIPPING_RATES_RATE_LIMIT || DEFAULT_RATE_LIMIT),
     windowMs: Number(process.env.SHIPPING_RATES_RATE_WINDOW_MS || DEFAULT_RATE_WINDOW_MS),

@@ -97,6 +97,7 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `CLOVER_ENABLE_TIPS`: Optional `true`/`false` to enable tips in hosted checkout.
 - `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
 - `CLOVER_DEBUG_LOGS`: Optional `true`/`false` to enable verbose Clover diagnostics in Vercel logs.
+- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`: Optional Upstash Redis REST credentials used for distributed rate limiting across Vercel instances. If omitted, local in-memory buckets are used as a fallback.
 - `FREE_SHIPPING_THRESHOLD_MINOR`: Optional shipping threshold in minor units (default `40000` = CA$400.00).
 - `SHIPPING_PROVIDER_MODE`: Optional shipping provider mode. Defaults to `flat_rate`; set to `easypost` to restore live carrier rating and label purchases.
 - `FLAT_SHIPPING_RATE_MINOR`: Optional flat shipping charge in minor units when `SHIPPING_PROVIDER_MODE=flat_rate` (default `3000` = CA$30.00).
@@ -136,6 +137,10 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `GOOGLE_PLACE_ID`: For `/api/google-reviews`.
 - `ADMIN_DASHBOARD_TOKEN`: Required token for `/api/admin-orders` and `/orders-admin`.
 - `ALLOWED_PROMO_ORIGINS`: Optional CSV list of allowed browser origins for `/api/discount-signup`.
+
+### Operational endpoints
+
+- `/api/health`: Basic liveness/configuration probe for Vercel health checks and manual diagnostics.
 - `DISCOUNT_SIGNUP_RATE_LIMIT`: Optional rate limit for `/api/discount-signup` (default `20`).
 - `DISCOUNT_SIGNUP_RATE_WINDOW_MS`: Optional rate limit window in milliseconds for `/api/discount-signup` (default `60000`).
 - `DISCOUNT_CAMPAIGN_NAME`: Optional campaign label stored with popup signups (default `launch10_2026_03_20`).

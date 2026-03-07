@@ -1,19 +1,37 @@
-const asSingle = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
+import { z } from "zod";
+import { getHeader, getQueryValue, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
 
-const asHeader = (value: string | string[] | undefined) => {
-  const headerValue = asSingle(value);
-  return typeof headerValue === "string" ? headerValue : "";
-};
+interface HtmlApiResponse extends ApiResponse {
+  send?: (body: string) => void;
+}
 
-const buildBaseUrl = (req: any) => {
-  const explicitBaseUrl = process.env.CMS_BASE_URL;
+const callbackQuerySchema = z
+  .object({
+    provider: z.string().trim().max(40).optional(),
+    code: z.string().trim().max(2048).optional(),
+    state: z.string().trim().max(2048).optional(),
+    error: z.string().trim().max(512).optional(),
+    error_description: z.string().trim().max(1024).optional(),
+  })
+  .strict();
+
+const githubTokenResponseSchema = z
+  .object({
+    access_token: z.string().trim().min(1).optional(),
+    error: z.string().trim().max(512).optional(),
+    error_description: z.string().trim().max(1024).optional(),
+  })
+  .strict();
+
+const buildBaseUrl = (req: ApiRequest) => {
+  const explicitBaseUrl = process.env.CMS_BASE_URL?.trim();
   if (explicitBaseUrl) {
     return explicitBaseUrl.replace(/\/+$/, "");
   }
 
-  const proto = asHeader(req.headers["x-forwarded-proto"]) || "https";
-  const host = asHeader(req.headers["x-forwarded-host"]) || asHeader(req.headers.host);
-  return `${proto}://${host}`;
+  const proto = getHeader(req, "x-forwarded-proto") || "https";
+  const host = getHeader(req, "x-forwarded-host") || getHeader(req, "host") || "";
+  return host ? `${proto}://${host}` : "";
 };
 
 const resolveTargetOrigin = (baseUrl: string) => {
@@ -24,12 +42,20 @@ const resolveTargetOrigin = (baseUrl: string) => {
   }
 };
 
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 const popupHtml = (message: string, title: string, details: string, targetOrigin: string) => `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${title}</title>
+    <title>${escapeHtml(title)}</title>
     <style>
       body {
         font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -60,8 +86,8 @@ const popupHtml = (message: string, title: string, details: string, targetOrigin
   </head>
   <body>
     <div class="card">
-      <h1>${title}</h1>
-      <p id="status">${details}</p>
+      <h1>${escapeHtml(title)}</h1>
+      <p id="status">${escapeHtml(details)}</p>
     </div>
     <script>
       (function () {
@@ -95,51 +121,78 @@ const popupHtml = (message: string, title: string, details: string, targetOrigin
   </body>
 </html>`;
 
-const setPopupHeaders = (res: any) => {
+const setPopupHeaders = (res: ApiResponse) => {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
 };
 
-const sendPopup = (res: any, status: number, message: string, title: string, details: string, targetOrigin: string) => {
+const sendPopup = (
+  res: HtmlApiResponse,
+  status: number,
+  message: string,
+  title: string,
+  details: string,
+  targetOrigin: string,
+) => {
+  if (typeof res.send !== "function") {
+    sendError(res, 500, "SEND_NOT_SUPPORTED", "HTML response helper is not available.");
+    return;
+  }
+
   setPopupHeaders(res);
   res.status(status).send(popupHtml(message, title, details, targetOrigin));
 };
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: ApiRequest, res: HtmlApiResponse) {
   if (req.method !== "GET") {
-    res.status(405).json({ error: "Method not allowed" });
+    sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
+    return;
+  }
+
+  const validation = callbackQuerySchema.safeParse({
+    provider: getQueryValue(req, "provider").trim() || undefined,
+    code: getQueryValue(req, "code").trim() || undefined,
+    state: getQueryValue(req, "state").trim() || undefined,
+    error: getQueryValue(req, "error").trim() || undefined,
+    error_description: getQueryValue(req, "error_description").trim() || undefined,
+  });
+  if (!validation.success) {
+    sendError(res, 400, "VALIDATION_ERROR", "Invalid OAuth callback payload.", validation.error.flatten());
     return;
   }
 
   const baseUrl = buildBaseUrl(req);
   const targetOrigin = resolveTargetOrigin(baseUrl);
+  const provider = validation.data.provider || "github";
 
-  const provider = asSingle(req.query.provider) || "github";
   if (provider !== "github") {
-    const message = "authorization:github:error:Invalid provider";
-    sendPopup(res, 400, message, "CMS Login Failed", "Invalid OAuth provider.", targetOrigin);
+    sendPopup(res, 400, "authorization:github:error:Invalid provider", "CMS Login Failed", "Invalid OAuth provider.", targetOrigin);
     return;
   }
 
-  const code = asSingle(req.query.code);
-  if (!code) {
-    const oauthError = asSingle(req.query.error_description) || asSingle(req.query.error) || "Missing OAuth code.";
-    const message = `authorization:github:error:${oauthError}`;
-    sendPopup(res, 400, message, "CMS Login Failed", String(oauthError), targetOrigin);
+  if (!validation.data.code) {
+    const oauthError = validation.data.error_description || validation.data.error || "Missing OAuth code.";
+    sendPopup(
+      res,
+      400,
+      `authorization:github:error:${oauthError}`,
+      "CMS Login Failed",
+      oauthError,
+      targetOrigin,
+    );
     return;
   }
 
-  const clientId = process.env.GITHUB_OAUTH_CLIENT_ID;
-  const clientSecret = process.env.GITHUB_OAUTH_CLIENT_SECRET;
+  const clientId = process.env.GITHUB_OAUTH_CLIENT_ID?.trim() || "";
+  const clientSecret = process.env.GITHUB_OAUTH_CLIENT_SECRET?.trim() || "";
 
   if (!clientId || !clientSecret) {
-    const message = "authorization:github:error:Server OAuth credentials are missing.";
     sendPopup(
       res,
       500,
-      message,
+      "authorization:github:error:Server OAuth credentials are missing.",
       "CMS Login Failed",
       "Missing GITHUB_OAUTH_CLIENT_ID or GITHUB_OAUTH_CLIENT_SECRET on the server.",
       targetOrigin,
@@ -147,10 +200,20 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
+  if (!baseUrl) {
+    sendPopup(
+      res,
+      500,
+      "authorization:github:error:Unable to determine callback base URL.",
+      "CMS Login Failed",
+      "Unable to determine the CMS callback base URL.",
+      targetOrigin,
+    );
+    return;
+  }
+
   try {
     const redirectUri = `${baseUrl}/api/callback`;
-    const state = asSingle(req.query.state);
-
     const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
       method: "POST",
       headers: {
@@ -160,41 +223,46 @@ export default async function handler(req: any, res: any) {
       body: JSON.stringify({
         client_id: clientId,
         client_secret: clientSecret,
-        code,
+        code: validation.data.code,
         redirect_uri: redirectUri,
-        state: typeof state === "string" ? state : undefined,
+        state: validation.data.state,
       }),
     });
 
-    const tokenPayload = (await tokenResponse.json()) as {
-      access_token?: string;
-      error?: string;
-      error_description?: string;
-    };
-
-    if (!tokenResponse.ok || !tokenPayload.access_token) {
-      const reason = tokenPayload.error_description || tokenPayload.error || "GitHub token exchange failed.";
-      const message = `authorization:github:error:${reason}`;
-      sendPopup(res, 502, message, "CMS Login Failed", reason, targetOrigin);
+    const rawTokenPayload = await tokenResponse.json().catch(() => ({}));
+    const tokenPayloadResult = githubTokenResponseSchema.safeParse(rawTokenPayload);
+    if (!tokenPayloadResult.success) {
+      sendPopup(
+        res,
+        502,
+        "authorization:github:error:GitHub token exchange returned an invalid payload.",
+        "CMS Login Failed",
+        "GitHub token exchange returned an invalid payload.",
+        targetOrigin,
+      );
       return;
     }
 
-    const successMessage = `authorization:github:success:${JSON.stringify({
-      token: tokenPayload.access_token,
-      provider: "github",
-    })}`;
+    const tokenPayload = tokenPayloadResult.data;
+    if (!tokenResponse.ok || !tokenPayload.access_token) {
+      const reason = tokenPayload.error_description || tokenPayload.error || "GitHub token exchange failed.";
+      sendPopup(res, 502, `authorization:github:error:${reason}`, "CMS Login Failed", reason, targetOrigin);
+      return;
+    }
 
     sendPopup(
       res,
       200,
-      successMessage,
+      `authorization:github:success:${JSON.stringify({
+        token: tokenPayload.access_token,
+        provider: "github",
+      })}`,
       "CMS Login Successful",
       "Authentication complete. You can close this window.",
       targetOrigin,
     );
   } catch (error) {
     const reason = error instanceof Error ? error.message : "Unexpected server error.";
-    const message = `authorization:github:error:${reason}`;
-    sendPopup(res, 500, message, "CMS Login Failed", reason, targetOrigin);
+    sendPopup(res, 500, `authorization:github:error:${reason}`, "CMS Login Failed", reason, targetOrigin);
   }
 }

@@ -218,7 +218,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const clientIp = getClientIp(req);
-  const rateResult = checkRateLimit({
+  const rateResult = await checkRateLimit({
     key: `checkout:${clientIp}`,
     limit: Number(process.env.CHECKOUT_RATE_LIMIT || DEFAULT_RATE_LIMIT),
     windowMs: Number(process.env.CHECKOUT_RATE_WINDOW_MS || DEFAULT_RATE_WINDOW_MS),
