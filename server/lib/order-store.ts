@@ -35,7 +35,7 @@ export interface OrderPricing {
 }
 
 export interface StoredShippingQuote {
-  provider: "easypost";
+  provider: "easypost" | "flat_rate";
   shipmentId: string;
   rateId: string;
   carrier: string;
@@ -201,7 +201,7 @@ const normalizeShippingQuote = (value: unknown): StoredShippingQuote | null => {
   }
 
   return {
-    provider: "easypost",
+    provider: asString(quote.provider) === "flat_rate" ? "flat_rate" : "easypost",
     shipmentId,
     rateId,
     carrier: asString(quote.carrier),

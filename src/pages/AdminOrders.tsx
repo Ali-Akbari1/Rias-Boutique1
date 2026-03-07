@@ -43,6 +43,7 @@ interface AdminOrder {
       lineTotalMinor: number;
     }>;
   shippingQuote?: {
+    provider?: "easypost" | "flat_rate";
     carrier?: string;
     service?: string;
     deliveryDays?: number | null;
@@ -388,7 +389,8 @@ const AdminOrders = () => {
                     </p>
                      <p>
                        <span className="font-semibold text-foreground">Tracking:</span>{" "}
-                       {order.shipment?.trackingCode || "Pending label purchase"}
+                       {order.shipment?.trackingCode ||
+                         (order.shippingQuote?.provider === "flat_rate" ? "Manual fulfillment" : "Pending label purchase")}
                      </p>
                      {order.shipment?.status ? (
                        <p>
@@ -396,7 +398,9 @@ const AdminOrders = () => {
                          {order.shipment.status.replace(/_/g, " ")}
                        </p>
                      ) : null}
-                     {!order.shipment && order.shippingQuote && order.paymentStatus === "paid" ? (
+                     {!order.shipment &&
+                     order.shippingQuote?.provider === "easypost" &&
+                     order.paymentStatus === "paid" ? (
                        <div className="sm:col-span-2">
                          <Button
                            type="button"

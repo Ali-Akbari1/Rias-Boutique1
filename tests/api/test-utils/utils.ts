@@ -3,6 +3,20 @@ import type { ApiRequest, ApiResponse } from "../../../server/lib/http.js";
 import { createDeterministicHash } from "../../../server/lib/http.js";
 import { canonicalizeCartItems } from "../../../server/lib/security.js";
 
+const normalizeCountryCode = (value: string) => {
+  const normalized = value.trim();
+  const compact = normalized.replace(/[^a-zA-Z]/g, "").toLowerCase();
+
+  if (compact === "canada" || compact === "ca" || compact === "can") {
+    return "CA";
+  }
+  if (compact === "unitedstates" || compact === "unitedstatesofamerica" || compact === "usa" || compact === "us") {
+    return "US";
+  }
+
+  return normalized.length === 2 ? normalized.toUpperCase() : normalized.toUpperCase();
+};
+
 export interface MockResponse extends ApiResponse {
   statusCode: number;
   headers: Record<string, string>;
@@ -99,13 +113,11 @@ export const createSignedShippingQuoteToken = ({
     ) || "";
   const shippingFingerprint = [
     customer.deliveryMethod || "shipping",
-    customer.fullName,
-    customer.email,
     customer.address,
     customer.city,
     customer.state,
     customer.postalCode,
-    customer.country,
+    normalizeCountryCode(customer.country),
   ]
     .map((part) => part.trim().toLowerCase())
     .join("|");

@@ -2,6 +2,7 @@ import { createHmac } from "node:crypto";
 import QRCode from "qrcode";
 import { createDeterministicHash } from "./http.js";
 import { canonicalizeCartItems } from "./security.js";
+import { getFlatShippingRateMinor } from "./checkout-pricing.js";
 
 export interface QuoteCustomer {
   deliveryMethod?: "shipping" | "pickup";
@@ -49,7 +50,7 @@ export interface ShippingRateOption {
 }
 
 export interface ShippingRatesQuoteResult {
-  provider: "easypost";
+  provider: "easypost" | "flat_rate";
   requiresSelection: boolean;
   freeShippingApplied: boolean;
   freeShippingThresholdMinor: number;
@@ -60,7 +61,7 @@ export interface ShippingRatesQuoteResult {
 }
 
 export interface VerifiedShippingQuote {
-  provider: "easypost";
+  provider: "easypost" | "flat_rate";
   shipmentId: string;
   rateId: string;
   carrier: string;
@@ -162,7 +163,7 @@ interface EasyPostAddressResponse {
 
 interface ShippingQuoteTokenPayload {
   v: 1;
-  provider: "easypost";
+  provider: "easypost" | "flat_rate";
   shipmentId: string;
   rateId: string;
   carrier: string;
@@ -347,10 +348,23 @@ const getOriginAddress = () => ({
   email: normalizeString(process.env.EASYPOST_FROM_EMAIL) || normalizeString(process.env.MERCHANT_ORDER_EMAIL),
 });
 
+const getShippingQuoteConfig = () => {
+  const quoteSecret = getQuoteSecret();
+
+  if (!quoteSecret) {
+    throw new Error("EasyPost quote signing is not configured. Set EASYPOST_QUOTE_SECRET or CART_TOKEN_SECRET.");
+  }
+
+  return {
+    quoteSecret,
+    quoteTtlMs: toNumber(process.env.EASYPOST_QUOTE_TTL_MS, DEFAULT_QUOTE_TTL_MS),
+  };
+};
+
 const validateEasyPostConfig = () => {
   const apiKey = normalizeString(process.env.EASYPOST_API_KEY);
-  const quoteSecret = getQuoteSecret();
   const origin = getOriginAddress();
+  const quoteConfig = getShippingQuoteConfig();
 
   const missingOriginFields = ["street1", "city", "state", "zip", "country"].filter(
     (field) => !origin[field as keyof typeof origin],
@@ -360,19 +374,15 @@ const validateEasyPostConfig = () => {
     throw new Error("EasyPost is not configured. Missing EASYPOST_API_KEY.");
   }
 
-  if (!quoteSecret) {
-    throw new Error("EasyPost quote signing is not configured. Set EASYPOST_QUOTE_SECRET or CART_TOKEN_SECRET.");
-  }
-
   if (missingOriginFields.length > 0) {
     throw new Error(`EasyPost origin address is incomplete. Missing: ${missingOriginFields.join(", ")}.`);
   }
 
   return {
     apiKey,
-    quoteSecret,
+    quoteSecret: quoteConfig.quoteSecret,
     origin,
-    quoteTtlMs: toNumber(process.env.EASYPOST_QUOTE_TTL_MS, DEFAULT_QUOTE_TTL_MS),
+    quoteTtlMs: quoteConfig.quoteTtlMs,
   };
 };
 
@@ -417,7 +427,7 @@ const decodeQuoteToken = (token: string, secret: string): ShippingQuoteTokenPayl
   }
 
   const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as ShippingQuoteTokenPayload;
-  if (payload.v !== 1 || payload.provider !== "easypost") {
+  if (payload.v !== 1 || (payload.provider !== "easypost" && payload.provider !== "flat_rate")) {
     throw new Error("Shipping quote token version is unsupported.");
   }
 
@@ -811,6 +821,64 @@ export const createShippingRatesQuote = async ({
   };
 };
 
+export const createFlatRateShippingQuote = ({
+  customer,
+  items,
+  subtotalMinor,
+  freeShippingThresholdMinor,
+}: CreateShippingRatesQuoteInput): ShippingRatesQuoteResult => {
+  const { quoteSecret, quoteTtlMs } = getShippingQuoteConfig();
+  const createdAt = new Date();
+  const quoteExpiresAt = new Date(createdAt.getTime() + quoteTtlMs).toISOString();
+  const flatShippingRateMinor = getFlatShippingRateMinor();
+  const freeShippingApplied = subtotalMinor >= freeShippingThresholdMinor;
+  const contextHash = buildShippingContextHash({ customer, items, subtotalMinor });
+
+  const payload: ShippingQuoteTokenPayload = {
+    v: 1,
+    provider: "flat_rate",
+    shipmentId: "flat_rate",
+    rateId: "flat_standard",
+    carrier: "Ria's Boutique",
+    service: "Standard Shipping",
+    quotedRateMinor: flatShippingRateMinor,
+    customerRateMinor: freeShippingApplied ? 0 : flatShippingRateMinor,
+    currency: getStoreCurrency(),
+    deliveryDays: null,
+    deliveryDate: "",
+    freeShippingApplied,
+    selectedAt: createdAt.toISOString(),
+    expiresAt: quoteExpiresAt,
+    contextHash,
+  };
+
+  const option: ShippingRateOption = {
+    token: encodeQuoteToken(payload, quoteSecret),
+    carrier: payload.carrier,
+    service: payload.service,
+    label: "Standard Shipping",
+    quotedRateMinor: payload.quotedRateMinor,
+    customerRateMinor: payload.customerRateMinor,
+    currency: payload.currency,
+    deliveryDays: payload.deliveryDays,
+    deliveryDate: payload.deliveryDate,
+    shipmentId: payload.shipmentId,
+  };
+
+  return {
+    provider: "flat_rate",
+    requiresSelection: false,
+    freeShippingApplied,
+    freeShippingThresholdMinor,
+    options: [option],
+    selectedOptionToken: option.token,
+    quoteExpiresAt,
+    message: freeShippingApplied
+      ? "Free shipping is applied automatically on orders over CA$400."
+      : "Standard shipping is a flat CA$30 at checkout.",
+  };
+};
+
 export const verifyShippingQuoteToken = ({
   token,
   customer,
@@ -822,7 +890,7 @@ export const verifyShippingQuoteToken = ({
   items: QuoteLineItem[];
   subtotalMinor: number;
 }): VerifiedShippingQuote => {
-  const { quoteSecret } = validateEasyPostConfig();
+  const { quoteSecret } = getShippingQuoteConfig();
   const payload = decodeQuoteToken(token, quoteSecret);
   const contextHash = buildShippingContextHash({ customer, items, subtotalMinor });
   if (payload.contextHash !== contextHash) {
@@ -865,6 +933,10 @@ const buildQrCodeDataUrl = async (value: string) =>
     : "";
 
 export const buyShippingLabel = async (quote: VerifiedShippingQuote): Promise<PurchasedShipmentDetails> => {
+  if (quote.provider !== "easypost") {
+    throw new Error("EasyPost label purchasing is disabled for flat-rate shipping orders.");
+  }
+
   const purchasedAt = new Date().toISOString();
   const shipment = await easypostRequest<EasyPostShipmentResponse>({
     endpoint: `/shipments/${encodeURIComponent(quote.shipmentId)}/buy`,

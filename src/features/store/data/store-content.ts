@@ -47,7 +47,7 @@ export interface StorePickupDetails {
 }
 
 export const shippingPolicy = {
-  standardCost: "Live carrier rates at checkout",
+  standardCost: "CA$30 flat rate at checkout",
   freeShippingThreshold: "CA$400+",
   standardTimeline: "5-10 business days (Canada)",
 };

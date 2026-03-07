@@ -184,8 +184,8 @@ const Checkout = () => {
       : freeShippingApplied && selectedShippingOption
       ? `Free shipping on orders over ${formatCad(FREE_SHIPPING_THRESHOLD)}. Applied to ${selectedShippingOption.label}.`
       : selectedShippingOption
-      ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."}`
-      : `Free shipping on orders over ${formatCad(FREE_SHIPPING_THRESHOLD)}.`;
+      ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."} Orders under ${formatCad(FREE_SHIPPING_THRESHOLD)} are charged ${formatCad(30)} shipping.`
+      : `Orders under ${formatCad(FREE_SHIPPING_THRESHOLD)} are charged ${formatCad(30)} shipping.`;
 
   const handleFormChange = (field: keyof CheckoutForm) => (event: ChangeEvent<HTMLInputElement>) => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));
@@ -479,7 +479,7 @@ const Checkout = () => {
     clearPendingAddressVerificationRequest();
     setAddressVerificationStatus("verifying");
     setAddressVerificationError("");
-    setAddressVerificationMessage("Verifying your shipping address with the carrier.");
+    setAddressVerificationMessage("Confirming your shipping address.");
 
     const controller = new AbortController();
     addressVerificationControllerRef.current = controller;
@@ -525,7 +525,7 @@ const Checkout = () => {
           setVerifiedAddressFingerprint(nextFingerprint);
           setLastVerifiedAddressFingerprint(nextFingerprint);
           setAddressVerificationStatus("verified");
-          setAddressVerificationMessage(payload.message || "Address verified. Carrier rates are ready to load.");
+          setAddressVerificationMessage(payload.message || "Address verified. Shipping is ready to load.");
           setAddressVerificationError("");
         })
         .catch((error) => {
@@ -596,7 +596,7 @@ const Checkout = () => {
       clearPendingShippingRequest();
       setShippingOptions([]);
       setSelectedShippingToken("");
-      setShippingMessage("Complete your shipping address to verify it before loading live carrier rates.");
+      setShippingMessage("Complete your shipping address to load shipping.");
       setShippingError("");
       setIsShippingLoading(false);
       return;
@@ -606,7 +606,7 @@ const Checkout = () => {
       clearPendingShippingRequest();
       setShippingOptions([]);
       setSelectedShippingToken("");
-      setShippingMessage("Verifying your shipping address before requesting carrier pricing.");
+      setShippingMessage("Confirming your shipping address before loading shipping.");
       setShippingError("");
       setIsShippingLoading(false);
       return;
@@ -616,7 +616,7 @@ const Checkout = () => {
       clearPendingShippingRequest();
       setShippingOptions([]);
       setSelectedShippingToken("");
-      setShippingMessage(addressVerificationMessage || "Verify your shipping address before loading live rates.");
+      setShippingMessage(addressVerificationMessage || "Verify your shipping address before loading shipping.");
       setShippingError(addressVerificationStatus === "invalid" ? addressVerificationError : "");
       setIsShippingLoading(false);
       return;
@@ -626,7 +626,7 @@ const Checkout = () => {
       clearPendingShippingRequest();
       setShippingOptions([]);
       setSelectedShippingToken("");
-      setShippingMessage("Enter your contact details to finalize live carrier rates for this verified address.");
+      setShippingMessage("Enter your contact details to load shipping for this address.");
       setShippingError("");
       setIsShippingLoading(false);
       return;
@@ -740,7 +740,7 @@ const Checkout = () => {
       if (!shippingAddressReady) {
         toast({
           title: "Contact details required",
-          description: "Enter your full name, email, and phone number to load live carrier rates before checkout.",
+          description: "Enter your full name, email, and phone number to load shipping before checkout.",
           variant: "destructive",
         });
         return;
@@ -1163,7 +1163,7 @@ const Checkout = () => {
                             <div className="min-w-0">
                               <p className="font-body text-sm font-semibold text-foreground">Shipping method</p>
                               <p className="mt-1 text-xs text-muted-foreground">
-                                Live carrier rates appear here after your address is verified for delivery.
+                                Standard shipping appears here after your address is confirmed.
                               </p>
                             </div>
                             {isShippingLoading ? <Loader2 className="mt-0.5 h-4 w-4 animate-spin text-muted-foreground" /> : null}
@@ -1172,12 +1172,12 @@ const Checkout = () => {
                           {!addressFieldsReady ? (
                             <p className="text-sm text-muted-foreground">Complete your shipping address to start verification.</p>
                           ) : addressVerificationStatus === "verifying" ? (
-                            <p className="text-sm text-muted-foreground">Verifying your address with the carrier before loading rates.</p>
+                            <p className="text-sm text-muted-foreground">Confirming your address before loading shipping.</p>
                           ) : addressVerificationStatus === "invalid" ? (
                             <p className="text-sm text-destructive">{addressVerificationError}</p>
                           ) : !shippingAddressReady ? (
                             <p className="text-sm text-muted-foreground">
-                              Enter your full name, email, and phone number to load live carrier rates for this verified address.
+                              Enter your full name, email, and phone number to load shipping for this address.
                             </p>
                           ) : shippingError ? (
                             <p className="text-sm text-destructive">{shippingError}</p>
@@ -1284,7 +1284,7 @@ const Checkout = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-5 pt-0 font-body text-sm text-muted-foreground">
-                <div className="grid gap-3 rounded-md border border-border bg-muted/20 p-4 sm:grid-cols-2">
+                  <div className="grid gap-3 rounded-md border border-border bg-muted/20 p-4 sm:grid-cols-2">
                   <div>
                     <p className="font-semibold text-foreground">Standard shipping</p>
                     <p>
@@ -1293,7 +1293,7 @@ const Checkout = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">Rate source</p>
-                    <p>Live carrier pricing is calculated in checkout based on address and parcel estimate.</p>
+                    <p>Shipping is charged at a flat rate in checkout unless your order qualifies for free shipping.</p>
                   </div>
                   <div className="sm:col-span-2">
                     <p className="font-semibold text-foreground">Free shipping</p>

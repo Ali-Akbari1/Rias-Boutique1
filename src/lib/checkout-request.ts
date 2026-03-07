@@ -70,7 +70,7 @@ export interface AddressVerificationResponse {
 }
 
 export interface ShippingRatesResponse {
-  provider?: "easypost";
+  provider?: "easypost" | "flat_rate";
   requiresSelection?: boolean;
   freeShippingApplied?: boolean;
   freeShippingThresholdMinor?: number;

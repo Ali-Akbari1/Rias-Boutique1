@@ -9,6 +9,7 @@ import {
 } from "../server/lib/security.js";
 import { getCatalogMap } from "../server/lib/product-catalog.js";
 import {
+  createFlatRateShippingQuote,
   createShippingRatesQuote,
   describeEasyPostError,
   isEasyPostApiError,
@@ -16,7 +17,11 @@ import {
   toQuoteCustomer,
   type QuoteLineItem,
 } from "../server/lib/easypost.js";
-import { getFreeShippingThresholdMinor, isShippingChargesEnabled } from "../server/lib/checkout-pricing.js";
+import {
+  getFreeShippingThresholdMinor,
+  getShippingProviderMode,
+  isShippingChargesEnabled,
+} from "../server/lib/checkout-pricing.js";
 import { z } from "zod";
 
 const DEFAULT_RATE_LIMIT = 40;
@@ -74,9 +79,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const { customer, items } = validation.data;
+  const shippingProviderMode = getShippingProviderMode();
   if (customer.deliveryMethod === "pickup") {
     res.status(200).json({
-      provider: "easypost",
+      provider: shippingProviderMode,
       requiresSelection: false,
       freeShippingApplied: false,
       freeShippingThresholdMinor: getFreeShippingThresholdMinor(),
@@ -93,7 +99,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  if (!isEasyPostConfigured()) {
+  if (shippingProviderMode === "easypost" && !isEasyPostConfigured()) {
     sendError(res, 503, "SHIPPING_NOT_CONFIGURED", "Shipping is not configured right now. Please contact support.");
     return;
   }
@@ -123,12 +129,22 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   try {
-    const quote = await createShippingRatesQuote({
-      customer: toQuoteCustomer(customer),
-      items: normalizedItems,
-      subtotalMinor,
-      freeShippingThresholdMinor: getFreeShippingThresholdMinor(),
-    });
+    const quoteCustomer = toQuoteCustomer(customer);
+    const freeShippingThresholdMinor = getFreeShippingThresholdMinor();
+    const quote =
+      shippingProviderMode === "flat_rate"
+        ? createFlatRateShippingQuote({
+            customer: quoteCustomer,
+            items: normalizedItems,
+            subtotalMinor,
+            freeShippingThresholdMinor,
+          })
+        : await createShippingRatesQuote({
+            customer: quoteCustomer,
+            items: normalizedItems,
+            subtotalMinor,
+            freeShippingThresholdMinor,
+          });
 
     res.status(200).json(quote);
   } catch (error) {

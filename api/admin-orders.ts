@@ -130,6 +130,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   if (validation.data.action === "retry_label_purchase") {
+    if (order.shippingQuote?.provider !== "easypost") {
+      sendError(
+        res,
+        409,
+        "LABEL_PURCHASE_DISABLED",
+        "EasyPost label purchasing is disabled for flat-rate shipping orders.",
+      );
+      return;
+    }
+
     if (order.shipment) {
       res.setHeader("Cache-Control", "no-store");
       res.status(200).json({

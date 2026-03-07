@@ -98,6 +98,8 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
 - `CLOVER_DEBUG_LOGS`: Optional `true`/`false` to enable verbose Clover diagnostics in Vercel logs.
 - `FREE_SHIPPING_THRESHOLD_MINOR`: Optional shipping threshold in minor units (default `40000` = CA$400.00).
+- `SHIPPING_PROVIDER_MODE`: Optional shipping provider mode. Defaults to `flat_rate`; set to `easypost` to restore live carrier rating and label purchases.
+- `FLAT_SHIPPING_RATE_MINOR`: Optional flat shipping charge in minor units when `SHIPPING_PROVIDER_MODE=flat_rate` (default `3000` = CA$30.00).
 - `CHECKOUT_TAX_RATE`: Optional checkout tax rate (default `0.05` for 5% GST).
 - `LAUNCH10_EXPIRES_AT`: Optional ISO timestamp for launch discount expiry (default `2026-03-21T05:59:59.999Z`, which is March 20, 2026 at 11:59 PM in Calgary).
 - `MERCHANT_ORDER_EMAIL`: Store inbox that receives new paid order alerts.
@@ -109,9 +111,9 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `EMAIL_LOGO_URL`: Optional logo URL rendered in customer confirmation email header.
 - `STORE_BRAND_NAME`: Optional brand label for transactional emails (default `Ria's Boutique`).
 - `STORE_LOCATION_DISPLAY`: Optional location text in email footer (default `Calgary, AB`).
-- `EASYPOST_API_KEY`: Required to fetch live shipping rates and buy labels after payment.
+- `EASYPOST_API_KEY`: Required only when `SHIPPING_PROVIDER_MODE=easypost` to fetch live shipping rates and buy labels after payment.
 - `EASYPOST_API_BASE_URL`: Optional EasyPost API base URL (default `https://api.easypost.com/v2`).
-- `EASYPOST_QUOTE_SECRET`: Optional dedicated HMAC secret for signed shipping quote tokens. If omitted, server falls back to `CART_TOKEN_SECRET` or `SUPABASE_SERVICE_ROLE_KEY`.
+- `EASYPOST_QUOTE_SECRET`: Optional dedicated HMAC secret for signed shipping quote tokens. If omitted, server falls back to `CART_TOKEN_SECRET` or `SUPABASE_SERVICE_ROLE_KEY`. This is also used for flat-rate shipping quote signing.
 - `EASYPOST_QUOTE_TTL_MS`: Optional shipping quote lifetime in milliseconds (default `1800000` = 30 minutes).
 - `EASYPOST_CARRIER_ACCOUNT_IDS`: Optional comma-separated EasyPost carrier account IDs to constrain rating to your connected carrier accounts.
 - `EASYPOST_PREFERRED_CARRIERS`: Optional comma-separated carrier preference list. Defaults to `Canada Post`, and matching carriers are prioritized before all others.

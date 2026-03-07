@@ -63,27 +63,27 @@ describe("checkout flow", () => {
       if (url.includes("/api/shipping-rates")) {
         return new Response(
           JSON.stringify({
-            provider: "easypost",
+            provider: "flat_rate",
             requiresSelection: false,
             freeShippingApplied: false,
             freeShippingThresholdMinor: 40000,
             options: [
               {
                 token: "quote_token_123",
-                carrier: "Canada Post",
-                service: "Expedited Parcel",
-                label: "Canada Post Expedited Parcel",
-                quotedRateMinor: 1800,
-                customerRateMinor: 1800,
+                carrier: "Ria's Boutique",
+                service: "Standard Shipping",
+                label: "Standard Shipping",
+                quotedRateMinor: 3000,
+                customerRateMinor: 3000,
                 currency: "CAD",
-                deliveryDays: 4,
+                deliveryDays: null,
                 deliveryDate: "",
-                shipmentId: "shp_test_123",
+                shipmentId: "flat_rate",
               },
             ],
             selectedOptionToken: "quote_token_123",
             quoteExpiresAt: "2026-03-21T05:59:59.999Z",
-            message: "Live shipping loaded.",
+            message: "Standard shipping is a flat CA$30 at checkout.",
           }),
           {
             status: 200,
@@ -141,7 +141,7 @@ describe("checkout flow", () => {
         return new Response(
           JSON.stringify({
             verificationStatus: "verified",
-            message: "Address verified. Carrier rates are ready to load.",
+            message: "Address confirmed. Standard shipping is ready to load.",
             normalizedAddress: {
               address: "123 Main St",
               city: "Calgary",

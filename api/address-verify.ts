@@ -14,9 +14,23 @@ import {
   toQuoteCustomer,
   verifyShippingAddress,
 } from "../server/lib/easypost.js";
+import { getShippingProviderMode } from "../server/lib/checkout-pricing.js";
 
 const DEFAULT_RATE_LIMIT = 40;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
+const normalizeCountryCode = (value: string) => {
+  const normalized = value.trim();
+  const compact = normalized.replace(/[^a-zA-Z]/g, "").toLowerCase();
+
+  if (compact === "canada" || compact === "ca" || compact === "can") {
+    return "CA";
+  }
+  if (compact === "unitedstates" || compact === "unitedstatesofamerica" || compact === "usa" || compact === "us") {
+    return "US";
+  }
+
+  return normalized.length === 2 ? normalized.toUpperCase() : normalized.toUpperCase();
+};
 
 const requestSchema = z
   .object({
@@ -81,10 +95,28 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const { customer } = validation.data;
+  const shippingProviderMode = getShippingProviderMode();
   if (customer.deliveryMethod === "pickup") {
     res.status(200).json({
       verificationStatus: "skipped",
       message: "Pick up in store selected. No address verification is required.",
+    });
+    return;
+  }
+
+  if (shippingProviderMode === "flat_rate") {
+    res.status(200).json({
+      verificationStatus: "verified",
+      message: "Address confirmed. Standard shipping is ready to load.",
+      normalizedAddress: {
+        address: customer.address,
+        city: customer.city,
+        state: customer.state,
+        postalCode: customer.postalCode,
+        country: customer.country,
+        countryCode: normalizeCountryCode(customer.country),
+      },
+      residential: null,
     });
     return;
   }

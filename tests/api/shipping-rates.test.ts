@@ -6,6 +6,7 @@ import { createMockRequest, createMockResponse } from "./test-utils/utils";
 describe("shipping rates endpoint", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    delete process.env.SHIPPING_PROVIDER_MODE;
     process.env.CLOVER_CHECKOUT_BASE_URL = "https://www.riasboutique.com";
     process.env.ALLOWED_CHECKOUT_ORIGINS = "https://www.riasboutique.com";
     process.env.ENABLE_SHIPPING_CHARGES = "true";
@@ -20,7 +21,54 @@ describe("shipping rates endpoint", () => {
     process.env.EASYPOST_CUSTOMS_EEL_PFC = "NOEEI 30.37(a)";
   });
 
+  it("returns a flat CA$30 shipping quote by default without calling EasyPost", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = createMockResponse();
+    await shippingRatesHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "user-agent": "Mozilla/5.0",
+        },
+        body: JSON.stringify({
+          customer: {
+            deliveryMethod: "shipping",
+            fullName: "Ali Mustanser Akbari",
+            email: "alimustanserakbari@gmail.com",
+            phone: "8254382985",
+            address: "999 E Street Northwest",
+            city: "Washington",
+            state: "DC",
+            postalCode: "20004",
+            country: "United States",
+          },
+          items: [{ productId: "mens-offwhite-with-white", quantity: 2 }],
+        }),
+      }),
+      response,
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.jsonBody).toMatchObject({
+      provider: "flat_rate",
+      freeShippingApplied: false,
+      options: [
+        {
+          carrier: "Ria's Boutique",
+          service: "Standard Shipping",
+          quotedRateMinor: 3000,
+          customerRateMinor: 3000,
+        },
+      ],
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("sends a Canada-origin customs declaration with total line-item value and weight", async () => {
+    process.env.SHIPPING_PROVIDER_MODE = "easypost";
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.endsWith("/addresses/create_and_verify")) {

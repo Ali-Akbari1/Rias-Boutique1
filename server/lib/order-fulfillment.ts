@@ -14,6 +14,10 @@ export const ensureShipmentForOrder = async (order: StoredOrder) => {
     throw new Error(`Order ${order.id} is missing a stored shipping quote.`);
   }
 
+  if (order.shippingQuote.provider !== "easypost") {
+    return order;
+  }
+
   const shipment = await buyShippingLabel(order.shippingQuote);
   return saveOrderShipment({
     orderId: order.id,
