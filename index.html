@@ -14,9 +14,6 @@
     />
     <meta name="author" content="Ria's Boutique" />
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
-    <link id="rb-canonical" rel="canonical" href="https://www.riasboutique.com/" />
-    <link id="rb-alternate-en-ca" rel="alternate" hreflang="en-CA" href="https://www.riasboutique.com/" />
-    <link id="rb-alternate-x-default" rel="alternate" hreflang="x-default" href="https://www.riasboutique.com/" />
     <link rel="icon" type="image/png" sizes="256x256" href="/RAb.png?v=rb2" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/RAb.png?v=rb2" />
@@ -37,7 +34,6 @@
       content="Shop handcrafted Afghan dresses, bridal wear, and traditional Afghan clothing at Ria's Boutique in Calgary."
     />
     <meta property="og:type" content="website" />
-    <meta id="rb-og-url" property="og:url" content="https://www.riasboutique.com/" />
     <meta property="og:locale" content="en_CA" />
     <meta property="og:image" content="https://www.riasboutique.com/RAb.png" />
     <meta property="og:image:alt" content="Ria's Boutique Afghan clothing collection in Calgary" />
@@ -67,15 +63,37 @@
         const canonicalUrl =
           canonicalPath === "/" ? `${siteUrl}/` : `${siteUrl}${canonicalPath}`;
 
-        const canonicalLink = document.getElementById("rb-canonical");
-        const alternateEnCaLink = document.getElementById("rb-alternate-en-ca");
-        const alternateDefaultLink = document.getElementById("rb-alternate-x-default");
-        const ogUrlTag = document.getElementById("rb-og-url");
+        const ensureLink = (id, rel, href, hreflang) => {
+          let link = document.getElementById(id);
+          if (!link) {
+            link = document.createElement("link");
+            link.id = id;
+            document.head.appendChild(link);
+          }
 
-        if (canonicalLink) canonicalLink.setAttribute("href", canonicalUrl);
-        if (alternateEnCaLink) alternateEnCaLink.setAttribute("href", canonicalUrl);
-        if (alternateDefaultLink) alternateDefaultLink.setAttribute("href", canonicalUrl);
-        if (ogUrlTag) ogUrlTag.setAttribute("content", canonicalUrl);
+          link.setAttribute("rel", rel);
+          link.setAttribute("href", href);
+          if (hreflang) {
+            link.setAttribute("hreflang", hreflang);
+          }
+        };
+
+        const ensureMeta = (id, property, content) => {
+          let meta = document.getElementById(id);
+          if (!meta) {
+            meta = document.createElement("meta");
+            meta.id = id;
+            document.head.appendChild(meta);
+          }
+
+          meta.setAttribute("property", property);
+          meta.setAttribute("content", content);
+        };
+
+        ensureLink("rb-canonical", "canonical", canonicalUrl);
+        ensureLink("rb-alternate-en-ca", "alternate", canonicalUrl, "en-CA");
+        ensureLink("rb-alternate-x-default", "alternate", canonicalUrl, "x-default");
+        ensureMeta("rb-og-url", "og:url", canonicalUrl);
       })();
     </script>
 
