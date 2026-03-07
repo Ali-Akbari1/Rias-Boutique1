@@ -615,6 +615,7 @@ const buildInternationalCustomsInfo = ({
     ...(eelPfc ? { eel_pfc: eelPfc } : {}),
     customs_items: items.map((item) => ({
       description: normalizeString(item.name) || item.productId,
+      code: hsTariffNumber,
       quantity: Math.max(1, item.quantity),
       value: Number(((item.unitPriceMinor || 0) / 100).toFixed(2)),
       weight: Number(unitWeightOz.toFixed(2)),

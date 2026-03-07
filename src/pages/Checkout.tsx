@@ -66,7 +66,7 @@ const initialForm: CheckoutForm = {
   city: "",
   state: "",
   postalCode: "",
-  country: "Canada",
+  country: "",
 };
 
 const FREE_SHIPPING_THRESHOLD = 400;

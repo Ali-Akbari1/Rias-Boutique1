@@ -15,6 +15,31 @@ describe("checkout flow", () => {
     window.localStorage.clear();
   });
 
+  it("starts with an empty country field", () => {
+    const product = products[0];
+    window.localStorage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify([
+        {
+          id: `${product.id}-One Size-Default`,
+          product,
+          selection: { size: "One Size", color: "Default" },
+          quantity: 1,
+        },
+      ]),
+    );
+
+    render(
+      <MemoryRouter>
+        <CartProvider>
+          <Checkout />
+        </CartProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByLabelText(/^country$/i)).toHaveValue("");
+  });
+
   it("submits only productId and quantity for checkout payload", async () => {
     const product = products[0];
     window.localStorage.setItem(
