@@ -4,6 +4,7 @@ import { type Product } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
+import { rememberCollectionScrollPosition } from "@/lib/collection-scroll";
 import { formatCad } from "@/lib/money";
 import BagIcon from "@/shared/ui/BagIcon";
 
@@ -20,6 +21,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { toast } = useToast();
   const returnTo = `${location.pathname}${location.search}`;
   const detailsPath = `/products/${product.id}?returnTo=${encodeURIComponent(returnTo)}`;
+  const handleOpenDetails = () => {
+    rememberCollectionScrollPosition({
+      pathname: location.pathname,
+      search: location.search,
+      scrollY: window.scrollY,
+    });
+  };
 
   const canDirectAdd = product.sizes.length === 1 && product.colors.length === 1;
 
@@ -81,7 +89,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             Sale {product.salePercent}% OFF
           </span>
         ) : null}
-        <Link to={detailsPath} className="block h-full w-full">
+        <Link to={detailsPath} className="block h-full w-full" onClick={handleOpenDetails}>
           <img
             src={product.image}
             alt={product.name}
@@ -123,6 +131,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </button>
             <Link
               to={detailsPath}
+              onClick={handleOpenDetails}
               className="inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm bg-primary px-2.5 py-1.5 text-xs font-body text-primary-foreground transition-colors hover:bg-burgundy-light sm:text-sm"
             >
               View Details

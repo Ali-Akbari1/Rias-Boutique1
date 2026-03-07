@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useNavigationType, useSearchParams } from "react-router-dom";
 import { type ProductDepartment, PRODUCT_DEPARTMENTS, products } from "@/features/catalog/data/products";
+import { consumePendingCollectionScrollPosition } from "@/lib/collection-scroll";
 import ProductCard from "./ProductCard";
 import { normalizeSearchText, scoreWeightedSearchDocument } from "@/lib/search";
 import { normalizeToStandardSizeKey, STANDARD_SIZE_KEYS, standardSizeLabel } from "@/lib/size";
@@ -94,6 +95,7 @@ const buildCollectionPath = (department: DepartmentOption) =>
 const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGridProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const [searchParams, setSearchParams] = useSearchParams();
   const normalizedInitialQuery = initialQuery.trim();
   const initialCategory = searchParams.get("category")?.trim() || "all";
@@ -127,6 +129,7 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   );
   const [currentPage, setCurrentPage] = useState(initialPage);
   const didMountPageResetEffectRef = useRef(false);
+  const didMountPageScrollEffectRef = useRef(false);
   const didMountDepartmentResetEffectRef = useRef(false);
   const didMountSizeResetEffectRef = useRef(false);
   const isDepartmentUserDrivenRef = useRef(false);
@@ -335,12 +338,52 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
+  const restoreCollectionScroll = Boolean(
+    (location.state as { restoreCollectionScroll?: boolean } | null)?.restoreCollectionScroll,
+  );
+
+  useEffect(() => {
+    if (!restoreCollectionScroll && navigationType !== "POP") {
+      return;
+    }
+
+    const savedScrollY = consumePendingCollectionScrollPosition({
+      pathname: location.pathname,
+      search: location.search,
+    });
+    if (savedScrollY === null) {
+      return;
+    }
+
+    const animationFrame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: savedScrollY, left: 0, behavior: "auto" });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+    };
+  }, [location.pathname, location.search, navigationType, restoreCollectionScroll]);
 
   useEffect(() => {
     if (safePage !== currentPage) {
       setCurrentPage(safePage);
     }
   }, [currentPage, safePage]);
+
+  useEffect(() => {
+    if (!didMountPageScrollEffectRef.current) {
+      didMountPageScrollEffectRef.current = true;
+      return;
+    }
+
+    const collectionSection = document.getElementById("collection");
+    if (collectionSection) {
+      collectionSection.scrollIntoView({ behavior: "auto", block: "start" });
+      return;
+    }
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [safePage]);
 
   useEffect(() => {
     const nextPath = buildCollectionPath(department);

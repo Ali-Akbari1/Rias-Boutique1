@@ -227,7 +227,6 @@
       "price": 450,
       "galleryImages": [
         "/uploads/12665fda-357f-442c-bea4-4b06977b5b1b.webp",
-        "/uploads/img_0643.jpg",
         "/uploads/img_0712.webp"
       ],
       "name": "Handmade Cheerma Dozi Dress (Pre-Order Only)",
@@ -587,9 +586,9 @@
     {
       "price": 110,
       "galleryImages": [
-        "/uploads/img_0837.jpg",
-        "/uploads/img_0832.jpg",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.jpg"
+        "/uploads/img_0837.webp",
+        "/uploads/img_0832.webp",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
       ],
       "name": "Men's Off-White Parantoban ",
       "slug": "mens-offwhite-with-white",
@@ -605,7 +604,7 @@
       ],
       "id": "mens-offwhite-with-white",
       "createdAt": "2026-03-04",
-      "image": "/uploads/img_0837.jpg",
+      "image": "/uploads/img_0837.webp",
       "inventory": "available",
       "description": "Men's off-white parantoban with white embroidery. ",
       "category": "Machine Made"
@@ -614,8 +613,8 @@
       "fabric": "Hazaragi (Du-Domina) ",
       "price": 180,
       "galleryImages": [
-        "/uploads/chatgpt-image-mar-5-2026-03_09_44-pm.png",
-        "/uploads/img_0851.jpg"
+        "/uploads/chatgpt-image-mar-5-2026-03_09_44-pm.webp",
+        "/uploads/img_0851.webp"
       ],
       "name": "Hazaragi Dress Sage Green",
       "slug": "hazaragi-dress-sage-green",
@@ -632,7 +631,7 @@
       ],
       "id": "hazaragi-dress-sage-green",
       "createdAt": "2026-03-05",
-      "image": "/uploads/chatgpt-image-mar-5-2026-03_09_44-pm.png",
+      "image": "/uploads/chatgpt-image-mar-5-2026-03_09_44-pm.webp",
       "inventory": "available",
       "description": "3 pieces Hazaragi Dress in Sage Green",
       "category": "Party Wear",
@@ -642,8 +641,8 @@
       "fabric": "Georgette",
       "price": 225,
       "galleryImages": [
-        "/uploads/chatgpt-image-mar-6-2026-02_13_22-pm.png",
-        "/uploads/img_0885.jpg"
+        "/uploads/chatgpt-image-mar-6-2026-02_13_22-pm.webp",
+        "/uploads/img_0885.webp"
       ],
       "name": "Green Hazaragi Dress ",
       "slug": "green-hazaragi-dress",
@@ -660,7 +659,7 @@
       ],
       "id": "green-hazaragi-dress",
       "createdAt": "2026-03-07",
-      "image": "/uploads/chatgpt-image-mar-6-2026-02_13_22-pm.png",
+      "image": "/uploads/chatgpt-image-mar-6-2026-02_13_22-pm.webp",
       "inventory": "available",
       "description": "Mustard green long dress with white scarf. ",
       "category": "Formal",
@@ -670,8 +669,8 @@
       "fabric": "Du-domina",
       "price": 180,
       "galleryImages": [
-        "/uploads/img_0888.jpg",
-        "/uploads/img_0887.jpg"
+        "/uploads/img_0888.webp",
+        "/uploads/img_0887.webp"
       ],
       "name": "Baby Blue Hazaragi Dress",
       "slug": "baby-blue-du-domina",
@@ -687,7 +686,7 @@
       ],
       "id": "baby-blue-du-domina",
       "createdAt": "2026-03-07",
-      "image": "/uploads/img_0888.jpg",
+      "image": "/uploads/img_0888.webp",
       "inventory": "available",
       "description": "Baby blue Hazaragi dress ",
       "category": "Party Wear",

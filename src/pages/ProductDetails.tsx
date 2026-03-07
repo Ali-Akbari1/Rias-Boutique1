@@ -148,6 +148,7 @@ const ProductDetails = () => {
       <main className="container mx-auto space-y-8 px-4 pb-6 pt-20 sm:px-6 sm:pb-8 sm:pt-24">
         <Link
           to={backToCollectionHref}
+          state={{ restoreCollectionScroll: true }}
           className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />

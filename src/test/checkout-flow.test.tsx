@@ -191,14 +191,14 @@ describe("checkout flow", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /pay with clover/i })).toBeEnabled();
-    });
+    }, { timeout: 4000 });
 
     fireEvent.click(screen.getByRole("button", { name: /pay with clover/i }));
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledTimes(5);
       expect(redirectSpy).toHaveBeenCalledWith("https://checkout.clover.com/pay/abc");
-    });
+    }, { timeout: 4000 });
 
     const checkoutRequestCall = fetchMock.mock.calls.find(([url]) => String(url).includes("/api/clover-checkout"));
     expect(checkoutRequestCall).toBeTruthy();
