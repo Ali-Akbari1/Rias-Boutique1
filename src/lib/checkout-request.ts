@@ -242,7 +242,7 @@ export const requestAddressVerification = async ({
   signal?: AbortSignal;
 }) =>
   requestJson<AddressVerificationResponse>({
-    path: "/api/address-verify",
+    path: "/api/address-autocomplete",
     method: "POST",
     signal,
     body: {

@@ -6,14 +6,19 @@ import {
   applyCorsResponseHeaders,
   buildAllowedOrigins,
   getClientIp,
+  looksAutomatedTraffic,
   resolveAllowedOrigin,
 } from "../server/lib/security.js";
 import { isMapboxConfigured, retrieveAddressAutofillSelection, suggestAddressAutofill } from "../server/lib/mapbox.js";
 
 const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
+const DEFAULT_VERIFY_RATE_LIMIT = 40;
+const DEFAULT_VERIFY_RATE_WINDOW_MS = 60_000;
+const locationTextRegex = /^[\p{L}\p{M}.'\- ]+$/u;
+const genericPostalRegex = /^[A-Za-z0-9][A-Za-z0-9\- ]{2,19}$/;
 
-const requestSchema = z
+const lookupRequestSchema = z
   .object({
     query: z.string().trim().min(1).max(160).optional(),
     mapboxId: z.string().trim().min(1).max(200).optional(),
@@ -30,6 +35,134 @@ const requestSchema = z
       });
     }
   });
+
+const verificationRequestSchema = z
+  .object({
+    customer: z
+      .object({
+        deliveryMethod: z.enum(["shipping", "pickup"]).default("shipping"),
+        fullName: z.string().trim().max(120).optional().default(""),
+        email: z.string().trim().max(160).optional().default(""),
+        phone: z.string().trim().max(22).optional().default(""),
+        address: z.string().trim().min(4).max(200),
+        city: z.string().trim().min(2).max(80),
+        state: z.string().trim().min(2).max(80),
+        postalCode: z.string().trim().min(3).max(20),
+        country: z.string().trim().min(2).max(80),
+      })
+      .strict(),
+  })
+  .strict();
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const normalizeWhitespace = (value: string) => value.trim().replace(/\s+/g, " ");
+
+const normalizeCountryCode = (value: string | undefined) => {
+  const normalized = normalizeWhitespace(value || "");
+  if (!normalized) {
+    return "";
+  }
+
+  const compact = normalized.replace(/[^a-zA-Z]/g, "").toLowerCase();
+  if (compact === "canada" || compact === "ca" || compact === "can") {
+    return "CA";
+  }
+  if (compact === "unitedstates" || compact === "unitedstatesofamerica" || compact === "usa" || compact === "us") {
+    return "US";
+  }
+
+  return normalized.length === 2 ? normalized.toUpperCase() : normalized.toUpperCase();
+};
+
+const toCountryDisplayName = (countryCode: string) => {
+  switch (countryCode) {
+    case "CA":
+      return "Canada";
+    case "US":
+      return "United States";
+    default:
+      return countryCode;
+  }
+};
+
+const normalizeState = (value: string) => {
+  const normalized = normalizeWhitespace(value);
+  return normalized.length === 2 ? normalized.toUpperCase() : normalized;
+};
+
+const normalizePostalCode = (value: string, countryCode: string) => {
+  const normalized = normalizeWhitespace(value).toUpperCase();
+  if (!normalized) {
+    return "";
+  }
+
+  if (countryCode === "CA") {
+    const compact = normalized.replace(/\s+/g, "");
+    if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(compact)) {
+      return "";
+    }
+    return `${compact.slice(0, 3)} ${compact.slice(3)}`;
+  }
+
+  if (countryCode === "US") {
+    const compact = normalized.replace(/\s+/g, "");
+    if (!/^\d{5}(-\d{4})?$/.test(compact)) {
+      return "";
+    }
+    return compact;
+  }
+
+  return genericPostalRegex.test(normalized) ? normalized : "";
+};
+
+const validateLocationText = (value: string) => locationTextRegex.test(normalizeWhitespace(value));
+
+const buildNormalizedAddress = (customer: z.infer<typeof verificationRequestSchema>["customer"]) => {
+  const countryCode = normalizeCountryCode(customer.country);
+  const postalCode = normalizePostalCode(customer.postalCode, countryCode);
+
+  return {
+    address: normalizeWhitespace(customer.address),
+    city: normalizeWhitespace(customer.city),
+    state: normalizeState(customer.state),
+    postalCode,
+    country: toCountryDisplayName(countryCode || normalizeCountryCode(customer.country)),
+    countryCode,
+  };
+};
+
+const validateNormalizedAddress = ({
+  address,
+  city,
+  state,
+  postalCode,
+  country,
+  countryCode,
+}: ReturnType<typeof buildNormalizedAddress>) => {
+  if (address.length < 4) {
+    return "Street address is required.";
+  }
+  if (city.length < 2 || !validateLocationText(city)) {
+    return "City format is invalid.";
+  }
+  if (state.length < 2 || !validateLocationText(state)) {
+    return "State / Province format is invalid.";
+  }
+  if (!postalCode) {
+    return countryCode === "CA"
+      ? "Canadian postal code format is invalid."
+      : countryCode === "US"
+      ? "US ZIP code format is invalid."
+      : "Postal code format is invalid.";
+  }
+  if (!countryCode || country.length < 2) {
+    return "Country format is invalid.";
+  }
+
+  return "";
+};
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "POST") {
@@ -48,17 +181,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
   applyCorsResponseHeaders(res, allowedOrigin, ["POST"]);
 
-  const rateResult = await checkRateLimit({
-    key: `address-autocomplete:${getClientIp(req)}`,
-    limit: Number(process.env.ADDRESS_AUTOCOMPLETE_RATE_LIMIT || DEFAULT_RATE_LIMIT),
-    windowMs: Number(process.env.ADDRESS_AUTOCOMPLETE_RATE_WINDOW_MS || DEFAULT_RATE_WINDOW_MS),
-  });
-  applyRateLimitHeaders(res.setHeader.bind(res), rateResult);
-  if (!rateResult.allowed) {
-    sendError(res, 429, "RATE_LIMITED", "Too many address lookup requests. Please try again shortly.");
-    return;
-  }
-
   const rawBody = await readRawBody(req);
   const parsedBody = parseJsonBody<unknown>(rawBody);
   if (!parsedBody) {
@@ -66,7 +188,71 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const validation = requestSchema.safeParse(parsedBody);
+  const isVerificationRequest = isRecord(parsedBody) && "customer" in parsedBody;
+  const rateResult = await checkRateLimit({
+    key: `${isVerificationRequest ? "address-verify" : "address-autocomplete"}:${getClientIp(req)}`,
+    limit: Number(
+      isVerificationRequest
+        ? process.env.ADDRESS_VERIFY_RATE_LIMIT || DEFAULT_VERIFY_RATE_LIMIT
+        : process.env.ADDRESS_AUTOCOMPLETE_RATE_LIMIT || DEFAULT_RATE_LIMIT,
+    ),
+    windowMs: Number(
+      isVerificationRequest
+        ? process.env.ADDRESS_VERIFY_RATE_WINDOW_MS || DEFAULT_VERIFY_RATE_WINDOW_MS
+        : process.env.ADDRESS_AUTOCOMPLETE_RATE_WINDOW_MS || DEFAULT_RATE_WINDOW_MS,
+    ),
+  });
+  applyRateLimitHeaders(res.setHeader.bind(res), rateResult);
+  if (!rateResult.allowed) {
+    sendError(
+      res,
+      429,
+      "RATE_LIMITED",
+      isVerificationRequest
+        ? "Too many address confirmation requests. Please try again shortly."
+        : "Too many address lookup requests. Please try again shortly.",
+    );
+    return;
+  }
+
+  if (isVerificationRequest) {
+    if (looksAutomatedTraffic(req)) {
+      sendError(res, 403, "BOT_DETECTED", "Automated requests are not allowed.");
+      return;
+    }
+
+    const validation = verificationRequestSchema.safeParse(parsedBody);
+    if (!validation.success) {
+      sendError(res, 400, "VALIDATION_ERROR", "Address confirmation request is invalid.", validation.error.flatten());
+      return;
+    }
+
+    const { customer } = validation.data;
+    if (customer.deliveryMethod === "pickup") {
+      res.status(200).json({
+        verificationStatus: "skipped",
+        message: "Pick up in store selected. No address confirmation is required.",
+      });
+      return;
+    }
+
+    const normalizedAddress = buildNormalizedAddress(customer);
+    const validationMessage = validateNormalizedAddress(normalizedAddress);
+    if (validationMessage) {
+      sendError(res, 422, "ADDRESS_INVALID", validationMessage);
+      return;
+    }
+
+    res.status(200).json({
+      verificationStatus: "verified",
+      message: "Address confirmed. Shipping is ready to load.",
+      normalizedAddress,
+      residential: null,
+    });
+    return;
+  }
+
+  const validation = lookupRequestSchema.safeParse(parsedBody);
   if (!validation.success) {
     sendError(res, 400, "VALIDATION_ERROR", "Address lookup request is invalid.", validation.error.flatten());
     return;

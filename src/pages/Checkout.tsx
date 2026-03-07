@@ -479,7 +479,7 @@ const Checkout = () => {
     clearPendingAddressVerificationRequest();
     setAddressVerificationStatus("verifying");
     setAddressVerificationError("");
-    setAddressVerificationMessage("Confirming your shipping address.");
+    setAddressVerificationMessage("Confirming your shipping address format.");
 
     const controller = new AbortController();
     addressVerificationControllerRef.current = controller;
@@ -525,7 +525,7 @@ const Checkout = () => {
           setVerifiedAddressFingerprint(nextFingerprint);
           setLastVerifiedAddressFingerprint(nextFingerprint);
           setAddressVerificationStatus("verified");
-          setAddressVerificationMessage(payload.message || "Address verified. Shipping is ready to load.");
+          setAddressVerificationMessage(payload.message || "Address confirmed. Shipping is ready to load.");
           setAddressVerificationError("");
         })
         .catch((error) => {
@@ -606,7 +606,7 @@ const Checkout = () => {
       clearPendingShippingRequest();
       setShippingOptions([]);
       setSelectedShippingToken("");
-      setShippingMessage("Confirming your shipping address before loading shipping.");
+      setShippingMessage("Confirming your shipping address format before loading shipping.");
       setShippingError("");
       setIsShippingLoading(false);
       return;
@@ -616,7 +616,7 @@ const Checkout = () => {
       clearPendingShippingRequest();
       setShippingOptions([]);
       setSelectedShippingToken("");
-      setShippingMessage(addressVerificationMessage || "Verify your shipping address before loading shipping.");
+      setShippingMessage(addressVerificationMessage || "Confirm your shipping address before loading shipping.");
       setShippingError(addressVerificationStatus === "invalid" ? addressVerificationError : "");
       setIsShippingLoading(false);
       return;
@@ -713,7 +713,7 @@ const Checkout = () => {
       if (!addressFieldsReady) {
         toast({
           title: "Shipping address required",
-          description: "Enter your shipping address so we can verify it before loading carrier rates.",
+          description: "Enter your shipping address so we can confirm it before loading carrier rates.",
           variant: "destructive",
         });
         return;
@@ -721,8 +721,8 @@ const Checkout = () => {
 
       if (addressVerificationStatus === "verifying") {
         toast({
-          title: "Address still verifying",
-          description: "Wait for address verification to finish before continuing to payment.",
+          title: "Address still confirming",
+          description: "Wait for address confirmation to finish before continuing to payment.",
           variant: "destructive",
         });
         return;
@@ -730,8 +730,8 @@ const Checkout = () => {
 
       if (!isAddressVerified) {
         toast({
-          title: "Address verification required",
-          description: addressVerificationError || "Verify your shipping address before continuing to payment.",
+          title: "Address confirmation required",
+          description: addressVerificationError || "Confirm your shipping address before continuing to payment.",
           variant: "destructive",
         });
         return;
@@ -1140,7 +1140,7 @@ const Checkout = () => {
                             <div className="rounded-sm border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground">
                               <p className="inline-flex items-center gap-2 font-medium">
                                 <CheckCircle2 className="h-4 w-4 text-primary" />
-                                Address verified
+                                Address confirmed
                               </p>
                               <p className="mt-1 text-xs text-muted-foreground">{addressVerificationMessage}</p>
                             </div>

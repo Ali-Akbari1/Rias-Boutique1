@@ -54,7 +54,7 @@ describe("checkout flow", () => {
       ]),
     );
 
-    const fetchMock = vi.fn(async (input: RequestInfo | URL, _init?: RequestInit) => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.includes("/api/cart-token")) {
         return new Response(JSON.stringify({ error: { code: "TOKEN_DISABLED", message: "disabled" } }), { status: 404 });
@@ -92,27 +92,53 @@ describe("checkout flow", () => {
         );
       }
 
-      if (url.includes("/api/address-autocomplete-retrieve")) {
-        return new Response(
-          JSON.stringify({
-            configured: true,
-            address: {
-              address: "123 Main St",
-              city: "Calgary",
-              state: "Alberta",
-              postalCode: "T2X 1A1",
-              country: "Canada",
-              countryCode: "CA",
-            },
-          }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-      }
-
       if (url.includes("/api/address-autocomplete")) {
+        const body = JSON.parse(String(init?.body || "{}")) as {
+          mapboxId?: string;
+          customer?: Record<string, unknown>;
+        };
+
+        if (body.customer) {
+          return new Response(
+            JSON.stringify({
+              verificationStatus: "verified",
+              message: "Address confirmed. Shipping is ready to load.",
+              normalizedAddress: {
+                address: "123 Main St",
+                city: "Calgary",
+                state: "Alberta",
+                postalCode: "T2X 1A1",
+                country: "Canada",
+                countryCode: "CA",
+              },
+            }),
+            {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            },
+          );
+        }
+
+        if (body.mapboxId) {
+          return new Response(
+            JSON.stringify({
+              configured: true,
+              address: {
+                address: "123 Main St",
+                city: "Calgary",
+                state: "Alberta",
+                postalCode: "T2X 1A1",
+                country: "Canada",
+                countryCode: "CA",
+              },
+            }),
+            {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            },
+          );
+        }
+
         return new Response(
           JSON.stringify({
             configured: true,
@@ -129,27 +155,6 @@ describe("checkout flow", () => {
                 countryCode: "CA",
               },
             ],
-          }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-      }
-
-      if (url.includes("/api/address-verify")) {
-        return new Response(
-          JSON.stringify({
-            verificationStatus: "verified",
-            message: "Address confirmed. Standard shipping is ready to load.",
-            normalizedAddress: {
-              address: "123 Main St",
-              city: "Calgary",
-              state: "Alberta",
-              postalCode: "T2X 1A1",
-              country: "Canada",
-              countryCode: "CA",
-            },
           }),
           {
             status: 200,

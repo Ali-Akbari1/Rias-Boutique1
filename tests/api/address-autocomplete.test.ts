@@ -163,4 +163,85 @@ describe("address autocomplete endpoints", () => {
     expect(requestedUrl).toContain("/retrieve/mbx-address-1");
     expect(requestedUrl).toContain("session_token=session_test_123");
   });
+
+  it("confirms a shipping address locally without calling EasyPost", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = createMockResponse();
+    await addressAutocompleteHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "user-agent": "Mozilla/5.0",
+        },
+        body: JSON.stringify({
+          customer: {
+            deliveryMethod: "shipping",
+            fullName: "Test Buyer",
+            email: "buyer@example.com",
+            phone: "+1 403 555 0101",
+            address: " 123 Main St ",
+            city: " Calgary ",
+            state: " Alberta ",
+            postalCode: "t2x1a1",
+            country: "ca",
+          },
+        }),
+      }),
+      response,
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.jsonBody).toEqual({
+      verificationStatus: "verified",
+      message: "Address confirmed. Shipping is ready to load.",
+      normalizedAddress: {
+        address: "123 Main St",
+        city: "Calgary",
+        state: "Alberta",
+        postalCode: "T2X 1A1",
+        country: "Canada",
+        countryCode: "CA",
+      },
+      residential: null,
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid postal code formats during address confirmation", async () => {
+    const response = createMockResponse();
+    await addressAutocompleteHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "user-agent": "Mozilla/5.0",
+        },
+        body: JSON.stringify({
+          customer: {
+            deliveryMethod: "shipping",
+            fullName: "",
+            email: "",
+            phone: "",
+            address: "123 Main St",
+            city: "Calgary",
+            state: "Alberta",
+            postalCode: "12345",
+            country: "Canada",
+          },
+        }),
+      }),
+      response,
+    );
+
+    expect(response.statusCode).toBe(422);
+    expect(response.jsonBody).toEqual({
+      error: {
+        code: "ADDRESS_INVALID",
+        message: "Canadian postal code format is invalid.",
+      },
+    });
+  });
 });
