@@ -604,7 +604,7 @@ const buildInternationalCustomsInfo = ({
 
   const productOriginCountry = normalizeCountryCode(process.env.EASYPOST_PRODUCT_ORIGIN_COUNTRY) || originCountryCode;
   const unitWeightOz = toNumber(process.env.EASYPOST_ITEM_WEIGHT_OZ, DEFAULT_ITEM_WEIGHT_OZ);
-  const eelPfc = normalizeString(process.env.EASYPOST_CUSTOMS_EEL_PFC);
+  const eelPfc = originCountryCode === "US" ? normalizeString(process.env.EASYPOST_CUSTOMS_EEL_PFC) : "";
 
   return {
     customs_certify: true,
@@ -613,16 +613,20 @@ const buildInternationalCustomsInfo = ({
     restriction_type: normalizeString(process.env.EASYPOST_CUSTOMS_RESTRICTION_TYPE) || "none",
     non_delivery_option: normalizeString(process.env.EASYPOST_CUSTOMS_NON_DELIVERY_OPTION) || "return",
     ...(eelPfc ? { eel_pfc: eelPfc } : {}),
-    customs_items: items.map((item) => ({
-      description: normalizeString(item.name) || item.productId,
-      code: hsTariffNumber,
-      quantity: Math.max(1, item.quantity),
-      value: Number(((item.unitPriceMinor || 0) / 100).toFixed(2)),
-      weight: Number(unitWeightOz.toFixed(2)),
-      origin_country: productOriginCountry,
-      hs_tariff_number: hsTariffNumber,
-      currency: getStoreCurrency(),
-    })),
+    customs_items: items.map((item) => {
+      const quantity = Math.max(1, item.quantity);
+
+      return {
+        description: normalizeString(item.name) || item.productId,
+        code: hsTariffNumber,
+        quantity,
+        value: Number((((item.unitPriceMinor || 0) * quantity) / 100).toFixed(2)),
+        weight: Number((unitWeightOz * quantity).toFixed(2)),
+        origin_country: productOriginCountry,
+        hs_tariff_number: hsTariffNumber,
+        currency: getStoreCurrency(),
+      };
+    }),
   };
 };
 

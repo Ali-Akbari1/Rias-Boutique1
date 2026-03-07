@@ -20,7 +20,7 @@ describe("shipping rates endpoint", () => {
     process.env.EASYPOST_CUSTOMS_EEL_PFC = "NOEEI 30.37(a)";
   });
 
-  it("sends customs item code and eel_pfc for international shipments", async () => {
+  it("sends a Canada-origin customs declaration with total line-item value and weight", async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.endsWith("/addresses/create_and_verify")) {
@@ -50,14 +50,25 @@ describe("shipping rates endpoint", () => {
           shipment?: {
             customs_info?: {
               eel_pfc?: string;
-              customs_items?: Array<{ code?: string; hs_tariff_number?: string }>;
+              customs_items?: Array<{
+                code?: string;
+                hs_tariff_number?: string;
+                quantity?: number;
+                value?: number;
+                weight?: number;
+                origin_country?: string;
+              }>;
             };
           };
         };
 
-        expect(body.shipment?.customs_info?.eel_pfc).toBe("NOEEI 30.37(a)");
+        expect(body.shipment?.customs_info?.eel_pfc).toBeUndefined();
         expect(body.shipment?.customs_info?.customs_items?.[0]?.code).toBe("620443");
         expect(body.shipment?.customs_info?.customs_items?.[0]?.hs_tariff_number).toBe("620443");
+        expect(body.shipment?.customs_info?.customs_items?.[0]?.origin_country).toBe("CA");
+        expect(body.shipment?.customs_info?.customs_items?.[0]?.quantity).toBe(2);
+        expect(body.shipment?.customs_info?.customs_items?.[0]?.value).toBe(220);
+        expect(body.shipment?.customs_info?.customs_items?.[0]?.weight).toBe(48);
 
         return new Response(
           JSON.stringify({
@@ -104,7 +115,7 @@ describe("shipping rates endpoint", () => {
             postalCode: "20004",
             country: "United States",
           },
-          items: [{ productId: "mens-offwhite-with-white", quantity: 1 }],
+          items: [{ productId: "mens-offwhite-with-white", quantity: 2 }],
         }),
       }),
       response,
