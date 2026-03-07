@@ -133,7 +133,7 @@
       "id": "Handmade-Hazaragi-Dress",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0628.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Handmade Hazaragi dress with black embroidery mirror work. \n\n2 pieces: Dress and pants \n",
       "category": "Formal",
       "fitInfo": "Bust: 36in \nWaist: 32in \nLength of Pants: 35in"
@@ -668,7 +668,7 @@
     },
     {
       "fabric": "Du-domina",
-      "price": 178,
+      "price": 180,
       "galleryImages": [
         "/uploads/img_0888.jpg",
         "/uploads/img_0887.jpg"
