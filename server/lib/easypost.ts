@@ -740,6 +740,14 @@ export const createShippingRatesQuote = async ({
   });
   if (displayRates.length === 0) {
     const shipmentMessages = formatShipmentMessages(shipment.messages);
+    console.error("[easypost] shipment returned no displayable rates", {
+      shipmentId,
+      originCountryCode,
+      destinationCountryCode,
+      carrierAccounts,
+      ratesCount: Array.isArray(shipment.rates) ? shipment.rates.length : 0,
+      messages: Array.isArray(shipment.messages) ? shipment.messages : [],
+    });
     if (originCountryCode && destinationCountryCode && originCountryCode !== destinationCountryCode) {
       throw new Error(
         shipmentMessages
