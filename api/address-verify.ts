@@ -1,11 +1,13 @@
 import { z } from "zod";
 import { parseJsonBody, readRawBody, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import { logger } from "../server/lib/logger.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 import {
+  applyCorsResponseHeaders,
   buildAllowedOrigins,
   getClientIp,
   looksAutomatedTraffic,
-  validateOrigin,
+  resolveAllowedOrigin,
 } from "../server/lib/security.js";
 import {
   describeEasyPostError,
@@ -60,10 +62,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
     process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
   );
-  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+  const allowedOrigin = resolveAllowedOrigin(req, allowedOrigins, { allowMissingOrigin: false });
+  if (!allowedOrigin) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
+  applyCorsResponseHeaders(res, allowedOrigin, ["POST"]);
 
   const rateResult = await checkRateLimit({
     key: `address-verify:${getClientIp(req)}`,
@@ -133,7 +137,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       ...verifiedAddress,
     });
   } catch (error) {
-    console.error("[address-verify] verification failed", {
+    logger.error("address-verify.verification_failed", {
       error: describeEasyPostError(error),
       destinationCountry: customer.country,
       destinationPostalCode: customer.postalCode,

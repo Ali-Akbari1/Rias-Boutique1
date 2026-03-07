@@ -11,6 +11,16 @@
     <priority>0.95</priority>
   </url>
   <url>
+    <loc>https://www.riasboutique.com/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
     <loc>https://www.riasboutique.com/collection/women</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -24,16 +34,6 @@
     <loc>https://www.riasboutique.com/collection/jewelry</loc>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.riasboutique.com/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://www.riasboutique.com/faq</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/Burgundy-Bridal-Dress</loc>

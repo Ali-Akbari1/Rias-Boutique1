@@ -1,56 +1,60 @@
 # Ria's Boutique
 
-React + Vite storefront for handcrafted Afghan clothing, with product browsing, product detail pages, cart management, optional Clover Checkout, Google Reviews integration, and Decap CMS editing at `/admin`.
+[![CI](https://github.com/Ali-Akbari1/Rias-Boutique1/actions/workflows/ci.yml/badge.svg)](https://github.com/Ali-Akbari1/Rias-Boutique1/actions/workflows/ci.yml)
+![Lint](https://img.shields.io/badge/lint-ESLint-4B32C3)
+![Typecheck](https://img.shields.io/badge/typecheck-TypeScript-3178C6)
+![Tests](https://img.shields.io/badge/tests-Vitest-6E9F18)
+![Build](https://img.shields.io/badge/build-Vite-646CFF)
+
+React + Vite storefront for handcrafted Afghan clothing, backed by Vercel serverless APIs for checkout, shipping, reviews, CMS auth, and order operations.
 
 Live site: `https://www.riasboutique.com`
 
-## Features
+## What this repo contains
 
-- Search, filter, and sort product collection.
-- Product detail pages with gallery, zoom, sizes, colors, and care details.
-- Cart drawer with quantity controls and subtotal.
-- Optional Clover Checkout flow (`/checkout`, `/checkout/success`, `/checkout/cancel`).
-- EasyPost live shipping quotes in checkout, with free shipping over CA$400 still applied server-side.
-- Admin orders dashboard (`/orders-admin`) for viewing paid/pending orders, tracking details, label links, and QR codes.
-- Google Reviews section with live fetch fallback to curated reviews.
-- Instagram highlights driven by environment config.
-- Decap CMS for non-coder product editing and media uploads.
-- Vercel serverless functions for Google Places + GitHub OAuth.
+- Product catalog, collection filtering, product detail pages, and cart state.
+- Hosted Clover checkout with server-side price validation and order persistence.
+- Shipping quotes and label operations via EasyPost.
+- Launch discount capture and transactional email delivery.
+- Google Reviews ingestion through a backend wrapper.
+- Decap CMS integration at `/admin`.
+- Health, rate limiting, origin validation, and structured server logging.
 
-## Tech stack
+## Stack
 
 - React 18 + TypeScript
 - Vite 5
-- Tailwind CSS + shadcn/ui (Radix)
 - React Router
-- Clover Hosted Checkout API
-- EasyPost Shipping API
-- Decap CMS
+- Tailwind CSS + shadcn/ui
+- Zod validation
+- Supabase order storage
+- Clover Hosted Checkout
+- EasyPost shipping
 - Vitest + Testing Library
+- GitHub Actions CI
 
-## Project structure
+## Project layout
 
 ```text
-api/                     # Vercel serverless functions
-server/                  # Server-only checkout/order libraries and DB schema
-tests/                   # Node API test suites
-public/admin/            # Decap CMS admin app/config
-public/uploads/          # Uploaded product images
-src/content/products.json# Product source of truth
-src/features/            # Frontend features (cart, catalog, home, navigation, product, store)
-src/shared/ui/           # Shared UI primitives
-src/features/catalog/data/products.ts # Product normalization + runtime mapping
-src/pages/               # Storefront and checkout routes
+api/                      Vercel serverless functions
+server/                   Server-only integrations, validation, storage, logging
+scripts/                  Build, sitemap, image, and media maintenance scripts
+src/content/products.json Product source of truth
+src/features/             Frontend feature modules
+src/pages/                Route entry points
+public/admin/             Decap CMS
+public/uploads/           Product media served by the storefront
+tests/api/                API test suites
 ```
 
-## Getting started
+## Local development
 
 ### Prerequisites
 
-- Node.js 18+ (Node 20 LTS recommended)
+- Node.js 20 LTS recommended
 - npm
 
-### Install and run
+### Start the app
 
 ```powershell
 npm install
@@ -58,189 +62,116 @@ Copy-Item .env.example .env
 npm run dev
 ```
 
-App runs at `http://localhost:8080`.
+The storefront runs at `http://localhost:8080`.
 
-## Available scripts
+## Scripts
 
-- `npm run dev` - Start local dev server.
-- `npm run build` - Production build.
-- `npm run build:dev` - Development-mode build.
-- `npm run preview` - Preview built app.
-- `npm run lint` - Run ESLint.
-- `npm run test` - Run Vitest once.
-- `npm run test:watch` - Run Vitest in watch mode.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the local Vite dev server |
+| `npm run build` | Production build with sitemap generation |
+| `npm run build:dev` | Development-mode build |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run app and server TypeScript checks |
+| `npm run test` | Run the Vitest suite once |
+| `npm run test:watch` | Run Vitest in watch mode |
+| `npm run sitemap:generate` | Rebuild `public/sitemap.xml` from route and product data |
+| `npm run images:convert` | Generate `.webp` derivatives and normalize product image refs |
+| `npm run media:hygiene` | Dry-run orphan cleanup and oversized upload compression |
+| `npm run media:hygiene -- --apply` | Apply upload cleanup and compression changes |
 
-## Environment variables
+## Environment variable matrix
 
-Copy `.env.example` to `.env` and fill what you need.
+`.env.example` is the exhaustive reference. The matrix below groups the variables by operational concern.
 
-### Client-side (`VITE_`)
+| Area | Variables | Required when | Notes |
+| --- | --- | --- | --- |
+| Storefront toggles | `VITE_ENABLE_CHECKOUT`, `VITE_ENABLE_SHIPPING_CHARGES`, `VITE_LAUNCH10_EXPIRES_AT` | Always | Client-visible feature flags and promo timing |
+| Store metadata | `VITE_STORE_PICKUP_*`, `VITE_GOOGLE_REVIEWS_URL`, `VITE_INSTAGRAM_*`, `STORE_BRAND_NAME`, `STORE_LOCATION_DISPLAY` | Always | UI copy, pickup info, footer/social metadata |
+| Origins and CORS | `ALLOWED_BROWSER_ORIGINS`, `ALLOWED_PRODUCTION_ORIGINS`, `ALLOWED_PREVIEW_ORIGINS`, `ALLOWED_DEV_ORIGINS`, `ALLOWED_CHECKOUT_ORIGINS`, `ALLOWED_PROMO_ORIGINS` | Always | Browser-facing APIs validate origin against these lists |
+| Clover checkout | `CLOVER_API_BASE_URL`, `CLOVER_MERCHANT_ID`, `CLOVER_PRIVATE_TOKEN`, `CLOVER_CHECKOUT_BASE_URL`, `CLOVER_ENABLE_TIPS`, `CLOVER_PAGE_CONFIG_UUID`, `CLOVER_TIMEOUT_MS`, `CLOVER_DEBUG_LOGS` | Checkout enabled | Hosted checkout session creation and payment verification |
+| Clover webhooks | `CLOVER_WEBHOOK_SECRET`, `CLOVER_WEBHOOK_SECRETS`, `CLOVER_WEBHOOK_SECRET_SANDBOX`, `CLOVER_WEBHOOK_SECRET_PRODUCTION`, `CLOVER_WEBHOOK_TOLERANCE_MS` | Webhooks enabled | Supports secret rotation and environment split |
+| Pricing and discounting | `FREE_SHIPPING_THRESHOLD_MINOR`, `FLAT_SHIPPING_RATE_MINOR`, `CHECKOUT_TAX_RATE`, `LAUNCH10_EXPIRES_AT`, `DISCOUNT_CAMPAIGN_NAME` | Checkout or promo signup enabled | Server-side source of truth for pricing and discount timing |
+| Order storage | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ORDER_STORE_ADAPTER` | Persistent orders | Use `ORDER_STORE_ADAPTER=memory` only for isolated local testing |
+| Client Supabase access | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Only if the browser needs Supabase | Not required for the checkout flow itself |
+| EasyPost shipping | `SHIPPING_PROVIDER_MODE`, `ENABLE_SHIPPING_CHARGES`, `EASYPOST_API_KEY`, `EASYPOST_API_BASE_URL`, `EASYPOST_QUOTE_SECRET`, `EASYPOST_QUOTE_TTL_MS`, `EASYPOST_CARRIER_ACCOUNT_IDS`, `EASYPOST_PREFERRED_CARRIERS`, `EASYPOST_PREFERRED_SERVICES`, `EASYPOST_FROM_*`, `EASYPOST_PARCEL_*`, `EASYPOST_ITEM_WEIGHT_OZ`, `EASYPOST_ADDITIONAL_ITEM_*`, `EASYPOST_PRODUCT_ORIGIN_COUNTRY`, `EASYPOST_DEFAULT_HS_TARIFF_NUMBER`, `EASYPOST_CUSTOMS_*` | `SHIPPING_PROVIDER_MODE=easypost` | Required for live quotes and label purchase |
+| Email delivery | `MERCHANT_ORDER_EMAIL`, `CUSTOMER_ORDER_EMAIL_ENABLED`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_REPLY_TO_EMAIL`, `SUPPORT_EMAIL`, `EMAIL_LOGO_URL` | Order or promo emails enabled | Resend is optional locally, required for live email delivery |
+| Rate limiting and anti-abuse | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `CHECKOUT_RATE_LIMIT`, `ORDER_STATUS_RATE_LIMIT`, `WEBHOOK_RATE_LIMIT`, `ADDRESS_*`, `SHIPPING_RATES_*`, `DISCOUNT_SIGNUP_RATE_LIMIT`, `GOOGLE_REVIEWS_RATE_LIMIT`, `CART_TOKEN_SECRET`, `CART_TOKEN_MAX_AGE_MS` | Production | Falls back to in-memory buckets when Upstash is not configured |
+| Reviews | `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID` | Live Google Reviews enabled | Frontend calls the local wrapper, not Google directly |
+| Admin operations | `ADMIN_DASHBOARD_TOKEN` | `/orders-admin` used | Sent via `x-admin-token` or `Authorization: Bearer` |
+| CMS auth | `GITHUB_OAUTH_CLIENT_ID`, `GITHUB_OAUTH_CLIENT_SECRET`, `CMS_BASE_URL` | Decap CMS GitHub auth enabled | Used by `/api/auth` and `/api/callback` |
 
-- `VITE_ENABLE_CHECKOUT`: `true` or `false` to enable checkout routes/buttons.
-- `VITE_GOOGLE_REVIEWS_URL`: Fallback URL for review links.
-- `VITE_GOOGLE_LEAVE_REVIEW_URL`: Optional footer "Leave a Google Review" link.
-- `VITE_INSTAGRAM_PROFILE_URL`: Instagram profile link.
-- `VITE_INSTAGRAM_CARDS`: Comma-separated `postUrl|thumbnailUrl|label` entries.
+## Deployment runbook
 
-Example:
-
-```env
-VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|Blue and gold set,https://www.instagram.com/reel/REEL_1/|/instagram/reel-1.jpg|Runway reel
-```
-
-### Server-side (`api/*` on Vercel)
-
-- `CLOVER_API_BASE_URL`: Clover API base URL. Sandbox default is `https://apisandbox.dev.clover.com`.
-- `CLOVER_MERCHANT_ID`: Clover merchant ID.
-- `CLOVER_PRIVATE_TOKEN`: Clover private token for Hosted Checkout.
-- `CLOVER_CHECKOUT_BASE_URL`: HTTPS site URL used for success/failure redirects.
-- `CLOVER_ENABLE_TIPS`: Optional `true`/`false` to enable tips in hosted checkout.
-- `CLOVER_PAGE_CONFIG_UUID`: Optional Clover page config UUID.
-- `CLOVER_DEBUG_LOGS`: Optional `true`/`false` to enable verbose Clover diagnostics in Vercel logs.
-- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`: Optional Upstash Redis REST credentials used for distributed rate limiting across Vercel instances. If omitted, local in-memory buckets are used as a fallback.
-- `FREE_SHIPPING_THRESHOLD_MINOR`: Optional shipping threshold in minor units (default `40000` = CA$400.00).
-- `SHIPPING_PROVIDER_MODE`: Optional shipping provider mode. Defaults to `flat_rate`; set to `easypost` to restore live carrier rating and label purchases.
-- `FLAT_SHIPPING_RATE_MINOR`: Optional flat shipping charge in minor units when `SHIPPING_PROVIDER_MODE=flat_rate` (default `3000` = CA$30.00).
-- `CHECKOUT_TAX_RATE`: Optional checkout tax rate (default `0.05` for 5% GST).
-- `LAUNCH10_EXPIRES_AT`: Optional ISO timestamp for launch discount expiry (default `2026-03-21T05:59:59.999Z`, which is March 20, 2026 at 11:59 PM in Calgary).
-- `MERCHANT_ORDER_EMAIL`: Store inbox that receives new paid order alerts.
-- `CUSTOMER_ORDER_EMAIL_ENABLED`: Optional `true`/`false` (default `true`) to send customer order confirmation emails after payment.
-- `RESEND_API_KEY`: Optional Resend API key to send real merchant/customer emails.
-- `RESEND_FROM_EMAIL`: Optional sender identity for Resend, e.g. `Ria's Boutique <orders@riasboutique.com>`.
-- `RESEND_REPLY_TO_EMAIL`: Optional reply destination for customer emails. If not set, replies default to `MERCHANT_ORDER_EMAIL`.
-- `SUPPORT_EMAIL`: Optional support contact shown in customer confirmation emails.
-- `EMAIL_LOGO_URL`: Optional logo URL rendered in customer confirmation email header.
-- `STORE_BRAND_NAME`: Optional brand label for transactional emails (default `Ria's Boutique`).
-- `STORE_LOCATION_DISPLAY`: Optional location text in email footer (default `Calgary, AB`).
-- `EASYPOST_API_KEY`: Required only when `SHIPPING_PROVIDER_MODE=easypost` to fetch live shipping rates and buy labels after payment.
-- `EASYPOST_API_BASE_URL`: Optional EasyPost API base URL (default `https://api.easypost.com/v2`).
-- `EASYPOST_QUOTE_SECRET`: Optional dedicated HMAC secret for signed shipping quote tokens. If omitted, server falls back to `CART_TOKEN_SECRET` or `SUPABASE_SERVICE_ROLE_KEY`. This is also used for flat-rate shipping quote signing.
-- `EASYPOST_QUOTE_TTL_MS`: Optional shipping quote lifetime in milliseconds (default `1800000` = 30 minutes).
-- `EASYPOST_CARRIER_ACCOUNT_IDS`: Optional comma-separated EasyPost carrier account IDs to constrain rating to your connected carrier accounts.
-- `EASYPOST_PREFERRED_CARRIERS`: Optional comma-separated carrier preference list. Defaults to `Canada Post`, and matching carriers are prioritized before all others.
-- `EASYPOST_PREFERRED_SERVICES`: Optional comma-separated service preference list used inside the preferred carrier set.
-- `EASYPOST_FROM_*`: Origin address/contact used for EasyPost shipments (`NAME`, `COMPANY`, `STREET1`, `STREET2`, `CITY`, `STATE`, `ZIP`, `COUNTRY`, `PHONE`, `EMAIL`).
-- `EASYPOST_PARCEL_LENGTH_IN`, `EASYPOST_PARCEL_WIDTH_IN`, `EASYPOST_PARCEL_HEIGHT_IN`: Default parcel dimensions used for quotes.
-- `EASYPOST_ITEM_WEIGHT_OZ`: Estimated first-item parcel weight in ounces.
-- `EASYPOST_ADDITIONAL_ITEM_WEIGHT_OZ`: Additional estimated weight per extra item in ounces.
-- `EASYPOST_ADDITIONAL_ITEM_HEIGHT_IN`: Additional estimated parcel height per extra item.
-- `EASYPOST_PRODUCT_ORIGIN_COUNTRY`: Optional ISO country code used on EasyPost customs items for international quotes.
-- `EASYPOST_DEFAULT_HS_TARIFF_NUMBER`: Required if you want to quote cross-border shipments through EasyPost.
-- `EASYPOST_CUSTOMS_SIGNER`, `EASYPOST_CUSTOMS_CONTENTS_TYPE`, `EASYPOST_CUSTOMS_RESTRICTION_TYPE`, `EASYPOST_CUSTOMS_NON_DELIVERY_OPTION`, `EASYPOST_CUSTOMS_EEL_PFC`: Optional EasyPost customs metadata overrides.
-- `MAPBOX_ACCESS_TOKEN`: Server-side token used by `/api/address-autocomplete` for checkout address suggestions.
-- `MAPBOX_AUTOCOMPLETE_COUNTRIES`: Optional comma-separated country filter for checkout address suggestions (default `CA,US`).
-- `SUPABASE_URL`: Supabase project URL for server-side order persistence.
-- `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key used by serverless checkout/webhook/order endpoints.
-- `VITE_SUPABASE_URL`: Optional client URL if frontend calls Supabase directly.
-- `VITE_SUPABASE_ANON_KEY`: Optional client anon key if frontend calls Supabase directly.
-- `GOOGLE_PLACES_API_KEY`: For `/api/google-reviews`.
-- `GOOGLE_PLACE_ID`: For `/api/google-reviews`.
-- `ADMIN_DASHBOARD_TOKEN`: Required token for `/api/admin-orders` and `/orders-admin`.
-- `ALLOWED_PROMO_ORIGINS`: Optional CSV list of allowed browser origins for `/api/discount-signup`.
-
-### Operational endpoints
-
-- `/api/health`: Basic liveness/configuration probe for Vercel health checks and manual diagnostics.
-- `DISCOUNT_SIGNUP_RATE_LIMIT`: Optional rate limit for `/api/discount-signup` (default `20`).
-- `DISCOUNT_SIGNUP_RATE_WINDOW_MS`: Optional rate limit window in milliseconds for `/api/discount-signup` (default `60000`).
-- `DISCOUNT_CAMPAIGN_NAME`: Optional campaign label stored with popup signups (default `launch10_2026_03_20`).
-- `ADDRESS_AUTOCOMPLETE_RATE_LIMIT`: Optional rate limit for `/api/address-autocomplete` (default `60`).
-- `ADDRESS_AUTOCOMPLETE_RATE_WINDOW_MS`: Optional rate limit window for `/api/address-autocomplete` (default `60000`).
-- `ADDRESS_VERIFY_RATE_LIMIT`: Optional rate limit for `/api/address-verify` (default `40`).
-- `ADDRESS_VERIFY_RATE_WINDOW_MS`: Optional rate limit window for `/api/address-verify` (default `60000`).
-- `SHIPPING_RATES_RATE_LIMIT`: Optional rate limit for `/api/shipping-rates` (default `40`).
-- `SHIPPING_RATES_RATE_WINDOW_MS`: Optional rate limit window for `/api/shipping-rates` (default `60000`).
-- `GITHUB_OAUTH_CLIENT_ID`: For Decap GitHub auth.
-- `GITHUB_OAUTH_CLIENT_SECRET`: For Decap GitHub auth.
-- `CMS_BASE_URL`: Base URL used by OAuth callbacks, e.g. `https://www.riasboutique.com`.
-
-## Clover checkout setup
-
-1. In Clover dashboard, enable ecommerce + Hosted Checkout and create a private token.
-2. Set `VITE_ENABLE_CHECKOUT=true`.
-3. Add server env vars:
-   - `CLOVER_API_BASE_URL`
-   - `CLOVER_MERCHANT_ID`
-   - `CLOVER_PRIVATE_TOKEN`
-   - `CLOVER_CHECKOUT_BASE_URL` (must be `https://...`)
-   - `EASYPOST_API_KEY`
-   - `EASYPOST_FROM_*` origin address fields
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-4. Restart/redeploy.
-
-When checkout starts, the frontend can request server-side Mapbox suggestions from `api/address-autocomplete`, then verifies the completed address through `api/address-verify`. Only verified shipping addresses are allowed to request live rates from `api/shipping-rates`. The selected EasyPost quote is signed by the server, posted to `api/clover-checkout`, and used to create the Clover checkout session. After payment confirmation, the server buys the EasyPost label, stores tracking/QR details, and includes tracking information in merchant/customer order emails when available.
-
-Before first live checkout, run `server/db/schema.sql` in your Supabase SQL Editor. Existing projects should rerun it so the new `pricing_json`, `shipping_quote_json`, and `shipment_json` columns are added to `orders`.
-
-## Product content model
-
-Products are managed in `src/content/products.json`.
-
-Important rules:
-
-- Keep `id` unique for each product.
-- Keep `slug` URL-safe and unique.
-- Store uploaded images under `public/uploads` (or through Decap CMS media upload).
-
-`src/features/catalog/data/products.ts` normalizes incomplete data and provides safe defaults.
-
-## Decap CMS setup (`/admin`)
-
-This repo includes Decap CMS so products can be edited in a form UI.
-
-### One-time setup
-
-1. Verify `public/admin/config.yml` has the correct `repo`, `branch`, and `base_url`.
-2. Create a GitHub OAuth App:
-   - Homepage URL: `https://www.riasboutique.com`
-   - Callback URL: `https://www.riasboutique.com/api/callback`
-3. In Vercel project settings, set:
-   - `GITHUB_OAUTH_CLIENT_ID`
-   - `GITHUB_OAUTH_CLIENT_SECRET`
-   - `CMS_BASE_URL=https://www.riasboutique.com`
-4. Redeploy.
-5. Open `/admin` and sign in with GitHub.
-
-### Local CMS testing
+1. Create the Vercel project and connect the GitHub repository.
+2. Add all required environment variables from `.env.example`.
+3. Scope third-party keys to the minimum required permissions and restrict them to the correct production or preview origins.
+4. Run `server/db/schema.sql` against the target Supabase project before first live checkout.
+5. Confirm `CLOVER_CHECKOUT_BASE_URL`, `CMS_BASE_URL`, and all allowed origin variables match the deployed domain exactly.
+6. Set `SHIPPING_PROVIDER_MODE=flat_rate` first if you want to launch checkout before live carrier quoting is ready.
+7. Run the local verification set before merging:
 
 ```powershell
-npm run dev
-npx decap-server
-```
-
-Then open `http://localhost:8080/admin`.
-
-## Deployment notes
-
-- Recommended host: Vercel (uses `api/*.ts` serverless functions).
-- Add all required env vars in the Vercel project.
-- Ensure domain and callback URLs match exactly for GitHub OAuth.
-
-## Testing
-
-Current tests are in `src/test/` (frontend) and `tests/api/` (server/API).
-
-```powershell
+npm run lint
+npm run typecheck
 npm run test
+npm run build
 ```
+
+8. Open `/api/health` after deploy and verify the reported service flags.
+9. Execute a full sandbox checkout and confirm:
+   - Order row is created
+   - Payment status transitions to `paid`
+   - Confirmation email is logged
+   - Shipment data is present when EasyPost is enabled
+
+## Operational endpoints
+
+- `/api/health` returns a no-store health payload with service configuration flags.
+- `/api/order-status` verifies pending orders and can reconcile Clover payment state.
+- `/api/clover-webhook` is the primary payment confirmation path.
+- `/orders-admin` is the manual operations dashboard for paid orders and shipment actions.
+
+## Asset lifecycle policy
+
+- Product media lives in `public/uploads`.
+- Product references live in `src/content/products.json`; if a file is not referenced there or elsewhere in the repo, it is a cleanup candidate.
+- `npm run images:convert` generates `.webp` derivatives and normalizes product references toward those optimized assets.
+- `npm run media:hygiene` audits orphaned upload files and oversized retained media.
+- `npm run media:hygiene -- --apply` deletes orphaned uploads and compresses retained images larger than 500 KB.
+- Re-run `npm run sitemap:generate` or `npm run build` after adding or removing catalog routes.
+
+## Security and platform notes
+
+- Browser-facing APIs validate origin against environment-driven allowlists.
+- Pricing, tax, shipping, and discount validation are re-computed on the server before order creation.
+- Sensitive POST routes use strict Zod schemas.
+- Server-side timestamps are stored and emitted in UTC ISO format.
+- External provider failures are logged through the structured logger in `server/lib/logger.ts`.
+
+## Checkout flow summary
+
+1. The frontend requests only local `/api/*` endpoints.
+2. The server validates cart contents against the catalog and recomputes pricing.
+3. Shipping quotes are signed server-side before checkout creation.
+4. Clover redirects the customer to the hosted payment page.
+5. Webhook and order-status verification paths reconcile payment state.
+6. After payment, the server decrements inventory, stores shipment data, and sends notifications.
+
+## CMS setup
+
+1. Configure `public/admin/config.yml` with the correct repository and branch.
+2. Create a GitHub OAuth app with the live callback URL set to `/api/callback`.
+3. Set `GITHUB_OAUTH_CLIENT_ID`, `GITHUB_OAUTH_CLIENT_SECRET`, and `CMS_BASE_URL`.
+4. Redeploy and verify login at `/admin`.
 
 ## Troubleshooting
 
-- Checkout button disabled:
-  - Confirm `VITE_ENABLE_CHECKOUT=true`.
-  - Confirm Clover server env vars are set in your deployment.
-- Unable to start Clover checkout:
-  - Confirm `CLOVER_CHECKOUT_BASE_URL` is HTTPS.
-  - Confirm `CLOVER_PRIVATE_TOKEN` and `CLOVER_MERCHANT_ID` are valid.
-  - Temporarily set `CLOVER_DEBUG_LOGS=true` and inspect `X-Request-Id`-correlated logs for checkout, webhook, and order-status.
-  - For local testing, use an HTTPS tunnel URL (for example ngrok) as `CLOVER_CHECKOUT_BASE_URL`.
-- Live Google reviews not loading:
-  - Check `GOOGLE_PLACES_API_KEY` and `GOOGLE_PLACE_ID`.
-  - Site will fall back to static review content if API fetch fails.
-- `/admin` GitHub login fails:
-  - Recheck OAuth callback URL and `CMS_BASE_URL`.
-  - Verify `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET`.
+- Checkout disabled: confirm `VITE_ENABLE_CHECKOUT=true`.
+- Checkout request rejected by origin policy: verify the deployed domain is present in the allowed origin variables.
+- Shipping quote failures: confirm `SHIPPING_PROVIDER_MODE`, `EASYPOST_*`, and the origin address are set correctly.
+- Order emails missing: confirm `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `MERCHANT_ORDER_EMAIL`.
+- CMS login fails: re-check `CMS_BASE_URL` and the GitHub OAuth callback URL.
 
 ## License
 

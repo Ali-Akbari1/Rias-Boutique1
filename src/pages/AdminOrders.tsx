@@ -5,76 +5,14 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Badge } from "@/shared/ui/badge";
+import {
+  requestAdminOrders,
+  requestRefundShipmentLabel,
+  requestRetryShipmentLabel,
+  type AdminOrder,
+  type PaymentStatus,
+} from "@/lib/admin-api";
 import { formatCad } from "@/lib/money";
-
-type PaymentStatus = "pending" | "paid" | "failed" | "canceled";
-
-interface AdminOrder {
-  id: string;
-  paymentStatus: PaymentStatus;
-  cloverCheckoutId: string;
-  paymentReference: string;
-  subtotalMinor: number;
-  totalMinor: number;
-  pricing?: {
-    discountCode?: string;
-    discountMinor?: number;
-    shippingMinor?: number;
-    quotedShippingMinor?: number;
-    taxMinor?: number;
-    freeShippingApplied?: boolean;
-  };
-  customer: {
-    deliveryMethod?: "shipping" | "pickup";
-    fullName: string;
-    email: string;
-    phone?: string;
-    address: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  };
-  lineItems: Array<{
-    productId: string;
-    name: string;
-    unitAmountMinor: number;
-      quantity: number;
-      lineTotalMinor: number;
-    }>;
-  shippingQuote?: {
-    provider?: "easypost" | "flat_rate";
-    carrier?: string;
-    service?: string;
-    deliveryDays?: number | null;
-    expiresAt?: string;
-  } | null;
-  shipment?: {
-    shipmentId?: string;
-    carrier?: string;
-    service?: string;
-    trackingCode?: string;
-    trackingUrl?: string;
-    labelUrl?: string;
-    labelPdfUrl?: string;
-    trackingQrCodeDataUrl?: string;
-    labelQrCodeDataUrl?: string;
-    status?: string;
-    purchasedAt?: string;
-  } | null;
-  createdAt: string;
-  paidAt: string;
-}
-
-interface AdminOrdersResponse {
-  orders?: AdminOrder[];
-  count?: number;
-  order?: AdminOrder;
-  message?: string;
-  error?: {
-    message?: string;
-  };
-}
 
 const formatDate = (value: string) => {
   if (!value) {
@@ -142,20 +80,7 @@ const AdminOrders = () => {
     setStatusMessage("");
 
     try {
-      const response = await fetch("/api/admin-orders", {
-        method: "GET",
-        headers: {
-          "x-admin-token": token,
-        },
-      });
-
-      const payload = (await response.json().catch(() => ({}))) as AdminOrdersResponse;
-      if (!response.ok) {
-        const message =
-          payload?.error?.message || "Unable to load orders. Check your admin token and try again.";
-        throw new Error(message);
-      }
-
+      const payload = await requestAdminOrders(token);
       const nextOrders = Array.isArray(payload.orders) ? payload.orders : [];
       setOrders(nextOrders);
       setHasLoadedOnce(true);
@@ -178,23 +103,7 @@ const AdminOrders = () => {
     setStatusMessage("");
 
     try {
-      const response = await fetch("/api/admin-orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-token": token,
-        },
-        body: JSON.stringify({
-          action: "retry_label_purchase",
-          orderId,
-        }),
-      });
-
-      const payload = (await response.json().catch(() => ({}))) as AdminOrdersResponse;
-      if (!response.ok) {
-        throw new Error(payload?.error?.message || "Unable to purchase a shipping label right now.");
-      }
-
+      const payload = await requestRetryShipmentLabel(token, orderId);
       if (payload.order) {
         setOrders((currentOrders) => currentOrders.map((order) => (order.id === payload.order?.id ? payload.order : order)));
       }
@@ -218,23 +127,7 @@ const AdminOrders = () => {
     setStatusMessage("");
 
     try {
-      const response = await fetch("/api/admin-orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-token": token,
-        },
-        body: JSON.stringify({
-          action: "refund_label",
-          orderId,
-        }),
-      });
-
-      const payload = (await response.json().catch(() => ({}))) as AdminOrdersResponse;
-      if (!response.ok) {
-        throw new Error(payload?.error?.message || "Unable to request a shipping label refund right now.");
-      }
-
+      const payload = await requestRefundShipmentLabel(token, orderId);
       if (payload.order) {
         setOrders((currentOrders) => currentOrders.map((order) => (order.id === payload.order?.id ? payload.order : order)));
       }

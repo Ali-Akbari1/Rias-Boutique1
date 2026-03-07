@@ -4,14 +4,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { useCart } from "@/features/cart/context/CartContext";
-
-interface OrderStatusResponse {
-  orderId?: string;
-  paymentStatus?: string;
-  confirmed?: boolean;
-  pending?: boolean;
-  error?: string | { message?: string };
-}
+import { requestOrderStatus } from "@/lib/site-api";
 
 const CheckoutSuccess = () => {
   const { clearCart } = useCart();
@@ -44,33 +37,22 @@ const CheckoutSuccess = () => {
 
       attempts += 1;
       try {
-        const query = new URLSearchParams();
-        if (orderId) {
-          query.set("orderId", orderId);
-        }
-        if (sessionId) {
-          query.set("checkoutId", sessionId);
-        }
-
-        const response = await fetch(`/api/order-status?${query.toString()}`, {
-          cache: "no-store",
-          headers: {
-            "Cache-Control": "no-cache",
-          },
+        const payload = await requestOrderStatus({
+          orderId: orderId || undefined,
+          checkoutId: sessionId || undefined,
         });
-        const payload = (await response.json().catch(() => ({}))) as OrderStatusResponse;
         if (stopped) {
           return;
         }
 
-        if (response.ok && payload.confirmed) {
+        if (payload.confirmed) {
           setIsConfirmed(true);
           setIsLoading(false);
           setStatusMessage("Payment confirmed.");
           return;
         }
 
-        if (response.ok && payload.pending && attempts < maxAttempts) {
+        if (payload.pending && attempts < maxAttempts) {
           setIsLoading(true);
           setStatusMessage("Payment received and pending confirmation. This can take a few seconds.");
           return;

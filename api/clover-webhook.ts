@@ -8,6 +8,7 @@ import {
   type ApiRequest,
   type ApiResponse,
 } from "../server/lib/http.js";
+import { logger } from "../server/lib/logger.js";
 import { checkRateLimit, applyRateLimitHeaders } from "../server/lib/rate-limit.js";
 import {
   getClientIp,
@@ -110,7 +111,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     secret: webhookSecrets,
   });
   if (debugLogs) {
-    console.log("[clover-webhook] received", {
+    logger.debug("clover-webhook.received", {
       requestId,
       bodyLength: rawBody.length,
       bodyHash: rawBodyHash,
@@ -124,7 +125,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     });
   }
   if (!signatureCheck.valid) {
-    console.error("[clover-webhook] signature verification failed", {
+    logger.error("clover-webhook.signature_verification_failed", {
       requestId,
       bodyLength: rawBody.length,
       bodyHash: rawBodyHash,
@@ -147,7 +148,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     timestampHeader &&
     !verifyWebhookTimestamp(timestampHeader, Number(process.env.CLOVER_WEBHOOK_TOLERANCE_MS || DEFAULT_TIMESTAMP_TOLERANCE_MS))
   ) {
-    console.error("[clover-webhook] timestamp verification failed", {
+    logger.error("clover-webhook.timestamp_verification_failed", {
       requestId,
       timestampHeader,
       toleranceMs: Number(process.env.CLOVER_WEBHOOK_TOLERANCE_MS || DEFAULT_TIMESTAMP_TOLERANCE_MS),
@@ -164,7 +165,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const parsed = parseCloverWebhook(payload, rawBody);
-  console.log("[clover-webhook] parsed payload", {
+  logger.info("clover-webhook.parsed_payload", {
     requestId,
     bodyHash: rawBodyHash,
     eventId: parsed.eventId,
@@ -175,7 +176,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   });
   const order = parsed.orderId ? await findOrderById(parsed.orderId) : await findOrderByCheckoutId(parsed.checkoutId);
   if (!order) {
-    console.warn("[clover-webhook] order not found for parsed payload", {
+    logger.warn("clover-webhook.order_not_found", {
       requestId,
       eventId: parsed.eventId,
       eventType: parsed.eventType,
@@ -200,7 +201,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   });
   if (!inserted) {
     if (debugLogs) {
-      console.log("[clover-webhook] duplicate event ignored", {
+      logger.debug("clover-webhook.duplicate_event_ignored", {
         requestId,
         eventId: parsed.eventId,
         orderId: order.id,
@@ -226,7 +227,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         try {
           updatedOrder = await ensureShipmentForOrder(updatedOrder);
         } catch (shipmentError) {
-          console.error("[clover-webhook] shipment purchase failed", {
+          logger.error("clover-webhook.shipment_purchase_failed", {
             requestId,
             orderId: updatedOrder.id,
             eventId: parsed.eventId,
@@ -240,7 +241,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           await sendOrderConfirmationEmail(updatedOrder);
           await markConfirmationEmailSent(updatedOrder.id);
         } catch (emailError) {
-          console.error("[clover-webhook] confirmation email failed", {
+          logger.error("clover-webhook.confirmation_email_failed", {
             requestId,
             orderId: updatedOrder.id,
             eventId: parsed.eventId,
@@ -258,7 +259,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     await markWebhookProcessed(parsed.eventId);
-    console.log("[clover-webhook] processed", {
+    logger.info("clover-webhook.processed", {
       requestId,
       eventId: parsed.eventId,
       orderId: order.id,
@@ -272,7 +273,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       orderId: order.id,
     });
   } catch (error) {
-    console.error("[clover-webhook] processing failed", {
+    logger.error("clover-webhook.processing_failed", {
       requestId,
       eventId: parsed.eventId,
       orderId: order.id,

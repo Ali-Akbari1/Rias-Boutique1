@@ -1,5 +1,7 @@
 import type { StoredOrder } from "./order-store.js";
 import { getSupabaseAdminClient, hasSupabaseAdminConfig } from "./supabase-admin.js";
+import { logger } from "./logger.js";
+import { fetchProviderJson } from "./provider-client.js";
 
 const isMemoryEmailLogEnabled = () => process.env.ORDER_STORE_ADAPTER?.trim().toLowerCase() === "memory";
 const isCustomerOrderEmailEnabled = () => process.env.CUSTOMER_ORDER_EMAIL_ENABLED?.trim().toLowerCase() !== "false";
@@ -186,28 +188,23 @@ const sendWithResend = async ({ to, subject, text, html, replyTo }: ResendDispat
   }
 
   const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || "Ria's Boutique <orders@riasboutique.com>";
-  const response = await fetch("https://api.resend.com/emails", {
+  const payload = await fetchProviderJson<{ id?: string }>({
+    provider: "resend_email",
+    url: "https://api.resend.com/emails",
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({
+    body: {
       from: fromEmail,
       to: [to],
       ...(replyTo ? { reply_to: replyTo } : {}),
       subject,
       html,
       text,
-    }),
+    },
   });
-
-  if (!response.ok) {
-    const errorBody = await response.text().catch(() => "");
-    throw new Error(`Resend API failed (${response.status}): ${errorBody || response.statusText}`);
-  }
-
-  const payload = (await response.json().catch(() => ({}))) as { id?: string };
   return {
     provider: "resend",
     status: "sent",
@@ -221,7 +218,7 @@ const persistEmailLog = async ({ orderId, attempt }: { orderId?: string; attempt
   }
 
   if (!hasSupabaseAdminConfig()) {
-    console.warn("[email] skipping email log insert because Supabase is not configured", {
+    logger.warn("email.log_insert_skipped", {
       orderId,
       recipientType: attempt.recipientType,
       to: attempt.to,
@@ -253,7 +250,7 @@ const persistEmailLog = async ({ orderId, attempt }: { orderId?: string; attempt
     });
 
     if (error) {
-      console.error("[email] failed to record email log", {
+      logger.error("email.record_log_failed", {
         orderId,
         recipientType: attempt.recipientType,
         to: attempt.to,
@@ -262,7 +259,7 @@ const persistEmailLog = async ({ orderId, attempt }: { orderId?: string; attempt
       });
     }
   } catch (error) {
-    console.error("[email] failed to persist email log", {
+    logger.error("email.persist_log_failed", {
       orderId,
       recipientType: attempt.recipientType,
       to: attempt.to,
@@ -891,7 +888,7 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
     throw new Error(`All order notification emails failed for order ${order.id}.`);
   }
 
-  console.log("[email] order notifications processed", {
+  logger.info("email.order_notifications_processed", {
     orderId: order.id,
     attempts: attempts.map((attempt) => ({
       recipientType: attempt.recipientType,

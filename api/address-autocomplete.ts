@@ -1,7 +1,13 @@
 import { z } from "zod";
 import { parseJsonBody, readRawBody, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import { logger } from "../server/lib/logger.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
-import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
+import {
+  applyCorsResponseHeaders,
+  buildAllowedOrigins,
+  getClientIp,
+  resolveAllowedOrigin,
+} from "../server/lib/security.js";
 import { isMapboxConfigured, retrieveAddressAutofillSelection, suggestAddressAutofill } from "../server/lib/mapbox.js";
 
 const DEFAULT_RATE_LIMIT = 60;
@@ -35,10 +41,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
     process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
   );
-  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+  const allowedOrigin = resolveAllowedOrigin(req, allowedOrigins, { allowMissingOrigin: false });
+  if (!allowedOrigin) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
+  applyCorsResponseHeaders(res, allowedOrigin, ["POST"]);
 
   const rateResult = await checkRateLimit({
     key: `address-autocomplete:${getClientIp(req)}`,
@@ -83,7 +91,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         address,
       });
     } catch (error) {
-      console.error("[address-autocomplete] retrieve failed", {
+      logger.error("address-autocomplete.retrieve_failed", {
         error: error instanceof Error ? error.message : String(error),
         mapboxId,
         country: country || "",
@@ -120,7 +128,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       suggestions: payload.suggestions,
     });
   } catch (error) {
-    console.error("[address-autocomplete] lookup failed", {
+    logger.error("address-autocomplete.lookup_failed", {
       error: error instanceof Error ? error.message : String(error),
       queryLength: query.trim().length,
       country: country || "",

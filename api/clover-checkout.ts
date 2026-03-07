@@ -6,14 +6,16 @@ import {
   type ApiRequest,
   type ApiResponse,
 } from "../server/lib/http.js";
+import { logger } from "../server/lib/logger.js";
 import { checkRateLimit, applyRateLimitHeaders } from "../server/lib/rate-limit.js";
 import {
+  applyCorsResponseHeaders,
   buildAllowedOrigins,
   buildCheckoutIdempotencyKey,
   canonicalizeCartItems,
   getClientIp,
   looksAutomatedTraffic,
-  validateOrigin,
+  resolveAllowedOrigin,
   verifyCartToken,
 } from "../server/lib/security.js";
 import { checkoutRequestSchema } from "../server/lib/checkout-schema.js";
@@ -212,10 +214,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     getCheckoutBaseUrl(),
     process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
   );
-  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+  const allowedOrigin = resolveAllowedOrigin(req, allowedOrigins, { allowMissingOrigin: false });
+  if (!allowedOrigin) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
+  applyCorsResponseHeaders(res, allowedOrigin, ["POST"]);
 
   const clientIp = getClientIp(req);
   const rateResult = await checkRateLimit({
@@ -266,7 +270,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const config = validateServerConfiguration();
   if (!config.ok) {
-    console.error("[clover-checkout] invalid server configuration", {
+    logger.error("clover-checkout.invalid_server_configuration", {
       requestId,
       hasMerchantId: Boolean(process.env.CLOVER_MERCHANT_ID?.trim()),
       hasPrivateToken: Boolean(process.env.CLOVER_PRIVATE_TOKEN?.trim()),
@@ -396,7 +400,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const existingOrder = await findOrderByIdempotencyKey(idempotencyKey);
   if (existingOrder?.cloverCheckoutUrl && existingOrder.paymentStatus === "pending") {
     if (debugLogs) {
-      console.log("[clover-checkout] reusing existing pending checkout", {
+      logger.debug("clover-checkout.reused_pending_checkout", {
         requestId,
         orderId: existingOrder.id,
         checkoutId: existingOrder.cloverCheckoutId,
@@ -451,10 +455,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         freeShippingApplied,
       },
       shippingQuote: verifiedShippingQuote,
-    });
+  });
 
   if (debugLogs) {
-    console.log("[clover-checkout] creating checkout session", {
+    logger.debug("clover-checkout.creating_checkout_session", {
       requestId,
       orderId: order.id,
       itemCount: lineItems.length,
@@ -495,7 +499,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       checkoutId: session.checkoutId,
     });
 
-    console.log("[clover-checkout] checkout session created", {
+    logger.info("clover-checkout.checkout_session_created", {
       requestId,
       orderId: order.id,
       cloverCheckoutId: session.checkoutId,
@@ -529,7 +533,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
             responseBody: error.context.responseBody,
           }
         : null;
-    console.error("[clover-checkout] checkout session creation failed", {
+    logger.error("clover-checkout.checkout_session_creation_failed", {
       requestId,
       orderId: order.id,
       apiBaseUrl: config.apiBaseUrl,
@@ -541,7 +545,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     try {
       await markOrderFailed({ orderId: order.id, errorMessage: message });
     } catch (storeError) {
-      console.error("[clover-checkout] failed to persist order failure", {
+      logger.error("clover-checkout.persist_order_failure_failed", {
         requestId,
         orderId: order.id,
         error: safeErrorMessage(storeError),

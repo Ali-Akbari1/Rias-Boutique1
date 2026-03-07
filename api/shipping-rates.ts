@@ -1,11 +1,13 @@
 import { parseJsonBody, readRawBody, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import { logger } from "../server/lib/logger.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 import { checkoutCustomerSchema, checkoutItemSchema } from "../server/lib/checkout-schema.js";
 import {
+  applyCorsResponseHeaders,
   buildAllowedOrigins,
   getClientIp,
   looksAutomatedTraffic,
-  validateOrigin,
+  resolveAllowedOrigin,
 } from "../server/lib/security.js";
 import { getCatalogMap } from "../server/lib/product-catalog.js";
 import {
@@ -44,10 +46,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
     process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
   );
-  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+  const allowedOrigin = resolveAllowedOrigin(req, allowedOrigins, { allowMissingOrigin: false });
+  if (!allowedOrigin) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
+  applyCorsResponseHeaders(res, allowedOrigin, ["POST"]);
 
   const rateResult = await checkRateLimit({
     key: `shipping-rates:${getClientIp(req)}`,
@@ -148,7 +152,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     res.status(200).json(quote);
   } catch (error) {
-    console.error("[shipping-rates] quote failed", {
+    logger.error("shipping-rates.quote_failed", {
       error: describeEasyPostError(error),
       destinationCountry: customer.country,
       destinationPostalCode: customer.postalCode,

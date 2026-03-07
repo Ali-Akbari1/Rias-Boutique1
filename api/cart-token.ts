@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { parseJsonBody, readRawBody, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
 import {
+  applyCorsResponseHeaders,
   buildAllowedOrigins,
   canonicalizeCartItems,
   createCartToken,
   getClientIp,
-  validateOrigin,
+  resolveAllowedOrigin,
 } from "../server/lib/security.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 
@@ -41,10 +42,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
     process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
   );
-  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+  const allowedOrigin = resolveAllowedOrigin(req, allowedOrigins, { allowMissingOrigin: false });
+  if (!allowedOrigin) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
+  applyCorsResponseHeaders(res, allowedOrigin, ["POST"]);
 
   const rateResult = await checkRateLimit({
     key: `cart-token:${getClientIp(req)}`,

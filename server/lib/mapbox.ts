@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { fetchProviderJson, requireProviderConfig } from "./provider-client.js";
 
 const MAPBOX_SEARCHBOX_API_BASE_URL = "https://api.mapbox.com/search/searchbox/v1";
 const DEFAULT_AUTOCOMPLETE_LIMIT = 5;
@@ -255,13 +256,14 @@ const toSuggestion = (candidate: MapboxSearchCandidate, preferredCountry?: strin
 };
 
 const mapboxRequest = async <T>(url: URL) => {
-  const response = await fetch(url.toString());
-  if (!response.ok) {
-    const body = await response.text().catch(() => "");
-    throw new Error(`Mapbox autocomplete failed (${response.status}): ${body || response.statusText}`);
-  }
-
-  return (await response.json().catch(() => ({}))) as T;
+  return fetchProviderJson<T>({
+    provider: "mapbox_search",
+    url: url.toString(),
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
 };
 
 export const isMapboxConfigured = () => Boolean(getMapboxAccessToken());
@@ -278,9 +280,7 @@ export const suggestAddressAutofill = async ({
   sessionToken?: string;
 }): Promise<{ sessionToken: string; suggestions: AddressAutocompleteSuggestion[] }> => {
   const accessToken = getMapboxAccessToken();
-  if (!accessToken) {
-    throw new Error("Mapbox autocomplete is not configured. Missing MAPBOX_ACCESS_TOKEN.");
-  }
+  requireProviderConfig("mapbox_search", { MAPBOX_ACCESS_TOKEN: accessToken });
 
   const url = new URL(`${MAPBOX_SEARCHBOX_API_BASE_URL}/suggest`);
   url.searchParams.set("q", query.trim());
@@ -311,9 +311,7 @@ export const retrieveAddressAutofillSelection = async ({
   sessionToken?: string;
 }): Promise<ResolvedAddressFields> => {
   const accessToken = getMapboxAccessToken();
-  if (!accessToken) {
-    throw new Error("Mapbox autocomplete is not configured. Missing MAPBOX_ACCESS_TOKEN.");
-  }
+  requireProviderConfig("mapbox_search", { MAPBOX_ACCESS_TOKEN: accessToken });
 
   const url = new URL(`${MAPBOX_SEARCHBOX_API_BASE_URL}/retrieve/${encodeURIComponent(mapboxId.trim())}`);
   url.searchParams.set("language", "en");

@@ -1,5 +1,12 @@
 import { createHmac } from "node:crypto";
-import { asSingle, createDeterministicHash, getHeader, safeTimingCompare, type ApiRequest } from "./http.js";
+import {
+  asSingle,
+  createDeterministicHash,
+  getHeader,
+  safeTimingCompare,
+  type ApiRequest,
+  type ApiResponse,
+} from "./http.js";
 
 const DEFAULT_ALLOWED_DEV_ORIGINS = new Set([
   "http://localhost:8080",
@@ -9,6 +16,8 @@ const DEFAULT_ALLOWED_DEV_ORIGINS = new Set([
 ]);
 
 const toTrimmed = (value: string | undefined) => (value || "").trim();
+const isProductionEnvironment = () =>
+  ["production", "preview"].includes((process.env.VERCEL_ENV || process.env.NODE_ENV || "").trim().toLowerCase());
 
 export const getClientIp = (req: ApiRequest) => {
   const forwardedFor = getHeader(req, "x-forwarded-for");
@@ -31,17 +40,34 @@ const parseOrigin = (origin: string) => {
 };
 
 export const buildAllowedOrigins = (baseUrl: string, customCsv = "") => {
-  const allowed = new Set<string>(DEFAULT_ALLOWED_DEV_ORIGINS);
+  const allowed = new Set<string>();
+  if (!isProductionEnvironment()) {
+    DEFAULT_ALLOWED_DEV_ORIGINS.forEach((origin) => allowed.add(origin));
+  }
+
   const parsedBase = parseOrigin(baseUrl);
   if (parsedBase) {
     allowed.add(parsedBase);
   }
 
-  customCsv
-    .split(",")
+  [
+    process.env.ALLOWED_BROWSER_ORIGINS || "",
+    process.env.ALLOWED_PRODUCTION_ORIGINS || "",
+    process.env.ALLOWED_PREVIEW_ORIGINS || "",
+    process.env.ALLOWED_DEV_ORIGINS || "",
+    customCsv,
+  ]
+    .flatMap((entry) => entry.split(","))
     .map((entry) => parseOrigin(entry.trim()))
     .filter(Boolean)
     .forEach((origin) => allowed.add(origin));
+
+  const vercelUrls = [process.env.VERCEL_URL || "", process.env.VERCEL_BRANCH_URL || ""]
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => parseOrigin(entry.startsWith("http") ? entry : `https://${entry}`))
+    .filter(Boolean);
+  vercelUrls.forEach((origin) => allowed.add(origin));
 
   return allowed;
 };
@@ -70,6 +96,47 @@ export const validateOrigin = (
   }
 
   return allowedOrigins.has(parseOrigin(origin));
+};
+
+export const resolveAllowedOrigin = (
+  req: ApiRequest,
+  allowedOrigins: Set<string>,
+  options: ValidateOriginOptions = {},
+) => {
+  const { allowMissingOrigin = true, allowRefererFallback = true } = options;
+  const origin = getRequestOrigin(req);
+  if (!origin) {
+    if (allowRefererFallback) {
+      const refererOrigin = parseOrigin(toTrimmed(getHeader(req, "referer")));
+      if (refererOrigin && allowedOrigins.has(refererOrigin)) {
+        return refererOrigin;
+      }
+    }
+
+    return allowMissingOrigin ? "*" : "";
+  }
+
+  const parsedOrigin = parseOrigin(origin);
+  if (!parsedOrigin || !allowedOrigins.has(parsedOrigin)) {
+    return "";
+  }
+
+  return parsedOrigin;
+};
+
+export const applyCorsResponseHeaders = (
+  res: ApiResponse,
+  allowedOrigin: string,
+  methods: string[] = ["GET", "POST"],
+  headers: string[] = ["Content-Type", "Authorization", "X-Admin-Token"],
+) => {
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", methods.join(", "));
+  res.setHeader("Access-Control-Allow-Headers", headers.join(", "));
+
+  if (allowedOrigin && allowedOrigin !== "*") {
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  }
 };
 
 export const looksAutomatedTraffic = (req: ApiRequest) => {

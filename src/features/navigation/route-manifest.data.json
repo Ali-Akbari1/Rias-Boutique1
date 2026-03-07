@@ -1,0 +1,10 @@
+{
+  "siteUrl": "https://www.riasboutique.com",
+  "collectionDepartments": ["women", "men", "jewelry"],
+  "utilityRoutes": [
+    { "path": "/", "changefreq": "weekly", "priority": "1.0" },
+    { "path": "/collection", "changefreq": "daily", "priority": "0.95" },
+    { "path": "/about", "changefreq": "monthly", "priority": "0.65" },
+    { "path": "/faq", "changefreq": "monthly", "priority": "0.65" }
+  ]
+}

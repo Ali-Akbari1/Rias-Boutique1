@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { requestDiscountSignup } from "@/lib/site-api";
 import {
   getLaunchDiscountExpiryDateLabel,
   isLaunchDiscountActive,
@@ -108,24 +109,11 @@ const LaunchDiscountPopup = () => {
     setErrorMessage("");
 
     try {
-      const response = await fetch("/api/discount-signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          source: "launch-popup",
-          website: "",
-        }),
+      await requestDiscountSignup({
+        email: email.trim(),
+        source: "launch-popup",
+        website: "",
       });
-
-      const payload = (await response.json().catch(() => ({}))) as {
-        error?: { message?: string };
-      };
-      if (!response.ok) {
-        throw new Error(payload.error?.message || "Unable to send your discount email right now.");
-      }
 
       writeLocalStorageState("subscribed");
       setIsSuccess(true);

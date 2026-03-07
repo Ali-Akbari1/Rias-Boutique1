@@ -5,8 +5,10 @@ import { fileURLToPath } from "node:url";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = join(scriptDir, "..");
 const productsPath = join(projectRoot, "src", "content", "products.json");
+const routeManifestPath = join(projectRoot, "src", "features", "navigation", "route-manifest.data.json");
 const sitemapPath = join(projectRoot, "public", "sitemap.xml");
-const siteUrl = (process.env.SITE_URL ?? "https://www.riasboutique.com").replace(/\/+$/, "");
+const routeManifest = JSON.parse(readFileSync(routeManifestPath, "utf8"));
+const siteUrl = (process.env.SITE_URL ?? routeManifest.siteUrl ?? "https://www.riasboutique.com").replace(/\/+$/, "");
 
 const toIsoDate = (value) => {
   if (typeof value !== "string" || value.trim().length === 0) {
@@ -51,15 +53,16 @@ for (const product of productRows) {
   });
 }
 
-const staticRoutes = [
-  { path: "/", changefreq: "weekly", priority: "1.0" },
-  { path: "/collection", changefreq: "daily", priority: "0.95" },
-  { path: "/collection/women", changefreq: "daily", priority: "0.9" },
-  { path: "/collection/men", changefreq: "daily", priority: "0.9" },
-  { path: "/collection/jewelry", changefreq: "weekly", priority: "0.85" },
-  { path: "/about", changefreq: "monthly", priority: "0.65" },
-  { path: "/faq", changefreq: "monthly", priority: "0.65" },
-];
+const utilityRoutes = Array.isArray(routeManifest.utilityRoutes) ? routeManifest.utilityRoutes : [];
+const collectionDepartments = Array.isArray(routeManifest.collectionDepartments)
+  ? routeManifest.collectionDepartments
+  : [];
+
+const collectionRoutes = collectionDepartments.map((department) => ({
+  path: `/collection/${encodeURIComponent(String(department).trim())}`,
+  changefreq: department === "jewelry" ? "weekly" : "daily",
+  priority: department === "jewelry" ? "0.85" : "0.9",
+}));
 
 const productRoutes = [...productMap.values()].map((product) => ({
   path: `/products/${encodeURIComponent(product.id)}`,
@@ -68,7 +71,7 @@ const productRoutes = [...productMap.values()].map((product) => ({
   lastmod: product.createdAt ?? undefined,
 }));
 
-const allRoutes = [...staticRoutes, ...productRoutes];
+const allRoutes = [...utilityRoutes, ...collectionRoutes, ...productRoutes];
 
 const urlNodes = allRoutes
   .map((route) => {

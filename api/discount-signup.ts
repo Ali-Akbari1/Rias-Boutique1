@@ -6,12 +6,14 @@ import {
   type ApiRequest,
   type ApiResponse,
 } from "../server/lib/http.js";
+import { logger } from "../server/lib/logger.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 import {
+  applyCorsResponseHeaders,
   buildAllowedOrigins,
   getClientIp,
   looksAutomatedTraffic,
-  validateOrigin,
+  resolveAllowedOrigin,
 } from "../server/lib/security.js";
 import {
   getLaunchDiscountExpiryDisplay,
@@ -57,10 +59,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       .filter(Boolean)
       .join(","),
   );
-  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+  const allowedOrigin = resolveAllowedOrigin(req, allowedOrigins, { allowMissingOrigin: false });
+  if (!allowedOrigin) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
+  applyCorsResponseHeaders(res, allowedOrigin, ["POST"]);
 
   const rateResult = await checkRateLimit({
     key: `discount-signup:${getClientIp(req)}`,
@@ -130,7 +134,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       );
 
       if (error) {
-        console.error("[discount-signup] failed to store subscriber", {
+        logger.error("discount-signup.store_failed", {
           email: maskEmail(email),
           source,
           error: error.message,
@@ -139,7 +143,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         return;
       }
     } catch (error) {
-      console.error("[discount-signup] failed to store subscriber", {
+      logger.error("discount-signup.store_failed", {
         email: maskEmail(email),
         source,
         error: error instanceof Error ? error.message : String(error),
@@ -148,7 +152,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       return;
     }
   } else {
-    console.warn("[discount-signup] supabase not configured; subscriber not persisted", {
+    logger.warn("discount-signup.supabase_not_configured", {
       email: maskEmail(email),
       source,
     });
@@ -171,8 +175,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
             last_email_sent_at: new Date().toISOString(),
           })
           .eq("email", email);
-      } catch {
-        // Non-blocking.
+      } catch (error) {
+        logger.warn("discount-signup.store_last_email_timestamp_failed", {
+          email: maskEmail(email),
+          source,
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     }
 
@@ -184,7 +192,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       emailStatus: emailDispatch.status,
     });
   } catch (error) {
-    console.error("[discount-signup] failed to send promotional email", {
+    logger.error("discount-signup.email_failed", {
       email: maskEmail(email),
       source,
       error: error instanceof Error ? error.message : String(error),

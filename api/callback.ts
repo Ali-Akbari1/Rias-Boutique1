@@ -1,5 +1,11 @@
 import { z } from "zod";
 import { getHeader, getQueryValue, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import {
+  fetchProviderJson,
+  ProviderConfigurationError,
+  ProviderRequestError,
+  requireProviderConfig,
+} from "../server/lib/provider-client.js";
 
 interface HtmlApiResponse extends ApiResponse {
   send?: (body: string) => void;
@@ -136,13 +142,15 @@ const sendPopup = (
   details: string,
   targetOrigin: string,
 ) => {
-  if (typeof res.send !== "function") {
+  const send = res.send;
+  if (typeof send !== "function") {
     sendError(res, 500, "SEND_NOT_SUPPORTED", "HTML response helper is not available.");
     return;
   }
 
   setPopupHeaders(res);
-  res.status(status).send(popupHtml(message, title, details, targetOrigin));
+  res.status(status);
+  send.call(res, popupHtml(message, title, details, targetOrigin));
 };
 
 export default async function handler(req: ApiRequest, res: HtmlApiResponse) {
@@ -188,18 +196,6 @@ export default async function handler(req: ApiRequest, res: HtmlApiResponse) {
   const clientId = process.env.GITHUB_OAUTH_CLIENT_ID?.trim() || "";
   const clientSecret = process.env.GITHUB_OAUTH_CLIENT_SECRET?.trim() || "";
 
-  if (!clientId || !clientSecret) {
-    sendPopup(
-      res,
-      500,
-      "authorization:github:error:Server OAuth credentials are missing.",
-      "CMS Login Failed",
-      "Missing GITHUB_OAUTH_CLIENT_ID or GITHUB_OAUTH_CLIENT_SECRET on the server.",
-      targetOrigin,
-    );
-    return;
-  }
-
   if (!baseUrl) {
     sendPopup(
       res,
@@ -213,23 +209,28 @@ export default async function handler(req: ApiRequest, res: HtmlApiResponse) {
   }
 
   try {
+    requireProviderConfig("github_oauth", {
+      GITHUB_OAUTH_CLIENT_ID: clientId,
+      GITHUB_OAUTH_CLIENT_SECRET: clientSecret,
+    });
+
     const redirectUri = `${baseUrl}/api/callback`;
-    const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
+    const rawTokenPayload = await fetchProviderJson<unknown>({
+      provider: "github_oauth",
+      url: "https://github.com/login/oauth/access_token",
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
+      body: {
         client_id: clientId,
         client_secret: clientSecret,
         code: validation.data.code,
         redirect_uri: redirectUri,
         state: validation.data.state,
-      }),
+      },
     });
-
-    const rawTokenPayload = await tokenResponse.json().catch(() => ({}));
     const tokenPayloadResult = githubTokenResponseSchema.safeParse(rawTokenPayload);
     if (!tokenPayloadResult.success) {
       sendPopup(
@@ -244,7 +245,7 @@ export default async function handler(req: ApiRequest, res: HtmlApiResponse) {
     }
 
     const tokenPayload = tokenPayloadResult.data;
-    if (!tokenResponse.ok || !tokenPayload.access_token) {
+    if (!tokenPayload.access_token) {
       const reason = tokenPayload.error_description || tokenPayload.error || "GitHub token exchange failed.";
       sendPopup(res, 502, `authorization:github:error:${reason}`, "CMS Login Failed", reason, targetOrigin);
       return;
@@ -262,6 +263,23 @@ export default async function handler(req: ApiRequest, res: HtmlApiResponse) {
       targetOrigin,
     );
   } catch (error) {
+    if (error instanceof ProviderConfigurationError) {
+      sendPopup(
+        res,
+        500,
+        "authorization:github:error:Server OAuth credentials are missing.",
+        "CMS Login Failed",
+        "Missing GITHUB_OAUTH_CLIENT_ID or GITHUB_OAUTH_CLIENT_SECRET on the server.",
+        targetOrigin,
+      );
+      return;
+    }
+
+    if (error instanceof ProviderRequestError) {
+      sendPopup(res, 502, `authorization:github:error:${error.message}`, "CMS Login Failed", error.message, targetOrigin);
+      return;
+    }
+
     const reason = error instanceof Error ? error.message : "Unexpected server error.";
     sendPopup(res, 500, `authorization:github:error:${reason}`, "CMS Login Failed", reason, targetOrigin);
   }

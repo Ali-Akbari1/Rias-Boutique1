@@ -24,11 +24,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Typecheck app
-        run: npx tsc --noEmit -p tsconfig.app.json
-
-      - name: Typecheck server
-        run: npx tsc --noEmit -p tsconfig.node.json
+      - name: Typecheck
+        run: npm run typecheck
 
       - name: Test
         run: npm run test

@@ -1,22 +1,21 @@
-const DEFAULT_LAUNCH_DISCOUNT_EXPIRES_AT = "2026-03-21T05:59:59.999Z";
+import {
+  getLaunchDiscountExpiryDate as getResolvedLaunchDiscountExpiryDate,
+  isLaunchDiscountActiveForConfig,
+  resolveCommerceConfig,
+} from "../../src/shared/config/commerce.js";
 
-export const LAUNCH_DISCOUNT_CODE = "LAUNCH10";
-export const LAUNCH_DISCOUNT_RATE = 0.1;
+const getServerCommerceConfig = () => resolveCommerceConfig(process.env as Record<string, string | undefined>);
+
+export const LAUNCH_DISCOUNT_CODE = getServerCommerceConfig().launchDiscountCode;
+export const LAUNCH_DISCOUNT_RATE = getServerCommerceConfig().launchDiscountRate;
 
 export const getLaunchDiscountExpiryIso = () =>
-  process.env.LAUNCH10_EXPIRES_AT?.trim() || DEFAULT_LAUNCH_DISCOUNT_EXPIRES_AT;
+  getServerCommerceConfig().launchDiscountExpiresAtIso;
 
-export const getLaunchDiscountExpiryDate = () => {
-  const rawValue = getLaunchDiscountExpiryIso();
-  const parsed = new Date(rawValue);
-  if (Number.isNaN(parsed.getTime())) {
-    return new Date(DEFAULT_LAUNCH_DISCOUNT_EXPIRES_AT);
-  }
-  return parsed;
-};
+export const getLaunchDiscountExpiryDate = () => getResolvedLaunchDiscountExpiryDate(getServerCommerceConfig());
 
 export const isLaunchDiscountActive = (now = new Date()) =>
-  now.getTime() <= getLaunchDiscountExpiryDate().getTime();
+  isLaunchDiscountActiveForConfig(getServerCommerceConfig(), now);
 
 export const getLaunchDiscountExpiryDisplay = () =>
   new Intl.DateTimeFormat("en-CA", {

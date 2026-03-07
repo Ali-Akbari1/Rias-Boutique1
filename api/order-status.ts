@@ -6,11 +6,18 @@ import {
   markOrderPaidAndDecrementInventory,
 } from "../server/lib/order-store.js";
 import { createDeterministicHash, getQueryValue, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import { logger } from "../server/lib/logger.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
-import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
+import {
+  applyCorsResponseHeaders,
+  buildAllowedOrigins,
+  getClientIp,
+  resolveAllowedOrigin,
+} from "../server/lib/security.js";
 import { CloverApiError, fetchCloverCheckoutStatus } from "../server/lib/clover.js";
 import { sendOrderConfirmationEmail } from "../server/lib/email.js";
 import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
+import { z } from "zod";
 
 const DEFAULT_RATE_LIMIT = 120;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
@@ -19,6 +26,22 @@ const PROD_CLOVER_API_BASE_URL = "https://api.clover.com";
 const isDebugLoggingEnabled = () => process.env.CLOVER_DEBUG_LOGS?.trim().toLowerCase() === "true";
 const createRequestId = () => createDeterministicHash(`${Date.now()}|${Math.random()}`).slice(0, 12);
 const safeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
+const orderStatusQuerySchema = z
+  .object({
+    orderId: z.string().trim().max(128).optional(),
+    checkoutId: z.string().trim().max(128).optional(),
+    sessionId: z.string().trim().max(128).optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (!value.orderId && !value.checkoutId && !value.sessionId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["orderId"],
+        message: "Provide orderId or checkoutId.",
+      });
+    }
+  });
 
 const getCloverApiBaseCandidates = (configuredBaseUrl: string) => {
   const normalized = (configuredBaseUrl || DEFAULT_CLOVER_API_BASE_URL).replace(/\/+$/, "");
@@ -59,10 +82,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
     process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
   );
-  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+  const allowedOrigin = resolveAllowedOrigin(req, allowedOrigins, { allowMissingOrigin: false });
+  if (!allowedOrigin) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
+  applyCorsResponseHeaders(res, allowedOrigin, ["GET"]);
 
   const rateResult = await checkRateLimit({
     key: `order-status:${getClientIp(req)}`,
@@ -80,26 +105,31 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const orderId = getQueryValue(req, "orderId").trim();
-  const checkoutId = getQueryValue(req, "checkoutId").trim() || getQueryValue(req, "session_id").trim();
-
-  if (!orderId && !checkoutId) {
-    sendError(res, 400, "MISSING_IDENTIFIER", "Provide orderId or checkoutId.");
+  const queryValidation = orderStatusQuerySchema.safeParse({
+    orderId: getQueryValue(req, "orderId").trim() || undefined,
+    checkoutId: getQueryValue(req, "checkoutId").trim() || undefined,
+    sessionId: getQueryValue(req, "session_id").trim() || undefined,
+  });
+  if (!queryValidation.success) {
+    sendError(res, 400, "VALIDATION_ERROR", "Order status query is invalid.", queryValidation.error.flatten());
     return;
   }
 
-  let order = orderId ? await findOrderById(orderId) : await findOrderByCheckoutId(checkoutId);
+  const { orderId = "", checkoutId = "", sessionId = "" } = queryValidation.data;
+  const resolvedCheckoutId = checkoutId || sessionId;
+
+  let order = orderId ? await findOrderById(orderId) : await findOrderByCheckoutId(resolvedCheckoutId);
   if (!order) {
     sendError(res, 404, "ORDER_NOT_FOUND", "Order was not found.");
     return;
   }
 
-  const shouldVerifyWithClover = order.paymentStatus === "pending" && (order.cloverCheckoutId || checkoutId);
+  const shouldVerifyWithClover = order.paymentStatus === "pending" && (order.cloverCheckoutId || resolvedCheckoutId);
   if (shouldVerifyWithClover) {
     const merchantId = process.env.CLOVER_MERCHANT_ID?.trim() || "";
     const privateToken = process.env.CLOVER_PRIVATE_TOKEN?.trim() || "";
     const apiBaseUrl = (process.env.CLOVER_API_BASE_URL?.trim() || DEFAULT_CLOVER_API_BASE_URL).replace(/\/+$/, "");
-    const targetCheckoutId = order.cloverCheckoutId || checkoutId;
+    const targetCheckoutId = order.cloverCheckoutId || resolvedCheckoutId;
     const attemptLogs: Array<{
       baseCandidate: string;
       result: "success" | "error";
@@ -160,7 +190,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         }
 
         if (debugLogs) {
-          console.log("[order-status] Clover fallback attempts", {
+          logger.debug("order-status.clover_fallback_attempts", {
             requestId,
             orderId: order.id,
             checkoutId: targetCheckoutId,
@@ -179,7 +209,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
             try {
               order = await ensureShipmentForOrder(order);
             } catch (shipmentError) {
-              console.error("[order-status] shipment purchase failed", {
+              logger.error("order-status.shipment_purchase_failed", {
                 requestId,
                 orderId: order.id,
                 checkoutId: targetCheckoutId,
@@ -194,7 +224,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
               await markConfirmationEmailSent(order.id);
               order = (await findOrderById(order.id)) || order;
             } catch (emailError) {
-              console.error("[order-status] confirmation email failed", {
+              logger.error("order-status.confirmation_email_failed", {
                 requestId,
                 orderId: order.id,
                 checkoutId: targetCheckoutId,
@@ -204,7 +234,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           }
         }
       } catch (error) {
-        console.error("[order-status] Clover fallback verification failed", {
+        logger.error("order-status.clover_fallback_verification_failed", {
           requestId,
           orderId: order.id,
           checkoutId: targetCheckoutId,
@@ -224,7 +254,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         });
       }
     } else if (debugLogs) {
-      console.warn("[order-status] skipped Clover fallback verification", {
+      logger.warn("order-status.clover_fallback_skipped", {
         requestId,
         orderId: order.id,
         checkoutId: targetCheckoutId,

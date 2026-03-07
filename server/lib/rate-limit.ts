@@ -1,3 +1,5 @@
+import { logger } from "./logger.js";
+
 interface BucketState {
   count: number;
   resetAt: number;
@@ -97,6 +99,9 @@ export const checkRateLimit = async ({ key, limit, windowMs }: RateLimitInput): 
       retryAfterSeconds,
     };
   } catch {
+    logger.warn("rate-limit.upstash_fallback_to_memory", {
+      key,
+    });
     return checkMemoryRateLimit({ key, limit, windowMs });
   }
 };

@@ -8,12 +8,16 @@ const SEARCH_TERM_NORMALIZERS: Array<[RegExp, string]> = [
 ];
 
 const FIELD_WEIGHTS = {
-  name: 12,
-  category: 7,
-  department: 5,
-  description: 2,
-  keywords: 1,
+  name: 1.0,
+  category: 0.7,
+  department: 0.2,
+  description: 0.3,
+  keywords: 0.1,
 } as const;
+
+const EXACT_MATCH_SCORE_MULTIPLIER = 100;
+const PREFIX_MATCH_SCORE_MULTIPLIER = 20;
+const CONTAINS_MATCH_SCORE_MULTIPLIER = 8;
 
 export const normalizeSearchText = (value: string) => {
   let normalized = value
@@ -38,7 +42,7 @@ const tokenizeNormalizedSearchText = (value: string) =>
 
 const scoreTokenAgainstField = (fieldValue: string, fieldTokens: string[], queryToken: string) => {
   if (fieldTokens.some((token) => token === queryToken)) {
-    return 3;
+    return 1;
   }
 
   if (
@@ -46,11 +50,11 @@ const scoreTokenAgainstField = (fieldValue: string, fieldTokens: string[], query
       (token) => token.startsWith(queryToken) || queryToken.startsWith(token),
     )
   ) {
-    return 2;
+    return 0.75;
   }
 
   if (fieldValue.includes(queryToken)) {
-    return 1;
+    return 0.5;
   }
 
   return 0;
@@ -101,22 +105,27 @@ export const scoreWeightedSearchDocument = (
 
   const normalizedFields = [
     {
+      key: "name",
       value: normalizeSearchText(document.name),
       weight: FIELD_WEIGHTS.name,
     },
     {
+      key: "category",
       value: normalizeSearchText(document.category ?? ""),
       weight: FIELD_WEIGHTS.category,
     },
     {
+      key: "department",
       value: normalizeSearchText(document.department ?? ""),
       weight: FIELD_WEIGHTS.department,
     },
     {
+      key: "description",
       value: normalizeSearchText(document.description ?? ""),
       weight: FIELD_WEIGHTS.description,
     },
     {
+      key: "keywords",
       value: normalizeSearchText(document.keywords ?? ""),
       weight: FIELD_WEIGHTS.keywords,
     },
@@ -150,24 +159,24 @@ export const scoreWeightedSearchDocument = (
     totalScore += bestTokenScore;
   }
 
-  const normalizedName = normalizedFields[0].value;
-  const normalizedCategory = normalizedFields[1].value;
-  const normalizedDepartment = normalizedFields[2].value;
+  for (const field of normalizedFields) {
+    if (!field.value) {
+      continue;
+    }
 
-  if (normalizedName === normalizedQuery) {
-    totalScore += 500;
-  } else if (normalizedName.startsWith(normalizedQuery)) {
-    totalScore += 260;
-  } else if (normalizedName.includes(normalizedQuery)) {
-    totalScore += 120;
-  }
+    if (field.value === normalizedQuery) {
+      totalScore += field.weight * EXACT_MATCH_SCORE_MULTIPLIER;
+      continue;
+    }
 
-  if (normalizedCategory === normalizedQuery) {
-    totalScore += 140;
-  }
+    if (field.value.startsWith(normalizedQuery)) {
+      totalScore += field.weight * PREFIX_MATCH_SCORE_MULTIPLIER;
+      continue;
+    }
 
-  if (normalizedDepartment === normalizedQuery) {
-    totalScore += 90;
+    if (field.value.includes(normalizedQuery)) {
+      totalScore += field.weight * CONTAINS_MATCH_SCORE_MULTIPLIER;
+    }
   }
 
   return totalScore;

@@ -7,8 +7,14 @@ import {
   type ApiRequest,
   type ApiResponse,
 } from "../server/lib/http.js";
+import { logger } from "../server/lib/logger.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
-import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
+import {
+  applyCorsResponseHeaders,
+  buildAllowedOrigins,
+  getClientIp,
+  resolveAllowedOrigin,
+} from "../server/lib/security.js";
 import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
 import { refundShippingLabel } from "../server/lib/easypost.js";
 import { findOrderById, isOrderStoreConfigured, listOrders, saveOrderShipment } from "../server/lib/order-store.js";
@@ -57,10 +63,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
     process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
   );
-  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+  const allowedOrigin = resolveAllowedOrigin(req, allowedOrigins, { allowMissingOrigin: false });
+  if (!allowedOrigin) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
+  applyCorsResponseHeaders(res, allowedOrigin, ["GET", "POST"]);
 
   const rateResult = await checkRateLimit({
     key: `admin-orders:${getClientIp(req)}`,
@@ -157,6 +165,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         message: "Shipping label purchased successfully.",
       });
     } catch (error) {
+      logger.error("admin-orders.retry_label_purchase_failed", {
+        orderId: order.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
       sendError(
         res,
         502,
@@ -196,6 +208,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       message: "Label refund requested successfully.",
     });
   } catch (error) {
+    logger.error("admin-orders.refund_label_failed", {
+      orderId: order.id,
+      shipmentId: order.shipment.shipmentId,
+      error: error instanceof Error ? error.message : String(error),
+    });
     sendError(
       res,
       502,

@@ -1,4 +1,5 @@
 import type { CartItem } from "@/features/cart/context/CartContext";
+import { extractApiErrorMessage, requestJson } from "@/lib/api-client";
 
 interface CheckoutItemPayload {
   productId: string;
@@ -20,6 +21,12 @@ interface ShippingCustomerPayload {
 interface CartTokenResponse {
   cartToken?: string;
   cartTimestamp?: number;
+}
+
+interface CloverCheckoutResponse {
+  checkoutUrl?: string;
+  reused?: boolean;
+  orderId?: string;
 }
 
 export interface ShippingRateOption {
@@ -121,49 +128,24 @@ export const buildClientIdempotencyKey = ({
   return `checkout_${digest}_${normalized.length}`;
 };
 
-export const extractApiErrorMessage = (payload: unknown, fallback: string) => {
-  if (!payload || typeof payload !== "object") {
-    return fallback;
-  }
-
-  const record = payload as Record<string, unknown>;
-  const directError = record.error;
-  if (typeof directError === "string" && directError.trim()) {
-    return directError.trim();
-  }
-
-  if (directError && typeof directError === "object") {
-    const nested = directError as Record<string, unknown>;
-    if (typeof nested.message === "string" && nested.message.trim()) {
-      return nested.message.trim();
-    }
-  }
-
-  if (typeof record.message === "string" && record.message.trim()) {
-    return record.message.trim();
-  }
-
-  return fallback;
-};
+export { extractApiErrorMessage } from "@/lib/api-client";
 
 export const requestOptionalCartToken = async (items: CheckoutItemPayload[]) => {
-  const response = await fetch("/api/cart-token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ items }),
-  });
+  try {
+    const payload = await requestJson<CartTokenResponse>({
+      path: "/api/cart-token",
+      method: "POST",
+      body: { items },
+      fallbackErrorMessage: "Unable to start your cart session.",
+    });
 
-  if (!response.ok) {
+    return {
+      cartToken: typeof payload.cartToken === "string" ? payload.cartToken : "",
+      cartTimestamp: typeof payload.cartTimestamp === "number" ? payload.cartTimestamp : 0,
+    };
+  } catch {
     return { cartToken: "", cartTimestamp: 0 };
   }
-
-  const payload = (await response.json().catch(() => ({}))) as CartTokenResponse;
-  return {
-    cartToken: typeof payload.cartToken === "string" ? payload.cartToken : "",
-    cartTimestamp: typeof payload.cartTimestamp === "number" ? payload.cartTimestamp : 0,
-  };
 };
 
 export const requestShippingRates = async ({
@@ -174,26 +156,17 @@ export const requestShippingRates = async ({
   customer: ShippingCustomerPayload;
   items: CheckoutItemPayload[];
   signal?: AbortSignal;
-}) => {
-  const response = await fetch("/api/shipping-rates", {
+}) =>
+  requestJson<ShippingRatesResponse>({
+    path: "/api/shipping-rates",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     signal,
-    body: JSON.stringify({
+    body: {
       customer,
       items,
-    }),
+    },
+    fallbackErrorMessage: "Unable to calculate shipping right now.",
   });
-
-  const payload = (await response.json().catch(() => ({}))) as ShippingRatesResponse;
-  if (!response.ok) {
-    throw new Error(extractApiErrorMessage(payload, "Unable to calculate shipping right now."));
-  }
-
-  return payload;
-};
 
 export const requestAddressAutocomplete = async ({
   query,
@@ -206,28 +179,21 @@ export const requestAddressAutocomplete = async ({
   sessionToken?: string;
   signal?: AbortSignal;
 }) => {
-  const response = await fetch("/api/address-autocomplete", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    signal,
-    body: JSON.stringify({
-      query,
-      country,
-      sessionToken,
-    }),
-  });
-
-  const payload = (await response.json().catch(() => ({}))) as {
+  const payload = await requestJson<{
     configured?: boolean;
     sessionToken?: string;
     suggestions?: AddressAutocompleteSuggestion[];
-  };
-
-  if (!response.ok) {
-    throw new Error(extractApiErrorMessage(payload, "Unable to load address suggestions right now."));
-  }
+  }>({
+    path: "/api/address-autocomplete",
+    method: "POST",
+    signal,
+    body: {
+      query,
+      country,
+      sessionToken,
+    },
+    fallbackErrorMessage: "Unable to load address suggestions right now.",
+  });
 
   return {
     configured: payload.configured !== false,
@@ -247,27 +213,20 @@ export const requestAddressAutocompleteSelection = async ({
   sessionToken?: string;
   signal?: AbortSignal;
 }) => {
-  const response = await fetch("/api/address-autocomplete", {
+  const payload = await requestJson<{
+    configured?: boolean;
+    address?: AddressAutocompleteResolvedAddress | null;
+  }>({
+    path: "/api/address-autocomplete",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     signal,
-    body: JSON.stringify({
+    body: {
       mapboxId,
       country,
       sessionToken,
-    }),
+    },
+    fallbackErrorMessage: "Unable to load this address selection right now.",
   });
-
-  const payload = (await response.json().catch(() => ({}))) as {
-    configured?: boolean;
-    address?: AddressAutocompleteResolvedAddress | null;
-  };
-
-  if (!response.ok) {
-    throw new Error(extractApiErrorMessage(payload, "Unable to load this address selection right now."));
-  }
 
   return {
     configured: payload.configured !== false,
@@ -281,25 +240,31 @@ export const requestAddressVerification = async ({
 }: {
   customer: ShippingCustomerPayload;
   signal?: AbortSignal;
-}) => {
-  const response = await fetch("/api/address-verify", {
+}) =>
+  requestJson<AddressVerificationResponse>({
+    path: "/api/address-verify",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     signal,
-    body: JSON.stringify({
+    body: {
       customer,
-    }),
+    },
+    fallbackErrorMessage: "Unable to verify this shipping address right now.",
   });
 
-  const payload = (await response.json().catch(() => ({}))) as AddressVerificationResponse;
-  if (!response.ok) {
-    throw new Error(extractApiErrorMessage(payload, "Unable to verify this shipping address right now."));
-  }
-
-  return payload;
-};
+export const requestCloverCheckout = ({
+  payload,
+  signal,
+}: {
+  payload: Record<string, unknown>;
+  signal?: AbortSignal;
+}) =>
+  requestJson<CloverCheckoutResponse>({
+    path: "/api/clover-checkout",
+    method: "POST",
+    signal,
+    body: payload,
+    fallbackErrorMessage: "Unable to start checkout right now.",
+  });
 
 export const redirectToCheckout = (checkoutUrl: string) => {
   window.location.assign(checkoutUrl);

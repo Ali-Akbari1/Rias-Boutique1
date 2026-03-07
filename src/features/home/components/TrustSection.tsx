@@ -7,6 +7,7 @@ import {
   type GoogleReviewsResponse,
   type StoreReview,
 } from "@/features/store/data/store-content";
+import { requestGoogleReviews } from "@/lib/site-api";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 
@@ -36,12 +37,7 @@ const TrustSection = () => {
 
     const fetchGoogleReviews = async () => {
       try {
-        const response = await fetch("/api/google-reviews");
-        if (!response.ok) {
-          throw new Error("Failed to fetch Google reviews.");
-        }
-
-        const payload = (await response.json()) as GoogleReviewsResponse;
+        const payload = await requestGoogleReviews();
         if (!isMounted) {
           return;
         }

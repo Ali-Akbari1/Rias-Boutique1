@@ -1,6 +1,7 @@
 import { createHmac } from "node:crypto";
 import QRCode from "qrcode";
 import { createDeterministicHash } from "./http.js";
+import { logger } from "./logger.js";
 import { canonicalizeCartItems } from "./security.js";
 import { getFlatShippingRateMinor } from "./checkout-pricing.js";
 
@@ -242,7 +243,7 @@ const toMinor = (value: string | undefined, fallbackValue: string | undefined, f
   }
   return fallbackMinor;
 };
-const normalizeString = (value: string | undefined) => value?.trim() || "";
+const normalizeString = (value: string | null | undefined) => value?.trim() || "";
 export const toQuoteCustomer = (customer: Partial<QuoteCustomer>): QuoteCustomer => ({
   deliveryMethod: customer.deliveryMethod === "pickup" ? "pickup" : "shipping",
   fullName: normalizeString(customer.fullName),
@@ -751,7 +752,7 @@ export const createShippingRatesQuote = async ({
   });
   if (displayRates.length === 0) {
     const shipmentMessages = formatShipmentMessages(shipment.messages);
-    console.error("[easypost] shipment returned no displayable rates", {
+    logger.error("easypost.shipment_returned_no_displayable_rates", {
       shipmentId,
       originCountryCode,
       destinationCountryCode,

@@ -1,3 +1,8 @@
+import { getClientCommerceConfig } from "@/lib/commerce-config";
+import { formatCad } from "@/lib/money";
+
+const commerceConfig = getClientCommerceConfig();
+
 export interface FaqItem {
   id: string;
   question: string;
@@ -47,8 +52,8 @@ export interface StorePickupDetails {
 }
 
 export const shippingPolicy = {
-  standardCost: "CA$30 flat rate at checkout",
-  freeShippingThreshold: "CA$400+",
+  standardCost: `${formatCad(commerceConfig.flatShippingRateMinor / 100)} flat rate at checkout`,
+  freeShippingThreshold: `${formatCad(commerceConfig.freeShippingThresholdMinor / 100)}+`,
   standardTimeline: "5-10 business days (Canada)",
 };
 

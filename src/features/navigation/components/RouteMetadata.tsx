@@ -1,42 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-
-const SITE_URL = "https://www.riasboutique.com";
-const COLLECTION_DEPARTMENTS = new Set(["women", "men", "jewelry"]);
-
-const normalizePathname = (pathname: string) => {
-  if (!pathname || pathname === "/") {
-    return "/";
-  }
-
-  return pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
-};
-
-const resolveCanonicalPath = (pathname: string, search: string) => {
-  const normalizedPath = normalizePathname(pathname);
-  const searchParams = new URLSearchParams(search);
-  const queryDepartment = (searchParams.get("department") || "").trim().toLowerCase();
-
-  if (normalizedPath === "/collection" && COLLECTION_DEPARTMENTS.has(queryDepartment)) {
-    return `/collection/${queryDepartment}`;
-  }
-
-  if (normalizedPath.startsWith("/collection/")) {
-    const routeDepartment = normalizedPath.split("/")[2]?.trim().toLowerCase() || "";
-    if (!COLLECTION_DEPARTMENTS.has(routeDepartment)) {
-      return "/collection";
-    }
-
-    return `/collection/${routeDepartment}`;
-  }
-
-  return normalizedPath;
-};
-
-const toCanonicalUrl = (pathname: string, search: string) => {
-  const canonicalPath = resolveCanonicalPath(pathname, search);
-  return canonicalPath === "/" ? `${SITE_URL}/` : `${SITE_URL}${canonicalPath}`;
-};
+import { toCanonicalUrl } from "@/features/navigation/route-manifest";
 
 const updateLink = (id: string, rel: string, href: string, hreflang?: string) => {
   let link = document.getElementById(id) as HTMLLinkElement | null;

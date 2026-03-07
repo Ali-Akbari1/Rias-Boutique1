@@ -7,12 +7,13 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/shared/ui/accordion";
+import { getClientCommerceConfig } from "@/lib/commerce-config";
 import { formatCad } from "@/lib/money";
+import { buildCheckoutPricing, calculateLaunchDiscountMinor } from "@/shared/config/commerce";
 import {
   getLaunchDiscountExpiryDateLabel,
   isLaunchDiscountActive,
   LAUNCH_DISCOUNT_CODE,
-  LAUNCH_DISCOUNT_RATE,
 } from "@/lib/launch-discount";
 import {
   buildCheckoutItems,
@@ -21,6 +22,7 @@ import {
   requestAddressAutocomplete,
   requestAddressAutocompleteSelection,
   requestAddressVerification,
+  requestCloverCheckout,
   extractApiErrorMessage,
   requestOptionalCartToken,
   requestShippingRates,
@@ -50,13 +52,6 @@ interface CheckoutForm {
   country: string;
 }
 
-interface CloverCheckoutResponse {
-  checkoutUrl?: string;
-  reused?: boolean;
-  orderId?: string;
-  error?: string;
-}
-
 const initialForm: CheckoutForm = {
   deliveryMethod: "shipping",
   fullName: "",
@@ -69,10 +64,7 @@ const initialForm: CheckoutForm = {
   country: "",
 };
 
-const FREE_SHIPPING_THRESHOLD = 400;
-const TAX_RATE = 0.05;
-const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
-const isShippingChargesEnabled = () => toBoolean(import.meta.env.VITE_ENABLE_SHIPPING_CHARGES as string | undefined);
+const clientCommerceConfig = getClientCommerceConfig();
 const looksLikeEmail = (value: string) => /\S+@\S+\.\S+/.test(value.trim());
 const isAddressFieldsComplete = (form: CheckoutForm) =>
   form.deliveryMethod === "shipping" &&
@@ -127,7 +119,7 @@ const Checkout = () => {
   const [lastVerifiedAddressFingerprint, setLastVerifiedAddressFingerprint] = useState("");
   const googleReviewsUrl = getGoogleReviewsUrl();
   const pickupDetails = getStorePickupDetails();
-  const shippingChargesEnabled = isShippingChargesEnabled();
+  const shippingChargesEnabled = clientCommerceConfig.shippingChargesEnabled;
   const launchDiscountActive = isLaunchDiscountActive();
   const launchDiscountEndsLabel = getLaunchDiscountExpiryDateLabel();
   const checkoutControllerRef = useRef<AbortController | null>(null);
@@ -144,19 +136,27 @@ const Checkout = () => {
   const checkoutItems = useMemo(() => buildCheckoutItems(items), [items]);
   const subtotalMinor = Math.round(totalPrice * 100);
   const normalizedDiscountCode = discountCode.trim().toUpperCase();
-  const discountMinor =
-    launchDiscountActive && normalizedDiscountCode === LAUNCH_DISCOUNT_CODE
-      ? Math.round(subtotalMinor * LAUNCH_DISCOUNT_RATE)
-      : 0;
-  const discountedSubtotalMinor = Math.max(0, subtotalMinor - discountMinor);
+  const discountMinor = calculateLaunchDiscountMinor({
+    subtotalMinor,
+    submittedCode: normalizedDiscountCode,
+    launchDiscountCode: clientCommerceConfig.launchDiscountCode,
+    launchDiscountRate: clientCommerceConfig.launchDiscountRate,
+    launchDiscountActive,
+  });
   const isPickupInStore = checkoutForm.deliveryMethod === "pickup";
   const selectedShippingOption =
     shippingOptions.find((option) => option.token === selectedShippingToken) || shippingOptions[0] || null;
   const quotedShippingMinor = isPickupInStore ? 0 : selectedShippingOption?.quotedRateMinor || 0;
   const shippingMinor = isPickupInStore ? 0 : selectedShippingOption?.customerRateMinor || 0;
   const freeShippingApplied = !isPickupInStore && quotedShippingMinor > 0 && shippingMinor === 0;
-  const taxMinor = Math.round((discountedSubtotalMinor + shippingMinor) * TAX_RATE);
-  const totalMinor = discountedSubtotalMinor + shippingMinor + taxMinor;
+  const pricing = buildCheckoutPricing({
+    subtotalMinor,
+    discountMinor,
+    shippingMinor,
+    taxRate: clientCommerceConfig.checkoutTaxRate,
+  });
+  const taxMinor = pricing.taxMinor;
+  const totalMinor = pricing.totalMinor;
   const subtotal = subtotalMinor / 100;
   const discount = discountMinor / 100;
   const shipping = shippingMinor / 100;
@@ -182,10 +182,10 @@ const Checkout = () => {
     isPickupInStore
       ? "Pick up in store selected. No shipping fee will be charged."
       : freeShippingApplied && selectedShippingOption
-      ? `Free shipping on orders over ${formatCad(FREE_SHIPPING_THRESHOLD)}. Applied to ${selectedShippingOption.label}.`
+      ? `Free shipping on orders over ${formatCad(clientCommerceConfig.freeShippingThresholdMinor / 100)}. Applied to ${selectedShippingOption.label}.`
       : selectedShippingOption
-      ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."} Orders under ${formatCad(FREE_SHIPPING_THRESHOLD)} are charged ${formatCad(30)} shipping.`
-      : `Orders under ${formatCad(FREE_SHIPPING_THRESHOLD)} are charged ${formatCad(30)} shipping.`;
+      ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."} Orders under ${formatCad(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatCad(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`
+      : `Orders under ${formatCad(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatCad(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`;
 
   const handleFormChange = (field: keyof CheckoutForm) => (event: ChangeEvent<HTMLInputElement>) => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));
@@ -795,13 +795,9 @@ const Checkout = () => {
       checkoutControllerRef.current = controller;
       const timeout = window.setTimeout(() => controller.abort(), 15000);
       checkoutTimeoutRef.current = timeout;
-      const response = await fetch("/api/clover-checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const payload = await requestCloverCheckout({
         signal: controller.signal,
-        body: JSON.stringify({
+        payload: {
           customer: checkoutForm,
           items: checkoutItems,
           discountCode: normalizedDiscountCode,
@@ -810,7 +806,7 @@ const Checkout = () => {
           cartToken,
           cartTimestamp,
           website: "",
-        }),
+        },
       }).finally(() => {
         if (checkoutTimeoutRef.current !== null) {
           window.clearTimeout(checkoutTimeoutRef.current);
@@ -819,8 +815,7 @@ const Checkout = () => {
         checkoutControllerRef.current = null;
       });
 
-      const payload = (await response.json().catch(() => ({}))) as CloverCheckoutResponse;
-      if (!response.ok || !payload.checkoutUrl) {
+      if (!payload.checkoutUrl) {
         throw new Error(extractApiErrorMessage(payload, "Unable to start Clover checkout right now."));
       }
 
@@ -1398,7 +1393,7 @@ const Checkout = () => {
                     <p className="text-xs text-destructive">{shippingError}</p>
                   ) : null}
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span>Tax (5%)</span>
+                    <span>Tax ({Math.round(clientCommerceConfig.checkoutTaxRate * 100)}%)</span>
                     <span>{formatCad(tax)}</span>
                   </div>
                   <div className="flex items-center justify-between border-t border-border pt-3 font-display text-lg font-bold text-foreground">

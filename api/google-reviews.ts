@@ -1,6 +1,18 @@
 import { sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
+import { logger } from "../server/lib/logger.js";
+import {
+  fetchProviderJson,
+  ProviderConfigurationError,
+  ProviderRequestError,
+  requireProviderConfig,
+} from "../server/lib/provider-client.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
-import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
+import {
+  applyCorsResponseHeaders,
+  buildAllowedOrigins,
+  getClientIp,
+  resolveAllowedOrigin,
+} from "../server/lib/security.js";
 
 type GoogleAuthorAttribution = {
   displayName?: string;
@@ -39,10 +51,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "",
     process.env.ALLOWED_CHECKOUT_ORIGINS?.trim() || "",
   );
-  if (!validateOrigin(req, allowedOrigins, { allowMissingOrigin: false })) {
+  const allowedOrigin = resolveAllowedOrigin(req, allowedOrigins, { allowMissingOrigin: false });
+  if (!allowedOrigin) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
     return;
   }
+  applyCorsResponseHeaders(res, allowedOrigin, ["GET"]);
 
   const rateResult = await checkRateLimit({
     key: `google-reviews:${getClientIp(req)}`,
@@ -55,29 +69,25 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
-  const placeId = process.env.GOOGLE_PLACE_ID;
-
-  if (!apiKey || !placeId) {
-    sendError(res, 500, "GOOGLE_REVIEWS_NOT_CONFIGURED", "Google reviews are not configured right now.");
-    return;
-  }
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY?.trim() || "";
+  const placeId = process.env.GOOGLE_PLACE_ID?.trim() || "";
 
   try {
+    requireProviderConfig("google_places", {
+      GOOGLE_PLACES_API_KEY: apiKey || "",
+      GOOGLE_PLACE_ID: placeId || "",
+    });
+
     const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?languageCode=en`;
-    const response = await fetch(url, {
+    const payload = await fetchProviderJson<GooglePlaceDetailsResponse>({
+      provider: "google_places",
+      url,
+      method: "GET",
       headers: {
         "X-Goog-Api-Key": apiKey,
         "X-Goog-FieldMask": "displayName,rating,userRatingCount,googleMapsUri,reviews",
       },
     });
-
-    const payload = (await response.json()) as GooglePlaceDetailsResponse;
-
-    if (!response.ok) {
-      sendError(res, response.status, "GOOGLE_REVIEWS_PROVIDER_ERROR", payload?.error?.message || "Google Places API request failed.");
-      return;
-    }
 
     const reviews = (payload.reviews ?? []).slice(0, 6).map((review, index) => ({
       id: review.name || `google-review-${index}`,
@@ -99,6 +109,19 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       reviews,
     });
   } catch (error) {
+    if (error instanceof ProviderConfigurationError) {
+      sendError(res, 500, "GOOGLE_REVIEWS_NOT_CONFIGURED", "Google reviews are not configured right now.");
+      return;
+    }
+
+    if (error instanceof ProviderRequestError) {
+      sendError(res, error.statusCode, "GOOGLE_REVIEWS_PROVIDER_ERROR", error.message);
+      return;
+    }
+
+    logger.error("google-reviews.unexpected_failure", {
+      error,
+    });
     sendError(res, 500, "GOOGLE_REVIEWS_SERVER_ERROR", error instanceof Error ? error.message : "Unexpected server error.");
   }
 }
