@@ -123,7 +123,7 @@ VITE_INSTAGRAM_CARDS=https://www.instagram.com/p/POST_1/|/instagram/post-1.jpg|B
 - `EASYPOST_ADDITIONAL_ITEM_HEIGHT_IN`: Additional estimated parcel height per extra item.
 - `EASYPOST_PRODUCT_ORIGIN_COUNTRY`: Optional ISO country code used on EasyPost customs items for international quotes.
 - `EASYPOST_DEFAULT_HS_TARIFF_NUMBER`: Required if you want to quote cross-border shipments through EasyPost.
-- `EASYPOST_CUSTOMS_SIGNER`, `EASYPOST_CUSTOMS_CONTENTS_TYPE`, `EASYPOST_CUSTOMS_RESTRICTION_TYPE`, `EASYPOST_CUSTOMS_NON_DELIVERY_OPTION`: Optional EasyPost customs metadata overrides.
+- `EASYPOST_CUSTOMS_SIGNER`, `EASYPOST_CUSTOMS_CONTENTS_TYPE`, `EASYPOST_CUSTOMS_RESTRICTION_TYPE`, `EASYPOST_CUSTOMS_NON_DELIVERY_OPTION`, `EASYPOST_CUSTOMS_EEL_PFC`: Optional EasyPost customs metadata overrides.
 - `MAPBOX_ACCESS_TOKEN`: Server-side token used by `/api/address-autocomplete` for checkout address suggestions.
 - `MAPBOX_AUTOCOMPLETE_COUNTRIES`: Optional comma-separated country filter for checkout address suggestions (default `CA,US`).
 - `SUPABASE_URL`: Supabase project URL for server-side order persistence.

@@ -122,6 +122,12 @@ interface EasyPostPostageLabel {
 interface EasyPostShipmentResponse {
   id?: string;
   rates?: EasyPostRate[];
+  messages?: Array<{
+    carrier?: string | null;
+    carrier_account_id?: string | null;
+    message?: string | null;
+    type?: string | null;
+  }> | null;
   tracker?: EasyPostTracker | null;
   tracking_code?: string | null;
   status?: string | null;
@@ -598,6 +604,7 @@ const buildInternationalCustomsInfo = ({
 
   const productOriginCountry = normalizeCountryCode(process.env.EASYPOST_PRODUCT_ORIGIN_COUNTRY) || originCountryCode;
   const unitWeightOz = toNumber(process.env.EASYPOST_ITEM_WEIGHT_OZ, DEFAULT_ITEM_WEIGHT_OZ);
+  const eelPfc = normalizeString(process.env.EASYPOST_CUSTOMS_EEL_PFC);
 
   return {
     customs_certify: true,
@@ -605,6 +612,7 @@ const buildInternationalCustomsInfo = ({
     contents_type: normalizeString(process.env.EASYPOST_CUSTOMS_CONTENTS_TYPE) || "merchandise",
     restriction_type: normalizeString(process.env.EASYPOST_CUSTOMS_RESTRICTION_TYPE) || "none",
     non_delivery_option: normalizeString(process.env.EASYPOST_CUSTOMS_NON_DELIVERY_OPTION) || "return",
+    ...(eelPfc ? { eel_pfc: eelPfc } : {}),
     customs_items: items.map((item) => ({
       description: normalizeString(item.name) || item.productId,
       quantity: Math.max(1, item.quantity),
@@ -616,6 +624,24 @@ const buildInternationalCustomsInfo = ({
     })),
   };
 };
+
+const formatShipmentMessages = (messages: EasyPostShipmentResponse["messages"]) =>
+  (messages || [])
+    .map((entry) => {
+      const message = normalizeString(entry?.message || undefined);
+      if (!message) {
+        return "";
+      }
+
+      const carrier = normalizeString(entry?.carrier || undefined);
+      const carrierAccountId = normalizeString(entry?.carrier_account_id || undefined);
+      const type = normalizeString(entry?.type || undefined);
+      const prefix = [carrier, carrierAccountId, type].filter(Boolean).join(" | ");
+      return prefix ? `${prefix}: ${message}` : message;
+    })
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(" ");
 
 export const verifyShippingAddress = async (customer: QuoteCustomer): Promise<VerifiedShippingAddress> => {
   const countryCode = normalizeCountryCode(customer.country);
@@ -708,12 +734,17 @@ export const createShippingRatesQuote = async ({
     freeShippingThresholdMinor,
   });
   if (displayRates.length === 0) {
+    const shipmentMessages = formatShipmentMessages(shipment.messages);
     if (originCountryCode && destinationCountryCode && originCountryCode !== destinationCountryCode) {
       throw new Error(
-        "No shipping rates were returned for this international address. Confirm your EasyPost carrier setup and customs configuration for cross-border shipments.",
+        shipmentMessages
+          ? `No shipping rates were returned for this international address. ${shipmentMessages}`
+          : "No shipping rates were returned for this international address. Confirm your EasyPost carrier setup and customs configuration for cross-border shipments.",
       );
     }
-    throw new Error("No EasyPost shipping rates were returned for this address.");
+    throw new Error(
+      shipmentMessages ? `No EasyPost shipping rates were returned for this address. ${shipmentMessages}` : "No EasyPost shipping rates were returned for this address.",
+    );
   }
 
   const contextHash = buildShippingContextHash({ customer, items, subtotalMinor });
