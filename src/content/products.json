@@ -643,6 +643,9 @@
       ],
       "name": "Green Hazaragi Dress ",
       "slug": "green-hazaragi-dress",
+      "colors": [
+        "Mustard Green"
+      ],
       "sizes": [
         "Small",
         "Medium"
@@ -657,7 +660,7 @@
       "inventory": "available",
       "description": "Mustard green long dress with white scarf. ",
       "category": "Formal",
-      "fitInfo": "Small (Bust: \nMedium (Bust: "
+      "fitInfo": "*2 pieces\n\nSmall (Bust: 40in)\nMedium (Bust: 42in)"
     }
   ]
 }
