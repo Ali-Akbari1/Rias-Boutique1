@@ -665,6 +665,33 @@
       "description": "Mustard green long dress with white scarf. ",
       "category": "Formal",
       "fitInfo": "*2 pieces\n\nSmall (Bust: 40in)\nMedium (Bust: 42in)"
+    },
+    {
+      "fabric": "Du-domina",
+      "price": 178,
+      "galleryImages": [
+        "/uploads/img_0888.jpg",
+        "/uploads/img_0887.jpg"
+      ],
+      "name": "Baby Blue Hazaragi Dress",
+      "slug": "baby-blue-du-domina",
+      "colors": [
+        "Baby Blue "
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "baby-blue-du-domina",
+      "createdAt": "2026-03-07",
+      "image": "/uploads/img_0888.jpg",
+      "inventory": "available",
+      "description": "Baby blue Hazaragi dress ",
+      "category": "Party Wear",
+      "fitInfo": "* 3 pieces: dress, pants, and white scarf\n\nMedium (Bust: 42in)\nLarge (Bust: 44in)"
     }
   ]
 }
