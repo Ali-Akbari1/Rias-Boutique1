@@ -66,6 +66,8 @@ interface AdminOrder {
 interface AdminOrdersResponse {
   orders?: AdminOrder[];
   count?: number;
+  order?: AdminOrder;
+  message?: string;
   error?: {
     message?: string;
   };
@@ -111,7 +113,9 @@ const AdminOrders = () => {
   const [adminToken, setAdminToken] = useState("");
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [retryingOrderId, setRetryingOrderId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   const paidOrders = useMemo(() => orders.filter((order) => order.paymentStatus === "paid"), [orders]);
@@ -131,6 +135,7 @@ const AdminOrders = () => {
 
     setIsLoading(true);
     setErrorMessage("");
+    setStatusMessage("");
 
     try {
       const response = await fetch("/api/admin-orders", {
@@ -154,6 +159,46 @@ const AdminOrders = () => {
       setErrorMessage(error instanceof Error ? error.message : "Unable to load orders.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const retryLabelPurchase = async (orderId: string) => {
+    const token = adminToken.trim();
+    if (!token) {
+      setErrorMessage("Enter your admin dashboard token.");
+      return;
+    }
+
+    setRetryingOrderId(orderId);
+    setErrorMessage("");
+    setStatusMessage("");
+
+    try {
+      const response = await fetch("/api/admin-orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token,
+        },
+        body: JSON.stringify({
+          action: "retry_label_purchase",
+          orderId,
+        }),
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as AdminOrdersResponse;
+      if (!response.ok) {
+        throw new Error(payload?.error?.message || "Unable to purchase a shipping label right now.");
+      }
+
+      if (payload.order) {
+        setOrders((currentOrders) => currentOrders.map((order) => (order.id === payload.order?.id ? payload.order : order)));
+      }
+      setStatusMessage(payload.message || "Shipping label purchased successfully.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to purchase a shipping label.");
+    } finally {
+      setRetryingOrderId("");
     }
   };
 
@@ -207,6 +252,7 @@ const AdminOrders = () => {
               </div>
             </form>
             {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
+            {statusMessage ? <p className="text-sm text-foreground">{statusMessage}</p> : null}
           </CardContent>
         </Card>
 
@@ -297,12 +343,32 @@ const AdminOrders = () => {
                         ? [order.shippingQuote.carrier, order.shippingQuote.service].filter(Boolean).join(" ") || "-"
                         : "-"}
                     </p>
-                    <p>
-                      <span className="font-semibold text-foreground">Tracking:</span>{" "}
-                      {order.shipment?.trackingCode || "Pending label purchase"}
-                    </p>
-                    {order.shipment?.trackingUrl ? (
-                      <p className="sm:col-span-2">
+                     <p>
+                       <span className="font-semibold text-foreground">Tracking:</span>{" "}
+                       {order.shipment?.trackingCode || "Pending label purchase"}
+                     </p>
+                     {!order.shipment && order.shippingQuote && order.paymentStatus === "paid" ? (
+                       <div className="sm:col-span-2">
+                         <Button
+                           type="button"
+                           variant="outline"
+                           size="sm"
+                           onClick={() => void retryLabelPurchase(order.id)}
+                           disabled={retryingOrderId === order.id}
+                         >
+                           {retryingOrderId === order.id ? (
+                             <>
+                               <Loader2 className="h-4 w-4 animate-spin" />
+                               Retrying label purchase
+                             </>
+                           ) : (
+                             "Retry label purchase"
+                           )}
+                         </Button>
+                       </div>
+                     ) : null}
+                     {order.shipment?.trackingUrl ? (
+                       <p className="sm:col-span-2">
                         <span className="font-semibold text-foreground">Tracking Link:</span>{" "}
                         <a
                           href={order.shipment.trackingUrl}

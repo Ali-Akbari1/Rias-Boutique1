@@ -1,5 +1,7 @@
 import {
   getHeader,
+  parseJsonBody,
+  readRawBody,
   safeTimingCompare,
   sendError,
   type ApiRequest,
@@ -7,10 +9,19 @@ import {
 } from "../server/lib/http.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
-import { isOrderStoreConfigured, listOrders } from "../server/lib/order-store.js";
+import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
+import { findOrderById, isOrderStoreConfigured, listOrders } from "../server/lib/order-store.js";
+import { z } from "zod";
 
 const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
+
+const retryLabelPurchaseSchema = z
+  .object({
+    action: z.literal("retry_label_purchase"),
+    orderId: z.string().trim().min(1).max(128),
+  })
+  .strict();
 
 const readAdminToken = (req: ApiRequest) => {
   const directHeader = (getHeader(req, "x-admin-token") || "").trim();
@@ -27,7 +38,7 @@ const readAdminToken = (req: ApiRequest) => {
 };
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
-  if (req.method !== "GET") {
+  if (req.method !== "GET" && req.method !== "POST") {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
     return;
   }
@@ -69,10 +80,67 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const orders = await listOrders();
-  res.setHeader("Cache-Control", "no-store");
-  res.status(200).json({
-    orders,
-    count: orders.length,
-  });
+  if (req.method === "GET") {
+    const orders = await listOrders();
+    res.setHeader("Cache-Control", "no-store");
+    res.status(200).json({
+      orders,
+      count: orders.length,
+    });
+    return;
+  }
+
+  const rawBody = await readRawBody(req);
+  const parsedBody = parseJsonBody<unknown>(rawBody);
+  if (!parsedBody) {
+    sendError(res, 400, "INVALID_JSON", "Request body must be valid JSON.");
+    return;
+  }
+
+  const validation = retryLabelPurchaseSchema.safeParse(parsedBody);
+  if (!validation.success) {
+    sendError(res, 400, "VALIDATION_ERROR", "Retry request is invalid.", validation.error.flatten());
+    return;
+  }
+
+  const order = await findOrderById(validation.data.orderId);
+  if (!order) {
+    sendError(res, 404, "ORDER_NOT_FOUND", "Order not found.");
+    return;
+  }
+
+  if (order.customer.deliveryMethod !== "shipping") {
+    sendError(res, 409, "SHIPMENT_NOT_REQUIRED", "Pickup orders do not require a shipping label.");
+    return;
+  }
+
+  if (order.paymentStatus !== "paid") {
+    sendError(res, 409, "ORDER_NOT_PAID", "Shipping labels can only be purchased after payment is confirmed.");
+    return;
+  }
+
+  if (order.shipment) {
+    res.setHeader("Cache-Control", "no-store");
+    res.status(200).json({
+      order,
+      message: "Shipping label already purchased for this order.",
+    });
+    return;
+  }
+
+  try {
+    const updatedOrder = await ensureShipmentForOrder(order);
+    res.setHeader("Cache-Control", "no-store");
+    res.status(200).json({
+      order: updatedOrder,
+      message: "Shipping label purchased successfully.",
+    });
+  } catch (error) {
+    sendError(
+      res,
+      502,
+      "SHIPMENT_PURCHASE_FAILED",
+      error instanceof Error ? error.message : "Unable to purchase a shipping label right now.",
+    );
+  }
 }

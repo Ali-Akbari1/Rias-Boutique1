@@ -1,14 +1,21 @@
 /** @vitest-environment node */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import adminOrdersHandler from "../../api/admin-orders";
-import checkoutHandler from "../../api/clover-checkout";
-import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
-import { createMockRequest, createMockResponse, createSignedShippingQuoteToken } from "./test-utils/utils";
+import {
+  closeOrderStoreForTests,
+  createPendingOrder,
+  listOrders,
+  markOrderPaidAndDecrementInventory,
+  resetOrderStoreForTests,
+} from "../../server/lib/order-store.js";
+import { createDeterministicHash } from "../../server/lib/http.js";
+import { createMockRequest, createMockResponse } from "./test-utils/utils";
 
 const ADMIN_TOKEN = "admin-token-for-tests";
 
-const buildCheckoutBody = () => {
+const buildPendingOrderInput = () => {
   const customer = {
+    deliveryMethod: "shipping" as const,
     fullName: "Admin Orders Customer",
     email: "admin-orders@example.com",
     phone: "+1 (403) 555-0101",
@@ -18,20 +25,47 @@ const buildCheckoutBody = () => {
     postalCode: "T2X 1A1",
     country: "Canada",
   };
-  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 1 }];
+  const items = [
+    {
+      productId: "Blue-Cheerma-Dozi",
+      name: "Blue Cheerma Dozi",
+      unitAmountMinor: 40_000,
+      quantity: 1,
+      lineTotalMinor: 40_000,
+    },
+  ];
 
   return {
     customer,
-    items,
+    lineItems: items,
     shippingQuote: {
-      token: createSignedShippingQuoteToken({
-        customer,
-        items,
-        subtotalMinor: 40_000,
-        customerRateMinor: 1_800,
-        quotedRateMinor: 1_800,
-      }),
+      provider: "easypost" as const,
+      shipmentId: "shp_test_123",
+      rateId: "rate_test_123",
+      carrier: "Canada Post",
+      service: "Expedited Parcel",
+      quotedRateMinor: 1_800,
+      customerRateMinor: 1_800,
+      currency: "CAD",
+      deliveryDays: 4,
+      deliveryDate: "",
+      freeShippingApplied: false,
+      selectedAt: new Date(Date.now() - 60_000).toISOString(),
+      expiresAt: new Date(Date.now() + 30 * 60_000).toISOString(),
+      contextHash: createDeterministicHash("admin-orders-test-context"),
+      tokenHash: createDeterministicHash("admin-orders-test-token"),
     },
+    subtotalMinor: 40_000,
+    totalMinor: 41_800,
+    pricing: {
+      discountCode: "",
+      discountMinor: 0,
+      shippingMinor: 1_800,
+      quotedShippingMinor: 1_800,
+      taxMinor: 0,
+      freeShippingApplied: false,
+    },
+    idempotencyKey: "admin-orders-test-idempotency-key",
   };
 };
 
@@ -77,28 +111,7 @@ describe("admin orders endpoint", () => {
   });
 
   it("returns orders with customer shipping details", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "checkout_admin_1", href: "https://checkout.clover.com/pay/checkout_admin_1" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
-    vi.stubGlobal("fetch", fetchMock);
-
-    const checkoutResponse = createMockResponse();
-    await checkoutHandler(
-      createMockRequest({
-        method: "POST",
-        headers: {
-          origin: "https://www.riasboutique.com",
-          "user-agent": "Mozilla/5.0",
-        },
-        body: JSON.stringify(buildCheckoutBody()),
-      }),
-      checkoutResponse,
-    );
-
-    expect(checkoutResponse.statusCode).toBe(200);
+    await createPendingOrder(buildPendingOrderInput());
 
     const adminResponse = createMockResponse();
     await adminOrdersHandler(
@@ -125,6 +138,88 @@ describe("admin orders endpoint", () => {
           paymentStatus: "pending",
         },
       ],
+    });
+  });
+
+  it("retries shipping label purchase for paid shipping orders", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url.endsWith("/shipments/shp_test_123/buy")) {
+        return new Response(
+          JSON.stringify({
+            tracking_code: "CP123456789CA",
+            tracker: {
+              tracking_code: "CP123456789CA",
+              public_url: "https://track.easypost.com/CP123456789CA",
+            },
+            postage_label: {
+              label_url: "https://example.com/label.png",
+              label_pdf_url: "https://example.com/label.pdf",
+            },
+            status: "purchased",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          id: "checkout_admin_1",
+          href: "https://checkout.clover.com/pay/checkout_admin_1",
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await createPendingOrder({
+      ...buildPendingOrderInput(),
+      idempotencyKey: "admin-orders-retry-idempotency-key",
+    });
+
+    const [order] = await listOrders();
+    expect(order).toBeTruthy();
+    expect(order?.shipment).toBeNull();
+
+    await markOrderPaidAndDecrementInventory({
+      orderId: order.id,
+      paymentReference: "pay_retry_test_123",
+    });
+
+    const retryResponse = createMockResponse();
+    await adminOrdersHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "x-admin-token": ADMIN_TOKEN,
+        },
+        body: JSON.stringify({
+          action: "retry_label_purchase",
+          orderId: order.id,
+        }),
+      }),
+      retryResponse,
+    );
+
+    expect(retryResponse.statusCode).toBe(200);
+    expect(retryResponse.jsonBody).toMatchObject({
+      message: "Shipping label purchased successfully.",
+      order: {
+        id: order.id,
+        shipment: {
+          trackingCode: "CP123456789CA",
+          trackingUrl: "https://track.easypost.com/CP123456789CA",
+          labelPdfUrl: "https://example.com/label.pdf",
+        },
+      },
     });
   });
 });
