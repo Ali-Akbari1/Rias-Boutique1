@@ -619,6 +619,9 @@
       ],
       "name": "Hazaragi Dress Sage Green",
       "slug": "hazaragi-dress-sage-green",
+      "colors": [
+        "Sage Green"
+      ],
       "sizes": [
         "Small",
         "Large"
