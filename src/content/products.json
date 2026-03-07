@@ -638,7 +638,7 @@
       "fabric": "Georgette",
       "price": 225,
       "galleryImages": [
-        "/uploads/img_0881-2.jpg",
+        "/uploads/chatgpt-image-mar-6-2026-02_13_22-pm.png",
         "/uploads/img_0885.jpg"
       ],
       "name": "Green Hazaragi Dress ",
@@ -653,10 +653,11 @@
       ],
       "id": "green-hazaragi-dress",
       "createdAt": "2026-03-07",
-      "image": "/uploads/img_0881-2.jpg",
+      "image": "/uploads/chatgpt-image-mar-6-2026-02_13_22-pm.png",
       "inventory": "available",
       "description": "Mustard green long dress with white scarf. ",
-      "category": "Formal"
+      "category": "Formal",
+      "fitInfo": "Small (Bust: \nMedium (Bust: "
     }
   ]
 }
