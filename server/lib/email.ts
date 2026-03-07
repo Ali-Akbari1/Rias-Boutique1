@@ -109,11 +109,9 @@ const buildTrackingText = (order: StoredOrder) => {
 const buildTrackingHtml = ({
   order,
   includeLabelLink = false,
-  includeQr = false,
 }: {
   order: StoredOrder;
   includeLabelLink?: boolean;
-  includeQr?: boolean;
 }) => {
   if (!order.shipment || order.customer.deliveryMethod === "pickup") {
     return "";
@@ -142,24 +140,6 @@ const buildTrackingHtml = ({
           ? `<p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;">
                <a href="${escapeHtml(labelUrl)}" style="color:#111827;text-decoration:underline;">Download shipping label</a>
              </p>`
-          : ""
-      }
-      ${
-        includeQr && order.shipment.trackingQrCodeDataUrl
-          ? `<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:16px;">
-               <div style="text-align:center;">
-                 <img src="${escapeHtml(order.shipment.trackingQrCodeDataUrl)}" alt="Tracking QR code" style="width:140px;height:140px;border:1px solid #ececec;border-radius:8px;" />
-                 <p style="margin:8px 0 0 0;font-size:12px;color:#6b7280;">Track shipment</p>
-               </div>
-               ${
-                 includeLabelLink && order.shipment.labelQrCodeDataUrl
-                   ? `<div style="text-align:center;">
-                        <img src="${escapeHtml(order.shipment.labelQrCodeDataUrl)}" alt="Shipping label QR code" style="width:140px;height:140px;border:1px solid #ececec;border-radius:8px;" />
-                        <p style="margin:8px 0 0 0;font-size:12px;color:#6b7280;">Open label</p>
-                      </div>`
-                   : ""
-               }
-             </div>`
           : ""
       }
     </div>
@@ -631,7 +611,7 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
                   </td>
                 </tr>
                 <tr>
-                  <td>${buildTrackingHtml({ order, includeLabelLink: true, includeQr: true })}</td>
+                  <td>${buildTrackingHtml({ order, includeLabelLink: true })}</td>
                 </tr>
                 <tr>
                   <td style="padding:16px 24px;border-top:1px solid #ececec;background:#fafafa;">
@@ -703,7 +683,7 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
           : order.shipment
           ? "Your shipment details are ready below."
           : "We will email you with tracking details as soon as your shipment is ready.",
-        ...buildTrackingText(order).filter((line) => !line.startsWith("Label:")),
+        ...buildTrackingText(order),
         "",
         `Questions? Please ${supportLine}.`,
         `${brandName} | ${storeLocation}`,
@@ -826,7 +806,7 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
                     </td>
                   </tr>
                   <tr>
-                    <td>${buildTrackingHtml({ order, includeQr: true })}</td>
+                    <td>${buildTrackingHtml({ order, includeLabelLink: true })}</td>
                   </tr>
                   <tr>
                     <td style="padding:0 24px 20px 24px;">
