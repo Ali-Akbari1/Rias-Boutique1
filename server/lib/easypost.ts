@@ -131,6 +131,7 @@ interface EasyPostShipmentResponse {
   tracker?: EasyPostTracker | null;
   tracking_code?: string | null;
   status?: string | null;
+  refund_status?: string | null;
   selected_rate?: EasyPostRate | null;
   postage_label?: EasyPostPostageLabel | null;
 }
@@ -897,6 +898,18 @@ export const buyShippingLabel = async (quote: VerifiedShippingQuote): Promise<Pu
     labelQrCodeDataUrl: await buildQrCodeDataUrl(labelPdfUrl || labelUrl),
     status: normalizeString(shipment.status) || "unknown",
     purchasedAt,
+  };
+};
+
+export const refundShippingLabel = async (shipmentId: string) => {
+  const shipment = await easypostRequest<EasyPostShipmentResponse>({
+    endpoint: `/shipments/${encodeURIComponent(shipmentId)}/refund`,
+    body: {},
+  });
+
+  return {
+    refundStatus: normalizeString(shipment.refund_status) || "submitted",
+    shipmentStatus: normalizeString(shipment.status) || "",
   };
 };
 

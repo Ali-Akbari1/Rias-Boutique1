@@ -7,6 +7,7 @@ import {
   listOrders,
   markOrderPaidAndDecrementInventory,
   resetOrderStoreForTests,
+  saveOrderShipment,
 } from "../../server/lib/order-store.js";
 import { createDeterministicHash } from "../../server/lib/http.js";
 import { createMockRequest, createMockResponse } from "./test-utils/utils";
@@ -218,6 +219,89 @@ describe("admin orders endpoint", () => {
           trackingCode: "CP123456789CA",
           trackingUrl: "https://track.easypost.com/CP123456789CA",
           labelPdfUrl: "https://example.com/label.pdf",
+        },
+      },
+    });
+  });
+
+  it("requests a shipping label refund for purchased labels", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url.endsWith("/shipments/shp_refund_test_123/refund")) {
+        return new Response(
+          JSON.stringify({
+            id: "shp_refund_test_123",
+            status: "pre_transit",
+            refund_status: "submitted",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      throw new Error(`Unexpected fetch URL: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const createdOrder = await createPendingOrder({
+      ...buildPendingOrderInput(),
+      idempotencyKey: "admin-orders-refund-idempotency-key",
+    });
+
+    await markOrderPaidAndDecrementInventory({
+      orderId: createdOrder.id,
+      paymentReference: "pay_refund_test_123",
+    });
+
+    await saveOrderShipment({
+      orderId: createdOrder.id,
+      shipment: {
+        provider: "easypost",
+        shipmentId: "shp_refund_test_123",
+        rateId: "rate_refund_test_123",
+        carrier: "Canada Post",
+        service: "Expedited Parcel",
+        quotedRateMinor: 1_800,
+        customerRateMinor: 1_800,
+        currency: "CAD",
+        trackingCode: "CPREFUND123CA",
+        trackingUrl: "https://track.easypost.com/CPREFUND123CA",
+        labelUrl: "https://example.com/refund-label.png",
+        labelPdfUrl: "https://example.com/refund-label.pdf",
+        trackingQrCodeDataUrl: "data:image/png;base64,tracking",
+        labelQrCodeDataUrl: "data:image/png;base64,label",
+        status: "purchased",
+        purchasedAt: new Date().toISOString(),
+      },
+    });
+
+    const refundResponse = createMockResponse();
+    await adminOrdersHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "x-admin-token": ADMIN_TOKEN,
+        },
+        body: JSON.stringify({
+          action: "refund_label",
+          orderId: createdOrder.id,
+        }),
+      }),
+      refundResponse,
+    );
+
+    expect(refundResponse.statusCode).toBe(200);
+    expect(refundResponse.jsonBody).toMatchObject({
+      message: "Label refund requested successfully.",
+      order: {
+        id: createdOrder.id,
+        shipment: {
+          shipmentId: "shp_refund_test_123",
+          status: "refund_submitted",
         },
       },
     });

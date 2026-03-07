@@ -49,6 +49,7 @@ interface AdminOrder {
     expiresAt?: string;
   } | null;
   shipment?: {
+    shipmentId?: string;
     carrier?: string;
     service?: string;
     trackingCode?: string;
@@ -57,6 +58,7 @@ interface AdminOrder {
     labelPdfUrl?: string;
     trackingQrCodeDataUrl?: string;
     labelQrCodeDataUrl?: string;
+    status?: string;
     purchasedAt?: string;
   } | null;
   createdAt: string;
@@ -114,6 +116,7 @@ const AdminOrders = () => {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [retryingOrderId, setRetryingOrderId] = useState("");
+  const [refundingOrderId, setRefundingOrderId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
@@ -199,6 +202,46 @@ const AdminOrders = () => {
       setErrorMessage(error instanceof Error ? error.message : "Unable to purchase a shipping label.");
     } finally {
       setRetryingOrderId("");
+    }
+  };
+
+  const refundLabel = async (orderId: string) => {
+    const token = adminToken.trim();
+    if (!token) {
+      setErrorMessage("Enter your admin dashboard token.");
+      return;
+    }
+
+    setRefundingOrderId(orderId);
+    setErrorMessage("");
+    setStatusMessage("");
+
+    try {
+      const response = await fetch("/api/admin-orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token,
+        },
+        body: JSON.stringify({
+          action: "refund_label",
+          orderId,
+        }),
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as AdminOrdersResponse;
+      if (!response.ok) {
+        throw new Error(payload?.error?.message || "Unable to request a shipping label refund right now.");
+      }
+
+      if (payload.order) {
+        setOrders((currentOrders) => currentOrders.map((order) => (order.id === payload.order?.id ? payload.order : order)));
+      }
+      setStatusMessage(payload.message || "Label refund requested successfully.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to request a shipping label refund.");
+    } finally {
+      setRefundingOrderId("");
     }
   };
 
@@ -347,6 +390,12 @@ const AdminOrders = () => {
                        <span className="font-semibold text-foreground">Tracking:</span>{" "}
                        {order.shipment?.trackingCode || "Pending label purchase"}
                      </p>
+                     {order.shipment?.status ? (
+                       <p>
+                         <span className="font-semibold text-foreground">Shipment Status:</span>{" "}
+                         {order.shipment.status.replace(/_/g, " ")}
+                       </p>
+                     ) : null}
                      {!order.shipment && order.shippingQuote && order.paymentStatus === "paid" ? (
                        <div className="sm:col-span-2">
                          <Button
@@ -380,21 +429,41 @@ const AdminOrders = () => {
                         </a>
                       </p>
                     ) : null}
-                    {order.shipment?.labelPdfUrl || order.shipment?.labelUrl ? (
-                      <p className="sm:col-span-2">
-                        <span className="font-semibold text-foreground">Label:</span>{" "}
+                     {order.shipment?.labelPdfUrl || order.shipment?.labelUrl ? (
+                       <p className="sm:col-span-2">
+                         <span className="font-semibold text-foreground">Label:</span>{" "}
                         <a
                           href={order.shipment.labelPdfUrl || order.shipment.labelUrl || "#"}
                           target="_blank"
                           rel="noreferrer"
                           className="underline hover:text-foreground"
-                        >
-                          Download label
-                        </a>
-                      </p>
-                    ) : null}
-                    {order.shipment?.trackingQrCodeDataUrl || order.shipment?.labelQrCodeDataUrl ? (
-                      <div className="grid gap-3 pt-2 sm:col-span-2 sm:grid-cols-2">
+                         >
+                           Download label
+                         </a>
+                       </p>
+                     ) : null}
+                     {order.shipment && order.paymentStatus === "paid" && !order.shipment.status?.startsWith("refund_") ? (
+                       <div className="sm:col-span-2">
+                         <Button
+                           type="button"
+                           variant="outline"
+                           size="sm"
+                           onClick={() => void refundLabel(order.id)}
+                           disabled={refundingOrderId === order.id}
+                         >
+                           {refundingOrderId === order.id ? (
+                             <>
+                               <Loader2 className="h-4 w-4 animate-spin" />
+                               Requesting refund
+                             </>
+                           ) : (
+                             "Refund label"
+                           )}
+                         </Button>
+                       </div>
+                     ) : null}
+                     {order.shipment?.trackingQrCodeDataUrl || order.shipment?.labelQrCodeDataUrl ? (
+                       <div className="grid gap-3 pt-2 sm:col-span-2 sm:grid-cols-2">
                         {order.shipment?.trackingQrCodeDataUrl ? (
                           <div className="rounded-md border border-border bg-muted/20 p-3">
                             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Tracking QR</p>

@@ -10,7 +10,8 @@ import {
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
 import { buildAllowedOrigins, getClientIp, validateOrigin } from "../server/lib/security.js";
 import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
-import { findOrderById, isOrderStoreConfigured, listOrders } from "../server/lib/order-store.js";
+import { refundShippingLabel } from "../server/lib/easypost.js";
+import { findOrderById, isOrderStoreConfigured, listOrders, saveOrderShipment } from "../server/lib/order-store.js";
 import { z } from "zod";
 
 const DEFAULT_RATE_LIMIT = 60;
@@ -22,6 +23,15 @@ const retryLabelPurchaseSchema = z
     orderId: z.string().trim().min(1).max(128),
   })
   .strict();
+
+const refundLabelSchema = z
+  .object({
+    action: z.literal("refund_label"),
+    orderId: z.string().trim().min(1).max(128),
+  })
+  .strict();
+
+const adminShipmentActionSchema = z.discriminatedUnion("action", [retryLabelPurchaseSchema, refundLabelSchema]);
 
 const readAdminToken = (req: ApiRequest) => {
   const directHeader = (getHeader(req, "x-admin-token") || "").trim();
@@ -97,9 +107,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const validation = retryLabelPurchaseSchema.safeParse(parsedBody);
+  const validation = adminShipmentActionSchema.safeParse(parsedBody);
   if (!validation.success) {
-    sendError(res, 400, "VALIDATION_ERROR", "Retry request is invalid.", validation.error.flatten());
+    sendError(res, 400, "VALIDATION_ERROR", "Shipment action request is invalid.", validation.error.flatten());
     return;
   }
 
@@ -119,28 +129,68 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  if (order.shipment) {
+  if (validation.data.action === "retry_label_purchase") {
+    if (order.shipment) {
+      res.setHeader("Cache-Control", "no-store");
+      res.status(200).json({
+        order,
+        message: "Shipping label already purchased for this order.",
+      });
+      return;
+    }
+
+    try {
+      const updatedOrder = await ensureShipmentForOrder(order);
+      res.setHeader("Cache-Control", "no-store");
+      res.status(200).json({
+        order: updatedOrder,
+        message: "Shipping label purchased successfully.",
+      });
+    } catch (error) {
+      sendError(
+        res,
+        502,
+        "SHIPMENT_PURCHASE_FAILED",
+        error instanceof Error ? error.message : "Unable to purchase a shipping label right now.",
+      );
+    }
+    return;
+  }
+
+  if (!order.shipment) {
+    sendError(res, 409, "SHIPMENT_NOT_PURCHASED", "This order does not have a purchased shipping label yet.");
+    return;
+  }
+
+  if (order.shipment.status?.startsWith("refund_")) {
     res.setHeader("Cache-Control", "no-store");
     res.status(200).json({
       order,
-      message: "Shipping label already purchased for this order.",
+      message: "Label refund already requested for this order.",
     });
     return;
   }
 
   try {
-    const updatedOrder = await ensureShipmentForOrder(order);
+    const refund = await refundShippingLabel(order.shipment.shipmentId);
+    const updatedOrder = await saveOrderShipment({
+      orderId: order.id,
+      shipment: {
+        ...order.shipment,
+        status: `refund_${refund.refundStatus}`,
+      },
+    });
     res.setHeader("Cache-Control", "no-store");
     res.status(200).json({
       order: updatedOrder,
-      message: "Shipping label purchased successfully.",
+      message: "Label refund requested successfully.",
     });
   } catch (error) {
     sendError(
       res,
       502,
-      "SHIPMENT_PURCHASE_FAILED",
-      error instanceof Error ? error.message : "Unable to purchase a shipping label right now.",
+      "SHIPMENT_REFUND_FAILED",
+      error instanceof Error ? error.message : "Unable to request a shipping label refund right now.",
     );
   }
 }
