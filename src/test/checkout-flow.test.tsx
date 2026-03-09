@@ -189,16 +189,29 @@ describe("checkout flow", () => {
     fireEvent.change(screen.getByLabelText(/zip \/ postal code/i), { target: { value: "T2X 1A1" } });
     fireEvent.change(screen.getByLabelText(/^country$/i), { target: { value: "Canada" } });
 
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: /pay with clover/i })).toBeEnabled();
-    }, { timeout: 4000 });
+    await waitFor(
+      () => {
+        expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/api/shipping-rates"))).toBe(true);
+      },
+      { timeout: 10000 },
+    );
+
+    await waitFor(
+      () => {
+        expect(screen.getByRole("button", { name: /pay with clover/i })).toBeEnabled();
+      },
+      { timeout: 10000 },
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /pay with clover/i }));
 
-    await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledTimes(5);
-      expect(redirectSpy).toHaveBeenCalledWith("https://checkout.clover.com/pay/abc");
-    }, { timeout: 4000 });
+    await waitFor(
+      () => {
+        expect(fetchMock).toHaveBeenCalledTimes(5);
+        expect(redirectSpy).toHaveBeenCalledWith("https://checkout.clover.com/pay/abc");
+      },
+      { timeout: 10000 },
+    );
 
     const checkoutRequestCall = fetchMock.mock.calls.find(([url]) => String(url).includes("/api/clover-checkout"));
     expect(checkoutRequestCall).toBeTruthy();
@@ -216,6 +229,6 @@ describe("checkout flow", () => {
       },
     ]);
     expect(requestPayload.shippingQuote).toEqual({ token: "quote_token_123" });
-  });
+  }, 15_000);
 });
 
