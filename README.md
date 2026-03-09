@@ -76,9 +76,24 @@ The storefront runs at `http://localhost:8080`.
 | `npm run test` | Run the Vitest suite once |
 | `npm run test:watch` | Run Vitest in watch mode |
 | `npm run sitemap:generate` | Rebuild `public/sitemap.xml` from route and product data |
+| `npm run merchant-feed:generate` | Rebuild `public/google-merchant-feed.xml` for Google Merchant Center |
 | `npm run images:convert` | Generate `.webp` derivatives and normalize product image refs |
 | `npm run media:hygiene` | Dry-run orphan cleanup and oversized upload compression |
 | `npm run media:hygiene -- --apply` | Apply upload cleanup and compression changes |
+
+## Google Merchant feed
+
+- Feed file path: `public/google-merchant-feed.xml`
+- Live feed URL: `https://www.riasboutique.com/google-merchant-feed.xml`
+- Generation source: `src/content/products.json`
+- Build behavior: `npm run build` regenerates both sitemap and Merchant feed automatically.
+
+Merchant Center setup:
+
+1. Choose **Add products from a file**.
+2. Paste `https://www.riasboutique.com/google-merchant-feed.xml` as the file URL.
+3. Keep fetch schedule at daily (or more frequent if you change products often).
+4. Save and run **Fetch now** once to validate the feed.
 
 ## Environment variable matrix
 

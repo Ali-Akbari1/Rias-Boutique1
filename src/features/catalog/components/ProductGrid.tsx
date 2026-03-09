@@ -92,6 +92,34 @@ const normalizeCollectionPath = (pathname: string) =>
 const buildCollectionPath = (department: DepartmentOption) =>
   department === "all" ? "/collection" : `/collection/${department}`;
 
+const getCollectionHeading = (department: DepartmentOption) => {
+  if (department === "women") {
+    return {
+      title: "Women's Collection",
+      subtitle: "Handcrafted Afghan dresses and styles for women.",
+    };
+  }
+
+  if (department === "men") {
+    return {
+      title: "Men's Collection",
+      subtitle: "Traditional Afghan clothing and tailored looks for men.",
+    };
+  }
+
+  if (department === "jewelry") {
+    return {
+      title: "Jewelry Collection",
+      subtitle: "Afghan-inspired jewelry and statement accessories.",
+    };
+  }
+
+  return {
+    title: "Our Collection",
+    subtitle: "Handcrafted Afghan clothing and accessories.",
+  };
+};
+
 const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGridProps) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -459,6 +487,7 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
 
   const rangeStart = filteredProducts.length === 0 ? 0 : (safePage - 1) * PRODUCTS_PER_PAGE + 1;
   const rangeEnd = filteredProducts.length === 0 ? 0 : Math.min(safePage * PRODUCTS_PER_PAGE, filteredProducts.length);
+  const collectionHeading = getCollectionHeading(department);
 
   const resetFilters = () => {
     setQueryInput("");
@@ -479,7 +508,10 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
       <div className="container mx-auto px-4 sm:px-6">
         <div className="mb-10 text-center sm:mb-14">
           <p className="mb-3 text-sm font-body uppercase tracking-[0.3em] text-gold">Handcrafted with Love</p>
-          <h2 className="text-3xl font-display font-bold text-foreground sm:text-4xl md:text-5xl">Our Collection</h2>
+          <h1 className="text-3xl font-display font-bold text-foreground sm:text-4xl md:text-5xl">
+            {collectionHeading.title}
+          </h1>
+          <p className="mt-2 font-body text-sm text-muted-foreground sm:text-base">{collectionHeading.subtitle}</p>
         </div>
 
         <div className="mb-8 rounded-lg border border-border/80 bg-card/60 p-4 shadow-sm sm:p-5">
