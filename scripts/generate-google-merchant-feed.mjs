@@ -12,11 +12,19 @@ const outputPath = join(projectRoot, "public", "google-merchant-feed.xml");
 const DEFAULT_SITE_URL = "https://www.riasboutique.com";
 const DEFAULT_BRAND = "Ria's Boutique";
 const DEFAULT_CURRENCY = "CAD";
+const DEFAULT_SHIPPING_COUNTRY = "CA";
+const DEFAULT_SHIPPING_SERVICE = "Standard";
+const DEFAULT_SHIPPING_PRICE = 30;
 
 const routeManifest = JSON.parse(readFileSync(routeManifestPath, "utf8"));
 const siteUrl = (process.env.SITE_URL ?? routeManifest.siteUrl ?? DEFAULT_SITE_URL).replace(/\/+$/, "");
 const brand = (process.env.MERCHANT_FEED_BRAND || DEFAULT_BRAND).trim() || DEFAULT_BRAND;
 const currency = ((process.env.MERCHANT_FEED_CURRENCY || DEFAULT_CURRENCY).trim() || DEFAULT_CURRENCY).toUpperCase();
+const shippingCountry =
+  ((process.env.MERCHANT_FEED_SHIPPING_COUNTRY || DEFAULT_SHIPPING_COUNTRY).trim() || DEFAULT_SHIPPING_COUNTRY)
+    .toUpperCase();
+const shippingService =
+  (process.env.MERCHANT_FEED_SHIPPING_SERVICE || DEFAULT_SHIPPING_SERVICE).trim() || DEFAULT_SHIPPING_SERVICE;
 
 const rawProductContent = JSON.parse(readFileSync(productsPath, "utf8"));
 const productRows = Array.isArray(rawProductContent.products) ? rawProductContent.products : [];
@@ -46,6 +54,8 @@ const toNumber = (value, fallback = 0) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
 };
+
+const shippingPriceValue = Math.max(0, toNumber(process.env.MERCHANT_FEED_SHIPPING_PRICE, DEFAULT_SHIPPING_PRICE));
 
 const toStringArray = (value) => {
   if (!Array.isArray(value)) {
@@ -160,6 +170,9 @@ for (let index = 0; index < productRows.length; index += 1) {
         ageGroup: "adult",
         color,
         size,
+        shippingCountry,
+        shippingService,
+        shippingPrice: formatPrice(shippingPriceValue),
       });
     }
   }
@@ -179,6 +192,13 @@ const toItemXml = (variant) => {
     .map((imageUrl) => `    <g:additional_image_link>${escapeXml(imageUrl)}</g:additional_image_link>`)
     .join("\n");
   const additionalImageBlock = additionalImageNodes ? `${additionalImageNodes}\n` : "";
+  const shippingNode = [
+    "    <g:shipping>",
+    `      <g:country>${escapeXml(variant.shippingCountry)}</g:country>`,
+    `      <g:service>${escapeXml(variant.shippingService)}</g:service>`,
+    `      <g:price>${escapeXml(variant.shippingPrice)}</g:price>`,
+    "    </g:shipping>",
+  ].join("\n");
 
   return [
     "  <item>",
@@ -199,6 +219,7 @@ const toItemXml = (variant) => {
     "    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>",
     `    <g:gender>${escapeXml(variant.gender)}</g:gender>`,
     `    <g:age_group>${escapeXml(variant.ageGroup)}</g:age_group>`,
+    shippingNode,
     colorNode.trimEnd(),
     sizeNode.trimEnd(),
     "  </item>",

@@ -21,6 +21,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Red</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -41,6 +46,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Burgundy</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -63,6 +73,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:size>Large</g:size>
   </item>
   <item>
@@ -84,6 +99,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -105,6 +125,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:size>Small</g:size>
   </item>
   <item>
@@ -128,6 +153,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Teal</g:color>
     <g:size>Small</g:size>
   </item>
@@ -150,6 +180,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>White</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -171,6 +206,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Black with Gold</g:color>
     <g:size>Large</g:size>
   </item>
@@ -192,6 +232,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>White and Silver</g:color>
     <g:size>Large</g:size>
   </item>
@@ -212,6 +257,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>Small</g:size>
   </item>
@@ -232,6 +282,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>Small</g:size>
   </item>
@@ -252,6 +307,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>Small</g:size>
   </item>
@@ -272,6 +332,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>Small</g:size>
   </item>
@@ -292,6 +357,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -312,6 +382,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -332,6 +407,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -352,6 +432,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -372,6 +457,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>Large</g:size>
   </item>
@@ -392,6 +482,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>Large</g:size>
   </item>
@@ -412,6 +507,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>Large</g:size>
   </item>
@@ -432,6 +532,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>Large</g:size>
   </item>
@@ -452,6 +557,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -472,6 +582,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -492,6 +607,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -512,6 +632,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -533,6 +658,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>unisex</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Pink</g:color>
     <g:size>Small</g:size>
   </item>
@@ -553,6 +683,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Green</g:color>
     <g:size>Small</g:size>
   </item>
@@ -573,6 +708,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Green</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -593,6 +733,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Green</g:color>
     <g:size>Large</g:size>
   </item>
@@ -613,6 +758,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Green</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -635,6 +785,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple</g:color>
     <g:size>Small</g:size>
   </item>
@@ -657,6 +812,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Red</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -678,6 +838,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Burgundy</g:color>
     <g:size>Large</g:size>
   </item>
@@ -697,6 +862,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>unisex</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Dark Blue</g:color>
     <g:size>Small</g:size>
   </item>
@@ -716,6 +886,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Burgundy</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -737,6 +912,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Black</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -758,6 +938,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Black</g:color>
     <g:size>XX-Large</g:size>
   </item>
@@ -779,6 +964,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Black</g:color>
     <g:size>Small</g:size>
   </item>
@@ -801,6 +991,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Black</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -822,6 +1017,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Off-white</g:color>
     <g:size>Large</g:size>
   </item>
@@ -843,6 +1043,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Off-white</g:color>
     <g:size>XX-Large</g:size>
   </item>
@@ -864,6 +1069,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Off-white</g:color>
     <g:size>Small</g:size>
   </item>
@@ -885,6 +1095,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Grey</g:color>
     <g:size>Large</g:size>
   </item>
@@ -906,6 +1121,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>White</g:color>
     <g:size>Large</g:size>
   </item>
@@ -927,6 +1147,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>White</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -948,6 +1173,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>White</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -969,6 +1199,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Off-White</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -989,6 +1224,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Sage Green</g:color>
     <g:size>Small</g:size>
   </item>
@@ -1009,6 +1249,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Sage Green</g:color>
     <g:size>Large</g:size>
   </item>
@@ -1029,6 +1274,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Mustard Green</g:color>
     <g:size>Small</g:size>
   </item>
@@ -1049,6 +1299,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Baby Blue</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -1069,6 +1324,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Baby Blue</g:color>
     <g:size>Large</g:size>
   </item>
@@ -1090,6 +1350,11 @@
     <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
     <g:color>Emerald Green</g:color>
     <g:size>Medium</g:size>
   </item>
