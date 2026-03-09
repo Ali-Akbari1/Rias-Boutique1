@@ -1,12 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import Checkout from "@/pages/Checkout";
 import { CartProvider } from "@/features/cart/context/CartContext";
 import { products } from "@/features/catalog/data/products";
 import * as checkoutRequest from "@/lib/checkout-request";
 
 const CART_STORAGE_KEY = "rias_boutique_cart_v1";
+const renderCheckout = async () => {
+  const { default: Checkout } = await import("@/pages/Checkout");
+  return render(
+    <MemoryRouter>
+      <CartProvider>
+        <Checkout />
+      </CartProvider>
+    </MemoryRouter>,
+  );
+};
 
 describe("checkout flow", () => {
   beforeEach(() => {
@@ -15,7 +24,7 @@ describe("checkout flow", () => {
     window.localStorage.clear();
   });
 
-  it("starts with an empty country field", () => {
+  it("starts with an empty country field", async () => {
     const product = products[0];
     window.localStorage.setItem(
       CART_STORAGE_KEY,
@@ -29,13 +38,7 @@ describe("checkout flow", () => {
       ]),
     );
 
-    render(
-      <MemoryRouter>
-        <CartProvider>
-          <Checkout />
-        </CartProvider>
-      </MemoryRouter>,
-    );
+    await renderCheckout();
 
     expect(screen.getByLabelText(/^country$/i)).toHaveValue("");
   });
@@ -172,13 +175,7 @@ describe("checkout flow", () => {
 
     const redirectSpy = vi.spyOn(checkoutRequest, "redirectToCheckout").mockImplementation(() => {});
 
-    render(
-      <MemoryRouter>
-        <CartProvider>
-          <Checkout />
-        </CartProvider>
-      </MemoryRouter>,
-    );
+    await renderCheckout();
 
     fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: "Test Buyer" } });
     fireEvent.change(screen.getByLabelText(/^email$/i), { target: { value: "buyer@example.com" } });
