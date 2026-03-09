@@ -2,7 +2,7 @@
   "products": [
     {
       "fabric": "Velvet",
-      "price": 450,
+      "price": 1,
       "galleryImages": [
         "/uploads/full-photo.webp",
         "/uploads/img.webp"
@@ -696,9 +696,9 @@
       "fabric": "Velvet",
       "price": 380,
       "galleryImages": [
-        "/uploads/img_3462.webp",
-        "/uploads/img_0935.webp",
-        "/uploads/img_0940.webp"
+        "/uploads/img_3462.jpg",
+        "/uploads/img_0935.jpg",
+        "/uploads/img_0940.jpg"
       ],
       "name": "Green Gulabatoon Dress",
       "slug": "green-gulabatoon-dress",
@@ -714,7 +714,7 @@
       ],
       "id": "green-gulabatoon-dress",
       "createdAt": "2026-03-08",
-      "image": "/uploads/img_3462.webp",
+      "image": "/uploads/img_3462.jpg",
       "inventory": "sold_out",
       "description": "Emerald green dress with gulabatoon detailing. ",
       "category": "Party Wear",
