@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import handler from "../../api/clover-checkout";
 import { createMockRequest, createMockResponse, createSignedShippingQuoteToken } from "./test-utils/utils";
 import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
+import * as productCatalog from "../../server/lib/product-catalog";
 
 const makeCheckoutBody = () => {
   const customer = {
@@ -106,6 +107,19 @@ describe("clover checkout endpoint", () => {
   it("rejects sold out products", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
+    vi.spyOn(productCatalog, "getCatalogMap").mockResolvedValue(
+      new Map([
+        [
+          "Burgundy-Bridal-Dress",
+          {
+            id: "Burgundy-Bridal-Dress",
+            name: "Burgundy Bridal Dress",
+            priceMinor: 100,
+            availability: "sold_out",
+          },
+        ],
+      ]),
+    );
 
     const request = createMockRequest({
       method: "POST",
