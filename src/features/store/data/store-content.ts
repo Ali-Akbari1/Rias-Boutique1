@@ -97,6 +97,18 @@ export const faqItems: FaqItem[] = [
     answer:
       "All sales are final. We do not accept returns or offer refunds. Please ensure you review product details and sizing before completing your purchase.",
   },
+  {
+    id: "faq-7",
+    question: "How long does it take to process my order?",
+    answer:
+      "Orders are typically processed within 1–3 business days before being shipped. You will receive a confirmation email with tracking information once your order has been dispatched."
+  },
+  {
+    id: "faq-8",
+    question: "Do you offer pre-orders or customizable items?",
+    answer:
+      "Yes, we offer select items for pre-order or customization. Pre-order and custom items require a minimum production time of 4 weeks. Once your item is ready, shipping typically takes an additional 2 weeks depending on the destination. Please note that timelines may vary slightly depending on order volume.",
+  },
 ];
 
 export const trustBadges: TrustBadgeItem[] = [
