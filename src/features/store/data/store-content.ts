@@ -77,7 +77,25 @@ export const faqItems: FaqItem[] = [
     id: "faq-3",
     question: "Can I exchange for another size?",
     answer:
-      "If you need a different size, contact us and we will review exchange options based on available stock and the item's condition.",
+      "At this time, we do not offer exchanges. Please review our sizing information carefully before placing your order. If you have questions about sizing, feel free to contact us before purchasing and we will be happy to help.",
+  },
+  {
+    id: "faq-4",
+    question: "What are your shipping rates and delivery times?",
+    answer:
+      "We offer standard shipping within Canada for a CA$30.00 flat rate at checkout, with delivery typically taking 5–10 business days. Orders over CA$400.00 qualify for free standard shipping. Shipping costs are calculated at checkout unless your order qualifies for free shipping.",
+  },
+  {
+    id: "faq-5",
+    question: "How is shipping calculated?",
+    answer:
+      "Shipping is charged at a flat rate during checkout unless your order qualifies for free shipping. Orders over CA$400.00 automatically receive free standard shipping within Canada.",
+  },
+  {
+    id: "faq-6",
+    question: "Do you accept returns?",
+    answer:
+      "All sales are final. We do not accept returns or offer refunds. Please ensure you review product details and sizing before completing your purchase.",
   },
 ];
 
