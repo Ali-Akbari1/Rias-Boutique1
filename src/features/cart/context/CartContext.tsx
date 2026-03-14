@@ -25,6 +25,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 const CART_STORAGE_KEY = "rias_boutique_cart_v1";
+const MAX_ITEM_QUANTITY = 1;
 
 const buildCartItemId = (productId: string, selection: ProductSelection) =>
   `${productId}-${selection.size}-${selection.color}`;
@@ -75,13 +76,14 @@ const restoreCartFromStorage = (): CartItem[] => {
         continue;
       }
 
+      const normalizedQuantity = Math.min(MAX_ITEM_QUANTITY, candidate.quantity);
       const existing = merged.get(candidate.id);
       if (existing) {
-        existing.quantity += candidate.quantity;
+        existing.quantity = Math.min(MAX_ITEM_QUANTITY, existing.quantity + normalizedQuantity);
       } else {
         merged.set(candidate.id, {
           ...candidate,
-          quantity: candidate.quantity,
+          quantity: normalizedQuantity,
         });
       }
     }
@@ -108,7 +110,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       const existing = prev.find((item) => item.id === itemId);
 
       if (existing) {
-        return prev.map((item) => (item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item));
+        return prev;
       }
 
       return [...prev, { id: itemId, product, selection, quantity: 1 }];
@@ -125,7 +127,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    setItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, quantity } : item)));
+    const nextQuantity = Math.min(quantity, MAX_ITEM_QUANTITY);
+    setItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, quantity: nextQuantity } : item)));
   };
 
   const clearCart = () => setItems([]);

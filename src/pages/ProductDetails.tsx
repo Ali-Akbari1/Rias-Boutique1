@@ -5,6 +5,7 @@ import { getProductById } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
 import CartDrawer from "@/features/cart/components/CartDrawer";
 import Navbar from "@/features/navigation/components/Navbar";
+import { trustBadges } from "@/features/store/data/store-content";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/money";
@@ -81,6 +82,10 @@ const ProductDetails = () => {
         : [product?.image || ""].filter(Boolean),
     [product?.galleryImages, product?.image],
   );
+  const selectedImageIndex = useMemo(() => {
+    const index = galleryImages.findIndex((image) => image === selectedImage);
+    return index >= 0 ? index : 0;
+  }, [galleryImages, selectedImage]);
 
   const availableSizeKeys = useMemo<StandardSizeKey[]>(() => {
     const keys = new Set<StandardSizeKey>();
@@ -158,7 +163,13 @@ const ProductDetails = () => {
         <section className="grid gap-8 lg:grid-cols-[1fr_1fr]">
           <div className="space-y-4">
             <div className="overflow-hidden rounded-md border border-border bg-card">
-              <ZoomableImageDialog src={primaryImage} alt={product.name} title={`${product.name} image`}>
+              <ZoomableImageDialog
+                src={primaryImage}
+                images={galleryImages}
+                initialIndex={selectedImageIndex}
+                alt={product.name}
+                title={`${product.name} image`}
+              >
                 <button type="button" className="relative block h-full w-full cursor-zoom-in">
                   <img
                     src={primaryImage}
@@ -223,35 +234,35 @@ const ProductDetails = () => {
               </span>
             </div>
 
-            <div className="space-y-4 rounded-md border border-border bg-card p-4 sm:p-5">
+            <div className="space-y-4 rounded-md border border-border bg-card p-4 text-center sm:p-5">
               <div>
                 <p className="mb-2 text-sm font-semibold text-foreground">Choose size</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-center gap-2">
                   {STANDARD_SIZE_KEYS.map((sizeKey) => {
                     const label = standardSizeLabel(sizeKey);
                     const isAvailable = availableSizeKeys.includes(sizeKey);
                     const isSelected = isAvailable && selectedSize === label;
 
                     return (
-                    <button
-                      key={sizeKey}
-                      type="button"
-                      onClick={() => {
-                        if (isAvailable) {
-                          setSelectedSize(label);
-                        }
-                      }}
-                      disabled={!isAvailable}
-                      className={`relative min-w-12 rounded-sm border px-3 py-2 text-sm font-medium transition ${
-                        isSelected
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : isAvailable
-                            ? "border-border bg-background text-foreground hover:bg-secondary"
-                            : "cursor-not-allowed border-border/60 bg-muted/30 text-muted-foreground/80 line-through decoration-muted-foreground/80"
-                      }`}
-                    >
-                      {label}
-                    </button>
+                      <button
+                        key={sizeKey}
+                        type="button"
+                        onClick={() => {
+                          if (isAvailable) {
+                            setSelectedSize(label);
+                          }
+                        }}
+                        disabled={!isAvailable}
+                        className={`relative min-w-12 rounded-sm border px-3 py-2 text-sm font-medium transition ${
+                          isSelected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : isAvailable
+                              ? "border-border bg-background text-foreground hover:bg-secondary"
+                              : "cursor-not-allowed border-border/60 bg-muted/30 text-muted-foreground/80 line-through decoration-muted-foreground/80"
+                        }`}
+                      >
+                        {label}
+                      </button>
                     );
                   })}
                 </div>
@@ -259,7 +270,7 @@ const ProductDetails = () => {
 
               <div>
                 <p className="mb-2 text-sm font-semibold text-foreground">Choose color</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-center gap-2">
                   {colorOptions.map((color) => (
                     <button
                       key={color}
@@ -327,19 +338,17 @@ const ProductDetails = () => {
           </div>
         </section>
 
-        <section className="grid gap-4 rounded-md border border-border bg-card/40 p-4 sm:grid-cols-3 sm:p-5">
-          <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <BadgeCheck className="h-4 w-4 text-primary" />
-            Authentic craftsmanship
-          </div>
-          <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <Truck className="h-4 w-4 text-primary" />
-            Tracked shipping with updates
-          </div>
-          <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <CheckCircle2 className="h-4 w-4 text-primary" />
-            Custom orders available on request
-          </div>
+        <section className="grid gap-4 rounded-md border border-border bg-card/40 p-4 text-center sm:grid-cols-3 sm:p-5">
+          {trustBadges.map((badge) => {
+            const Icon =
+              badge.id === "custom-orders" ? BadgeCheck : badge.id === "authentic-craft" ? ShieldCheck : Truck;
+            return (
+              <div key={badge.id} className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Icon className="h-4 w-4 text-primary" />
+                {badge.label}
+              </div>
+            );
+          })}
         </section>
       </main>
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />

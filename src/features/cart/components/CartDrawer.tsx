@@ -44,48 +44,56 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
         ) : (
           <>
             <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:space-y-6 sm:p-6">
-              {items.map(({ id, product, selection, quantity }) => (
-                <div key={id} className="flex gap-3 sm:gap-4">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-20 w-16 rounded-sm object-cover sm:h-24 sm:w-20"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-display truncate font-semibold text-foreground">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground font-body">{formatCad(product.price)}</p>
-                    <p className="text-xs text-muted-foreground font-body mt-1">
-                      Size: {selection.size} | Color: {selection.color}
-                    </p>
-                    <div className="flex items-center gap-3 mt-2">
+              {items.map(({ id, product, selection, quantity }) => {
+                const isMaxQuantity = quantity >= 1;
+
+                return (
+                  <div key={id} className="flex gap-3 sm:gap-4">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-20 w-16 rounded-sm object-cover sm:h-24 sm:w-20"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-display truncate font-semibold text-foreground">{product.name}</h3>
+                      <p className="text-sm text-muted-foreground font-body">{formatCad(product.price)}</p>
+                      <p className="text-xs text-muted-foreground font-body mt-1">
+                        Size: {selection.size} | Color: {selection.color}
+                      </p>
+                      <div className="flex items-center gap-3 mt-2">
+                        <button
+                          onClick={() => updateQuantity(id, quantity - 1)}
+                          className="h-8 w-8 rounded-sm border border-border flex items-center justify-center text-foreground hover:bg-secondary transition-colors"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="font-body text-sm text-foreground">{quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(id, quantity + 1)}
+                          disabled={isMaxQuantity}
+                          title={isMaxQuantity ? "Limit 1 per item" : "Increase quantity"}
+                          className={`h-8 w-8 rounded-sm border border-border flex items-center justify-center text-foreground transition-colors ${
+                            isMaxQuantity ? "cursor-not-allowed opacity-40" : "hover:bg-secondary"
+                          }`}
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end justify-between">
+                      <span className="font-display text-sm font-bold text-foreground sm:text-base">
+                        {formatCad(product.price * quantity)}
+                      </span>
                       <button
-                        onClick={() => updateQuantity(id, quantity - 1)}
-                        className="h-8 w-8 rounded-sm border border-border flex items-center justify-center text-foreground hover:bg-secondary transition-colors"
+                        onClick={() => removeFromCart(id)}
+                        className="text-xs text-muted-foreground hover:text-destructive font-body transition-colors"
                       >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="font-body text-sm text-foreground">{quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(id, quantity + 1)}
-                        className="h-8 w-8 rounded-sm border border-border flex items-center justify-center text-foreground hover:bg-secondary transition-colors"
-                      >
-                        <Plus className="w-3 h-3" />
+                        Remove
                       </button>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end justify-between">
-                    <span className="font-display text-sm font-bold text-foreground sm:text-base">
-                      {formatCad(product.price * quantity)}
-                    </span>
-                    <button
-                      onClick={() => removeFromCart(id)}
-                      className="text-xs text-muted-foreground hover:text-destructive font-body transition-colors"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="space-y-4 border-t border-border p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6">

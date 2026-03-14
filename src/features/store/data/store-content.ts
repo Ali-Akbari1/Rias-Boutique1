@@ -113,19 +113,19 @@ export const faqItems: FaqItem[] = [
 
 export const trustBadges: TrustBadgeItem[] = [
   {
-    id: "custom-orders",
-    label: "Custom Orders",
-    description: "Need a unique design or special sizing? Place a custom order directly with our team.",
-  },
-  {
     id: "authentic-craft",
     label: "Authentic Craftsmanship",
     description: "Hand-finished embroidery by Afghan artisans.",
   },
   {
     id: "tracked-shipping",
-    label: "Tracked Shipping",
+    label: "Tracked Shipping With Updates",
     description: "Reliable tracked delivery across the world.",
+  },
+  {
+    id: "custom-orders",
+    label: "Custom Orders Available on Request",
+    description: "Need a unique design or special sizing? Place a custom order directly with our team.",
   },
 ];
 

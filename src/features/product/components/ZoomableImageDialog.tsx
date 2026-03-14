@@ -1,18 +1,22 @@
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent,
   type ReactNode,
   type SyntheticEvent,
   type WheelEvent,
 } from "react";
-import { RotateCcw, X, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, X, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/shared/ui/dialog";
 
 interface ZoomableImageDialogProps {
   src: string;
+  images?: string[];
+  initialIndex?: number;
   alt: string;
   title: string;
   children: ReactNode;
@@ -25,6 +29,12 @@ const WHEEL_ZOOM_SENSITIVITY = 0.0018;
 
 const clampZoom = (value: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
 const clampValue = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const clampIndex = (value: number, length: number) => {
+  if (length <= 0) {
+    return 0;
+  }
+  return Math.min(length - 1, Math.max(0, value));
+};
 
 interface TransformState {
   zoom: number;
@@ -57,7 +67,21 @@ const getMidpoint = (first: PointerPosition, second: PointerPosition): PointerPo
   y: (first.y + second.y) / 2,
 });
 
-const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogProps) => {
+const ZoomableImageDialog = ({ src, images, initialIndex, alt, title, children }: ZoomableImageDialogProps) => {
+  const resolvedImages = useMemo(() => {
+    const base = Array.isArray(images) && images.length > 0 ? images : [src];
+    return base.filter(Boolean);
+  }, [images, src]);
+  const resolvedCount = resolvedImages.length;
+  const fallbackIndex = resolvedImages.indexOf(src);
+  const baseInitialIndex =
+    typeof initialIndex === "number" && Number.isFinite(initialIndex)
+      ? initialIndex
+      : fallbackIndex >= 0
+        ? fallbackIndex
+        : 0;
+  const safeInitialIndex = clampIndex(baseInitialIndex, resolvedCount);
+
   const [open, setOpen] = useState(false);
   const [imageAspectRatio, setImageAspectRatio] = useState(1);
   const [transform, setTransform] = useState<TransformState>({
@@ -65,12 +89,15 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
     x: 0,
     y: 0,
   });
+  const [activeIndex, setActiveIndex] = useState(safeInitialIndex);
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const pointersRef = useRef<Map<number, PointerPosition>>(new Map());
   const dragRef = useRef<DragState | null>(null);
   const pinchRef = useRef<PinchState | null>(null);
+  const clickIntentRef = useRef<{ pointerId: number; start: PointerPosition } | null>(null);
+  const didPointerMoveRef = useRef(false);
   const transformRef = useRef<TransformState>({
     zoom: MIN_ZOOM,
     x: 0,
@@ -82,13 +109,36 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
   }, [transform]);
 
   useEffect(() => {
+    setActiveIndex(safeInitialIndex);
+  }, [open, safeInitialIndex]);
+
+  useEffect(() => {
+    setActiveIndex((current) => clampIndex(current, resolvedCount));
+  }, [resolvedCount]);
+
+  const activeSrc = resolvedImages[activeIndex] ?? src;
+  const hasMultipleImages = resolvedCount > 1;
+  const canGoPrevious = hasMultipleImages;
+  const canGoNext = hasMultipleImages;
+
+  useEffect(() => {
     if (!open) {
       setTransform({ zoom: MIN_ZOOM, x: 0, y: 0 });
       pointersRef.current.clear();
       dragRef.current = null;
       pinchRef.current = null;
+      clickIntentRef.current = null;
+      didPointerMoveRef.current = false;
+      return;
     }
-  }, [open]);
+
+    setTransform({ zoom: MIN_ZOOM, x: 0, y: 0 });
+    pointersRef.current.clear();
+    dragRef.current = null;
+    pinchRef.current = null;
+    clickIntentRef.current = null;
+    didPointerMoveRef.current = false;
+  }, [open, activeSrc]);
 
   const toLocalPoint = (clientX: number, clientY: number): PointerPosition => {
     const viewport = viewportRef.current;
@@ -187,6 +237,35 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
     updateTransform({ zoom: MIN_ZOOM, x: 0, y: 0 });
   };
 
+  const handlePreviousImage = () => {
+    if (!hasMultipleImages) {
+      return;
+    }
+    setActiveIndex((current) => (current - 1 + resolvedCount) % resolvedCount);
+  };
+
+  const handleNextImage = () => {
+    if (!hasMultipleImages) {
+      return;
+    }
+    setActiveIndex((current) => (current + 1) % resolvedCount);
+  };
+
+  const handleViewportClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (!open) {
+      return;
+    }
+
+    if (didPointerMoveRef.current) {
+      didPointerMoveRef.current = false;
+      return;
+    }
+
+    const nextZoom =
+      transformRef.current.zoom >= MAX_ZOOM ? MIN_ZOOM : transformRef.current.zoom + ZOOM_STEP;
+    zoomAtPoint(nextZoom, toLocalPoint(event.clientX, event.clientY));
+  };
+
   const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
 
@@ -204,6 +283,10 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
     event.currentTarget.setPointerCapture(event.pointerId);
     const pointer = toLocalPoint(event.clientX, event.clientY);
     pointersRef.current.set(event.pointerId, pointer);
+    if (pointersRef.current.size === 1) {
+      clickIntentRef.current = { pointerId: event.pointerId, start: pointer };
+      didPointerMoveRef.current = false;
+    }
 
     const pointerValues = Array.from(pointersRef.current.values());
     if (pointerValues.length === 1 && transformRef.current.zoom > MIN_ZOOM) {
@@ -239,6 +322,14 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
     const pointer = toLocalPoint(event.clientX, event.clientY);
     pointersRef.current.set(event.pointerId, pointer);
     const pointerValues = Array.from(pointersRef.current.values());
+    const clickIntent = clickIntentRef.current;
+    if (clickIntent && clickIntent.pointerId === event.pointerId) {
+      const deltaX = pointer.x - clickIntent.start.x;
+      const deltaY = pointer.y - clickIntent.start.y;
+      if (Math.hypot(deltaX, deltaY) > 3) {
+        didPointerMoveRef.current = true;
+      }
+    }
 
     if (pointerValues.length >= 2 && pinchRef.current) {
       const [firstPointer, secondPointer] = pointerValues;
@@ -277,6 +368,9 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
     }
 
     pointersRef.current.delete(event.pointerId);
+    if (clickIntentRef.current?.pointerId === event.pointerId) {
+      clickIntentRef.current = null;
+    }
 
     if (dragRef.current?.pointerId === event.pointerId) {
       dragRef.current = null;
@@ -324,7 +418,13 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
 
   const isPortrait = imageAspectRatio > 0 && imageAspectRatio < 0.95;
   const dialogMaxWidthClass = isPortrait ? "max-w-[44rem]" : "max-w-6xl";
-  const interactionHint = transform.zoom > MIN_ZOOM ? "Drag to pan." : "Pinch, scroll, or use controls to zoom.";
+  const interactionHint =
+    transform.zoom > MIN_ZOOM
+      ? "Drag to pan."
+      : hasMultipleImages
+        ? "Use arrows to browse. Pinch, scroll, or use controls to zoom."
+        : "Pinch, scroll, or use controls to zoom.";
+  const imagePositionLabel = hasMultipleImages ? `Image ${activeIndex + 1} of ${resolvedCount}` : "";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -354,7 +454,9 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
         <div className="flex items-start justify-between gap-3 pr-11">
           <div className="min-w-0">
             <DialogTitle className="line-clamp-1 text-sm sm:text-base">{title}</DialogTitle>
-            <p className="mt-1 text-xs text-muted-foreground">{interactionHint}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {imagePositionLabel ? `${imagePositionLabel} - ${interactionHint}` : interactionHint}
+            </p>
           </div>
           <div className="flex items-center gap-1.5">
             <Button type="button" variant="outline" size="icon" onClick={handleZoomOut} disabled={transform.zoom <= MIN_ZOOM}>
@@ -380,12 +482,13 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerEnd}
           onPointerCancel={handlePointerEnd}
+          onClick={handleViewportClick}
         >
-          <div className="flex h-full w-full items-center justify-center">
+          <div className="relative flex h-full w-full items-center justify-center">
             <img
               ref={imageRef}
-              src={src}
-              alt={alt}
+              src={activeSrc}
+              alt={imagePositionLabel ? `${alt} (${imagePositionLabel})` : alt}
               className="max-h-full max-w-full w-auto origin-center select-none will-change-transform"
               style={{
                 transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.zoom})`,
@@ -393,6 +496,44 @@ const ZoomableImageDialog = ({ src, alt, title, children }: ZoomableImageDialogP
               onLoad={handleImageLoad}
               draggable={false}
             />
+            {hasMultipleImages ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handlePreviousImage();
+                  }}
+                  onPointerDown={(event) => event.stopPropagation()}
+                  disabled={!canGoPrevious}
+                  className={`absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-sm bg-background/90 hover:bg-secondary sm:left-3 ${
+                    canGoPrevious ? "" : "opacity-50"
+                  }`}
+                  aria-label="View previous image"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleNextImage();
+                  }}
+                  onPointerDown={(event) => event.stopPropagation()}
+                  disabled={!canGoNext}
+                  className={`absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-sm bg-background/90 hover:bg-secondary sm:right-3 ${
+                    canGoNext ? "" : "opacity-50"
+                  }`}
+                  aria-label="View next image"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </>
+            ) : null}
           </div>
         </div>
       </DialogContent>
