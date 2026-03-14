@@ -445,15 +445,14 @@
         "/uploads/img_0787.webp",
         "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
       ],
-      "name": "Black and Gold Men's Parantoban",
+      "name": "Men's Black and Parantoban",
       "slug": "men-black-gold",
       "colors": [
         "Black"
       ],
       "sizes": [
-        "X-Large ",
-        "XX-Large ",
-        "Small "
+        "Small",
+        "XX-Large"
       ],
       "department": "men",
       "popularity": 100,
