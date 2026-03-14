@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { resolveCanonicalPath, toCanonicalUrl } from "@/features/navigation/route-manifest";
+import { getProductById, getProductBySlug } from "@/features/catalog/data/products";
 
 const updateLink = (id: string, rel: string, href: string, hreflang?: string) => {
   let link = document.getElementById(id) as HTMLLinkElement | null;
@@ -44,6 +45,17 @@ const updateMetaName = (id: string, name: string, content: string) => {
 const DEFAULT_TITLE = "Ria's Boutique | Afghan Clothing, Afghan Dresses, Afghan Boutique in Canada";
 const DEFAULT_DESCRIPTION =
   "Shop handcrafted Afghan dresses, bridal wear, and traditional outfits in Canada from Ria's Boutique.";
+const normalizeDescription = (value: string) => value.replace(/\s+/g, " ").trim();
+const toMetaDescription = (value: string) => {
+  const normalized = normalizeDescription(value);
+  if (!normalized) {
+    return "";
+  }
+  if (normalized.length <= 160) {
+    return normalized;
+  }
+  return `${normalized.slice(0, 157).trimEnd()}...`;
+};
 
 const getMetadataForCanonicalPath = (canonicalPath: string) => {
   if (canonicalPath === "/collection/women") {
@@ -95,6 +107,18 @@ const getMetadataForCanonicalPath = (canonicalPath: string) => {
   }
 
   if (canonicalPath.startsWith("/products/")) {
+    const productId = canonicalPath.split("/")[2] || "";
+    const product = getProductById(productId) || getProductBySlug(productId);
+    if (product) {
+      const description =
+        toMetaDescription(product.description) ||
+        `Shop ${normalizeDescription(product.name)} at Ria's Boutique.`;
+      return {
+        title: `${normalizeDescription(product.name)} | Ria's Boutique`,
+        description,
+      };
+    }
+
     return {
       title: "Product Details | Ria's Boutique",
       description:

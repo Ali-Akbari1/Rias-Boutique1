@@ -403,6 +403,146 @@ export const sendLaunchDiscountEmail = async ({
   }
 };
 
+export const sendTrackingEmail = async (order: StoredOrder) => {
+  if (order.customer.deliveryMethod === "pickup") {
+    throw new Error("Pickup orders do not require tracking emails.");
+  }
+
+  if (!order.shipment || (!order.shipment.trackingCode && !order.shipment.trackingUrl)) {
+    throw new Error("Tracking information is not available yet.");
+  }
+
+  const recipient = order.customer.email.trim();
+  if (!isLikelyEmail(recipient)) {
+    throw new Error("A valid recipient email is required.");
+  }
+
+  const merchantRecipient =
+    process.env.MERCHANT_ORDER_EMAIL?.trim() || process.env.ORDER_ALERT_EMAIL?.trim() || "";
+  const explicitReplyTo = process.env.RESEND_REPLY_TO_EMAIL?.trim() || "";
+  const replyToRecipient = isLikelyEmail(explicitReplyTo)
+    ? explicitReplyTo
+    : isLikelyEmail(merchantRecipient)
+      ? merchantRecipient
+      : "";
+  const brandName = process.env.STORE_BRAND_NAME?.trim() || "Ria's Boutique";
+  const supportEmail = isLikelyEmail((process.env.SUPPORT_EMAIL || "").trim())
+    ? (process.env.SUPPORT_EMAIL || "").trim()
+    : replyToRecipient;
+  const websiteUrl = cleanUrl(process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "", "https://www.riasboutique.com");
+  const logoUrl = cleanUrl(process.env.EMAIL_LOGO_URL?.trim() || "", "");
+  const orderNumber = toOrderNumber(order.id);
+  const greetingName = order.customer.fullName?.trim() || "there";
+  const trackingLines = buildTrackingText(order);
+
+  const subject = `${brandName} - Your order is on the way (Order #${orderNumber})`;
+  const text = [
+    `Hi ${greetingName},`,
+    "",
+    `Your order #${orderNumber} is on the way.`,
+    ...trackingLines,
+    "",
+    `Need help? Reply to this email${supportEmail ? ` or contact ${supportEmail}` : ""}.`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const html = `
+    <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;color:#111827;">
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f5f5;padding:24px 12px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:620px;background:#ffffff;border:1px solid #ececec;border-radius:10px;overflow:hidden;">
+              <tr>
+                <td style="padding:24px 24px 16px 24px;border-bottom:1px solid #ececec;background:#ffffff;">
+                  ${logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(brandName)}" style="height:34px;display:block;margin-bottom:12px;" />` : ""}
+                  <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">${escapeHtml(
+                    brandName,
+                  )}</p>
+                  <h1 style="margin:8px 0 6px 0;font-size:24px;line-height:1.25;color:#111827;">Your order is on the way</h1>
+                  <p style="margin:0;font-size:15px;color:#4b5563;">Order #${escapeHtml(orderNumber)}</p>
+                </td>
+              </tr>
+              <tr>
+                <td>${buildTrackingHtml({ order })}</td>
+              </tr>
+              <tr>
+                <td style="padding:0 24px 20px 24px;">
+                  <p style="margin:0;font-size:14px;color:#4b5563;">
+                    Need help?
+                    ${
+                      supportEmail
+                        ? ` Reply to this email or contact us at <a href="mailto:${escapeHtml(
+                            supportEmail,
+                          )}" style="color:#111827;text-decoration:underline;">${escapeHtml(supportEmail)}</a>.`
+                        : " Reply to this email and our team will help you."
+                    }
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:16px 24px;border-top:1px solid #ececec;background:#fafafa;">
+                  <p style="margin:0;font-size:13px;color:#6b7280;">
+                    <a href="${escapeHtml(websiteUrl)}" style="color:#111827;text-decoration:underline;">Visit ${escapeHtml(
+                      brandName,
+                    )}</a>
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+
+  const timestamp = new Date().toISOString();
+
+  try {
+    const dispatch = (await sendWithResend({
+      to: recipient,
+      subject,
+      text,
+      html,
+      replyTo: replyToRecipient,
+    })) || {
+      provider: "mock" as const,
+      status: "queued" as const,
+      externalId: "",
+    };
+
+    await persistEmailLog({
+      orderId: order.id,
+      attempt: {
+        recipientType: "customer",
+        to: recipient,
+        subject,
+        provider: dispatch.provider,
+        status: dispatch.status,
+        externalId: dispatch.externalId,
+        timestamp,
+      },
+    });
+
+    return dispatch;
+  } catch (error) {
+    await persistEmailLog({
+      orderId: order.id,
+      attempt: {
+        recipientType: "customer",
+        to: recipient,
+        subject,
+        provider: "resend",
+        status: "failed",
+        externalId: "",
+        error: safeErrorMessage(error),
+        timestamp,
+      },
+    });
+    throw error;
+  }
+};
+
 export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
   const merchantRecipient =
     process.env.MERCHANT_ORDER_EMAIL?.trim() || process.env.ORDER_ALERT_EMAIL?.trim() || order.customer.email;

@@ -104,3 +104,15 @@ export const requestRefundShipmentLabel = (adminToken: string, orderId: string) 
     },
     fallbackErrorMessage: "Unable to request a shipping label refund right now.",
   });
+
+export const requestSendTrackingEmail = (adminToken: string, orderId: string) =>
+  requestJson<AdminOrdersResponse>({
+    path: "/api/admin-orders",
+    method: "POST",
+    headers: buildAdminHeaders(adminToken),
+    body: {
+      action: "send_tracking_email",
+      orderId,
+    },
+    fallbackErrorMessage: "Unable to send the tracking email right now.",
+  });

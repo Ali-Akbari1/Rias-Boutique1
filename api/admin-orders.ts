@@ -15,6 +15,7 @@ import {
   getClientIp,
   resolveAllowedOrigin,
 } from "../server/lib/security.js";
+import { sendTrackingEmail } from "../server/lib/email.js";
 import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
 import { refundShippingLabel } from "../server/lib/easypost.js";
 import { findOrderById, isOrderStoreConfigured, listOrders, saveOrderShipment } from "../server/lib/order-store.js";
@@ -37,7 +38,18 @@ const refundLabelSchema = z
   })
   .strict();
 
-const adminShipmentActionSchema = z.discriminatedUnion("action", [retryLabelPurchaseSchema, refundLabelSchema]);
+const sendTrackingEmailSchema = z
+  .object({
+    action: z.literal("send_tracking_email"),
+    orderId: z.string().trim().min(1).max(128),
+  })
+  .strict();
+
+const adminShipmentActionSchema = z.discriminatedUnion("action", [
+  retryLabelPurchaseSchema,
+  refundLabelSchema,
+  sendTrackingEmailSchema,
+]);
 
 const readAdminToken = (req: ApiRequest) => {
   const directHeader = (getHeader(req, "x-admin-token") || "").trim();
@@ -134,6 +146,34 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   if (order.paymentStatus !== "paid") {
     sendError(res, 409, "ORDER_NOT_PAID", "Shipping labels can only be purchased after payment is confirmed.");
+    return;
+  }
+
+  if (validation.data.action === "send_tracking_email") {
+    if (!order.shipment || (!order.shipment.trackingCode && !order.shipment.trackingUrl)) {
+      sendError(res, 409, "TRACKING_NOT_READY", "Tracking information is not available yet for this order.");
+      return;
+    }
+
+    try {
+      const dispatch = await sendTrackingEmail(order);
+      res.setHeader("Cache-Control", "no-store");
+      res.status(200).json({
+        order,
+        message: dispatch.status === "queued" ? "Tracking email queued successfully." : "Tracking email sent successfully.",
+      });
+    } catch (error) {
+      logger.error("admin-orders.tracking_email_failed", {
+        orderId: order.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      sendError(
+        res,
+        502,
+        "TRACKING_EMAIL_FAILED",
+        error instanceof Error ? error.message : "Unable to send the tracking email right now.",
+      );
+    }
     return;
   }
 

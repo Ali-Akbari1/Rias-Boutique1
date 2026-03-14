@@ -9,6 +9,7 @@ import {
   requestAdminOrders,
   requestRefundShipmentLabel,
   requestRetryShipmentLabel,
+  requestSendTrackingEmail,
   type AdminOrder,
   type PaymentStatus,
 } from "@/lib/admin-api";
@@ -56,6 +57,7 @@ const AdminOrders = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [retryingOrderId, setRetryingOrderId] = useState("");
   const [refundingOrderId, setRefundingOrderId] = useState("");
+  const [sendingTrackingOrderId, setSendingTrackingOrderId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
@@ -136,6 +138,30 @@ const AdminOrders = () => {
       setErrorMessage(error instanceof Error ? error.message : "Unable to request a shipping label refund.");
     } finally {
       setRefundingOrderId("");
+    }
+  };
+
+  const sendTrackingEmail = async (orderId: string) => {
+    const token = adminToken.trim();
+    if (!token) {
+      setErrorMessage("Enter your admin dashboard token.");
+      return;
+    }
+
+    setSendingTrackingOrderId(orderId);
+    setErrorMessage("");
+    setStatusMessage("");
+
+    try {
+      const payload = await requestSendTrackingEmail(token, orderId);
+      if (payload.order) {
+        setOrders((currentOrders) => currentOrders.map((order) => (order.id === payload.order?.id ? payload.order : order)));
+      }
+      setStatusMessage(payload.message || "Tracking email sent successfully.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to send the tracking email.");
+    } finally {
+      setSendingTrackingOrderId("");
     }
   };
 
@@ -223,96 +249,121 @@ const AdminOrders = () => {
         <div className="space-y-4">
           {orders.map((order) => {
             const pricing = getOrderPricing(order);
+            const hasTrackingInfo = Boolean(order.shipment?.trackingCode || order.shipment?.trackingUrl);
 
             return (
-            <Card key={order.id}>
-              <CardHeader className="gap-3 pb-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <CardTitle className="font-display text-lg">Order {order.id}</CardTitle>
-                  <Badge variant={statusBadgeVariant(order.paymentStatus)}>{order.paymentStatus.toUpperCase()}</Badge>
-                </div>
-                <CardDescription className="font-body text-sm">
-                  Created: {formatDate(order.createdAt)} | Paid: {formatDate(order.paidAt)}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 text-sm">
-                <div className="grid gap-2 rounded-md border border-border bg-muted/20 p-3">
-                  <p>
-                    <span className="font-semibold text-foreground">Fulfillment:</span>{" "}
-                    {order.customer.deliveryMethod === "pickup" ? "Pick up in store" : "Shipping"}
-                  </p>
-                  <p>
-                    <span className="font-semibold text-foreground">Customer:</span> {order.customer.fullName}
-                  </p>
-                  <p>
-                    <span className="font-semibold text-foreground">Email:</span> {order.customer.email}
-                  </p>
-                  <p>
-                    <span className="font-semibold text-foreground">Phone:</span> {order.customer.phone || "-"}
-                  </p>
-                  {order.customer.deliveryMethod === "pickup" ? (
+              <Card key={order.id}>
+                <CardHeader className="gap-3 pb-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle className="font-display text-lg">Order {order.id}</CardTitle>
+                    <Badge variant={statusBadgeVariant(order.paymentStatus)}>{order.paymentStatus.toUpperCase()}</Badge>
+                  </div>
+                  <CardDescription className="font-body text-sm">
+                    Created: {formatDate(order.createdAt)} | Paid: {formatDate(order.paidAt)}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm">
+                  <div className="grid gap-2 rounded-md border border-border bg-muted/20 p-3">
                     <p>
-                      <span className="font-semibold text-foreground">Shipping:</span> Pickup in store selected.
+                      <span className="font-semibold text-foreground">Fulfillment:</span>{" "}
+                      {order.customer.deliveryMethod === "pickup" ? "Pick up in store" : "Shipping"}
                     </p>
-                  ) : (
                     <p>
-                      <span className="font-semibold text-foreground">Shipping:</span> {order.customer.address},{" "}
-                      {order.customer.city}, {order.customer.state} {order.customer.postalCode}, {order.customer.country}
+                      <span className="font-semibold text-foreground">Customer:</span> {order.customer.fullName}
                     </p>
-                  )}
-                </div>
+                    <p>
+                      <span className="font-semibold text-foreground">Email:</span> {order.customer.email}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-foreground">Phone:</span> {order.customer.phone || "-"}
+                    </p>
+                    {order.customer.deliveryMethod === "pickup" ? (
+                      <p>
+                        <span className="font-semibold text-foreground">Shipping:</span> Pickup in store selected.
+                      </p>
+                    ) : (
+                      <p>
+                        <span className="font-semibold text-foreground">Shipping:</span> {order.customer.address},{" "}
+                        {order.customer.city}, {order.customer.state} {order.customer.postalCode}, {order.customer.country}
+                      </p>
+                    )}
+                  </div>
 
-                {order.customer.deliveryMethod === "shipping" ? (
-                  <div className="grid gap-2 rounded-md border border-border bg-background p-3 sm:grid-cols-2">
-                    <p>
-                      <span className="font-semibold text-foreground">Quoted Rate:</span>{" "}
-                      {pricing.quotedShippingMinor > 0 ? formatMinorCad(pricing.quotedShippingMinor) : "-"}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-foreground">Customer Charged:</span>{" "}
-                      {pricing.shippingMinor > 0 ? formatMinorCad(pricing.shippingMinor) : pricing.freeShippingApplied ? "Free" : "-"}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-foreground">Selected Service:</span>{" "}
-                      {order.shipment
-                        ? [order.shipment.carrier, order.shipment.service].filter(Boolean).join(" ") || "-"
-                        : order.shippingQuote
-                        ? [order.shippingQuote.carrier, order.shippingQuote.service].filter(Boolean).join(" ") || "-"
-                        : "-"}
-                    </p>
-                     <p>
-                       <span className="font-semibold text-foreground">Tracking:</span>{" "}
-                       {order.shipment?.trackingCode ||
-                         (order.shippingQuote?.provider === "flat_rate" ? "Manual fulfillment" : "Pending label purchase")}
-                     </p>
-                     {order.shipment?.status ? (
-                       <p>
-                         <span className="font-semibold text-foreground">Shipment Status:</span>{" "}
-                         {order.shipment.status.replace(/_/g, " ")}
-                       </p>
-                     ) : null}
-                     {!order.shipment &&
-                     order.shippingQuote?.provider === "easypost" &&
-                     order.paymentStatus === "paid" ? (
-                       <div className="sm:col-span-2">
-                         <Button
-                           type="button"
-                           variant="outline"
-                           size="sm"
-                           onClick={() => void retryLabelPurchase(order.id)}
-                           disabled={retryingOrderId === order.id}
-                         >
-                           {retryingOrderId === order.id ? (
-                             <>
-                               <Loader2 className="h-4 w-4 animate-spin" />
-                               Retrying label purchase
-                             </>
-                           ) : (
-                             "Retry label purchase"
-                           )}
-                         </Button>
-                       </div>
-                     ) : null}
+                  {order.customer.deliveryMethod === "shipping" ? (
+                    <div className="grid gap-2 rounded-md border border-border bg-background p-3 sm:grid-cols-2">
+                      <p>
+                        <span className="font-semibold text-foreground">Quoted Rate:</span>{" "}
+                        {pricing.quotedShippingMinor > 0 ? formatMinorCad(pricing.quotedShippingMinor) : "-"}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-foreground">Customer Charged:</span>{" "}
+                        {pricing.shippingMinor > 0
+                          ? formatMinorCad(pricing.shippingMinor)
+                          : pricing.freeShippingApplied
+                            ? "Free"
+                            : "-"}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-foreground">Selected Service:</span>{" "}
+                        {order.shipment
+                          ? [order.shipment.carrier, order.shipment.service].filter(Boolean).join(" ") || "-"
+                          : order.shippingQuote
+                            ? [order.shippingQuote.carrier, order.shippingQuote.service].filter(Boolean).join(" ") || "-"
+                            : "-"}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-foreground">Tracking:</span>{" "}
+                        {order.shipment?.trackingCode ||
+                          (order.shippingQuote?.provider === "flat_rate" ? "Manual fulfillment" : "Pending label purchase")}
+                      </p>
+                      {hasTrackingInfo ? (
+                        <div className="sm:col-span-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => void sendTrackingEmail(order.id)}
+                            disabled={sendingTrackingOrderId === order.id}
+                          >
+                            {sendingTrackingOrderId === order.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Sending tracking email
+                              </>
+                            ) : (
+                              "Email tracking to customer"
+                            )}
+                          </Button>
+                        </div>
+                      ) : null}
+                      {order.shipment?.status ? (
+                        <p>
+                          <span className="font-semibold text-foreground">Shipment Status:</span>{" "}
+                          {order.shipment.status.replace(/_/g, " ")}
+                        </p>
+                      ) : null}
+                      {!order.shipment &&
+                      order.shippingQuote?.provider === "easypost" &&
+                      order.paymentStatus === "paid" ? (
+                        <div className="sm:col-span-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => void retryLabelPurchase(order.id)}
+                            disabled={retryingOrderId === order.id}
+                          >
+                            {retryingOrderId === order.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Retrying label purchase
+                              </>
+                            ) : (
+                              "Retry label purchase"
+                            )}
+                          </Button>
+                        </div>
+                      ) : null}
                      {order.shipment?.trackingUrl ? (
                        <p className="sm:col-span-2">
                         <span className="font-semibold text-foreground">Tracking Link:</span>{" "}
