@@ -53,22 +53,22 @@ export interface StoredShippingQuote {
 }
 
 export interface StoredShipment {
-  provider: "easypost";
-  shipmentId: string;
-  rateId: string;
-  carrier: string;
-  service: string;
-  quotedRateMinor: number;
-  customerRateMinor: number;
-  currency: string;
-  trackingCode: string;
-  trackingUrl: string;
-  labelUrl: string;
-  labelPdfUrl: string;
-  trackingQrCodeDataUrl: string;
-  labelQrCodeDataUrl: string;
-  status: string;
-  purchasedAt: string;
+  provider: "easypost" | "manual";
+  shipmentId?: string;
+  rateId?: string;
+  carrier?: string;
+  service?: string;
+  quotedRateMinor?: number;
+  customerRateMinor?: number;
+  currency?: string;
+  trackingCode?: string;
+  trackingUrl?: string;
+  labelUrl?: string;
+  labelPdfUrl?: string;
+  trackingQrCodeDataUrl?: string;
+  labelQrCodeDataUrl?: string;
+  status?: string;
+  purchasedAt?: string;
 }
 
 export interface StoredOrder {
@@ -225,6 +225,26 @@ const normalizeShipment = (value: unknown): StoredShipment | null => {
     return null;
   }
 
+  const provider = asString(shipment.provider).toLowerCase() === "manual" ? "manual" : "easypost";
+  const trackingCode = asString(shipment.trackingCode);
+  const trackingUrl = asString(shipment.trackingUrl);
+
+  if (provider === "manual") {
+    if (!trackingCode && !trackingUrl) {
+      return null;
+    }
+
+    return {
+      provider,
+      carrier: asString(shipment.carrier),
+      service: asString(shipment.service),
+      trackingCode,
+      trackingUrl,
+      status: asString(shipment.status) || "manual",
+      purchasedAt: asString(shipment.purchasedAt),
+    };
+  }
+
   const shipmentId = asString(shipment.shipmentId);
   const rateId = asString(shipment.rateId);
   if (!shipmentId || !rateId) {
@@ -240,8 +260,8 @@ const normalizeShipment = (value: unknown): StoredShipment | null => {
     quotedRateMinor: asNumber(shipment.quotedRateMinor),
     customerRateMinor: asNumber(shipment.customerRateMinor),
     currency: asString(shipment.currency) || DEFAULT_CURRENCY,
-    trackingCode: asString(shipment.trackingCode),
-    trackingUrl: asString(shipment.trackingUrl),
+    trackingCode,
+    trackingUrl,
     labelUrl: asString(shipment.labelUrl),
     labelPdfUrl: asString(shipment.labelPdfUrl),
     trackingQrCodeDataUrl: asString(shipment.trackingQrCodeDataUrl),

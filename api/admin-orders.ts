@@ -45,10 +45,31 @@ const sendTrackingEmailSchema = z
   })
   .strict();
 
+const manualTrackingSchema = z
+  .object({
+    action: z.literal("update_tracking_manual"),
+    orderId: z.string().trim().min(1).max(128),
+    trackingCode: z.string().trim().max(160).optional().or(z.literal("")),
+    trackingUrl: z.string().trim().max(512).optional().or(z.literal("")),
+    carrier: z.string().trim().max(80).optional().or(z.literal("")),
+    service: z.string().trim().max(80).optional().or(z.literal("")),
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    if (!data.trackingCode && !data.trackingUrl) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Tracking number or tracking link is required.",
+        path: ["trackingCode"],
+      });
+    }
+  });
+
 const adminShipmentActionSchema = z.discriminatedUnion("action", [
   retryLabelPurchaseSchema,
   refundLabelSchema,
   sendTrackingEmailSchema,
+  manualTrackingSchema,
 ]);
 
 const readAdminToken = (req: ApiRequest) => {
@@ -177,6 +198,50 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
+  if (validation.data.action === "update_tracking_manual") {
+    if (order.shipment?.provider === "easypost") {
+      sendError(res, 409, "SHIPMENT_ALREADY_PURCHASED", "This order already has a purchased shipping label.");
+      return;
+    }
+
+    const trackingCode = (validation.data.trackingCode || "").trim();
+    const trackingUrl = (validation.data.trackingUrl || "").trim();
+    const carrier = (validation.data.carrier || "").trim();
+    const service = (validation.data.service || "").trim();
+
+    try {
+      const updatedOrder = await saveOrderShipment({
+        orderId: order.id,
+        shipment: {
+          provider: "manual",
+          carrier: carrier || undefined,
+          service: service || undefined,
+          trackingCode: trackingCode || undefined,
+          trackingUrl: trackingUrl || undefined,
+          status: "manual",
+          purchasedAt: new Date().toISOString(),
+        },
+      });
+      res.setHeader("Cache-Control", "no-store");
+      res.status(200).json({
+        order: updatedOrder,
+        message: "Manual tracking details saved.",
+      });
+    } catch (error) {
+      logger.error("admin-orders.manual_tracking_failed", {
+        orderId: order.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      sendError(
+        res,
+        502,
+        "TRACKING_SAVE_FAILED",
+        error instanceof Error ? error.message : "Unable to save tracking details right now.",
+      );
+    }
+    return;
+  }
+
   if (validation.data.action === "retry_label_purchase") {
     if (order.shippingQuote?.provider !== "easypost") {
       sendError(
@@ -221,6 +286,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   if (!order.shipment) {
     sendError(res, 409, "SHIPMENT_NOT_PURCHASED", "This order does not have a purchased shipping label yet.");
+    return;
+  }
+
+  if (order.shipment.provider !== "easypost" || !order.shipment.shipmentId) {
+    sendError(res, 409, "SHIPMENT_NOT_REFUNDABLE", "This order does not have a refundable shipping label.");
     return;
   }
 

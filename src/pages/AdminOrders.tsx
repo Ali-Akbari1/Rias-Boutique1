@@ -10,6 +10,7 @@ import {
   requestRefundShipmentLabel,
   requestRetryShipmentLabel,
   requestSendTrackingEmail,
+  requestUpdateManualTracking,
   type AdminOrder,
   type PaymentStatus,
 } from "@/lib/admin-api";
@@ -58,6 +59,10 @@ const AdminOrders = () => {
   const [retryingOrderId, setRetryingOrderId] = useState("");
   const [refundingOrderId, setRefundingOrderId] = useState("");
   const [sendingTrackingOrderId, setSendingTrackingOrderId] = useState("");
+  const [savingTrackingOrderId, setSavingTrackingOrderId] = useState("");
+  const [trackingInputs, setTrackingInputs] = useState<
+    Record<string, { code: string; url: string; carrier: string; service: string }>
+  >({});
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
@@ -165,6 +170,70 @@ const AdminOrders = () => {
     }
   };
 
+  const updateTrackingInput = (
+    order: AdminOrder,
+    field: "code" | "url" | "carrier" | "service",
+    value: string,
+  ) => {
+    setTrackingInputs((current) => {
+      const existing = current[order.id] || {
+        code: order.shipment?.trackingCode || "",
+        url: order.shipment?.trackingUrl || "",
+        carrier: order.shipment?.carrier || "",
+        service: order.shipment?.service || "",
+      };
+      return {
+        ...current,
+        [order.id]: {
+          ...existing,
+          [field]: value,
+        },
+      };
+    });
+  };
+
+  const saveManualTracking = async (order: AdminOrder) => {
+    const token = adminToken.trim();
+    if (!token) {
+      setErrorMessage("Enter your admin dashboard token.");
+      return;
+    }
+
+    const trackingValues = trackingInputs[order.id] || {
+      code: order.shipment?.trackingCode || "",
+      url: order.shipment?.trackingUrl || "",
+      carrier: order.shipment?.carrier || "",
+      service: order.shipment?.service || "",
+    };
+
+    if (!trackingValues.code.trim() && !trackingValues.url.trim()) {
+      setErrorMessage("Enter a tracking number or tracking link before saving.");
+      return;
+    }
+
+    setSavingTrackingOrderId(order.id);
+    setErrorMessage("");
+    setStatusMessage("");
+
+    try {
+      const payload = await requestUpdateManualTracking(token, {
+        orderId: order.id,
+        trackingCode: trackingValues.code.trim(),
+        trackingUrl: trackingValues.url.trim(),
+        carrier: trackingValues.carrier.trim(),
+        service: trackingValues.service.trim(),
+      });
+      if (payload.order) {
+        setOrders((currentOrders) => currentOrders.map((entry) => (entry.id === payload.order?.id ? payload.order : entry)));
+      }
+      setStatusMessage(payload.message || "Tracking details saved.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to save tracking details.");
+    } finally {
+      setSavingTrackingOrderId("");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-background/95 backdrop-blur">
@@ -250,6 +319,20 @@ const AdminOrders = () => {
           {orders.map((order) => {
             const pricing = getOrderPricing(order);
             const hasTrackingInfo = Boolean(order.shipment?.trackingCode || order.shipment?.trackingUrl);
+            const trackingValues = trackingInputs[order.id] || {
+              code: order.shipment?.trackingCode || "",
+              url: order.shipment?.trackingUrl || "",
+              carrier: order.shipment?.carrier || "",
+              service: order.shipment?.service || "",
+            };
+            const canEditTracking =
+              order.customer.deliveryMethod === "shipping" &&
+              order.paymentStatus === "paid" &&
+              order.shipment?.provider !== "easypost";
+            const canRefundLabel =
+              order.shipment?.provider === "easypost" &&
+              order.paymentStatus === "paid" &&
+              !order.shipment?.status?.startsWith("refund_");
 
             return (
               <Card key={order.id}>
@@ -311,36 +394,101 @@ const AdminOrders = () => {
                             ? [order.shippingQuote.carrier, order.shippingQuote.service].filter(Boolean).join(" ") || "-"
                             : "-"}
                       </p>
-                      <p>
-                        <span className="font-semibold text-foreground">Tracking:</span>{" "}
-                        {order.shipment?.trackingCode ||
-                          (order.shippingQuote?.provider === "flat_rate" ? "Manual fulfillment" : "Pending label purchase")}
-                      </p>
-                      {hasTrackingInfo ? (
-                        <div className="sm:col-span-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => void sendTrackingEmail(order.id)}
-                            disabled={sendingTrackingOrderId === order.id}
-                          >
-                            {sendingTrackingOrderId === order.id ? (
-                              <>
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                Sending tracking email
-                              </>
-                            ) : (
-                              "Email tracking to customer"
-                            )}
-                          </Button>
-                        </div>
-                      ) : null}
-                      {order.shipment?.status ? (
-                        <p>
-                          <span className="font-semibold text-foreground">Shipment Status:</span>{" "}
-                          {order.shipment.status.replace(/_/g, " ")}
-                        </p>
+                     <p>
+                       <span className="font-semibold text-foreground">Tracking:</span>{" "}
+                       {order.shipment?.trackingCode ||
+                         (order.shippingQuote?.provider === "flat_rate" ? "Manual fulfillment" : "Pending label purchase")}
+                     </p>
+                     {canEditTracking ? (
+                       <div className="sm:col-span-2 space-y-2 rounded-md border border-border bg-muted/20 p-3">
+                         <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                           Manual tracking details
+                         </p>
+                         <div className="grid gap-2 sm:grid-cols-2">
+                           <Input
+                             value={trackingValues.code}
+                             onChange={(event) => updateTrackingInput(order, "code", event.target.value)}
+                             placeholder="Tracking number"
+                           />
+                           <Input
+                             value={trackingValues.url}
+                             onChange={(event) => updateTrackingInput(order, "url", event.target.value)}
+                             placeholder="Tracking link (optional)"
+                           />
+                           <Input
+                             value={trackingValues.carrier}
+                             onChange={(event) => updateTrackingInput(order, "carrier", event.target.value)}
+                             placeholder="Carrier (optional)"
+                           />
+                           <Input
+                             value={trackingValues.service}
+                             onChange={(event) => updateTrackingInput(order, "service", event.target.value)}
+                             placeholder="Service (optional)"
+                           />
+                         </div>
+                         <div className="flex flex-wrap gap-2">
+                           <Button
+                             type="button"
+                             variant="outline"
+                             size="sm"
+                             onClick={() => void saveManualTracking(order)}
+                             disabled={savingTrackingOrderId === order.id}
+                           >
+                             {savingTrackingOrderId === order.id ? (
+                               <>
+                                 <Loader2 className="h-4 w-4 animate-spin" />
+                                 Saving tracking
+                               </>
+                             ) : (
+                               "Save tracking"
+                             )}
+                           </Button>
+                           {hasTrackingInfo ? (
+                             <Button
+                               type="button"
+                               variant="outline"
+                               size="sm"
+                               onClick={() => void sendTrackingEmail(order.id)}
+                               disabled={sendingTrackingOrderId === order.id}
+                             >
+                               {sendingTrackingOrderId === order.id ? (
+                                 <>
+                                   <Loader2 className="h-4 w-4 animate-spin" />
+                                   Sending tracking email
+                                 </>
+                               ) : (
+                                 "Email tracking to customer"
+                               )}
+                             </Button>
+                           ) : null}
+                         </div>
+                       </div>
+                     ) : null}
+                     {!canEditTracking && hasTrackingInfo ? (
+                       <div className="sm:col-span-2">
+                         <Button
+                           type="button"
+                           variant="outline"
+                           size="sm"
+                           onClick={() => void sendTrackingEmail(order.id)}
+                           disabled={sendingTrackingOrderId === order.id}
+                         >
+                           {sendingTrackingOrderId === order.id ? (
+                             <>
+                               <Loader2 className="h-4 w-4 animate-spin" />
+                               Sending tracking email
+                             </>
+                           ) : (
+                             "Email tracking to customer"
+                           )}
+                         </Button>
+                       </div>
+                     ) : null}
+                     {order.shipment?.status ? (
+                       <p>
+                         <span className="font-semibold text-foreground">Shipment Status:</span>{" "}
+                         {order.shipment.status.replace(/_/g, " ")}
+                       </p>
                       ) : null}
                       {!order.shipment &&
                       order.shippingQuote?.provider === "easypost" &&
@@ -390,7 +538,7 @@ const AdminOrders = () => {
                          </a>
                        </p>
                      ) : null}
-                     {order.shipment && order.paymentStatus === "paid" && !order.shipment.status?.startsWith("refund_") ? (
+                     {canRefundLabel ? (
                        <div className="sm:col-span-2">
                          <Button
                            type="button"

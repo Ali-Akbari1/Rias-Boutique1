@@ -234,10 +234,10 @@ const ProductDetails = () => {
               </span>
             </div>
 
-            <div className="space-y-4 rounded-md border border-border bg-card p-4 text-center sm:p-5">
+            <div className="space-y-4 rounded-md border border-border bg-card p-4 sm:p-5">
               <div>
                 <p className="mb-2 text-sm font-semibold text-foreground">Choose size</p>
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex flex-wrap gap-2">
                   {STANDARD_SIZE_KEYS.map((sizeKey) => {
                     const label = standardSizeLabel(sizeKey);
                     const isAvailable = availableSizeKeys.includes(sizeKey);
@@ -270,7 +270,7 @@ const ProductDetails = () => {
 
               <div>
                 <p className="mb-2 text-sm font-semibold text-foreground">Choose color</p>
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex flex-wrap gap-2">
                   {colorOptions.map((color) => (
                     <button
                       key={color}

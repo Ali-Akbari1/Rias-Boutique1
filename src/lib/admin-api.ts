@@ -43,6 +43,7 @@ export interface AdminOrder {
     expiresAt?: string;
   } | null;
   shipment?: {
+    provider?: "easypost" | "manual";
     shipmentId?: string;
     carrier?: string;
     service?: string;
@@ -115,4 +116,29 @@ export const requestSendTrackingEmail = (adminToken: string, orderId: string) =>
       orderId,
     },
     fallbackErrorMessage: "Unable to send the tracking email right now.",
+  });
+
+export const requestUpdateManualTracking = (
+  adminToken: string,
+  payload: {
+    orderId: string;
+    trackingCode?: string;
+    trackingUrl?: string;
+    carrier?: string;
+    service?: string;
+  },
+) =>
+  requestJson<AdminOrdersResponse>({
+    path: "/api/admin-orders",
+    method: "POST",
+    headers: buildAdminHeaders(adminToken),
+    body: {
+      action: "update_tracking_manual",
+      orderId: payload.orderId,
+      trackingCode: payload.trackingCode,
+      trackingUrl: payload.trackingUrl,
+      carrier: payload.carrier,
+      service: payload.service,
+    },
+    fallbackErrorMessage: "Unable to save tracking details right now.",
   });
