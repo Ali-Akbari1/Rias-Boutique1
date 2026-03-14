@@ -54,16 +54,7 @@ const manualTrackingSchema = z
     carrier: z.string().trim().max(80).optional().or(z.literal("")),
     service: z.string().trim().max(80).optional().or(z.literal("")),
   })
-  .strict()
-  .superRefine((data, ctx) => {
-    if (!data.trackingCode && !data.trackingUrl) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Tracking number or tracking link is required.",
-        path: ["trackingCode"],
-      });
-    }
-  });
+  .strict();
 
 const adminShipmentActionSchema = z.discriminatedUnion("action", [
   retryLabelPurchaseSchema,
@@ -208,6 +199,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const trackingUrl = (validation.data.trackingUrl || "").trim();
     const carrier = (validation.data.carrier || "").trim();
     const service = (validation.data.service || "").trim();
+
+    if (!trackingCode && !trackingUrl) {
+      sendError(res, 400, "TRACKING_REQUIRED", "Tracking number or tracking link is required.");
+      return;
+    }
 
     try {
       const updatedOrder = await saveOrderShipment({
