@@ -443,7 +443,7 @@
       "galleryImages": [
         "/uploads/img_0786.webp",
         "/uploads/img_0787.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
       "name": "Men's Black and Parantoban",
       "slug": "men-black-gold",
@@ -473,7 +473,7 @@
         "/uploads/img_0790.webp",
         "/uploads/img_0795.webp",
         "/uploads/img_0789.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
       "name": "Handmade Mens Parantoban ",
       "slug": "Handmade-mens-parantoban",
@@ -501,7 +501,7 @@
       "galleryImages": [
         "/uploads/img_0797.webp",
         "/uploads/img_0802.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
       "name": "Men's Off-White Parantoban ",
       "slug": "mens-offwhite-with-gold",
@@ -530,7 +530,7 @@
       "galleryImages": [
         "/uploads/img_0812.webp",
         "/uploads/img_0811.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
       "name": "Men's Grey Parantoban",
       "slug": "mens-grey-parantoban",
@@ -558,7 +558,7 @@
       "galleryImages": [
         "/uploads/img_0821.webp",
         "/uploads/img_0815.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
       "name": "Men's White Handmade Parantoban",
       "slug": "mens-white-handmade-parantoban",
@@ -587,7 +587,7 @@
       "galleryImages": [
         "/uploads/img_0837.webp",
         "/uploads/img_0832.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
       "name": "Men's Off-White Parantoban ",
       "slug": "mens-offwhite-with-white",
@@ -595,8 +595,8 @@
         "Off-White"
       ],
       "sizes": [
-        "Medium",
-        "Small"
+        "Small",
+        "Medium"
       ],
       "department": "men",
       "careInstructions": [
