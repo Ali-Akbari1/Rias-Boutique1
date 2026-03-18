@@ -595,7 +595,8 @@
         "Off-White"
       ],
       "sizes": [
-        "Medium"
+        "Medium",
+        "Small"
       ],
       "department": "men",
       "careInstructions": [
@@ -685,7 +686,7 @@
       "id": "baby-blue-du-domina",
       "createdAt": "2026-03-07",
       "image": "/uploads/img_0888.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Baby blue Hazaragi dress ",
       "category": "Party Wear",
       "fitInfo": "* 3 pieces: dress, pants, and white scarf\n\nMedium (Bust: 42in)\nLarge (Bust: 44in)"
