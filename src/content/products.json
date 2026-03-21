@@ -717,6 +717,30 @@
       "description": "Emerald green dress with gulabatoon detailing. ",
       "category": "Party Wear",
       "fitInfo": "Bust: 42in"
+    },
+    {
+      "fabric": "Barosha",
+      "price": 250,
+      "galleryImages": [
+        "/uploads/img_1240-2.jpg",
+        "/uploads/img_1247-2.jpg",
+        "/uploads/img_1250-2.jpg"
+      ],
+      "name": "Teal Barosha Dress",
+      "slug": "teal-barosha-dress",
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only "
+      ],
+      "id": "teal-barosha-dress",
+      "image": "/uploads/img_1240-2.jpg",
+      "inventory": "available",
+      "description": "Teal barosha dress with silver cheerma detailing. ",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 38in \nSleeves: 21in\nLength of Dress: 36in\nLength of Pants: \n\n"
     }
   ]
 }
