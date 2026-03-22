@@ -737,6 +737,34 @@
       "description": "Teal barosha dress with silver cheerma detailing. ",
       "category": "Party Wear",
       "fitInfo": "Bust: 38in \nSleeves: 21in\nLength of Dress: 36in\nLength of Pants: \n\n"
+    },
+    {
+      "price": 110,
+      "galleryImages": [
+        "/uploads/img_1255.jpg",
+        "/uploads/img_1256.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
+      ],
+      "name": "Men's White Parantoban ",
+      "slug": "white-mens-parantoban",
+      "colors": [
+        "True White"
+      ],
+      "sizes": [
+        "Medium",
+        "Large",
+        "X-Large"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "true-white-mens-parantoban",
+      "image": "/uploads/img_1255.jpg",
+      "inventory": "available",
+      "description": "True white men's parantoban with white embroidery. ",
+      "category": "Machine Made",
+      "fitInfo": "Please check our size chart for all specific measurements before ordering. \n\n*Please note: Elastic and/or an ezar band for the pants are not included."
     }
   ]
 }
