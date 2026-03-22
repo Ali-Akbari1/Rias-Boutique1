@@ -462,9 +462,10 @@
       "inventory": "sold_out",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements. "
+      "fitInfo": "Please check our size chart for all specific measurements. \n\nPlease note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
+      "fabric": "*Mirror work is handmade. ",
       "price": 225,
       "galleryImages": [
         "/uploads/img_0790.webp",
@@ -491,7 +492,7 @@
       "inventory": "available",
       "description": "Handmade black mens parantoban with silver embroidery. ",
       "category": "Handmade",
-      "fitInfo": "Please check our size chart for all specific measurements. \nSize: 46in"
+      "fitInfo": "Please check our size chart for all specific measurements. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
       "price": 110,
@@ -518,7 +519,7 @@
       "inventory": "available",
       "description": "Off-white machine made men's parantoban with gold embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements. "
+      "fitInfo": "Please check our size chart for all specific measurements. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
       "price": 110,
@@ -545,7 +546,7 @@
       "inventory": "sold_out",
       "description": "Machine made men's grey parantoban with silver and grey embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements."
+      "fitInfo": "Please check our size chart for all specific measurements.\n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
       "fabric": "*Mirror work is handmade ",
