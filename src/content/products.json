@@ -574,7 +574,7 @@
       "inventory": "available",
       "description": "Handmade men's white parantoban with silver embroidery and mirror work. ",
       "category": "Handmade",
-      "fitInfo": "Please check our size chart for all specific measurements.\n\nPlease measure before ordering. \n\n"
+      "fitInfo": "Please check our size chart for all specific measurements.\n\nPlease measure before ordering. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n"
     },
     {
       "price": 110,
@@ -601,7 +601,8 @@
       "image": "/uploads/img_0837.webp",
       "inventory": "available",
       "description": "Men's off-white parantoban with white embroidery. ",
-      "category": "Machine Made"
+      "category": "Machine Made",
+      "fitInfo": "*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
       "fabric": "Hazaragi (Du-Domina) ",
