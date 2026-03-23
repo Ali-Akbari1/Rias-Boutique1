@@ -2,6 +2,7 @@ import type { StoredOrder } from "./order-store.js";
 import { getSupabaseAdminClient, hasSupabaseAdminConfig } from "./supabase-admin.js";
 import { logger } from "./logger.js";
 import { fetchProviderJson } from "./provider-client.js";
+import { buildCarrierTrackingUrl } from "./tracking.js";
 
 const isMemoryEmailLogEnabled = () => process.env.ORDER_STORE_ADAPTER?.trim().toLowerCase() === "memory";
 const isCustomerOrderEmailEnabled = () => process.env.CUSTOMER_ORDER_EMAIL_ENABLED?.trim().toLowerCase() !== "false";
@@ -46,18 +47,46 @@ const cleanUrl = (value: string, fallback: string) => {
 };
 const toSingleLineAddress = (order: StoredOrder) =>
   `${order.customer.address}, ${order.customer.city}, ${order.customer.state}, ${order.customer.postalCode}, ${order.customer.country}`;
-const formatLineItemsText = (order: StoredOrder) =>
+const formatLineItemDetails = (
+  item: StoredOrder["lineItems"][number],
+  { includeSku = false }: { includeSku?: boolean } = {},
+) => {
+  const parts: string[] = [];
+  if (item.selection?.size) {
+    parts.push(`Size: ${item.selection.size}`);
+  }
+  if (item.selection?.color) {
+    parts.push(`Color: ${item.selection.color}`);
+  }
+  if (includeSku && item.productId) {
+    parts.push(`SKU: ${item.productId}`);
+  }
+
+  if (parts.length > 0) {
+    return parts.join(" • ");
+  }
+
+  return includeSku ? item.productId || "-" : "-";
+};
+
+const formatLineItemsText = (order: StoredOrder, { includeSku = false }: { includeSku?: boolean } = {}) =>
   order.lineItems
-    .map((item) => `- ${item.name} x${item.quantity} (${formatMinorCad(item.lineTotalMinor)})`)
+    .map((item) => {
+      const details = formatLineItemDetails(item, { includeSku });
+      const detailSuffix = details && details !== "-" ? ` (${details})` : "";
+      return `- ${item.name}${detailSuffix} x${item.quantity} (${formatMinorCad(item.lineTotalMinor)})`;
+    })
     .join("\n");
-const formatLineItemsTableHtml = (order: StoredOrder) =>
+
+const formatLineItemsTableHtml = (order: StoredOrder, { includeSku = false }: { includeSku?: boolean } = {}) =>
   order.lineItems
     .map((item) => {
       const unitPrice = item.quantity > 0 ? Math.round(item.lineTotalMinor / item.quantity) : item.unitAmountMinor;
+      const details = formatLineItemDetails(item, { includeSku });
       return `
         <tr>
           <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;">${escapeHtml(item.name)}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#6b7280;">${escapeHtml(item.productId || "-")}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#6b7280;">${escapeHtml(details)}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;text-align:center;">${item.quantity}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;text-align:right;">${escapeHtml(
             formatMinorCad(unitPrice),
@@ -83,24 +112,47 @@ const getShippingLineLabel = (order: StoredOrder) => {
     return `${order.shipment.carrier} ${order.shipment.service}`;
   }
 
+  if (order.shipment?.carrier) {
+    return order.shipment.carrier;
+  }
+
   if (order.shippingQuote?.carrier && order.shippingQuote?.service) {
     return `${order.shippingQuote.carrier} ${order.shippingQuote.service}`;
   }
 
+  if (order.shippingQuote?.carrier) {
+    return order.shippingQuote.carrier;
+  }
+
   return "Shipping";
+};
+const resolveTrackingUrl = (order: StoredOrder) => {
+  if (!order.shipment) {
+    return "";
+  }
+
+  if (order.shipment.trackingUrl) {
+    return order.shipment.trackingUrl;
+  }
+
+  return buildCarrierTrackingUrl({
+    carrier: order.shipment.carrier,
+    trackingCode: order.shipment.trackingCode,
+  });
 };
 const buildTrackingText = (order: StoredOrder) => {
   if (!order.shipment || order.customer.deliveryMethod === "pickup") {
     return [];
   }
 
+  const trackingUrl = resolveTrackingUrl(order);
   const lines = [
     `Carrier / Service: ${getShippingLineLabel(order)}`,
     `Tracking Number: ${order.shipment.trackingCode || "-"}`,
   ];
 
-  if (order.shipment.trackingUrl) {
-    lines.push(`Track your order: ${order.shipment.trackingUrl}`);
+  if (trackingUrl) {
+    lines.push(`Track your order: ${trackingUrl}`);
   }
   if (order.shipment.labelPdfUrl || order.shipment.labelUrl) {
     lines.push(`Label: ${order.shipment.labelPdfUrl || order.shipment.labelUrl}`);
@@ -120,6 +172,7 @@ const buildTrackingHtml = ({
   }
 
   const labelUrl = order.shipment.labelPdfUrl || order.shipment.labelUrl;
+  const trackingUrl = resolveTrackingUrl(order);
 
   return `
     <div style="padding:0 24px 20px 24px;">
@@ -131,9 +184,9 @@ const buildTrackingHtml = ({
         order.shipment.trackingCode || "-",
       )}</p>
       ${
-        order.shipment.trackingUrl
+        trackingUrl
           ? `<p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;">
-               <a href="${escapeHtml(order.shipment.trackingUrl)}" style="color:#111827;text-decoration:underline;">Track shipment</a>
+               <a href="${escapeHtml(trackingUrl)}" style="color:#111827;text-decoration:underline;">Track shipment</a>
              </p>`
           : ""
       }
@@ -434,12 +487,38 @@ export const sendTrackingEmail = async (order: StoredOrder) => {
   const orderNumber = toOrderNumber(order.id);
   const greetingName = order.customer.fullName?.trim() || "there";
   const trackingLines = buildTrackingText(order);
+  const trackingUrl = resolveTrackingUrl(order);
+  const trackingVariantLabel = order.lineItems.some((item) => item.selection?.size || item.selection?.color)
+    ? "Size / Color"
+    : "Details";
+  const orderSummaryTable = `
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;border:1px solid #ececec;border-radius:8px;overflow:hidden;">
+      <thead>
+        <tr style="background:#f8fafc;">
+          <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Item</th>
+          <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">${escapeHtml(
+            trackingVariantLabel,
+          )}</th>
+          <th align="center" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Qty</th>
+          <th align="right" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${formatLineItemsTableHtml(order)}
+      </tbody>
+    </table>
+  `;
 
   const subject = `${brandName} - Your order is on the way (Order #${orderNumber})`;
   const text = [
     `Hi ${greetingName},`,
     "",
-    `Your order #${orderNumber} is on the way.`,
+    "Thank you for your order! Your shipment is on the way.",
+    "",
+    `Order Number: ${orderNumber}`,
+    "Items:",
+    formatLineItemsText(order),
+    "",
     ...trackingLines,
     "",
     `Need help? Reply to this email${supportEmail ? ` or contact ${supportEmail}` : ""}.`,
@@ -460,11 +539,41 @@ export const sendTrackingEmail = async (order: StoredOrder) => {
                     brandName,
                   )}</p>
                   <h1 style="margin:8px 0 6px 0;font-size:24px;line-height:1.25;color:#111827;">Your order is on the way</h1>
-                  <p style="margin:0;font-size:15px;color:#4b5563;">Order #${escapeHtml(orderNumber)}</p>
+                  <p style="margin:0;font-size:15px;color:#4b5563;">Thank you for your order! Order #${escapeHtml(
+                    orderNumber,
+                  )}</p>
                 </td>
               </tr>
               <tr>
-                <td>${buildTrackingHtml({ order })}</td>
+                <td style="padding:20px 24px 8px 24px;">
+                  <h2 style="margin:0 0 10px 0;font-size:18px;color:#111827;">Order Summary</h2>
+                  ${orderSummaryTable}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 24px 20px 24px;">
+                  <h2 style="margin:0 0 8px 0;font-size:18px;color:#111827;">Tracking</h2>
+                  <p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Carrier / Service:</strong> ${escapeHtml(
+                    getShippingLineLabel(order),
+                  )}</p>
+                  <p style="margin:0 0 10px 0;font-size:14px;color:#4b5563;"><strong>Tracking Number:</strong> ${escapeHtml(
+                    order.shipment?.trackingCode || "-",
+                  )}</p>
+                  ${
+                    trackingUrl
+                      ? `<p style="margin:0 0 12px 0;">
+                           <a href="${escapeHtml(
+                             trackingUrl,
+                           )}" style="display:inline-block;padding:10px 16px;background:#111827;color:#ffffff;text-decoration:none;border-radius:4px;font-size:14px;font-weight:600;">
+                             Track your shipment
+                           </a>
+                         </p>
+                         <p style="margin:0;font-size:12px;color:#6b7280;">Or use this link: <a href="${escapeHtml(
+                           trackingUrl,
+                         )}" style="color:#111827;text-decoration:underline;">${escapeHtml(trackingUrl)}</a></p>`
+                      : ""
+                  }
+                </td>
               </tr>
               <tr>
                 <td style="padding:0 24px 20px 24px;">
@@ -571,9 +680,10 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
   const orderDate = formatDateTime(order.createdAt || new Date().toISOString());
   const deliveryMethod = order.customer.deliveryMethod === "pickup" ? "Pick up in store" : "Shipping";
   const pricing = getOrderPricing(order);
-  const variantLabel = order.lineItems.some((item) => item.productId)
-    ? "Style / Variant"
-    : "Variant";
+  const merchantVariantLabel = "Details";
+  const customerVariantLabel = order.lineItems.some((item) => item.selection?.size || item.selection?.color)
+    ? "Size / Color"
+    : "Details";
 
   const messages: OrderEmailMessage[] = [];
 
@@ -583,14 +693,14 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
         <tr style="background:#f8fafc;">
           <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Item</th>
           <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">${escapeHtml(
-            variantLabel,
+            merchantVariantLabel,
           )}</th>
           <th align="center" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Qty</th>
           <th align="right" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Price</th>
         </tr>
       </thead>
       <tbody>
-        ${formatLineItemsTableHtml(order)}
+        ${formatLineItemsTableHtml(order, { includeSku: true })}
       </tbody>
     </table>
   `;
@@ -615,7 +725,7 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
       `Total: ${formatMinorCad(order.totalMinor)}`,
       "",
       "Items:",
-      formatLineItemsText(order),
+      formatLineItemsText(order, { includeSku: true }),
       "",
       `Subtotal: ${formatMinorCad(order.subtotalMinor)}`,
       pricing.discountMinor > 0 ? `Discount${pricing.discountCode ? ` (${pricing.discountCode})` : ""}: -${formatMinorCad(pricing.discountMinor)}` : "",
@@ -777,7 +887,7 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
           <tr style="background:#f8fafc;">
             <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Item</th>
             <th align="left" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">${escapeHtml(
-              variantLabel,
+              customerVariantLabel,
             )}</th>
             <th align="center" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Qty</th>
             <th align="right" style="padding:10px 12px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;">Price</th>

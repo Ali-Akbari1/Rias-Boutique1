@@ -23,6 +23,10 @@ export interface OrderLineItem {
   unitAmountMinor: number;
   quantity: number;
   lineTotalMinor: number;
+  selection?: {
+    size?: string;
+    color?: string;
+  };
 }
 
 export interface OrderPricing {
@@ -136,7 +140,10 @@ const cloneOrder = (order: StoredOrder): StoredOrder => ({
   ...order,
   pricing: { ...order.pricing },
   customer: { ...order.customer },
-  lineItems: order.lineItems.map((item) => ({ ...item })),
+  lineItems: order.lineItems.map((item) => ({
+    ...item,
+    selection: item.selection ? { ...item.selection } : undefined,
+  })),
   shippingQuote: order.shippingQuote ? { ...order.shippingQuote } : null,
   shipment: order.shipment ? { ...order.shipment } : null,
 });

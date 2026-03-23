@@ -34,6 +34,10 @@ export interface AdminOrder {
     unitAmountMinor: number;
     quantity: number;
     lineTotalMinor: number;
+    selection?: {
+      size?: string;
+      color?: string;
+    };
   }>;
   shippingQuote?: {
     provider?: "easypost" | "flat_rate";

@@ -9,20 +9,11 @@ import {
   resolveAllowedOrigin,
 } from "../server/lib/security.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
+import { checkoutItemSchema } from "../server/lib/checkout-schema.js";
 
 const tokenRequestSchema = z
   .object({
-    items: z
-      .array(
-        z
-          .object({
-            productId: z.string().trim().min(1).max(120),
-            quantity: z.number().int().min(1).max(10),
-          })
-          .strict(),
-      )
-      .min(1)
-      .max(50),
+    items: z.array(checkoutItemSchema).min(1).max(50),
   })
   .strict();
 

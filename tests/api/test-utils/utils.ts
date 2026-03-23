@@ -88,7 +88,7 @@ export const createSignedShippingQuoteToken = ({
     postalCode: string;
     country: string;
   };
-  items: Array<{ productId: string; quantity: number }>;
+  items: Array<{ productId: string; quantity: number; selection?: { size?: string; color?: string } }>;
   subtotalMinor: number;
   shipmentId?: string;
   rateId?: string;
@@ -109,6 +109,7 @@ export const createSignedShippingQuoteToken = ({
       items.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
+        selection: item.selection,
       })),
     ) || "";
   const shippingFingerprint = [

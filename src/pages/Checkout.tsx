@@ -136,9 +136,10 @@ const Checkout = () => {
   const checkoutItems = useMemo(() => buildCheckoutItems(items), [items]);
   const subtotalMinor = Math.round(totalPrice * 100);
   const normalizedDiscountCode = discountCode.trim().toUpperCase();
+  const effectiveDiscountCode = launchDiscountActive ? normalizedDiscountCode : "";
   const discountMinor = calculateLaunchDiscountMinor({
     subtotalMinor,
-    submittedCode: normalizedDiscountCode,
+    submittedCode: effectiveDiscountCode,
     launchDiscountCode: clientCommerceConfig.launchDiscountCode,
     launchDiscountRate: clientCommerceConfig.launchDiscountRate,
     launchDiscountActive,
@@ -322,6 +323,12 @@ const Checkout = () => {
       addressBlurTimeoutRef.current = null;
     }
   };
+
+  useEffect(() => {
+    if (!launchDiscountActive && discountCode) {
+      setDiscountCode("");
+    }
+  }, [launchDiscountActive, discountCode]);
 
   useEffect(() => {
     const handlePageShow = () => {
@@ -769,14 +776,14 @@ const Checkout = () => {
 
     try {
       clearPendingCheckoutRequest();
-      const idempotencyKey = buildClientIdempotencyKey({
-        email: checkoutForm.email,
-        postalCode: checkoutForm.deliveryMethod === "pickup" ? "pickup" : checkoutForm.postalCode,
-        discountCode: normalizedDiscountCode,
-        items: checkoutItems,
-        shippingContext:
-          checkoutForm.deliveryMethod === "pickup"
-            ? "pickup"
+        const idempotencyKey = buildClientIdempotencyKey({
+          email: checkoutForm.email,
+          postalCode: checkoutForm.deliveryMethod === "pickup" ? "pickup" : checkoutForm.postalCode,
+          discountCode: effectiveDiscountCode,
+          items: checkoutItems,
+          shippingContext:
+            checkoutForm.deliveryMethod === "pickup"
+              ? "pickup"
             : [
                 selectedShippingToken,
                 checkoutForm.address,
@@ -797,13 +804,13 @@ const Checkout = () => {
       checkoutTimeoutRef.current = timeout;
       const payload = await requestCloverCheckout({
         signal: controller.signal,
-        payload: {
-          customer: checkoutForm,
-          items: checkoutItems,
-          discountCode: normalizedDiscountCode,
-          shippingQuote: selectedShippingToken ? { token: selectedShippingToken } : undefined,
-          idempotencyKey,
-          cartToken,
+          payload: {
+            customer: checkoutForm,
+            items: checkoutItems,
+            discountCode: effectiveDiscountCode,
+            shippingQuote: selectedShippingToken ? { token: selectedShippingToken } : undefined,
+            idempotencyKey,
+            cartToken,
           cartTimestamp,
           website: "",
         },
@@ -952,36 +959,32 @@ const Checkout = () => {
                       />
                     </div>
 
-                    <div className="space-y-2 sm:col-span-2">
-                      <label htmlFor="discountCode" className="font-body text-sm font-semibold text-foreground">
-                        Discount code
-                      </label>
-                      <Input
-                        id="discountCode"
-                        maxLength={40}
-                        value={discountCode}
-                        onChange={(event) => setDiscountCode(event.target.value)}
-                        placeholder="Enter discount code"
-                        autoComplete="off"
-                      />
-                      {discountCode.trim() ? (
-                        <p className="text-xs text-muted-foreground">
-                          {normalizedDiscountCode !== LAUNCH_DISCOUNT_CODE
-                            ? `Invalid code.`
-                            : !launchDiscountActive
-                            ? `${LAUNCH_DISCOUNT_CODE} expired on ${launchDiscountEndsLabel}.`
-                            : `${LAUNCH_DISCOUNT_CODE} applied (10% off).`}
-                        </p>
-                      ) : launchDiscountActive ? (
-                        <p className="text-xs text-muted-foreground">
-                          Have a launch discount code? Enter it above to get 10% off. Offer ends {launchDiscountEndsLabel}.
-                        </p>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">
-                          Promotional launch discount has ended.
-                        </p>
-                      )}
-                    </div>
+                      {launchDiscountActive ? (
+                        <div className="space-y-2 sm:col-span-2">
+                          <label htmlFor="discountCode" className="font-body text-sm font-semibold text-foreground">
+                            Discount code
+                          </label>
+                          <Input
+                            id="discountCode"
+                            maxLength={40}
+                            value={discountCode}
+                            onChange={(event) => setDiscountCode(event.target.value)}
+                            placeholder="Enter discount code"
+                            autoComplete="off"
+                          />
+                          {discountCode.trim() ? (
+                            <p className="text-xs text-muted-foreground">
+                              {normalizedDiscountCode !== LAUNCH_DISCOUNT_CODE
+                                ? `Invalid code.`
+                                : `${LAUNCH_DISCOUNT_CODE} applied (10% off).`}
+                            </p>
+                          ) : (
+                            <p className="text-xs text-muted-foreground">
+                              Have a launch discount code? Enter it above to get 10% off. Offer ends {launchDiscountEndsLabel}.
+                            </p>
+                          )}
+                        </div>
+                      ) : null}
 
                     {isPickupInStore ? (
                       <div className="rounded-md border border-border bg-muted/20 p-3 text-sm text-muted-foreground sm:col-span-2">

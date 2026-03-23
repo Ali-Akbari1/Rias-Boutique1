@@ -132,10 +132,18 @@ export const checkoutCustomerSchema = z
     }
   });
 
+const checkoutItemSelectionSchema = z
+  .object({
+    size: z.string().trim().min(1, "Size is required.").max(80, "Size is too long."),
+    color: z.string().trim().min(1, "Color is required.").max(80, "Color is too long."),
+  })
+  .strict();
+
 export const checkoutItemSchema = z
   .object({
     productId: z.string().trim().min(1, "Product ID is required.").max(120, "Product ID is too long."),
     quantity: z.number().int().min(1).max(10),
+    selection: checkoutItemSelectionSchema,
   })
   .strict();
 

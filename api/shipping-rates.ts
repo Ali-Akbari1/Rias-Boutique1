@@ -129,6 +129,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       name: product.name,
       quantity: item.quantity,
       unitPriceMinor: product.priceMinor,
+      selection: {
+        size: item.selection?.size || "",
+        color: item.selection?.color || "",
+      },
     });
   }
 

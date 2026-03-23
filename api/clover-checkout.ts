@@ -336,6 +336,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       unitAmountMinor: product.priceMinor,
       quantity: requestedItem.quantity,
       lineTotalMinor: product.priceMinor * requestedItem.quantity,
+      selection: {
+        size: requestedItem.selection?.size || "",
+        color: requestedItem.selection?.color || "",
+      },
     });
   }
 

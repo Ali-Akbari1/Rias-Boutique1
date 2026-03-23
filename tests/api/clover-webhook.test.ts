@@ -19,7 +19,7 @@ const buildCheckoutRequestBody = () => {
     postalCode: "T2X 1A1",
     country: "Canada",
   };
-  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 1 }];
+  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 1, selection: { size: "One Size", color: "Default" } }];
 
   return {
     customer,

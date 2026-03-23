@@ -4,6 +4,10 @@ import { extractApiErrorMessage, requestJson } from "@/lib/api-client";
 interface CheckoutItemPayload {
   productId: string;
   quantity: number;
+  selection: {
+    size: string;
+    color: string;
+  };
 }
 
 interface ShippingCustomerPayload {
@@ -87,18 +91,37 @@ export interface ShippingRatesResponse {
   message?: string;
 }
 
+const normalizeSelectionValue = (value: string) => value.trim().toLowerCase();
 const normalizeLineItems = (items: CheckoutItemPayload[]) =>
   items
     .map((item) => ({
       productId: item.productId.trim(),
       quantity: item.quantity,
+      selection: {
+        size: normalizeSelectionValue(item.selection?.size || ""),
+        color: normalizeSelectionValue(item.selection?.color || ""),
+      },
     }))
-    .sort((a, b) => a.productId.localeCompare(b.productId));
+    .sort((a, b) => {
+      const idCompare = a.productId.localeCompare(b.productId);
+      if (idCompare !== 0) {
+        return idCompare;
+      }
+      const sizeCompare = a.selection.size.localeCompare(b.selection.size);
+      if (sizeCompare !== 0) {
+        return sizeCompare;
+      }
+      return a.selection.color.localeCompare(b.selection.color);
+    });
 
 export const buildCheckoutItems = (items: CartItem[]): CheckoutItemPayload[] =>
-  items.map(({ product, quantity }) => ({
+  items.map(({ product, quantity, selection }) => ({
     productId: product.id,
     quantity,
+    selection: {
+      size: selection.size,
+      color: selection.color,
+    },
   }));
 
 export const buildClientIdempotencyKey = ({

@@ -449,16 +449,34 @@ export const verifyWebhookTimestamp = (timestampHeader: string, toleranceMs: num
 };
 
 export const canonicalizeCartItems = (
-  items: Array<{ productId?: string | null; quantity?: number | null }>,
+  items: Array<{
+    productId?: string | null;
+    quantity?: number | null;
+    selection?: { size?: string | null; color?: string | null } | null;
+  }>,
 ) =>
   items
     .map((item) => ({
       productId: String(item.productId || "").trim(),
       quantity: Number(item.quantity),
+      selection: {
+        size: String(item.selection?.size || "").trim().toLowerCase(),
+        color: String(item.selection?.color || "").trim().toLowerCase(),
+      },
     }))
     .filter((item) => item.productId.length > 0 && Number.isFinite(item.quantity) && item.quantity > 0)
-    .sort((a, b) => a.productId.localeCompare(b.productId))
-    .map((item) => `${item.productId}:${item.quantity}`)
+    .sort((a, b) => {
+      const idCompare = a.productId.localeCompare(b.productId);
+      if (idCompare !== 0) {
+        return idCompare;
+      }
+      const sizeCompare = a.selection.size.localeCompare(b.selection.size);
+      if (sizeCompare !== 0) {
+        return sizeCompare;
+      }
+      return a.selection.color.localeCompare(b.selection.color);
+    })
+    .map((item) => `${item.productId}:${item.quantity}:${item.selection.size}:${item.selection.color}`)
     .join("|");
 
 export const buildCheckoutIdempotencyKey = ({

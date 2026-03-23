@@ -22,6 +22,10 @@ export interface QuoteLineItem {
   name?: string;
   quantity: number;
   unitPriceMinor?: number;
+  selection?: {
+    size?: string;
+    color?: string;
+  };
 }
 
 export interface VerifiedShippingAddress {
@@ -262,6 +266,12 @@ export const toQuoteLineItems = (items: Array<Partial<QuoteLineItem>>): QuoteLin
     quantity: typeof item.quantity === "number" && Number.isFinite(item.quantity) ? item.quantity : 0,
     unitPriceMinor:
       typeof item.unitPriceMinor === "number" && Number.isFinite(item.unitPriceMinor) ? item.unitPriceMinor : undefined,
+    selection: item.selection
+      ? {
+          size: normalizeString(item.selection.size),
+          color: normalizeString(item.selection.color),
+        }
+      : undefined,
   }));
 const parseCsvList = (value: string | undefined) =>
   (value || "")
@@ -393,6 +403,7 @@ const buildShippingContextHash = ({ customer, items, subtotalMinor }: EasyPostCo
       items.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
+        selection: item.selection,
       })),
     ) || "";
 

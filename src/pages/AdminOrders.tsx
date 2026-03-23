@@ -52,6 +52,9 @@ const statusBadgeVariant = (status: PaymentStatus): "default" | "secondary" | "d
   return "outline";
 };
 
+const CARRIER_PRESETS = ["Canada Post", "USPS", "UPS", "FedEx", "DHL", "Purolator"];
+const resolveCarrierPreset = (value: string) => (CARRIER_PRESETS.includes(value) ? value : "");
+
 const AdminOrders = () => {
   const [adminToken, setAdminToken] = useState("");
   const [orders, setOrders] = useState<AdminOrder[]>([]);
@@ -404,12 +407,29 @@ const AdminOrders = () => {
                          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                            Manual tracking details
                          </p>
-                         <div className="grid gap-2 sm:grid-cols-2">
-                           <Input
-                             value={trackingValues.code}
-                             onChange={(event) => updateTrackingInput(order, "code", event.target.value)}
-                             placeholder="Tracking number"
-                           />
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          <div className="sm:col-span-2">
+                            <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                              Carrier preset
+                            </label>
+                            <select
+                              value={resolveCarrierPreset(trackingValues.carrier)}
+                              onChange={(event) => updateTrackingInput(order, "carrier", event.target.value)}
+                              className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            >
+                              <option value="">Select a carrier (optional)</option>
+                              {CARRIER_PRESETS.map((carrier) => (
+                                <option key={carrier} value={carrier}>
+                                  {carrier}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <Input
+                            value={trackingValues.code}
+                            onChange={(event) => updateTrackingInput(order, "code", event.target.value)}
+                            placeholder="Tracking number"
+                          />
                            <Input
                              value={trackingValues.url}
                              onChange={(event) => updateTrackingInput(order, "url", event.target.value)}
@@ -588,11 +608,17 @@ const AdminOrders = () => {
                 <div className="space-y-2">
                   <p className="font-semibold text-foreground">Line Items</p>
                   {order.lineItems.map((item) => (
-                    <div key={`${order.id}-${item.productId}-${item.name}`} className="flex items-center justify-between rounded-md border border-border px-3 py-2">
+                    <div
+                      key={`${order.id}-${item.productId}-${item.name}-${item.selection?.size || ""}-${item.selection?.color || ""}`}
+                      className="flex items-center justify-between rounded-md border border-border px-3 py-2"
+                    >
                       <div className="min-w-0">
                         <p className="truncate font-medium text-foreground">{item.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {item.productId} | {item.quantity} x {formatMinorCad(item.unitAmountMinor)}
+                          {[item.productId, item.selection?.size ? `Size: ${item.selection.size}` : "", item.selection?.color ? `Color: ${item.selection.color}` : ""]
+                            .filter(Boolean)
+                            .join(" • ")}{" "}
+                          | {item.quantity} x {formatMinorCad(item.unitAmountMinor)}
                         </p>
                       </div>
                       <p className="font-semibold text-foreground">{formatMinorCad(item.lineTotalMinor)}</p>

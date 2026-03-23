@@ -16,7 +16,7 @@ const makeCheckoutBody = () => {
     postalCode: "T2X 1A1",
     country: "Canada",
   };
-  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 2 }];
+  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 2, selection: { size: "One Size", color: "Default" } }];
 
   return {
     customer,
@@ -65,7 +65,9 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        items: [{ productId: "Royal-Blue", quantity: 1, unitAmount: 1 }],
+        items: [
+          { productId: "Royal-Blue", quantity: 1, unitAmount: 1, selection: { size: "One Size", color: "Default" } },
+        ],
       }),
     });
     const response = createMockResponse();
@@ -89,7 +91,7 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        items: [{ productId: "does-not-exist", quantity: 1 }],
+        items: [{ productId: "does-not-exist", quantity: 1, selection: { size: "One Size", color: "Default" } }],
       }),
     });
     const response = createMockResponse();
@@ -129,7 +131,7 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        items: [{ productId: "Burgundy-Bridal-Dress", quantity: 1 }],
+        items: [{ productId: "Burgundy-Bridal-Dress", quantity: 1, selection: { size: "One Size", color: "Default" } }],
       }),
     });
     const response = createMockResponse();
@@ -201,7 +203,7 @@ describe("clover checkout endpoint", () => {
           ...makeCheckoutBody().customer,
           email: "not-an-email",
         },
-        items: [{ productId: "Blue-Cheerma-Dozi", quantity: 11 }],
+        items: [{ productId: "Blue-Cheerma-Dozi", quantity: 11, selection: { size: "One Size", color: "Default" } }],
       }),
     });
     const response = createMockResponse();
@@ -245,6 +247,7 @@ describe("clover checkout endpoint", () => {
   });
 
   it("applies LAUNCH10 discount to checkout line items", async () => {
+    process.env.LAUNCH10_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "checkout_launch10", href: "https://checkout.clover.com/pay/checkout_launch10" }), {
         status: 200,
@@ -301,7 +304,9 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        items: [{ productId: "Blue-Cheerma-Dozi", quantity: 2, unitAmount: 1 }],
+        items: [
+          { productId: "Blue-Cheerma-Dozi", quantity: 2, unitAmount: 1, selection: { size: "One Size", color: "Default" } },
+        ],
       }),
     });
     const response = createMockResponse();

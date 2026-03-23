@@ -43,7 +43,7 @@ describe("checkout flow", () => {
     expect(screen.getByLabelText(/^country$/i)).toHaveValue("");
   });
 
-  it("submits only productId and quantity for checkout payload", async () => {
+  it("submits product selection details for checkout payload", async () => {
     const product = products[0];
     window.localStorage.setItem(
       CART_STORAGE_KEY,
@@ -222,7 +222,11 @@ describe("checkout flow", () => {
     expect(requestPayload.items).toEqual([
       {
         productId: product.id,
-        quantity: 2,
+        quantity: 1,
+        selection: {
+          size: "One Size",
+          color: "Default",
+        },
       },
     ]);
     expect(requestPayload.shippingQuote).toEqual({ token: "quote_token_123" });

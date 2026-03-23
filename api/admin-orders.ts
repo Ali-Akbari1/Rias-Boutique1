@@ -19,6 +19,7 @@ import { sendTrackingEmail } from "../server/lib/email.js";
 import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
 import { refundShippingLabel } from "../server/lib/easypost.js";
 import { findOrderById, isOrderStoreConfigured, listOrders, saveOrderShipment } from "../server/lib/order-store.js";
+import { buildCarrierTrackingUrl } from "../server/lib/tracking.js";
 import { z } from "zod";
 
 const DEFAULT_RATE_LIMIT = 60;
@@ -199,6 +200,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const trackingUrl = (validation.data.trackingUrl || "").trim();
     const carrier = (validation.data.carrier || "").trim();
     const service = (validation.data.service || "").trim();
+    const generatedTrackingUrl = !trackingUrl
+      ? buildCarrierTrackingUrl({ carrier, trackingCode })
+      : "";
+    const resolvedTrackingUrl = trackingUrl || generatedTrackingUrl;
 
     if (!trackingCode && !trackingUrl) {
       sendError(res, 400, "TRACKING_REQUIRED", "Tracking number or tracking link is required.");
@@ -213,7 +218,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           carrier: carrier || undefined,
           service: service || undefined,
           trackingCode: trackingCode || undefined,
-          trackingUrl: trackingUrl || undefined,
+          trackingUrl: resolvedTrackingUrl || undefined,
           status: "manual",
           purchasedAt: new Date().toISOString(),
         },

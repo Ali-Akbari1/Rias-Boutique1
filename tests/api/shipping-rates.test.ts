@@ -45,7 +45,9 @@ describe("shipping rates endpoint", () => {
             postalCode: "20004",
             country: "United States",
           },
-          items: [{ productId: "mens-offwhite-with-white", quantity: 2 }],
+          items: [
+            { productId: "mens-offwhite-with-white", quantity: 2, selection: { size: "One Size", color: "Default" } },
+          ],
         }),
       }),
       response,
@@ -163,7 +165,9 @@ describe("shipping rates endpoint", () => {
             postalCode: "20004",
             country: "United States",
           },
-          items: [{ productId: "mens-offwhite-with-white", quantity: 2 }],
+          items: [
+            { productId: "mens-offwhite-with-white", quantity: 2, selection: { size: "One Size", color: "Default" } },
+          ],
         }),
       }),
       response,
