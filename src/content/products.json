@@ -78,7 +78,7 @@
       "id": "Blue-Cheerma-Dozi",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0557.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Long blue handmade cheerma dozi dress. \n\n2 piece: Dress and chadar",
       "category": "Party Wear",
       "salePercent": "",
@@ -104,7 +104,7 @@
       "id": "Royal-Blue",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_0667.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "3 piece velvet suit with gulabatoon embroidery\n",
       "category": "Party Wear",
       "fitInfo": "Bust: 40in\nTop Length: 36in\nPants Length: 38in\n"
@@ -162,7 +162,7 @@
       "id": "White-cheerma-with-gold",
       "createdAt": "2026-02-17",
       "image": "/uploads/img_8832-2.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "White velvet dress with wide-leg pants, featuring handmade cheerma. \n",
       "category": "Party Wear",
       "fitInfo": "Bust: 42in \nSleeves: 22in\nShoulders: 16in\nLength of Pants: 38in \n\n3 pieces: Dress, Pants, Chadar\n"
@@ -275,7 +275,7 @@
       "id": "pink-banaras-dress",
       "createdAt": "2026-02-18",
       "image": "/uploads/img_8963.webp",
-      "inventory": 1,
+      "inventory": "sold_out",
       "description": "3 piece pink banaras dress with handmade cheerma.",
       "category": "Party Wear",
       "fitInfo": "Bust: 40in"
@@ -443,17 +443,14 @@
       "galleryImages": [
         "/uploads/img_0786.webp",
         "/uploads/img_0787.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
-      "name": "Men's Black and Parantoban",
+      "name": "Men's Black and Gold Parantoban",
       "slug": "men-black-gold",
       "colors": [
-        "Black"
+        "Black with Gold"
       ],
-      "sizes": [
-        "Small",
-        "XX-Large"
-      ],
+      "sizes": [],
       "department": "men",
       "popularity": 100,
       "careInstructions": [
@@ -462,21 +459,22 @@
       "id": "men-black-gold",
       "createdAt": "2026-02-24",
       "image": "/uploads/img_0786.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements. "
+      "fitInfo": "Please check our size chart for all specific measurements. \n\nPlease note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
+      "fabric": "*Mirror work is handmade. ",
       "price": 225,
       "galleryImages": [
         "/uploads/img_0790.webp",
         "/uploads/img_0795.webp",
         "/uploads/img_0789.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
-      "name": "Handmade Mens Parantoban ",
-      "slug": "Handmade-mens-parantoban",
+      "name": "Handmade Mens Parantoban in Black",
+      "slug": "Handmade-mens-parantoban-black",
       "colors": [
         "Black"
       ],
@@ -488,29 +486,27 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
-      "id": "Handmade-mens-parantoban",
+      "id": "Handmade-mens-parantoban-black",
       "createdAt": "2026-02-24",
       "image": "/uploads/img_0790.webp",
       "inventory": "available",
       "description": "Handmade black mens parantoban with silver embroidery. ",
       "category": "Handmade",
-      "fitInfo": "Please check our size chart for all specific measurements. \nSize: 46in"
+      "fitInfo": "Please check our size chart for all specific measurements. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
       "price": 110,
       "galleryImages": [
         "/uploads/img_0797.webp",
         "/uploads/img_0802.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
-      "name": "Men's Off-White Parantoban ",
+      "name": "Men's Off-White and Gold Parantoban ",
       "slug": "mens-offwhite-with-gold",
       "colors": [
         "Off-white "
       ],
       "sizes": [
-        "Large",
-        "XX-Large ",
         "Small"
       ],
       "department": "men",
@@ -523,14 +519,14 @@
       "inventory": "available",
       "description": "Off-white machine made men's parantoban with gold embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements. "
+      "fitInfo": "Please check our size chart for all specific measurements. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
       "price": 110,
       "galleryImages": [
         "/uploads/img_0812.webp",
         "/uploads/img_0811.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
       "name": "Men's Grey Parantoban",
       "slug": "mens-grey-parantoban",
@@ -550,7 +546,7 @@
       "inventory": "sold_out",
       "description": "Machine made men's grey parantoban with silver and grey embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements."
+      "fitInfo": "Please check our size chart for all specific measurements.\n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
       "fabric": "*Mirror work is handmade ",
@@ -558,7 +554,7 @@
       "galleryImages": [
         "/uploads/img_0821.webp",
         "/uploads/img_0815.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
       "name": "Men's White Handmade Parantoban",
       "slug": "mens-white-handmade-parantoban",
@@ -566,8 +562,6 @@
         "White"
       ],
       "sizes": [
-        "Large",
-        "Medium",
         "X-Large"
       ],
       "department": "men",
@@ -580,14 +574,14 @@
       "inventory": "available",
       "description": "Handmade men's white parantoban with silver embroidery and mirror work. ",
       "category": "Handmade",
-      "fitInfo": "Please check our size chart for all specific measurements.\n\nPlease measure before ordering. \n\n"
+      "fitInfo": "Please check our size chart for all specific measurements.\n\nPlease measure before ordering. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n"
     },
     {
       "price": 110,
       "galleryImages": [
         "/uploads/img_0837.webp",
         "/uploads/img_0832.webp",
-        "/uploads/grey-minimalist-clean-size-chart-instagram-post.webp"
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
       ],
       "name": "Men's Off-White Parantoban ",
       "slug": "mens-offwhite-with-white",
@@ -595,7 +589,8 @@
         "Off-White"
       ],
       "sizes": [
-        "Medium"
+        "Medium",
+        "XX-Large"
       ],
       "department": "men",
       "careInstructions": [
@@ -606,7 +601,8 @@
       "image": "/uploads/img_0837.webp",
       "inventory": "available",
       "description": "Men's off-white parantoban with white embroidery. ",
-      "category": "Machine Made"
+      "category": "Machine Made",
+      "fitInfo": "Please check our size chart for all specific measurements before ordering.\n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
       "fabric": "Hazaragi (Du-Domina) ",
@@ -676,7 +672,6 @@
         "Baby Blue "
       ],
       "sizes": [
-        "Medium",
         "Large"
       ],
       "department": "women",
@@ -686,7 +681,7 @@
       "id": "baby-blue-du-domina",
       "createdAt": "2026-03-07",
       "image": "/uploads/img_0888.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Baby blue Hazaragi dress ",
       "category": "Party Wear",
       "fitInfo": "* 3 pieces: dress, pants, and white scarf\n\nMedium (Bust: 42in)\nLarge (Bust: 44in)"
@@ -718,6 +713,59 @@
       "description": "Emerald green dress with gulabatoon detailing. ",
       "category": "Party Wear",
       "fitInfo": "Bust: 42in"
+    },
+    {
+      "fabric": "Barosha",
+      "price": 250,
+      "galleryImages": [
+        "/uploads/img_1240-2.jpg",
+        "/uploads/img_1247-2.jpg",
+        "/uploads/img_1250-2.jpg"
+      ],
+      "name": "Teal Barosha Dress",
+      "slug": "teal-barosha-dress",
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only "
+      ],
+      "id": "teal-barosha-dress",
+      "image": "/uploads/img_1240-2.jpg",
+      "inventory": "sold_out",
+      "description": "Teal barosha dress with silver cheerma detailing. ",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 38in \nSleeves: 21in\nLength of Dress: 36in\n\n\n"
+    },
+    {
+      "price": 110,
+      "galleryImages": [
+        "/uploads/img_1255.jpg",
+        "/uploads/img_1256.jpg",
+        "/uploads/grey-minimalist-clean-size-chart-instagram-post.png"
+      ],
+      "name": "Men's White Parantoban ",
+      "slug": "white-mens-parantoban",
+      "colors": [
+        "True White"
+      ],
+      "sizes": [
+        "Medium",
+        "Large",
+        "X-Large",
+        "XX-Large"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "true-white-mens-parantoban",
+      "image": "/uploads/img_1255.jpg",
+      "inventory": "available",
+      "description": "True white men's parantoban with white embroidery. ",
+      "category": "Machine Made",
+      "fitInfo": "Please check our size chart for all specific measurements before ordering. \n\n*Please note: Elastic and/or an ezar band for the pants are not included."
     }
   ]
 }
