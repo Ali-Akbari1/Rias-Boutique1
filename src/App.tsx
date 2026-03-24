@@ -3,11 +3,13 @@ import { Toaster } from "@/shared/ui/toaster";
 import { Toaster as Sonner } from "@/shared/ui/sonner";
 import { TooltipProvider } from "@/shared/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import { CartProvider } from "@/features/cart/context/CartContext";
 import LaunchDiscountPopup from "@/features/home/components/LaunchDiscountPopup";
 import RouteMetadata from "@/features/navigation/components/RouteMetadata";
 import ScrollToTop from "@/features/navigation/components/ScrollToTop";
+import { resolveCanonicalPath } from "@/features/navigation/route-manifest";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import HomePage from "./pages/HomePage";
 import Checkout from "./pages/Checkout";
@@ -22,6 +24,14 @@ const queryClient = new QueryClient();
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const FaqPage = lazy(() => import("./pages/FaqPage"));
 
+const AnalyticsTracker = () => {
+  const location = useLocation();
+  const route = resolveCanonicalPath(location.pathname, location.search);
+  const path = `${location.pathname}${location.search}`;
+
+  return <Analytics route={route} path={path} />;
+};
+
 const App = () => {
   const checkoutEnabled = isCheckoutEnabled();
 
@@ -35,6 +45,7 @@ const App = () => {
             <LaunchDiscountPopup />
             <RouteMetadata />
             <ScrollToTop />
+            <AnalyticsTracker />
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/collection" element={<CollectionPage />} />
