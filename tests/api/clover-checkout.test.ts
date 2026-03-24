@@ -16,7 +16,7 @@ const makeCheckoutBody = () => {
     postalCode: "T2X 1A1",
     country: "Canada",
   };
-  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 2, selection: { size: "One Size", color: "Default" } }];
+  const items = [{ productId: "Blue-Cheerma-Dozi", quantity: 1, selection: { size: "One Size", color: "Default" } }];
 
   return {
     customer,
@@ -25,7 +25,7 @@ const makeCheckoutBody = () => {
       token: createSignedShippingQuoteToken({
         customer,
         items,
-        subtotalMinor: 80_000,
+        subtotalMinor: 40_000,
         customerRateMinor: 0,
         quotedRateMinor: 1_800,
         freeShippingApplied: true,
@@ -35,6 +35,8 @@ const makeCheckoutBody = () => {
 };
 
 describe("clover checkout endpoint", () => {
+  let catalogSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(async () => {
     vi.restoreAllMocks();
 
@@ -52,6 +54,20 @@ describe("clover checkout endpoint", () => {
     process.env.EASYPOST_FROM_STATE = "AB";
     process.env.EASYPOST_FROM_ZIP = "T4A 0X8";
     process.env.EASYPOST_FROM_COUNTRY = "CA";
+
+    catalogSpy = vi.spyOn(productCatalog, "getCatalogMap").mockResolvedValue(
+      new Map([
+        [
+          "Blue-Cheerma-Dozi",
+          {
+            id: "Blue-Cheerma-Dozi",
+            name: "Blue Long Cheerma Dozi Dress",
+            priceMinor: 40000,
+            availability: "available",
+          },
+        ],
+      ]),
+    );
 
     await resetOrderStoreForTests();
   });
@@ -109,7 +125,7 @@ describe("clover checkout endpoint", () => {
   it("rejects sold out products", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
-    vi.spyOn(productCatalog, "getCatalogMap").mockResolvedValue(
+    catalogSpy.mockResolvedValue(
       new Map([
         [
           "Burgundy-Bridal-Dress",
@@ -283,8 +299,8 @@ describe("clover checkout endpoint", () => {
 
     expect(lineItems.every((lineItem) => lineItem.price > 0)).toBe(true);
     expect(lineItems.some((lineItem) => lineItem.name.includes("Discount"))).toBe(false);
-    expect(taxLine?.price).toBe(3600);
-    expect(lineItemsTotal).toBe(75600);
+    expect(taxLine?.price).toBe(1800);
+    expect(lineItemsTotal).toBe(37800);
   });
 
   it("uses trusted server pricing instead of client price", async () => {
@@ -334,7 +350,7 @@ describe("clover checkout endpoint", () => {
       shoppingCart?: { lineItems?: Array<{ price: number; unitQty: number }> };
     };
     expect(fetchPayload.shoppingCart?.lineItems?.[0]?.price).toBe(40000);
-    expect(fetchPayload.shoppingCart?.lineItems?.[0]?.unitQty).toBe(2);
+    expect(fetchPayload.shoppingCart?.lineItems?.[0]?.unitQty).toBe(1);
   });
 
   it("reuses existing checkout session for duplicate submissions (idempotency)", async () => {

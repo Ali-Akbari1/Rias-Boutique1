@@ -46,7 +46,7 @@ describe("shipping rates endpoint", () => {
             country: "United States",
           },
           items: [
-            { productId: "mens-offwhite-with-white", quantity: 2, selection: { size: "One Size", color: "Default" } },
+            { productId: "mens-offwhite-with-white", quantity: 1, selection: { size: "One Size", color: "Default" } },
           ],
         }),
       }),
@@ -116,9 +116,9 @@ describe("shipping rates endpoint", () => {
         expect(body.shipment?.customs_info?.customs_items?.[0]?.code).toBe("620443");
         expect(body.shipment?.customs_info?.customs_items?.[0]?.hs_tariff_number).toBe("620443");
         expect(body.shipment?.customs_info?.customs_items?.[0]?.origin_country).toBe("CA");
-        expect(body.shipment?.customs_info?.customs_items?.[0]?.quantity).toBe(2);
-        expect(body.shipment?.customs_info?.customs_items?.[0]?.value).toBe(220);
-        expect(body.shipment?.customs_info?.customs_items?.[0]?.weight).toBe(48);
+        expect(body.shipment?.customs_info?.customs_items?.[0]?.quantity).toBe(1);
+        expect(body.shipment?.customs_info?.customs_items?.[0]?.value).toBe(110);
+        expect(body.shipment?.customs_info?.customs_items?.[0]?.weight).toBe(24);
 
         return new Response(
           JSON.stringify({
@@ -166,7 +166,7 @@ describe("shipping rates endpoint", () => {
             country: "United States",
           },
           items: [
-            { productId: "mens-offwhite-with-white", quantity: 2, selection: { size: "One Size", color: "Default" } },
+            { productId: "mens-offwhite-with-white", quantity: 1, selection: { size: "One Size", color: "Default" } },
           ],
         }),
       }),

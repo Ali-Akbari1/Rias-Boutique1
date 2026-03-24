@@ -1,9 +1,11 @@
 import { z } from "zod";
+import type { CatalogProduct } from "./product-catalog.js";
 
 const nameRegex = /^[\p{L}\p{M}.'\- ]+$/u;
 const phoneRegex = /^[0-9()+\-.\s]{7,22}$/;
 const postalRegex = /^[A-Za-z0-9\- ]{3,20}$/;
 const deliveryMethodSchema = z.enum(["shipping", "pickup"]);
+const HARD_MAX_ITEM_QUANTITY = 10;
 
 export const checkoutCustomerSchema = z
   .object({
@@ -142,7 +144,7 @@ const checkoutItemSelectionSchema = z
 export const checkoutItemSchema = z
   .object({
     productId: z.string().trim().min(1, "Product ID is required.").max(120, "Product ID is too long."),
-    quantity: z.number().int().min(1).max(10),
+    quantity: z.number().int().min(1).max(HARD_MAX_ITEM_QUANTITY),
     selection: checkoutItemSelectionSchema,
   })
   .strict();
@@ -176,6 +178,32 @@ export const checkoutRequestSchema = z
     shippingQuote: checkoutShippingQuoteSchema.optional(),
   })
   .strict();
+
+const normalizeMaxQuantity = (value: unknown) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  return Math.max(0, Math.floor(parsed));
+};
+
+export const getMaxQuantityForCatalogProduct = (product: CatalogProduct) => {
+  if (product.availability === "sold_out") {
+    return 0;
+  }
+
+  const configured = normalizeMaxQuantity(product.maxQuantity);
+  if (configured === null) {
+    return 1;
+  }
+
+  return Math.min(Math.max(1, configured), HARD_MAX_ITEM_QUANTITY);
+};
 
 export type CheckoutCustomerInput = z.infer<typeof checkoutCustomerSchema>;
 export type CheckoutItemInput = z.infer<typeof checkoutItemSchema>;

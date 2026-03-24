@@ -8,6 +8,7 @@ export interface Product {
   slug: string;
   name: string;
   price: number;
+  maxQuantity?: number;
   compareAtPrice?: number;
   salePercent?: number;
   department: ProductDepartment;
@@ -31,6 +32,7 @@ interface RawProduct {
   slug?: string;
   name?: string;
   price?: number | string;
+  maxQuantity?: number | string | null;
   image?: string;
   galleryImages?: string[];
   category?: string;
@@ -114,6 +116,19 @@ const getNumber = (value: unknown, fallback: number) => {
 
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const normalizeMaxQuantity = (value: unknown) => {
+  if (value === null || value === undefined || value === "") {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return undefined;
+  }
+
+  return Math.max(0, Math.floor(parsed));
 };
 
 const normalizeAvailability = (value: unknown): "available" | "sold_out" => {
@@ -225,6 +240,7 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
   const department = normalizeDepartment(product.department, category);
   const availability = normalizeAvailability(product.availability ?? product.inventory);
   const price = Math.max(0, getNumber(product.price, 0));
+  const maxQuantity = normalizeMaxQuantity(product.maxQuantity);
   const saleData = normalizeSaleData(price, product.salePercent, product.compareAtPrice);
 
   return {
@@ -232,6 +248,7 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
     slug,
     name,
     price,
+    maxQuantity,
     compareAtPrice: saleData.compareAtPrice,
     salePercent: saleData.salePercent,
     department,

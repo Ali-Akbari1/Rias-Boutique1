@@ -65,6 +65,16 @@ collections:
                   - { label: "Available", value: "available" }
                   - { label: "Sold Out", value: "sold_out" }
               - {
+                  label: "Max Order Quantity",
+                  name: "maxQuantity",
+                  widget: "number",
+                  value_type: "int",
+                  min: 1,
+                  max: 10,
+                  required: false,
+                  hint: "Leave blank to default to 1. Sold out always forces 0."
+                }
+              - {
                   label: "Category",
                   name: "category",
                   widget: "select",

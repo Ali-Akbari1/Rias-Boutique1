@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { type Product } from "@/features/catalog/data/products";
+import { getProductById, type Product } from "@/features/catalog/data/products";
 
 export interface ProductSelection {
   size: string;
@@ -25,7 +25,33 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 const CART_STORAGE_KEY = "rias_boutique_cart_v1";
-const MAX_ITEM_QUANTITY = 1;
+
+const HARD_MAX_ITEM_QUANTITY = 10;
+const normalizeMaxQuantity = (value: unknown) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  return Math.max(0, Math.floor(parsed));
+};
+
+export const getMaxQuantityForProduct = (product: Product) => {
+  if (product.availability === "sold_out") {
+    return 0;
+  }
+
+  const configured = normalizeMaxQuantity(product.maxQuantity);
+  if (configured === null) {
+    return 1;
+  }
+
+  return Math.min(Math.max(1, configured), HARD_MAX_ITEM_QUANTITY);
+};
 
 const buildCartItemId = (productId: string, selection: ProductSelection) =>
   `${productId}-${selection.size}-${selection.color}`;
@@ -76,13 +102,23 @@ const restoreCartFromStorage = (): CartItem[] => {
         continue;
       }
 
-      const normalizedQuantity = Math.min(MAX_ITEM_QUANTITY, candidate.quantity);
+      const resolvedProduct = getProductById(candidate.product.id) || candidate.product;
+      const maxQuantity = getMaxQuantityForProduct(resolvedProduct);
+      if (maxQuantity <= 0) {
+        continue;
+      }
+
+      const normalizedQuantity = Math.min(maxQuantity, candidate.quantity);
+      if (normalizedQuantity <= 0) {
+        continue;
+      }
       const existing = merged.get(candidate.id);
       if (existing) {
-        existing.quantity = Math.min(MAX_ITEM_QUANTITY, existing.quantity + normalizedQuantity);
+        existing.quantity = Math.min(maxQuantity, existing.quantity + normalizedQuantity);
       } else {
         merged.set(candidate.id, {
           ...candidate,
+          product: resolvedProduct,
           quantity: normalizedQuantity,
         });
       }
@@ -106,6 +142,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = (product: Product, selection: ProductSelection) => {
     setItems((prev) => {
+      const maxQuantity = getMaxQuantityForProduct(product);
+      if (maxQuantity <= 0) {
+        return prev;
+      }
+
       const itemId = buildCartItemId(product.id, selection);
       const existing = prev.find((item) => item.id === itemId);
 
@@ -113,7 +154,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         return prev;
       }
 
-      return [...prev, { id: itemId, product, selection, quantity: 1 }];
+      return [...prev, { id: itemId, product, selection, quantity: Math.min(1, maxQuantity) }];
     });
   };
 
@@ -127,8 +168,24 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const nextQuantity = Math.min(quantity, MAX_ITEM_QUANTITY);
-    setItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, quantity: nextQuantity } : item)));
+    setItems((prev) => {
+      const target = prev.find((item) => item.id === itemId);
+      if (!target) {
+        return prev;
+      }
+
+      const maxQuantity = getMaxQuantityForProduct(target.product);
+      if (maxQuantity <= 0) {
+        return prev.filter((item) => item.id !== itemId);
+      }
+
+      const nextQuantity = Math.min(quantity, maxQuantity);
+      if (nextQuantity <= 0) {
+        return prev.filter((item) => item.id !== itemId);
+      }
+
+      return prev.map((item) => (item.id === itemId ? { ...item, quantity: nextQuantity } : item));
+    });
   };
 
   const clearCart = () => setItems([]);

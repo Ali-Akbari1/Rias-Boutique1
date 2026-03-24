@@ -18,7 +18,7 @@ import {
   resolveAllowedOrigin,
   verifyCartToken,
 } from "../server/lib/security.js";
-import { checkoutRequestSchema } from "../server/lib/checkout-schema.js";
+import { checkoutRequestSchema, getMaxQuantityForCatalogProduct } from "../server/lib/checkout-schema.js";
 import { getCatalogMap } from "../server/lib/product-catalog.js";
 import {
   attachCheckoutSession,
@@ -327,6 +327,14 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     if (product.availability === "sold_out") {
       sendError(res, 400, "PRODUCT_SOLD_OUT", `${product.name} is currently sold out.`);
+      return;
+    }
+
+    const maxQuantity = getMaxQuantityForCatalogProduct(product);
+    if (requestedItem.quantity > maxQuantity) {
+      sendError(res, 400, "VALIDATION_ERROR", "Some checkout fields are invalid.", {
+        items: [`${product.name} has a max quantity of ${maxQuantity}.`],
+      });
       return;
     }
 

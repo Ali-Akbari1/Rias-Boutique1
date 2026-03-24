@@ -1,7 +1,7 @@
 import { parseJsonBody, readRawBody, sendError, type ApiRequest, type ApiResponse } from "../server/lib/http.js";
 import { logger } from "../server/lib/logger.js";
 import { applyRateLimitHeaders, checkRateLimit } from "../server/lib/rate-limit.js";
-import { checkoutCustomerSchema, checkoutItemSchema } from "../server/lib/checkout-schema.js";
+import { checkoutCustomerSchema, checkoutItemSchema, getMaxQuantityForCatalogProduct } from "../server/lib/checkout-schema.js";
 import {
   applyCorsResponseHeaders,
   buildAllowedOrigins,
@@ -120,6 +120,14 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     if (product.availability === "sold_out") {
       sendError(res, 400, "PRODUCT_SOLD_OUT", `${product.name} is currently sold out.`);
+      return;
+    }
+
+    const maxQuantity = getMaxQuantityForCatalogProduct(product);
+    if (item.quantity > maxQuantity) {
+      sendError(res, 400, "VALIDATION_ERROR", "Shipping request is invalid.", {
+        items: [`${product.name} has a max quantity of ${maxQuantity}.`],
+      });
       return;
     }
 

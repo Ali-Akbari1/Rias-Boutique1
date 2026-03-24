@@ -1,6 +1,6 @@
 import { X, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "@/features/cart/context/CartContext";
+import { getMaxQuantityForProduct, useCart } from "@/features/cart/context/CartContext";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatCad } from "@/lib/money";
 import BagIcon from "@/shared/ui/BagIcon";
@@ -45,7 +45,8 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
           <>
             <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:space-y-6 sm:p-6">
               {items.map(({ id, product, selection, quantity }) => {
-                const isMaxQuantity = quantity >= 1;
+                const maxQuantity = getMaxQuantityForProduct(product);
+                const isMaxQuantity = maxQuantity <= 0 || quantity >= maxQuantity;
 
                 return (
                   <div key={id} className="flex gap-3 sm:gap-4">
@@ -71,7 +72,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                         <button
                           onClick={() => updateQuantity(id, quantity + 1)}
                           disabled={isMaxQuantity}
-                          title={isMaxQuantity ? "Limit 1 per item" : "Increase quantity"}
+                          title={isMaxQuantity ? (maxQuantity <= 0 ? "Sold out" : `Limit ${maxQuantity} per item`) : "Increase quantity"}
                           className={`h-8 w-8 rounded-sm border border-border flex items-center justify-center text-foreground transition-colors ${
                             isMaxQuantity ? "cursor-not-allowed opacity-40" : "hover:bg-secondary"
                           }`}

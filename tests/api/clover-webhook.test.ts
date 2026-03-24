@@ -6,6 +6,7 @@ import webhookHandler from "../../api/clover-webhook";
 import orderStatusHandler from "../../api/order-status";
 import { createMockRequest, createMockResponse, createSignedShippingQuoteToken } from "./test-utils/utils";
 import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
+import * as productCatalog from "../../server/lib/product-catalog";
 const WEBHOOK_SECRET = "webhook_secret_test";
 
 const buildCheckoutRequestBody = () => {
@@ -86,6 +87,20 @@ describe("clover webhook flow", () => {
     process.env.EASYPOST_FROM_STATE = "AB";
     process.env.EASYPOST_FROM_ZIP = "T4A 0X8";
     process.env.EASYPOST_FROM_COUNTRY = "CA";
+
+    vi.spyOn(productCatalog, "getCatalogMap").mockResolvedValue(
+      new Map([
+        [
+          "Blue-Cheerma-Dozi",
+          {
+            id: "Blue-Cheerma-Dozi",
+            name: "Blue Long Cheerma Dozi Dress",
+            priceMinor: 40000,
+            availability: "available",
+          },
+        ],
+      ]),
+    );
 
     await resetOrderStoreForTests();
   });

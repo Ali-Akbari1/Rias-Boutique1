@@ -7,6 +7,7 @@ export interface CatalogProduct {
   name: string;
   priceMinor: number;
   availability: "available" | "sold_out";
+  maxQuantity?: number;
 }
 
 const productSchema = z.object({
@@ -19,6 +20,7 @@ const productSchema = z.object({
   // Kept as "inventory" to support Decap CMS schema and legacy numeric values.
   inventory: z.union([z.number(), z.string(), z.null(), z.undefined()]).optional(),
   availability: z.string().optional(),
+  maxQuantity: z.union([z.number(), z.string(), z.null(), z.undefined()]).optional(),
 });
 
 const contentSchema = z.object({
@@ -55,6 +57,19 @@ const normalizeAvailability = (value: unknown): "available" | "sold_out" => {
   return "available";
 };
 
+const normalizeMaxQuantity = (value: unknown) => {
+  if (value === null || value === undefined || value === "") {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return undefined;
+  }
+
+  return Math.max(0, Math.floor(parsed));
+};
+
 export const loadCatalog = async () => {
   if (cache && Date.now() - cache.loadedAt < CACHE_TTL_MS) {
     return cache.products;
@@ -80,6 +95,7 @@ export const loadCatalog = async () => {
       name: product.name,
       priceMinor: Math.round(product.price * 100),
       availability: normalizeAvailability(product.availability ?? product.inventory),
+      maxQuantity: normalizeMaxQuantity(product.maxQuantity),
     };
   });
 
