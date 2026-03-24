@@ -1,44 +1,15 @@
 {
-  "rewrites": [
+  "redirects": [
     {
-      "source": "/favicon.ico",
-      "destination": "/RAb.png"
-    },
-    {
-      "source": "/collection",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/collection/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/about",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/faq",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/checkout",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/checkout/success",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/checkout/cancel",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/orders-admin",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/products/(.*)",
-      "destination": "/index.html"
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "riasboutique.com"
+        }
+      ],
+      "destination": "https://www.riasboutique.com/$1",
+      "permanent": true
     }
   ]
 }
