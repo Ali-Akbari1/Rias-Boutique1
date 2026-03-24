@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, Lock, RotateCcw, Search, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/features/cart/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { track } from "@vercel/analytics/react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
@@ -773,17 +774,26 @@ const Checkout = () => {
     }
 
     setIsLoading(true);
+    track("Checkout Started", {
+      items: checkoutItems.length,
+      itemQuantity: items.reduce((sum, item) => sum + item.quantity, 0),
+      total,
+      shipping,
+      discount,
+      deliveryMethod: checkoutForm.deliveryMethod,
+      hasDiscount: discountMinor > 0,
+    });
 
     try {
       clearPendingCheckoutRequest();
-        const idempotencyKey = buildClientIdempotencyKey({
-          email: checkoutForm.email,
-          postalCode: checkoutForm.deliveryMethod === "pickup" ? "pickup" : checkoutForm.postalCode,
-          discountCode: effectiveDiscountCode,
-          items: checkoutItems,
-          shippingContext:
-            checkoutForm.deliveryMethod === "pickup"
-              ? "pickup"
+      const idempotencyKey = buildClientIdempotencyKey({
+        email: checkoutForm.email,
+        postalCode: checkoutForm.deliveryMethod === "pickup" ? "pickup" : checkoutForm.postalCode,
+        discountCode: effectiveDiscountCode,
+        items: checkoutItems,
+        shippingContext:
+          checkoutForm.deliveryMethod === "pickup"
+            ? "pickup"
             : [
                 selectedShippingToken,
                 checkoutForm.address,
@@ -804,13 +814,13 @@ const Checkout = () => {
       checkoutTimeoutRef.current = timeout;
       const payload = await requestCloverCheckout({
         signal: controller.signal,
-          payload: {
-            customer: checkoutForm,
-            items: checkoutItems,
-            discountCode: effectiveDiscountCode,
-            shippingQuote: selectedShippingToken ? { token: selectedShippingToken } : undefined,
-            idempotencyKey,
-            cartToken,
+        payload: {
+          customer: checkoutForm,
+          items: checkoutItems,
+          discountCode: effectiveDiscountCode,
+          shippingQuote: selectedShippingToken ? { token: selectedShippingToken } : undefined,
+          idempotencyKey,
+          cartToken,
           cartTimestamp,
           website: "",
         },

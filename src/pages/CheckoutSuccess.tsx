@@ -5,6 +5,7 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { useCart } from "@/features/cart/context/CartContext";
 import { requestOrderStatus } from "@/lib/site-api";
+import { track } from "@vercel/analytics/react";
 
 const CheckoutSuccess = () => {
   const { clearCart } = useCart();
@@ -15,6 +16,7 @@ const CheckoutSuccess = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [statusMessage, setStatusMessage] = useState("Verifying your payment confirmation.");
+  const trackedRef = useRef(false);
 
   useEffect(() => {
     if (isConfirmed && !clearedRef.current) {
@@ -22,6 +24,17 @@ const CheckoutSuccess = () => {
       clearedRef.current = true;
     }
   }, [clearCart, isConfirmed]);
+
+  useEffect(() => {
+    if (isConfirmed && !trackedRef.current) {
+      track("Purchase Success", {
+        provider: "clover",
+        hasOrderId: Boolean(orderId),
+        hasSessionId: Boolean(sessionId),
+      });
+      trackedRef.current = true;
+    }
+  }, [isConfirmed, orderId, sessionId]);
 
   useEffect(() => {
     let stopped = false;

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/shared/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { CartProvider } from "@/features/cart/context/CartContext";
 import LaunchDiscountPopup from "@/features/home/components/LaunchDiscountPopup";
 import RouteMetadata from "@/features/navigation/components/RouteMetadata";
@@ -32,6 +33,15 @@ const AnalyticsTracker = () => {
   return <Analytics route={route} path={path} />;
 };
 
+const SPEED_INSIGHTS_SAMPLE_RATE = 0.2;
+
+const SpeedInsightsTracker = () => {
+  const location = useLocation();
+  const route = resolveCanonicalPath(location.pathname, location.search);
+
+  return <SpeedInsights route={route} sampleRate={SPEED_INSIGHTS_SAMPLE_RATE} />;
+};
+
 const App = () => {
   const checkoutEnabled = isCheckoutEnabled();
 
@@ -46,6 +56,7 @@ const App = () => {
             <RouteMetadata />
             <ScrollToTop />
             <AnalyticsTracker />
+            <SpeedInsightsTracker />
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/collection" element={<CollectionPage />} />

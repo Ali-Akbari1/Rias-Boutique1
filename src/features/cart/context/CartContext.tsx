@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { track } from "@vercel/analytics/react";
 import { getProductById, type Product } from "@/features/catalog/data/products";
 
 export interface ProductSelection {
@@ -141,6 +142,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [items]);
 
   const addToCart = (product: Product, selection: ProductSelection) => {
+    let didAdd = false;
     setItems((prev) => {
       const maxQuantity = getMaxQuantityForProduct(product);
       if (maxQuantity <= 0) {
@@ -154,8 +156,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         return prev;
       }
 
+      didAdd = true;
       return [...prev, { id: itemId, product, selection, quantity: Math.min(1, maxQuantity) }];
     });
+
+    if (didAdd) {
+      track("Add to Cart", {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        size: selection.size,
+        color: selection.color,
+        category: product.category,
+      });
+    }
   };
 
   const removeFromCart = (itemId: string) => {
