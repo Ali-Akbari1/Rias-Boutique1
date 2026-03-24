@@ -17,6 +17,8 @@ const renderCheckout = async () => {
   );
 };
 
+const getAvailableProduct = () => products.find((product) => product.availability === "available") || products[0];
+
 describe("checkout flow", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -25,7 +27,7 @@ describe("checkout flow", () => {
   });
 
   it("starts with an empty country field", async () => {
-    const product = products[0];
+    const product = getAvailableProduct();
     window.localStorage.setItem(
       CART_STORAGE_KEY,
       JSON.stringify([
@@ -44,7 +46,7 @@ describe("checkout flow", () => {
   });
 
   it("submits product selection details for checkout payload", async () => {
-    const product = products[0];
+    const product = getAvailableProduct();
     window.localStorage.setItem(
       CART_STORAGE_KEY,
       JSON.stringify([
