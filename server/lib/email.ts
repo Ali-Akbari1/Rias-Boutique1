@@ -490,6 +490,7 @@ export const sendTrackingEmail = async (order: StoredOrder) => {
   const shippingAddress = toSingleLineAddress(order);
   const trackingLines = buildTrackingText(order);
   const trackingUrl = resolveTrackingUrl(order);
+  const trackingNote = "Tracking updates may take 24-48 hours to appear.";
   const trackingVariantLabel = order.lineItems.some((item) => item.selection?.size || item.selection?.color)
     ? "Size / Color"
     : "Details";
@@ -508,6 +509,46 @@ export const sendTrackingEmail = async (order: StoredOrder) => {
       <tbody>
         ${formatLineItemsTableHtml(order)}
       </tbody>
+    </table>
+  `;
+  const orderTotalsTable = `
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:12px;border-collapse:collapse;">
+      <tr>
+        <td style="padding:6px 0;font-size:14px;color:#6b7280;">Subtotal</td>
+        <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
+          formatMinorCad(order.subtotalMinor),
+        )}</td>
+      </tr>
+      ${
+        pricing.discountMinor > 0
+          ? `<tr>
+               <td style="padding:6px 0;font-size:14px;color:#6b7280;">Discount${
+                 pricing.discountCode ? ` (${escapeHtml(pricing.discountCode)})` : ""
+               }</td>
+               <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">-${escapeHtml(
+                 formatMinorCad(pricing.discountMinor),
+               )}</td>
+             </tr>`
+          : ""
+      }
+      <tr>
+        <td style="padding:6px 0;font-size:14px;color:#6b7280;">Shipping</td>
+        <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
+          formatMinorCad(pricing.shippingMinor),
+        )}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:14px;color:#6b7280;">Tax</td>
+        <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
+          formatMinorCad(pricing.taxMinor),
+        )}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0 0 0;font-size:16px;font-weight:700;color:#111827;border-top:1px solid #ececec;">Total</td>
+        <td align="right" style="padding:10px 0 0 0;font-size:16px;font-weight:700;color:#111827;border-top:1px solid #ececec;">${escapeHtml(
+          formatMinorCad(order.totalMinor),
+        )}</td>
+      </tr>
     </table>
   `;
 
@@ -533,7 +574,7 @@ export const sendTrackingEmail = async (order: StoredOrder) => {
     `Total: ${formatMinorCad(order.totalMinor)}`,
     "",
     ...trackingLines,
-    "Tracking updates may take 24-48 hours to appear.",
+    trackingNote,
     "",
     `Need help? Reply to this email${supportEmail ? ` or contact ${supportEmail}` : ""}.`,
   ]
@@ -569,44 +610,7 @@ export const sendTrackingEmail = async (order: StoredOrder) => {
                 <td style="padding:20px 24px 8px 24px;">
                   <h2 style="margin:0 0 10px 0;font-size:18px;color:#111827;">Order Summary</h2>
                   ${orderSummaryTable}
-                  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:12px;border-collapse:collapse;">
-                    <tr>
-                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Subtotal</td>
-                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
-                        formatMinorCad(order.subtotalMinor),
-                      )}</td>
-                    </tr>
-                    ${
-                      pricing.discountMinor > 0
-                        ? `<tr>
-                             <td style="padding:6px 0;font-size:14px;color:#6b7280;">Discount${
-                               pricing.discountCode ? ` (${escapeHtml(pricing.discountCode)})` : ""
-                             }</td>
-                             <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">-${escapeHtml(
-                               formatMinorCad(pricing.discountMinor),
-                             )}</td>
-                           </tr>`
-                        : ""
-                    }
-                    <tr>
-                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Shipping</td>
-                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
-                        formatMinorCad(pricing.shippingMinor),
-                      )}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Tax</td>
-                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(
-                        formatMinorCad(pricing.taxMinor),
-                      )}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding:10px 0 0 0;font-size:16px;font-weight:700;color:#111827;border-top:1px solid #ececec;">Total</td>
-                      <td align="right" style="padding:10px 0 0 0;font-size:16px;font-weight:700;color:#111827;border-top:1px solid #ececec;">${escapeHtml(
-                        formatMinorCad(order.totalMinor),
-                      )}</td>
-                    </tr>
-                  </table>
+                  ${orderTotalsTable}
                 </td>
               </tr>
               <tr>
@@ -627,7 +631,7 @@ export const sendTrackingEmail = async (order: StoredOrder) => {
                              Track your shipment
                            </a>
                          </p>
-                         <p style="margin:0 0 12px 0;font-size:12px;color:#6b7280;">Tracking updates may take 24-48 hours to appear.</p>
+                         <p style="margin:0 0 12px 0;font-size:12px;color:#6b7280;">${escapeHtml(trackingNote)}</p>
                          <p style="margin:0;font-size:12px;color:#6b7280;">Or use this link: <a href="${escapeHtml(
                            trackingUrl,
                          )}" style="color:#111827;text-decoration:underline;">${escapeHtml(trackingUrl)}</a></p>`
@@ -665,6 +669,104 @@ export const sendTrackingEmail = async (order: StoredOrder) => {
     </div>
   `;
 
+  const merchantSubject = `${brandName} - Tracking update (Order #${orderNumber})`;
+  const merchantText = [
+    `Tracking update for Order #${orderNumber}.`,
+    "",
+    `Customer: ${order.customer.fullName} <${order.customer.email}>`,
+    `Shipping to: ${shippingAddress}`,
+    "",
+    "Items:",
+    formatLineItemsText(order, { includeSku: true }),
+    "",
+    `Subtotal: ${formatMinorCad(order.subtotalMinor)}`,
+    pricing.discountMinor > 0
+      ? `Discount${pricing.discountCode ? ` (${pricing.discountCode})` : ""}: -${formatMinorCad(
+          pricing.discountMinor,
+        )}`
+      : "",
+    `Shipping: ${formatMinorCad(pricing.shippingMinor)}`,
+    `Tax: ${formatMinorCad(pricing.taxMinor)}`,
+    `Total: ${formatMinorCad(order.totalMinor)}`,
+    "",
+    ...trackingLines,
+    trackingNote,
+    "",
+    `Admin: ${websiteUrl.replace(/\/+$/, "")}/orders-admin`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const merchantHtml = `
+    <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;color:#111827;">
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f5f5;padding:24px 12px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:620px;background:#ffffff;border:1px solid #ececec;border-radius:10px;overflow:hidden;">
+              <tr>
+                <td style="padding:24px 24px 16px 24px;border-bottom:1px solid #ececec;background:#ffffff;">
+                  ${logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(brandName)}" style="height:34px;display:block;margin-bottom:12px;" />` : ""}
+                  <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">${escapeHtml(
+                    brandName,
+                  )}</p>
+                  <h1 style="margin:8px 0 6px 0;font-size:24px;line-height:1.25;color:#111827;">Tracking update</h1>
+                  <p style="margin:0;font-size:15px;color:#4b5563;">Order #${escapeHtml(
+                    orderNumber,
+                  )} for ${escapeHtml(order.customer.fullName || "customer")}</p>
+                  <p style="margin:8px 0 0 0;font-size:14px;color:#4b5563;"><strong>Shipping to:</strong> ${escapeHtml(
+                    shippingAddress,
+                  )}</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:20px 24px 8px 24px;">
+                  <h2 style="margin:0 0 10px 0;font-size:18px;color:#111827;">Order Summary</h2>
+                  ${orderSummaryTable}
+                  ${orderTotalsTable}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 24px 20px 24px;">
+                  <h2 style="margin:0 0 8px 0;font-size:18px;color:#111827;">Tracking</h2>
+                  <p style="margin:0 0 6px 0;font-size:14px;color:#4b5563;"><strong>Carrier / Service:</strong> ${escapeHtml(
+                    getShippingLineLabel(order),
+                  )}</p>
+                  <p style="margin:0 0 10px 0;font-size:14px;color:#4b5563;"><strong>Tracking Number:</strong> ${escapeHtml(
+                    order.shipment?.trackingCode || "-",
+                  )}</p>
+                  ${
+                    trackingUrl
+                      ? `<p style="margin:0 0 12px 0;">
+                           <a href="${escapeHtml(
+                             trackingUrl,
+                           )}" style="display:inline-block;padding:10px 16px;background:#111827;color:#ffffff;text-decoration:none;border-radius:4px;font-size:14px;font-weight:600;">
+                             Track your shipment
+                           </a>
+                         </p>
+                         <p style="margin:0 0 12px 0;font-size:12px;color:#6b7280;">${escapeHtml(trackingNote)}</p>
+                         <p style="margin:0;font-size:12px;color:#6b7280;">Or use this link: <a href="${escapeHtml(
+                           trackingUrl,
+                         )}" style="color:#111827;text-decoration:underline;">${escapeHtml(trackingUrl)}</a></p>`
+                      : ""
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:16px 24px;border-top:1px solid #ececec;background:#fafafa;">
+                  <p style="margin:0;font-size:13px;color:#6b7280;">
+                    <a href="${escapeHtml(
+                      `${websiteUrl.replace(/\/+$/, "")}/orders-admin`,
+                    )}" style="color:#111827;text-decoration:underline;">Open Orders Dashboard</a>
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+
   const timestamp = new Date().toISOString();
 
   try {
@@ -692,6 +794,49 @@ export const sendTrackingEmail = async (order: StoredOrder) => {
         timestamp,
       },
     });
+
+    if (isLikelyEmail(merchantRecipient) && merchantRecipient !== recipient) {
+      try {
+        const merchantDispatch = (await sendWithResend({
+          to: merchantRecipient,
+          subject: merchantSubject,
+          text: merchantText,
+          html: merchantHtml,
+          replyTo: replyToRecipient,
+        })) || {
+          provider: "mock" as const,
+          status: "queued" as const,
+          externalId: "",
+        };
+
+        await persistEmailLog({
+          orderId: order.id,
+          attempt: {
+            recipientType: "merchant",
+            to: merchantRecipient,
+            subject: merchantSubject,
+            provider: merchantDispatch.provider,
+            status: merchantDispatch.status,
+            externalId: merchantDispatch.externalId,
+            timestamp,
+          },
+        });
+      } catch (error) {
+        await persistEmailLog({
+          orderId: order.id,
+          attempt: {
+            recipientType: "merchant",
+            to: merchantRecipient,
+            subject: merchantSubject,
+            provider: "resend",
+            status: "failed",
+            externalId: "",
+            error: safeErrorMessage(error),
+            timestamp,
+          },
+        });
+      }
+    }
 
     return dispatch;
   } catch (error) {
