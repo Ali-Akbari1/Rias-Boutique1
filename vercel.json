@@ -11,5 +11,14 @@
       "destination": "https://www.riasboutique.com/$1",
       "permanent": true
     }
+  ],
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
   ]
 }
