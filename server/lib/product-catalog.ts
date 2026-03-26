@@ -8,11 +8,13 @@ export interface CatalogProduct {
   priceMinor: number;
   availability: "available" | "sold_out";
   maxQuantity?: number;
+  image?: string;
 }
 
 const productSchema = z.object({
   id: z.union([z.string(), z.number()]).transform((value) => String(value).trim()),
   name: z.string().trim().min(1).max(180),
+  image: z.string().trim().optional(),
   price: z
     .union([z.number(), z.string()])
     .transform((value) => Number(value))
@@ -93,6 +95,7 @@ export const loadCatalog = async () => {
     return {
       id,
       name: product.name,
+      image: product.image,
       priceMinor: Math.round(product.price * 100),
       availability: normalizeAvailability(product.availability ?? product.inventory),
       maxQuantity: normalizeMaxQuantity(product.maxQuantity),

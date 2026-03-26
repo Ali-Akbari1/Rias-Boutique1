@@ -20,6 +20,7 @@ export interface OrderCustomer {
 export interface OrderLineItem {
   productId: string;
   name: string;
+  imageUrl?: string;
   unitAmountMinor: number;
   quantity: number;
   lineTotalMinor: number;

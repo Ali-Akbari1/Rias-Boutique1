@@ -83,9 +83,23 @@ const formatLineItemsTableHtml = (order: StoredOrder, { includeSku = false }: { 
     .map((item) => {
       const unitPrice = item.quantity > 0 ? Math.round(item.lineTotalMinor / item.quantity) : item.unitAmountMinor;
       const details = formatLineItemDetails(item, { includeSku });
+      const imageHtml = item.imageUrl
+        ? `<td style="padding-right:10px;">
+             <img src="${escapeHtml(
+               item.imageUrl,
+             )}" alt="${escapeHtml(item.name)}" style="width:48px;height:48px;border-radius:6px;display:block;object-fit:cover;" />
+           </td>`
+        : "";
       return `
         <tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;">${escapeHtml(item.name)}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+              <tr>
+                ${imageHtml}
+                <td style="font-size:14px;color:#111827;">${escapeHtml(item.name)}</td>
+              </tr>
+            </table>
+          </td>
           <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#6b7280;">${escapeHtml(details)}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;text-align:center;">${item.quantity}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #ececec;font-size:14px;color:#111827;text-align:right;">${escapeHtml(

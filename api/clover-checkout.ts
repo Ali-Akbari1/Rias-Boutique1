@@ -58,6 +58,18 @@ const maskValue = (value: string, keepStart = 3, keepEnd = 4) => {
 const safeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 const getCheckoutBaseUrl = () => process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "";
+const resolveImageUrl = (image: string | undefined, checkoutBaseUrl: string) => {
+  const trimmed = (image || "").trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  try {
+    return new URL(trimmed, checkoutBaseUrl).toString();
+  } catch {
+    return trimmed;
+  }
+};
 
 const validateServerConfiguration = () => {
   const merchantId = process.env.CLOVER_MERCHANT_ID?.trim() || "";
@@ -338,9 +350,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       return;
     }
 
+    const imageUrl = resolveImageUrl(product.image, config.checkoutBaseUrl);
+
     lineItems.push({
       productId: product.id,
       name: product.name,
+      imageUrl: imageUrl || undefined,
       unitAmountMinor: product.priceMinor,
       quantity: requestedItem.quantity,
       lineTotalMinor: product.priceMinor * requestedItem.quantity,
