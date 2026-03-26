@@ -31,6 +31,7 @@ const formatDate = (value: string) => {
 };
 
 const formatMinorCad = (value: number) => formatCad((Number(value) || 0) / 100);
+const isLikelyEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 const getOrderPricing = (order: AdminOrder) => ({
   discountCode: order.pricing?.discountCode?.trim().toUpperCase() || "",
   discountMinor: Number(order.pricing?.discountMinor) || 0,
@@ -183,6 +184,12 @@ const AdminOrders = () => {
       return;
     }
 
+    const recipientOverride = testEmailRecipient.trim();
+    if (recipientOverride && !isLikelyEmail(recipientOverride)) {
+      setErrorMessage("Enter a valid test recipient email or leave the field blank.");
+      return;
+    }
+
     setSendingTestEmailType(type);
     setErrorMessage("");
     setStatusMessage("");
@@ -190,7 +197,7 @@ const AdminOrders = () => {
     try {
       const payload = await requestEmailTest(token, {
         type,
-        customerEmail: testEmailRecipient.trim() || undefined,
+        customerEmail: recipientOverride || undefined,
       });
       setStatusMessage(
         payload.ok
@@ -317,7 +324,7 @@ const AdminOrders = () => {
                 </Button>
               </div>
             </form>
-            <div className="grid gap-3 rounded-md border border-border bg-muted/20 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+            <div className="grid items-center gap-3 rounded-md border border-border bg-muted/20 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
               <div className="sm:col-span-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                   Test Emails (Dev Only)
@@ -325,7 +332,7 @@ const AdminOrders = () => {
                 <Input
                   value={testEmailRecipient}
                   onChange={(event) => setTestEmailRecipient(event.target.value)}
-                  placeholder="Optional recipient override"
+                  placeholder="Optional recipient override (email)"
                   className="mt-2"
                 />
                 <p className="mt-2 text-xs text-muted-foreground">
