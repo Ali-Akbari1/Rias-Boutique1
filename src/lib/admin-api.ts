@@ -74,6 +74,17 @@ export interface AdminOrdersResponse {
   };
 }
 
+export interface EmailTestResponse {
+  ok?: boolean;
+  type?: "confirmation" | "tracking";
+  recipient?: string;
+  productId?: string;
+  orderId?: string;
+  error?: {
+    message?: string;
+  };
+}
+
 const buildAdminHeaders = (adminToken: string) => ({
   "x-admin-token": adminToken.trim(),
 });
@@ -145,4 +156,19 @@ export const requestUpdateManualTracking = (
       service: payload.service,
     },
     fallbackErrorMessage: "Unable to save tracking details right now.",
+  });
+
+export const requestEmailTest = (
+  adminToken: string,
+  payload: { type: "confirmation" | "tracking"; customerEmail?: string },
+) =>
+  requestJson<EmailTestResponse>({
+    path: "/api/email-test",
+    method: "POST",
+    headers: buildAdminHeaders(adminToken),
+    body: {
+      type: payload.type,
+      ...(payload.customerEmail ? { customerEmail: payload.customerEmail } : {}),
+    },
+    fallbackErrorMessage: "Unable to send the test email right now.",
   });

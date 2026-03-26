@@ -9,6 +9,7 @@ import {
   requestAdminOrders,
   requestRefundShipmentLabel,
   requestRetryShipmentLabel,
+  requestEmailTest,
   requestSendTrackingEmail,
   requestUpdateManualTracking,
   type AdminOrder,
@@ -63,12 +64,14 @@ const AdminOrders = () => {
   const [refundingOrderId, setRefundingOrderId] = useState("");
   const [sendingTrackingOrderId, setSendingTrackingOrderId] = useState("");
   const [savingTrackingOrderId, setSavingTrackingOrderId] = useState("");
+  const [sendingTestEmailType, setSendingTestEmailType] = useState<"" | "confirmation" | "tracking">("");
   const [trackingInputs, setTrackingInputs] = useState<
     Record<string, { code: string; url: string; carrier: string; service: string }>
   >({});
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [testEmailRecipient, setTestEmailRecipient] = useState("");
 
   const paidOrders = useMemo(() => orders.filter((order) => order.paymentStatus === "paid"), [orders]);
   const paidRevenueMinor = useMemo(
@@ -170,6 +173,34 @@ const AdminOrders = () => {
       setErrorMessage(error instanceof Error ? error.message : "Unable to send the tracking email.");
     } finally {
       setSendingTrackingOrderId("");
+    }
+  };
+
+  const sendTestEmail = async (type: "confirmation" | "tracking") => {
+    const token = adminToken.trim();
+    if (!token) {
+      setErrorMessage("Enter your admin dashboard token.");
+      return;
+    }
+
+    setSendingTestEmailType(type);
+    setErrorMessage("");
+    setStatusMessage("");
+
+    try {
+      const payload = await requestEmailTest(token, {
+        type,
+        customerEmail: testEmailRecipient.trim() || undefined,
+      });
+      setStatusMessage(
+        payload.ok
+          ? `Test ${type} email sent to ${payload.recipient || "recipient"}.`
+          : payload.error?.message || `Test ${type} email sent.`,
+      );
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to send the test email.");
+    } finally {
+      setSendingTestEmailType("");
     }
   };
 
@@ -286,6 +317,52 @@ const AdminOrders = () => {
                 </Button>
               </div>
             </form>
+            <div className="grid gap-3 rounded-md border border-border bg-muted/20 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+              <div className="sm:col-span-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                  Test Emails (Dev Only)
+                </p>
+                <Input
+                  value={testEmailRecipient}
+                  onChange={(event) => setTestEmailRecipient(event.target.value)}
+                  placeholder="Optional recipient override"
+                  className="mt-2"
+                />
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Uses the email-test endpoint. Leave blank to use EMAIL_TEST_RECIPIENT.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void sendTestEmail("confirmation")}
+                disabled={sendingTestEmailType !== "" || !adminToken.trim()}
+              >
+                {sendingTestEmailType === "confirmation" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Sending confirmation
+                  </>
+                ) : (
+                  "Send test confirmation"
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void sendTestEmail("tracking")}
+                disabled={sendingTestEmailType !== "" || !adminToken.trim()}
+              >
+                {sendingTestEmailType === "tracking" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Sending tracking
+                  </>
+                ) : (
+                  "Send test tracking"
+                )}
+              </Button>
+            </div>
             {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
             {statusMessage ? <p className="text-sm text-foreground">{statusMessage}</p> : null}
           </CardContent>
