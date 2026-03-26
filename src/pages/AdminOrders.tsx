@@ -31,7 +31,6 @@ const formatDate = (value: string) => {
 };
 
 const formatMinorCad = (value: number) => formatCad((Number(value) || 0) / 100);
-const isLikelyEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 const getOrderPricing = (order: AdminOrder) => ({
   discountCode: order.pricing?.discountCode?.trim().toUpperCase() || "",
   discountMinor: Number(order.pricing?.discountMinor) || 0,
@@ -65,16 +64,13 @@ const AdminOrders = () => {
   const [refundingOrderId, setRefundingOrderId] = useState("");
   const [sendingTrackingOrderId, setSendingTrackingOrderId] = useState("");
   const [savingTrackingOrderId, setSavingTrackingOrderId] = useState("");
-  const [sendingTestEmailType, setSendingTestEmailType] = useState<"" | "confirmation" | "tracking">("");
+  const [sendingTestConfirmationOrderId, setSendingTestConfirmationOrderId] = useState("");
   const [trackingInputs, setTrackingInputs] = useState<
     Record<string, { code: string; url: string; carrier: string; service: string }>
   >({});
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-  const [testEmailRecipient, setTestEmailRecipient] = useState("");
-  const [directOrderId, setDirectOrderId] = useState("");
-  const [directAction, setDirectAction] = useState<"" | "retry_label" | "refund_label" | "send_tracking">("");
 
   const paidOrders = useMemo(() => orders.filter((order) => order.paymentStatus === "paid"), [orders]);
   const paidRevenueMinor = useMemo(
@@ -179,77 +175,31 @@ const AdminOrders = () => {
     }
   };
 
-  const runDirectOrderAction = async (action: "retry_label" | "refund_label" | "send_tracking") => {
-    const token = adminToken.trim();
-    const orderId = directOrderId.trim();
-    if (!token) {
-      setErrorMessage("Enter your admin dashboard token.");
-      return;
-    }
-    if (!orderId) {
-      setErrorMessage("Enter an order ID.");
-      return;
-    }
-
-    setDirectAction(action);
-    setErrorMessage("");
-    setStatusMessage("");
-
-    try {
-      const payload =
-        action === "retry_label"
-          ? await requestRetryShipmentLabel(token, orderId)
-          : action === "refund_label"
-            ? await requestRefundShipmentLabel(token, orderId)
-            : await requestSendTrackingEmail(token, orderId);
-      if (payload.order) {
-        setOrders((currentOrders) => {
-          const exists = currentOrders.some((order) => order.id === payload.order?.id);
-          if (exists) {
-            return currentOrders.map((order) => (order.id === payload.order?.id ? payload.order : order));
-          }
-          return [payload.order, ...currentOrders];
-        });
-      }
-      setStatusMessage(payload.message || "Order action completed.");
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Unable to run that order action.");
-    } finally {
-      setDirectAction("");
-    }
-  };
-
-  const sendTestEmail = async (type: "confirmation" | "tracking") => {
+  const sendTestConfirmationEmail = async (orderId: string) => {
     const token = adminToken.trim();
     if (!token) {
       setErrorMessage("Enter your admin dashboard token.");
       return;
     }
 
-    const recipientOverride = testEmailRecipient.trim();
-    if (recipientOverride && !isLikelyEmail(recipientOverride)) {
-      setErrorMessage("Enter a valid test recipient email or leave the field blank.");
-      return;
-    }
-
-    setSendingTestEmailType(type);
+    setSendingTestConfirmationOrderId(orderId);
     setErrorMessage("");
     setStatusMessage("");
 
     try {
       const payload = await requestEmailTest(token, {
-        type,
-        customerEmail: recipientOverride || undefined,
+        type: "confirmation",
+        orderId,
       });
       setStatusMessage(
         payload.ok
-          ? `Test ${type} email sent to ${payload.recipient || "recipient"}.`
-          : payload.error?.message || `Test ${type} email sent.`,
+          ? `Test confirmation email sent to ${payload.recipient || "recipient"}.`
+          : payload.error?.message || "Test confirmation email sent.",
       );
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Unable to send the test email.");
     } finally {
-      setSendingTestEmailType("");
+      setSendingTestConfirmationOrderId("");
     }
   };
 
@@ -366,113 +316,6 @@ const AdminOrders = () => {
                 </Button>
               </div>
             </form>
-            <div className="grid gap-3 rounded-md border border-border bg-background p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                  Order ID Actions
-                </p>
-                <Input
-                  value={directOrderId}
-                  onChange={(event) => setDirectOrderId(event.target.value)}
-                  placeholder="Paste full order ID"
-                  className="mt-2"
-                />
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Use this when you want to trigger actions without scrolling.
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => void runDirectOrderAction("send_tracking")}
-                disabled={directAction !== "" || !adminToken.trim() || !directOrderId.trim()}
-              >
-                {directAction === "send_tracking" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Sending tracking
-                  </>
-                ) : (
-                  "Send tracking email"
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => void runDirectOrderAction("retry_label")}
-                disabled={directAction !== "" || !adminToken.trim() || !directOrderId.trim()}
-              >
-                {directAction === "retry_label" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Retrying label
-                  </>
-                ) : (
-                  "Retry label purchase"
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => void runDirectOrderAction("refund_label")}
-                disabled={directAction !== "" || !adminToken.trim() || !directOrderId.trim()}
-              >
-                {directAction === "refund_label" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Requesting refund
-                  </>
-                ) : (
-                  "Refund label"
-                )}
-              </Button>
-            </div>
-            <div className="grid items-center gap-3 rounded-md border border-border bg-muted/20 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
-              <div className="sm:col-span-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                  Test Emails (Dev Only)
-                </p>
-                <Input
-                  value={testEmailRecipient}
-                  onChange={(event) => setTestEmailRecipient(event.target.value)}
-                  placeholder="Optional recipient override (email)"
-                  className="mt-2"
-                />
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Uses the email test action. Leave blank to use EMAIL_TEST_RECIPIENT.
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => void sendTestEmail("confirmation")}
-                disabled={sendingTestEmailType !== "" || !adminToken.trim()}
-              >
-                {sendingTestEmailType === "confirmation" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Sending confirmation
-                  </>
-                ) : (
-                  "Send test confirmation"
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => void sendTestEmail("tracking")}
-                disabled={sendingTestEmailType !== "" || !adminToken.trim()}
-              >
-                {sendingTestEmailType === "tracking" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Sending tracking
-                  </>
-                ) : (
-                  "Send test tracking"
-                )}
-              </Button>
-            </div>
             {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
             {statusMessage ? <p className="text-sm text-foreground">{statusMessage}</p> : null}
           </CardContent>
@@ -791,6 +634,25 @@ const AdminOrders = () => {
                     ) : null}
                   </div>
                 ) : null}
+
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void sendTestConfirmationEmail(order.id)}
+                    disabled={sendingTestConfirmationOrderId === order.id}
+                  >
+                    {sendingTestConfirmationOrderId === order.id ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Sending test confirmation
+                      </>
+                    ) : (
+                      "Send test confirmation"
+                    )}
+                  </Button>
+                </div>
 
                 <div className="space-y-2">
                   <p className="font-semibold text-foreground">Line Items</p>

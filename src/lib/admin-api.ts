@@ -160,7 +160,7 @@ export const requestUpdateManualTracking = (
 
 export const requestEmailTest = (
   adminToken: string,
-  payload: { type: "confirmation" | "tracking"; customerEmail?: string },
+  payload: { type: "confirmation" | "tracking"; customerEmail?: string; orderId?: string },
 ) =>
   requestJson<EmailTestResponse>({
     path: "/api/admin-orders",
@@ -169,6 +169,7 @@ export const requestEmailTest = (
     body: {
       action: "send_test_email",
       type: payload.type,
+      ...(payload.orderId ? { orderId: payload.orderId } : {}),
       ...(payload.customerEmail ? { customerEmail: payload.customerEmail } : {}),
     },
     fallbackErrorMessage: "Unable to send the test email right now.",
