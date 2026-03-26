@@ -766,6 +766,30 @@
       "description": "True white men's parantoban with white embroidery. ",
       "category": "Machine Made",
       "fitInfo": "Please check our size chart for all specific measurements before ordering. \n\n*Please note: Elastic and/or an ezar band for the pants are not included."
+    },
+    {
+      "fabric": "Velvet ",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_1283.jpg",
+        "/uploads/img_1286.jpg",
+        "/uploads/img_1290.jpg"
+      ],
+      "name": "Dark Blue Cheerma Dozi Dress",
+      "slug": "dark-blue-cheerma-dozi-dress",
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only "
+      ],
+      "id": "dark-blue-cheerma-dozi-machini",
+      "image": "/uploads/img_1283.jpg",
+      "inventory": "available",
+      "description": "Dark blue cheerma dozi dress with wide leg pants. ",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 38in \nLength of dress: 37in "
     }
   ]
 }
