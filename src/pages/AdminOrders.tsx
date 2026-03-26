@@ -73,6 +73,8 @@ const AdminOrders = () => {
   const [statusMessage, setStatusMessage] = useState("");
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [testEmailRecipient, setTestEmailRecipient] = useState("");
+  const [directOrderId, setDirectOrderId] = useState("");
+  const [directAction, setDirectAction] = useState<"" | "retry_label" | "refund_label" | "send_tracking">("");
 
   const paidOrders = useMemo(() => orders.filter((order) => order.paymentStatus === "paid"), [orders]);
   const paidRevenueMinor = useMemo(
@@ -174,6 +176,46 @@ const AdminOrders = () => {
       setErrorMessage(error instanceof Error ? error.message : "Unable to send the tracking email.");
     } finally {
       setSendingTrackingOrderId("");
+    }
+  };
+
+  const runDirectOrderAction = async (action: "retry_label" | "refund_label" | "send_tracking") => {
+    const token = adminToken.trim();
+    const orderId = directOrderId.trim();
+    if (!token) {
+      setErrorMessage("Enter your admin dashboard token.");
+      return;
+    }
+    if (!orderId) {
+      setErrorMessage("Enter an order ID.");
+      return;
+    }
+
+    setDirectAction(action);
+    setErrorMessage("");
+    setStatusMessage("");
+
+    try {
+      const payload =
+        action === "retry_label"
+          ? await requestRetryShipmentLabel(token, orderId)
+          : action === "refund_label"
+            ? await requestRefundShipmentLabel(token, orderId)
+            : await requestSendTrackingEmail(token, orderId);
+      if (payload.order) {
+        setOrders((currentOrders) => {
+          const exists = currentOrders.some((order) => order.id === payload.order?.id);
+          if (exists) {
+            return currentOrders.map((order) => (order.id === payload.order?.id ? payload.order : order));
+          }
+          return [payload.order, ...currentOrders];
+        });
+      }
+      setStatusMessage(payload.message || "Order action completed.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to run that order action.");
+    } finally {
+      setDirectAction("");
     }
   };
 
@@ -324,6 +366,67 @@ const AdminOrders = () => {
                 </Button>
               </div>
             </form>
+            <div className="grid gap-3 rounded-md border border-border bg-background p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                  Order ID Actions
+                </p>
+                <Input
+                  value={directOrderId}
+                  onChange={(event) => setDirectOrderId(event.target.value)}
+                  placeholder="Paste full order ID"
+                  className="mt-2"
+                />
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Use this when you want to trigger actions without scrolling.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void runDirectOrderAction("send_tracking")}
+                disabled={directAction !== "" || !adminToken.trim() || !directOrderId.trim()}
+              >
+                {directAction === "send_tracking" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Sending tracking
+                  </>
+                ) : (
+                  "Send tracking email"
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void runDirectOrderAction("retry_label")}
+                disabled={directAction !== "" || !adminToken.trim() || !directOrderId.trim()}
+              >
+                {directAction === "retry_label" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Retrying label
+                  </>
+                ) : (
+                  "Retry label purchase"
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void runDirectOrderAction("refund_label")}
+                disabled={directAction !== "" || !adminToken.trim() || !directOrderId.trim()}
+              >
+                {directAction === "refund_label" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Requesting refund
+                  </>
+                ) : (
+                  "Refund label"
+                )}
+              </Button>
+            </div>
             <div className="grid items-center gap-3 rounded-md border border-border bg-muted/20 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
               <div className="sm:col-span-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
