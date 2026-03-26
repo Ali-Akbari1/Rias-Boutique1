@@ -33,6 +33,7 @@ import { z } from "zod";
 const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
 const isEmailTestEnabled = () => process.env.EMAIL_TEST_ENABLED?.trim().toLowerCase() === "true";
+const allowEmailTestInProd = () => process.env.EMAIL_TEST_ALLOW_PROD?.trim().toLowerCase() === "true";
 const isProductionEnv = () =>
   (process.env.VERCEL_ENV || process.env.NODE_ENV || "").trim().toLowerCase() === "production";
 
@@ -238,12 +239,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   if (validation.data.action === "send_test_email") {
-    if (!isEmailTestEnabled() || isProductionEnv()) {
+    if (!isEmailTestEnabled() || (isProductionEnv() && !allowEmailTestInProd())) {
       sendError(
         res,
         403,
         "EMAIL_TEST_DISABLED",
-        "Email test endpoint is disabled. Set EMAIL_TEST_ENABLED=true in non-production environments.",
+        "Email test endpoint is disabled. Set EMAIL_TEST_ENABLED=true and EMAIL_TEST_ALLOW_PROD=true to allow in production.",
       );
       return;
     }
