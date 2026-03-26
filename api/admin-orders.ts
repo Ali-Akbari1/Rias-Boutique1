@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import {
   getHeader,
   parseJsonBody,
@@ -15,15 +16,25 @@ import {
   getClientIp,
   resolveAllowedOrigin,
 } from "../server/lib/security.js";
-import { sendTrackingEmail } from "../server/lib/email.js";
+import { sendOrderConfirmationEmail, sendTrackingEmail } from "../server/lib/email.js";
 import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
 import { refundShippingLabel } from "../server/lib/easypost.js";
-import { findOrderById, isOrderStoreConfigured, listOrders, saveOrderShipment } from "../server/lib/order-store.js";
+import {
+  findOrderById,
+  isOrderStoreConfigured,
+  listOrders,
+  saveOrderShipment,
+  type StoredOrder,
+} from "../server/lib/order-store.js";
 import { buildCarrierTrackingUrl } from "../server/lib/tracking.js";
+import { loadCatalog } from "../server/lib/product-catalog.js";
 import { z } from "zod";
 
 const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
+const isEmailTestEnabled = () => process.env.EMAIL_TEST_ENABLED?.trim().toLowerCase() === "true";
+const isProductionEnv = () =>
+  (process.env.VERCEL_ENV || process.env.NODE_ENV || "").trim().toLowerCase() === "production";
 
 const retryLabelPurchaseSchema = z
   .object({
@@ -46,6 +57,21 @@ const sendTrackingEmailSchema = z
   })
   .strict();
 
+const sendTestEmailSchema = z
+  .object({
+    action: z.literal("send_test_email"),
+    type: z.enum(["confirmation", "tracking"]).optional(),
+    customerEmail: z.string().trim().email().optional(),
+    customerName: z.string().trim().min(1).max(120).optional(),
+    productId: z.string().trim().min(1).max(120).optional(),
+    quantity: z.number().int().min(1).max(5).optional(),
+    trackingCode: z.string().trim().max(160).optional(),
+    trackingUrl: z.string().trim().max(512).optional(),
+    carrier: z.string().trim().max(80).optional(),
+    service: z.string().trim().max(80).optional(),
+  })
+  .strict();
+
 const manualTrackingSchema = z
   .object({
     action: z.literal("update_tracking_manual"),
@@ -61,8 +87,28 @@ const adminShipmentActionSchema = z.discriminatedUnion("action", [
   retryLabelPurchaseSchema,
   refundLabelSchema,
   sendTrackingEmailSchema,
+  sendTestEmailSchema,
   manualTrackingSchema,
 ]);
+
+const toNumber = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const resolveBaseUrl = () => process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "https://www.riasboutique.com";
+const resolveImageUrl = (image: string | undefined, baseUrl: string) => {
+  const trimmed = (image || "").trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  try {
+    return new URL(trimmed, baseUrl).toString();
+  } catch {
+    return trimmed;
+  }
+};
 
 const readAdminToken = (req: ApiRequest) => {
   const directHeader = (getHeader(req, "x-admin-token") || "").trim();
@@ -185,6 +231,146 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         502,
         "TRACKING_EMAIL_FAILED",
         error instanceof Error ? error.message : "Unable to send the tracking email right now.",
+      );
+    }
+    return;
+  }
+
+  if (validation.data.action === "send_test_email") {
+    if (!isEmailTestEnabled() || isProductionEnv()) {
+      sendError(
+        res,
+        403,
+        "EMAIL_TEST_DISABLED",
+        "Email test endpoint is disabled. Set EMAIL_TEST_ENABLED=true in non-production environments.",
+      );
+      return;
+    }
+
+    const type = validation.data.type || "tracking";
+    const recipient =
+      validation.data.customerEmail?.trim() || process.env.EMAIL_TEST_RECIPIENT?.trim() || "";
+    if (!recipient) {
+      sendError(res, 400, "MISSING_RECIPIENT", "Set customerEmail or EMAIL_TEST_RECIPIENT.");
+      return;
+    }
+
+    const catalog = await loadCatalog();
+    if (catalog.length === 0) {
+      sendError(res, 500, "CATALOG_EMPTY", "Product catalog is empty.");
+      return;
+    }
+
+    const product =
+      (validation.data.productId && catalog.find((entry) => entry.id === validation.data.productId)) ||
+      catalog.find((entry) => entry.availability === "available") ||
+      catalog[0];
+    if (!product) {
+      sendError(res, 404, "PRODUCT_NOT_FOUND", "Requested product was not found.");
+      return;
+    }
+
+    const quantity = validation.data.quantity ?? 1;
+    const unitAmountMinor = product.priceMinor;
+    const lineTotalMinor = unitAmountMinor * quantity;
+    const subtotalMinor = lineTotalMinor;
+    const shippingMinor = Math.round(toNumber(process.env.FLAT_SHIPPING_RATE_MINOR, 3000));
+    const discountMinor = 0;
+    const taxRate = toNumber(process.env.CHECKOUT_TAX_RATE, 0.05);
+    const taxMinor = Math.round((subtotalMinor - discountMinor + shippingMinor) * taxRate);
+    const totalMinor = subtotalMinor - discountMinor + shippingMinor + taxMinor;
+    const now = new Date().toISOString();
+    const baseUrl = resolveBaseUrl();
+    const imageUrl = resolveImageUrl(product.image, baseUrl) || undefined;
+
+    const order: StoredOrder = {
+      id: randomUUID(),
+      paymentStatus: "paid",
+      idempotencyKey: `test-${randomUUID()}`,
+      cloverCheckoutId: "",
+      cloverCheckoutUrl: "",
+      paymentReference: "test-payment",
+      currency: "CAD",
+      subtotalMinor,
+      totalMinor,
+      pricing: {
+        discountCode: "",
+        discountMinor,
+        shippingMinor,
+        quotedShippingMinor: shippingMinor,
+        taxMinor,
+        freeShippingApplied: false,
+      },
+      customer: {
+        deliveryMethod: "shipping",
+        fullName: validation.data.customerName?.trim() || "Test Customer",
+        email: recipient,
+        phone: "403-555-0100",
+        address: "123 9 Ave SE",
+        city: "Calgary",
+        state: "AB",
+        postalCode: "T2G 0P6",
+        country: "Canada",
+      },
+      lineItems: [
+        {
+          productId: product.id,
+          name: product.name,
+          imageUrl,
+          unitAmountMinor,
+          quantity,
+          lineTotalMinor,
+        },
+      ],
+      shippingQuote: null,
+      shipment:
+        type === "tracking"
+          ? {
+              provider: "manual",
+              carrier: validation.data.carrier?.trim() || "Canada Post",
+              service: validation.data.service?.trim() || "Standard",
+              trackingCode:
+                validation.data.trackingCode?.trim() || `TEST-${Math.random().toString(36).slice(2, 10)}`,
+              trackingUrl:
+                validation.data.trackingUrl?.trim() ||
+                buildCarrierTrackingUrl({
+                  carrier: validation.data.carrier?.trim() || "Canada Post",
+                  trackingCode: validation.data.trackingCode?.trim() || "TEST",
+                }),
+              status: "pre_transit",
+              purchasedAt: now,
+            }
+          : null,
+      createdAt: now,
+      updatedAt: now,
+      paidAt: now,
+      confirmationEmailSentAt: "",
+      lastError: "",
+    };
+
+    try {
+      if (type === "confirmation") {
+        await sendOrderConfirmationEmail(order);
+      } else {
+        await sendTrackingEmail(order);
+      }
+
+      res.status(200).json({
+        ok: true,
+        type,
+        recipient,
+        productId: product.id,
+        orderId: order.id,
+      });
+    } catch (error) {
+      logger.error("admin-orders.email_test_failed", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      sendError(
+        res,
+        502,
+        "EMAIL_TEST_FAILED",
+        error instanceof Error ? error.message : "Unable to send the test email.",
       );
     }
     return;

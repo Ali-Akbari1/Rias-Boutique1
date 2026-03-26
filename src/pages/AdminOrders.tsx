@@ -329,7 +329,7 @@ const AdminOrders = () => {
                   className="mt-2"
                 />
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Uses the email-test endpoint. Leave blank to use EMAIL_TEST_RECIPIENT.
+                  Uses the email test action. Leave blank to use EMAIL_TEST_RECIPIENT.
                 </p>
               </div>
               <Button

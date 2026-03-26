@@ -163,10 +163,11 @@ export const requestEmailTest = (
   payload: { type: "confirmation" | "tracking"; customerEmail?: string },
 ) =>
   requestJson<EmailTestResponse>({
-    path: "/api/email-test",
+    path: "/api/admin-orders",
     method: "POST",
     headers: buildAdminHeaders(adminToken),
     body: {
+      action: "send_test_email",
       type: payload.type,
       ...(payload.customerEmail ? { customerEmail: payload.customerEmail } : {}),
     },
