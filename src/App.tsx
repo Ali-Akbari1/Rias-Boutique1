@@ -7,6 +7,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-route
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { CartProvider } from "@/features/cart/context/CartContext";
+import { CurrencyProvider } from "@/features/currency/context/CurrencyContext";
 import LaunchDiscountPopup from "@/features/home/components/LaunchDiscountPopup";
 import RouteMetadata from "@/features/navigation/components/RouteMetadata";
 import ScrollToTop from "@/features/navigation/components/ScrollToTop";
@@ -48,53 +49,55 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <CartProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <LaunchDiscountPopup />
-            <RouteMetadata />
-            <ScrollToTop />
-            <AnalyticsTracker />
-            <SpeedInsightsTracker />
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/collection" element={<CollectionPage />} />
-              <Route path="/collection/:department" element={<CollectionPage />} />
-              <Route
-                path="/about"
-                element={
-                  <Suspense fallback={null}>
-                    <AboutPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/faq"
-                element={
-                  <Suspense fallback={null}>
-                    <FaqPage />
-                  </Suspense>
-                }
-              />
-              <Route path="/products/:productId" element={<ProductDetails />} />
-              <Route
-                path="/checkout"
-                element={checkoutEnabled ? <Checkout /> : <Navigate to="/" replace />}
-              />
-              <Route
-                path="/checkout/success"
-                element={checkoutEnabled ? <CheckoutSuccess /> : <Navigate to="/" replace />}
-              />
-              <Route
-                path="/checkout/cancel"
-                element={checkoutEnabled ? <CheckoutCancel /> : <Navigate to="/" replace />}
-              />
-              <Route path="/orders-admin" element={<AdminOrders />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </CartProvider>
+        <CurrencyProvider>
+          <CartProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <LaunchDiscountPopup />
+              <RouteMetadata />
+              <ScrollToTop />
+              <AnalyticsTracker />
+              <SpeedInsightsTracker />
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/collection" element={<CollectionPage />} />
+                <Route path="/collection/:department" element={<CollectionPage />} />
+                <Route
+                  path="/about"
+                  element={
+                    <Suspense fallback={null}>
+                      <AboutPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/faq"
+                  element={
+                    <Suspense fallback={null}>
+                      <FaqPage />
+                    </Suspense>
+                  }
+                />
+                <Route path="/products/:productId" element={<ProductDetails />} />
+                <Route
+                  path="/checkout"
+                  element={checkoutEnabled ? <Checkout /> : <Navigate to="/" replace />}
+                />
+                <Route
+                  path="/checkout/success"
+                  element={checkoutEnabled ? <CheckoutSuccess /> : <Navigate to="/" replace />}
+                />
+                <Route
+                  path="/checkout/cancel"
+                  element={checkoutEnabled ? <CheckoutCancel /> : <Navigate to="/" replace />}
+                />
+                <Route path="/orders-admin" element={<AdminOrders />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </CartProvider>
+        </CurrencyProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

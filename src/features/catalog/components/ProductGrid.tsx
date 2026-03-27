@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { useLocation, useNavigate, useNavigationType, useSearchParams } from "react-router-dom";
 import { type ProductDepartment, PRODUCT_DEPARTMENTS, products } from "@/features/catalog/data/products";
+import { useCurrency } from "@/features/currency/context/CurrencyContext";
 import { consumePendingCollectionScrollPosition } from "@/lib/collection-scroll";
 import ProductCard from "./ProductCard";
 import { normalizeSearchText, scoreWeightedSearchDocument } from "@/lib/search";
@@ -147,6 +148,7 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   const [size, setSize] = useState(initialSize);
   const [minPriceInput, setMinPriceInput] = useState(initialMinPrice);
   const [maxPriceInput, setMaxPriceInput] = useState(initialMaxPrice);
+  const { currency, cadToUsdRate } = useCurrency();
   const [sortBy, setSortBy] = useState<SortOption>(
     initialSortBy === "alphabetical" ||
       initialSortBy === "price-low" ||
@@ -177,6 +179,20 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
     }
     return Math.max(minPrice, maxPrice);
   }, [maxPrice, minPrice]);
+
+  const resolvedMinPriceCad = useMemo(() => {
+    if (resolvedMinPrice === null) {
+      return null;
+    }
+    return currency === "USD" ? resolvedMinPrice / cadToUsdRate : resolvedMinPrice;
+  }, [cadToUsdRate, currency, resolvedMinPrice]);
+
+  const resolvedMaxPriceCad = useMemo(() => {
+    if (resolvedMaxPrice === null) {
+      return null;
+    }
+    return currency === "USD" ? resolvedMaxPrice / cadToUsdRate : resolvedMaxPrice;
+  }, [cadToUsdRate, currency, resolvedMaxPrice]);
 
   const setDepartmentFromUser = (value: DepartmentOption) => {
     isDepartmentUserDrivenRef.current = true;
@@ -321,8 +337,8 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
           (saleFilter === "regular-price" && !isOnSale);
         const inSize = size === "all" || product.sizes.some((productSize) => sizeKey(productSize) === size);
         const inPriceRange =
-          (resolvedMinPrice === null || product.price >= resolvedMinPrice) &&
-          (resolvedMaxPrice === null || product.price <= resolvedMaxPrice);
+          (resolvedMinPriceCad === null || product.price >= resolvedMinPriceCad) &&
+          (resolvedMaxPriceCad === null || product.price <= resolvedMaxPriceCad);
         const matchesQuery = !debouncedQuery || searchScore > 0;
 
         return (
@@ -352,7 +368,17 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
         return new Date(b.product.createdAt).getTime() - new Date(a.product.createdAt).getTime();
       })
       .map((entry) => entry.product);
-  }, [availability, category, debouncedQuery, department, resolvedMaxPrice, resolvedMinPrice, saleFilter, size, sortBy]);
+  }, [
+    availability,
+    category,
+    debouncedQuery,
+    department,
+    resolvedMaxPriceCad,
+    resolvedMinPriceCad,
+    saleFilter,
+    size,
+    sortBy,
+  ]);
 
   useEffect(() => {
     // Keep initial page from URL on first render (for return-to-collection behavior).
@@ -362,7 +388,17 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
     }
 
     setCurrentPage(1);
-  }, [availability, category, debouncedQuery, department, resolvedMaxPrice, resolvedMinPrice, saleFilter, size, sortBy]);
+  }, [
+    availability,
+    category,
+    debouncedQuery,
+    department,
+    resolvedMaxPriceCad,
+    resolvedMinPriceCad,
+    saleFilter,
+    size,
+    sortBy,
+  ]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
@@ -488,6 +524,7 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   const rangeStart = filteredProducts.length === 0 ? 0 : (safePage - 1) * PRODUCTS_PER_PAGE + 1;
   const rangeEnd = filteredProducts.length === 0 ? 0 : Math.min(safePage * PRODUCTS_PER_PAGE, filteredProducts.length);
   const collectionHeading = getCollectionHeading(department);
+  const priceFilterLabel = currency === "USD" ? "USD (est.)" : "CAD";
 
   const resetFilters = () => {
     setQueryInput("");
@@ -617,7 +654,9 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <p className="text-xs font-body uppercase tracking-[0.08em] leading-none text-muted-foreground">Min Price (CA$)</p>
+              <p className="text-xs font-body uppercase tracking-[0.08em] leading-none text-muted-foreground">
+                Min Price ({priceFilterLabel})
+              </p>
               <Input
                 type="number"
                 inputMode="decimal"
@@ -631,7 +670,9 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <p className="text-xs font-body uppercase tracking-[0.08em] leading-none text-muted-foreground">Max Price (CA$)</p>
+              <p className="text-xs font-body uppercase tracking-[0.08em] leading-none text-muted-foreground">
+                Max Price ({priceFilterLabel})
+              </p>
               <Input
                 type="number"
                 inputMode="decimal"

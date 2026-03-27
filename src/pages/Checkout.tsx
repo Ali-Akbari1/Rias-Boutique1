@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/sha
 import { Input } from "@/shared/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/shared/ui/accordion";
 import { getClientCommerceConfig } from "@/lib/commerce-config";
-import { formatCad } from "@/lib/money";
+import { useCurrency } from "@/features/currency/context/CurrencyContext";
 import { buildCheckoutPricing, calculateLaunchDiscountMinor } from "@/shared/config/commerce";
 import {
   getLaunchDiscountExpiryDateLabel,
@@ -101,6 +101,7 @@ const createAutocompleteSessionToken = () => {
 const Checkout = () => {
   const { items, totalPrice } = useCart();
   const { toast } = useToast();
+  const { formatPrice, isUsd } = useCurrency();
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(initialForm);
   const [discountCode, setDiscountCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -184,10 +185,10 @@ const Checkout = () => {
     isPickupInStore
       ? "Pick up in store selected. No shipping fee will be charged."
       : freeShippingApplied && selectedShippingOption
-      ? `Free shipping on orders over ${formatCad(clientCommerceConfig.freeShippingThresholdMinor / 100)}. Applied to ${selectedShippingOption.label}.`
+      ? `Free shipping on orders over ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)}. Applied to ${selectedShippingOption.label}.`
       : selectedShippingOption
-      ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."} Orders under ${formatCad(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatCad(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`
-      : `Orders under ${formatCad(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatCad(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`;
+      ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."} Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`
+      : `Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`;
 
   const handleFormChange = (field: keyof CheckoutForm) => (event: ChangeEvent<HTMLInputElement>) => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));
@@ -1219,7 +1220,7 @@ const Checkout = () => {
                                     </div>
                                     <div className="pl-3 text-right">
                                       <p className="font-semibold text-foreground">
-                                        {option.customerRateMinor === 0 ? "Free" : formatCad(option.customerRateMinor / 100)}
+                                        {option.customerRateMinor === 0 ? "Free" : formatPrice(option.customerRateMinor / 100)}
                                       </p>
                                       {option.customerRateMinor === 0 && option.quotedRateMinor > 0 ? (
                                         <p className="mt-1 text-[11px] text-muted-foreground">Applied at checkout</p>
@@ -1355,14 +1356,14 @@ const Checkout = () => {
                     <div className="min-w-0 flex-1">
                       <p className="break-words font-display text-sm font-semibold text-foreground sm:text-base">{product.name}</p>
                       <p className="font-body text-xs text-muted-foreground sm:text-sm">
-                        {formatCad(product.price)} x {quantity}
+                        {formatPrice(product.price)} x {quantity}
                       </p>
                       <p className="font-body text-xs text-muted-foreground">
                         Size: {selection.size} | Color: {selection.color}
                       </p>
                     </div>
                     <p className="font-display text-sm font-semibold text-foreground sm:text-base">
-                      {formatCad(product.price * quantity)}
+                      {formatPrice(product.price * quantity)}
                     </p>
                   </div>
                 ))}
@@ -1371,12 +1372,12 @@ const Checkout = () => {
                 <div className="space-y-2 border-t border-border pt-4 text-sm">
                   <div className="flex items-center justify-between text-muted-foreground">
                     <span>Subtotal</span>
-                    <span>{formatCad(subtotal)}</span>
+                    <span>{formatPrice(subtotal)}</span>
                   </div>
                   {discountMinor > 0 ? (
                     <div className="flex items-center justify-between text-muted-foreground">
                       <span>Discount ({LAUNCH_DISCOUNT_CODE})</span>
-                      <span>-{formatCad(discount)}</span>
+                      <span>-{formatPrice(discount)}</span>
                     </div>
                   ) : null}
                   <div className="flex items-center justify-between text-muted-foreground">
@@ -1389,7 +1390,7 @@ const Checkout = () => {
                         : selectedShippingOption
                         ? shipping === 0
                           ? "Free"
-                          : formatCad(shipping)
+                          : formatPrice(shipping)
                         : "-"}
                     </span>
                   </div>
@@ -1407,12 +1408,17 @@ const Checkout = () => {
                   ) : null}
                   <div className="flex items-center justify-between text-muted-foreground">
                     <span>Tax ({Math.round(clientCommerceConfig.checkoutTaxRate * 100)}%)</span>
-                    <span>{formatCad(tax)}</span>
+                    <span>{formatPrice(tax)}</span>
                   </div>
                   <div className="flex items-center justify-between border-t border-border pt-3 font-display text-lg font-bold text-foreground">
                     <span>Total</span>
-                    <span>{formatCad(total)}</span>
+                    <span>{formatPrice(total)}</span>
                   </div>
+                  {isUsd ? (
+                    <p className="text-xs text-muted-foreground">
+                      USD totals are estimates. Final charges are processed in CAD.
+                    </p>
+                  ) : null}
                 </div>
               </CardContent>
             </Card>

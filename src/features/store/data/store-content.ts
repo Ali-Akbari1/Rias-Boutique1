@@ -71,7 +71,7 @@ export const faqItems: FaqItem[] = [
     id: "faq-2",
     question: "Do you ship internationally?",
     answer:
-      "We currently ship across North America and selected international destinations. Contact us before placing large international orders for exact rates.",
+      "Yes. We ship worldwide. International rates and delivery windows are calculated at checkout. Contact us before placing large international orders for exact rates.",
   },
   {
     id: "faq-3",
@@ -83,13 +83,13 @@ export const faqItems: FaqItem[] = [
     id: "faq-4",
     question: "What are your shipping rates and delivery times?",
     answer:
-      "We offer standard shipping within Canada for a CA$30.00 flat rate at checkout, with delivery typically taking 5–10 business days. Orders over CA$400.00 qualify for free standard shipping. Shipping costs are calculated at checkout unless your order qualifies for free shipping.",
+      "We offer standard shipping within Canada for a CA$30.00 flat rate at checkout, with delivery typically taking 5–10 business days. Orders over CA$400.00 qualify for free standard shipping within Canada. International rates are calculated at checkout and delivery timelines vary by destination.",
   },
   {
     id: "faq-5",
     question: "How is shipping calculated?",
     answer:
-      "Shipping is charged at a flat rate during checkout unless your order qualifies for free shipping. Orders over CA$400.00 automatically receive free standard shipping within Canada.",
+      "Shipping is charged at a flat rate during checkout unless your order qualifies for free shipping. Orders over CA$400.00 automatically receive free standard shipping within Canada. International rates are calculated at checkout.",
   },
   {
     id: "faq-6",

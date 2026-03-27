@@ -2,10 +2,10 @@ import { Link, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { type Product } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
+import { useCurrency } from "@/features/currency/context/CurrencyContext";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { rememberCollectionScrollPosition } from "@/lib/collection-scroll";
-import { formatCad } from "@/lib/money";
 import BagIcon from "@/shared/ui/BagIcon";
 
 interface ProductCardProps {
@@ -18,6 +18,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const isOnSale = !isSoldOut && Boolean(product.salePercent && product.compareAtPrice);
   const checkoutEnabled = isCheckoutEnabled();
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
   const { toast } = useToast();
   const returnTo = `${location.pathname}${location.search}`;
   const detailsPath = `/products/${product.id}?returnTo=${encodeURIComponent(returnTo)}`;
@@ -109,10 +110,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </p>
 
         <div className="mb-1.5 flex items-end gap-2">
-          <p className="font-display text-lg font-bold text-foreground sm:text-xl">{formatCad(product.price)}</p>
+          <p className="font-display text-lg font-bold text-foreground sm:text-xl">{formatPrice(product.price)}</p>
           {isOnSale ? (
             <p className="text-xs font-body text-muted-foreground line-through sm:text-sm">
-              {formatCad(product.compareAtPrice ?? 0)}
+              {formatPrice(product.compareAtPrice ?? 0)}
             </p>
           ) : null}
         </div>

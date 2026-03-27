@@ -3,12 +3,12 @@ import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, Truck } from "lucide-react";
 import { getProductById } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
+import { useCurrency } from "@/features/currency/context/CurrencyContext";
 import CartDrawer from "@/features/cart/components/CartDrawer";
 import Navbar from "@/features/navigation/components/Navbar";
 import { trustBadges } from "@/features/store/data/store-content";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
-import { formatCad } from "@/lib/money";
 import { STANDARD_SIZE_KEYS, standardSizeLabel, type StandardSizeKey, normalizeToStandardSizeKey } from "@/lib/size";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
@@ -20,6 +20,7 @@ const ProductDetails = () => {
   const location = useLocation();
   const product = getProductById(productId ?? "");
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
   const { toast } = useToast();
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -150,7 +151,7 @@ const ProductDetails = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar onCartClick={() => setCartOpen(true)} />
-      <main className="container mx-auto space-y-8 px-4 pb-6 pt-20 sm:px-6 sm:pb-8 sm:pt-24">
+      <main className="container mx-auto space-y-8 px-4 pb-6 pt-28 sm:px-6 sm:pb-8 sm:pt-32">
         <Link
           to={backToCollectionHref}
           state={{ restoreCollectionScroll: true }}
@@ -212,11 +213,11 @@ const ProductDetails = () => {
 
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <Badge variant="secondary" className="font-body">
-                {formatCad(product.price)}
+                {formatPrice(product.price)}
               </Badge>
               {isOnSale ? (
                 <span className="text-sm text-muted-foreground line-through">
-                  {formatCad(product.compareAtPrice ?? 0)}
+                  {formatPrice(product.compareAtPrice ?? 0)}
                 </span>
               ) : null}
               {isSoldOut ? (

@@ -1,8 +1,8 @@
 import { X, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getMaxQuantityForProduct, useCart } from "@/features/cart/context/CartContext";
+import { useCurrency } from "@/features/currency/context/CurrencyContext";
 import { isCheckoutEnabled } from "@/lib/checkout";
-import { formatCad } from "@/lib/money";
 import BagIcon from "@/shared/ui/BagIcon";
 
 interface CartDrawerProps {
@@ -14,6 +14,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const checkoutEnabled = isCheckoutEnabled();
+  const { formatPrice, isUsd } = useCurrency();
 
   const handleCheckout = () => {
     if (!checkoutEnabled) {
@@ -57,7 +58,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-display truncate font-semibold text-foreground">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground font-body">{formatCad(product.price)}</p>
+                      <p className="text-sm text-muted-foreground font-body">{formatPrice(product.price)}</p>
                       <p className="text-xs text-muted-foreground font-body mt-1">
                         Size: {selection.size} | Color: {selection.color}
                       </p>
@@ -83,7 +84,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                     </div>
                     <div className="flex flex-col items-end justify-between">
                       <span className="font-display text-sm font-bold text-foreground sm:text-base">
-                        {formatCad(product.price * quantity)}
+                        {formatPrice(product.price * quantity)}
                       </span>
                       <button
                         onClick={() => removeFromCart(id)}
@@ -100,8 +101,13 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
             <div className="space-y-4 border-t border-border p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6">
               <div className="flex justify-between items-center">
                 <span className="font-body text-lg text-muted-foreground">Total</span>
-                <span className="font-display text-2xl font-bold text-foreground">{formatCad(totalPrice)}</span>
+                <span className="font-display text-2xl font-bold text-foreground">{formatPrice(totalPrice)}</span>
               </div>
+              {isUsd ? (
+                <p className="text-xs font-body text-muted-foreground">
+                  USD totals are estimates. Final charges are processed in CAD at checkout.
+                </p>
+              ) : null}
               <button
                 onClick={handleCheckout}
                 disabled={!checkoutEnabled}

@@ -13,7 +13,7 @@ const FaqPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar onCartClick={() => setCartOpen(true)} />
 
-      <main className="pt-20 sm:pt-24">
+      <main className="pt-28 sm:pt-32">
         <section className="container mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
           <header>
             <p className="mb-3 text-sm font-body uppercase tracking-[0.3em] text-gold">Support</p>

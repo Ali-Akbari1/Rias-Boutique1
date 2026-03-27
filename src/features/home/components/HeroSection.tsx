@@ -17,15 +17,15 @@ const HeroSection = () => {
       
       <div className="relative z-10 container mx-auto flex flex-col items-start px-4 sm:px-6">
         <div className="max-w-xl animate-fade-in text-white">
-          <p className="mb-4 text-sm font-body uppercase tracking-[0.25em] text-white sm:text-lg sm:tracking-[0.3em]">
-            Afghan Heritage Collection
+          <p className="mb-4 pl-1.5 text-sm font-body uppercase tracking-[0.25em] text-white sm:pl-2 sm:text-lg sm:tracking-[0.3em]">
+            Traditional Afghan Fashion
           </p>
           <h2 className="mb-6 text-4xl font-display font-bold leading-tight text-white sm:text-5xl md:text-7xl">
-            Timeless Elegance, <br />
-            <span className="italic text-white">Crafted by Hand</span>
+          Authentic Afghan Dresses<br />
+            <span className="italic text-white">in Canada</span>
           </h2>
           <p className="mb-8 max-w-md text-lg font-body leading-relaxed text-white sm:text-xl">
-            Exquisite Afghan clothing adorned with centuries-old embroidery traditions. Each piece tells a story.
+          Hand-finished embroidery, shipped worldwide, and designed to stand out.
           </p>
           <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-4">
             <Link

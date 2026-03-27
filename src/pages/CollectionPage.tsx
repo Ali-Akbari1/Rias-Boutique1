@@ -40,7 +40,7 @@ const CollectionPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar onCartClick={() => setCartOpen(true)} />
-      <main className="pt-16 sm:pt-20">
+      <main className="pt-24 sm:pt-28">
         <ProductGrid initialDepartment={initialDepartment} initialQuery={initialSearch} />
       </main>
 

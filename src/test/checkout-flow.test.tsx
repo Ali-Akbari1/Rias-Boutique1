@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { CartProvider } from "@/features/cart/context/CartContext";
+import { CurrencyProvider } from "@/features/currency/context/CurrencyContext";
 import { products } from "@/features/catalog/data/products";
 import * as checkoutRequest from "@/lib/checkout-request";
 
@@ -10,9 +11,11 @@ const renderCheckout = async () => {
   const { default: Checkout } = await import("@/pages/Checkout");
   return render(
     <MemoryRouter>
-      <CartProvider>
-        <Checkout />
-      </CartProvider>
+      <CurrencyProvider>
+        <CartProvider>
+          <Checkout />
+        </CartProvider>
+      </CurrencyProvider>
     </MemoryRouter>,
   );
 };
