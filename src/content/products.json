@@ -386,7 +386,7 @@
       "id": "Burgundy-Banaras-Dress",
       "createdAt": "2026-02-22",
       "image": "/uploads/img_0761.webp",
-      "inventory": 1,
+      "inventory": "sold_out",
       "description": "Burgundy banaras dress with kochi pants and heavy embroidered scarf. ",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in "
