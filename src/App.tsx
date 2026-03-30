@@ -13,16 +13,17 @@ import RouteMetadata from "@/features/navigation/components/RouteMetadata";
 import ScrollToTop from "@/features/navigation/components/ScrollToTop";
 import { resolveCanonicalPath } from "@/features/navigation/route-manifest";
 import { isCheckoutEnabled } from "@/lib/checkout";
-import HomePage from "./pages/HomePage";
-import Checkout from "./pages/Checkout";
-import CheckoutSuccess from "./pages/CheckoutSuccess";
-import CheckoutCancel from "./pages/CheckoutCancel";
-import AdminOrders from "./pages/AdminOrders";
-import ProductDetails from "./pages/ProductDetails";
-import CollectionPage from "./pages/CollectionPage";
-import NotFound from "./pages/NotFound";
+import PageSkeleton from "@/shared/ui/page-skeleton";
 
 const queryClient = new QueryClient();
+const HomePage = lazy(() => import("./pages/HomePage"));
+const CollectionPage = lazy(() => import("./pages/CollectionPage"));
+const ProductDetails = lazy(() => import("./pages/ProductDetails"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
+const CheckoutCancel = lazy(() => import("./pages/CheckoutCancel"));
+const AdminOrders = lazy(() => import("./pages/AdminOrders"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const FaqPage = lazy(() => import("./pages/FaqPage"));
 
@@ -59,42 +60,30 @@ const App = () => {
               <ScrollToTop />
               <AnalyticsTracker />
               <SpeedInsightsTracker />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/collection" element={<CollectionPage />} />
-                <Route path="/collection/:department" element={<CollectionPage />} />
-                <Route
-                  path="/about"
-                  element={
-                    <Suspense fallback={null}>
-                      <AboutPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/faq"
-                  element={
-                    <Suspense fallback={null}>
-                      <FaqPage />
-                    </Suspense>
-                  }
-                />
-                <Route path="/products/:productId" element={<ProductDetails />} />
-                <Route
-                  path="/checkout"
-                  element={checkoutEnabled ? <Checkout /> : <Navigate to="/" replace />}
-                />
-                <Route
-                  path="/checkout/success"
-                  element={checkoutEnabled ? <CheckoutSuccess /> : <Navigate to="/" replace />}
-                />
-                <Route
-                  path="/checkout/cancel"
-                  element={checkoutEnabled ? <CheckoutCancel /> : <Navigate to="/" replace />}
-                />
-                <Route path="/orders-admin" element={<AdminOrders />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Suspense fallback={<PageSkeleton />}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/collection" element={<CollectionPage />} />
+                  <Route path="/collection/:department" element={<CollectionPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/faq" element={<FaqPage />} />
+                  <Route path="/products/:productId" element={<ProductDetails />} />
+                  <Route
+                    path="/checkout"
+                    element={checkoutEnabled ? <Checkout /> : <Navigate to="/" replace />}
+                  />
+                  <Route
+                    path="/checkout/success"
+                    element={checkoutEnabled ? <CheckoutSuccess /> : <Navigate to="/" replace />}
+                  />
+                  <Route
+                    path="/checkout/cancel"
+                    element={checkoutEnabled ? <CheckoutCancel /> : <Navigate to="/" replace />}
+                  />
+                  <Route path="/orders-admin" element={<AdminOrders />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </BrowserRouter>
           </CartProvider>
         </CurrencyProvider>
