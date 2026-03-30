@@ -1,7 +1,8 @@
 import { X, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getMaxQuantityForProduct, useCart } from "@/features/cart/context/CartContext";
-import { useCurrency } from "@/features/currency/context/CurrencyContext";
+import { getMaxQuantityForProduct } from "@/features/cart/context/cart-quantity";
+import { useCart } from "@/features/cart/context/CartContext";
+import { useCurrency } from "@/features/currency/context/useCurrency";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import BagIcon from "@/shared/ui/BagIcon";
 

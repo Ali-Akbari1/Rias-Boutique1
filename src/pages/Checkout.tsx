@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/sha
 import { Input } from "@/shared/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/shared/ui/accordion";
 import { getClientCommerceConfig } from "@/lib/commerce-config";
-import { useCurrency } from "@/features/currency/context/CurrencyContext";
+import { useCurrency } from "@/features/currency/context/useCurrency";
 import { buildCheckoutPricing, calculateLaunchDiscountMinor } from "@/shared/config/commerce";
 import {
   getLaunchDiscountExpiryDateLabel,

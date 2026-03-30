@@ -194,6 +194,176 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
+  if (validation.data.action === "send_test_email") {
+    const payload = validation.data as z.infer<typeof sendTestEmailSchema>;
+
+    if (!isEmailTestEnabled() || (isProductionEnv() && !allowEmailTestInProd())) {
+      sendError(
+        res,
+        403,
+        "EMAIL_TEST_DISABLED",
+        "Email test endpoint is disabled. Set EMAIL_TEST_ENABLED=true and EMAIL_TEST_ALLOW_PROD=true to allow in production.",
+      );
+      return;
+    }
+
+    const type = payload.type || "tracking";
+    const recipient = payload.customerEmail?.trim() || process.env.EMAIL_TEST_RECIPIENT?.trim() || "";
+    if (!recipient) {
+      sendError(res, 400, "MISSING_RECIPIENT", "Set customerEmail or EMAIL_TEST_RECIPIENT.");
+      return;
+    }
+
+    let order: StoredOrder | null = null;
+
+    if (payload.orderId) {
+      order = await findOrderById(payload.orderId);
+      if (!order) {
+        sendError(res, 404, "ORDER_NOT_FOUND", "Order not found.");
+        return;
+      }
+    }
+
+    if (!order) {
+      const catalog = await loadCatalog();
+      if (catalog.length === 0) {
+        sendError(res, 500, "CATALOG_EMPTY", "Product catalog is empty.");
+        return;
+      }
+
+      const product =
+        (payload.productId && catalog.find((entry) => entry.id === payload.productId)) ||
+        catalog.find((entry) => entry.availability === "available") ||
+        catalog[0];
+      if (!product) {
+        sendError(res, 404, "PRODUCT_NOT_FOUND", "Requested product was not found.");
+        return;
+      }
+
+      const quantity = payload.quantity ?? 1;
+      const unitAmountMinor = product.priceMinor;
+      const lineTotalMinor = unitAmountMinor * quantity;
+      const subtotalMinor = lineTotalMinor;
+      const shippingMinor = Math.round(toNumber(process.env.FLAT_SHIPPING_RATE_MINOR, 3000));
+      const discountMinor = 0;
+      const taxRate = toNumber(process.env.CHECKOUT_TAX_RATE, 0.05);
+      const taxMinor = Math.round((subtotalMinor - discountMinor + shippingMinor) * taxRate);
+      const totalMinor = subtotalMinor - discountMinor + shippingMinor + taxMinor;
+      const now = new Date().toISOString();
+      const baseUrl = resolveBaseUrl();
+      const imageUrl = resolveImageUrl(product.image, baseUrl) || undefined;
+
+      order = {
+        id: randomUUID(),
+        paymentStatus: "paid",
+        idempotencyKey: `test-${randomUUID()}`,
+        cloverCheckoutId: "",
+        cloverCheckoutUrl: "",
+        paymentReference: "test-payment",
+        currency: "CAD",
+        subtotalMinor,
+        totalMinor,
+        pricing: {
+          discountCode: "",
+          discountMinor,
+          shippingMinor,
+          quotedShippingMinor: shippingMinor,
+          taxMinor,
+          freeShippingApplied: false,
+        },
+        customer: {
+          deliveryMethod: "shipping",
+          fullName: payload.customerName?.trim() || "Test Customer",
+          email: recipient,
+          phone: "403-555-0100",
+          address: "123 9 Ave SE",
+          city: "Calgary",
+          state: "AB",
+          postalCode: "T2G 0P6",
+          country: "Canada",
+        },
+        lineItems: [
+          {
+            productId: product.id,
+            name: product.name,
+            imageUrl,
+            unitAmountMinor,
+            quantity,
+            lineTotalMinor,
+          },
+        ],
+        shippingQuote: null,
+        shipment:
+          type === "tracking"
+            ? {
+                provider: "manual",
+                carrier: payload.carrier?.trim() || "Canada Post",
+                service: payload.service?.trim() || "Standard",
+                trackingCode:
+                  payload.trackingCode?.trim() || `TEST-${Math.random().toString(36).slice(2, 10)}`,
+                trackingUrl:
+                  payload.trackingUrl?.trim() ||
+                  buildCarrierTrackingUrl({
+                    carrier: payload.carrier?.trim() || "Canada Post",
+                    trackingCode: payload.trackingCode?.trim() || "TEST",
+                  }),
+                status: "pre_transit",
+                purchasedAt: now,
+              }
+            : null,
+        createdAt: now,
+        updatedAt: now,
+        paidAt: now,
+        confirmationEmailSentAt: "",
+        lastError: "",
+      };
+    }
+
+    const orderToSend: StoredOrder = {
+      ...order,
+      customer: {
+        ...order.customer,
+        email: recipient,
+        fullName: payload.customerName?.trim() || order.customer.fullName,
+      },
+    };
+
+    if (
+      type === "tracking" &&
+      (!orderToSend.shipment || (!orderToSend.shipment.trackingCode && !orderToSend.shipment.trackingUrl))
+    ) {
+      sendError(res, 409, "TRACKING_NOT_READY", "Tracking information is not available yet.");
+      return;
+    }
+
+    try {
+      if (type === "confirmation") {
+        await sendOrderConfirmationEmail(orderToSend);
+      } else {
+        await sendTrackingEmail(orderToSend);
+      }
+
+      res.status(200).json({
+        ok: true,
+        type,
+        recipient,
+        productId: orderToSend.lineItems[0]?.productId || "",
+        orderId: orderToSend.id,
+      });
+    } catch (error) {
+      logger.error("admin-orders.email_test_failed", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      sendError(
+        res,
+        502,
+        "EMAIL_TEST_FAILED",
+        error instanceof Error ? error.message : "Unable to send the test email.",
+      );
+    }
+    return;
+  }
+
   const order = await findOrderById(validation.data.orderId);
   if (!order) {
     sendError(res, 404, "ORDER_NOT_FOUND", "Order not found.");
@@ -238,171 +408,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  if (validation.data.action === "send_test_email") {
-    if (!isEmailTestEnabled() || (isProductionEnv() && !allowEmailTestInProd())) {
-      sendError(
-        res,
-        403,
-        "EMAIL_TEST_DISABLED",
-        "Email test endpoint is disabled. Set EMAIL_TEST_ENABLED=true and EMAIL_TEST_ALLOW_PROD=true to allow in production.",
-      );
-      return;
-    }
-
-    const type = validation.data.type || "tracking";
-    const recipient =
-      validation.data.customerEmail?.trim() || process.env.EMAIL_TEST_RECIPIENT?.trim() || "";
-    if (!recipient) {
-      sendError(res, 400, "MISSING_RECIPIENT", "Set customerEmail or EMAIL_TEST_RECIPIENT.");
-      return;
-    }
-
-    let order: StoredOrder | null = null;
-
-    if (validation.data.orderId) {
-      order = await findOrderById(validation.data.orderId);
-      if (!order) {
-        sendError(res, 404, "ORDER_NOT_FOUND", "Order not found.");
-        return;
-      }
-    }
-
-    if (!order) {
-      const catalog = await loadCatalog();
-      if (catalog.length === 0) {
-        sendError(res, 500, "CATALOG_EMPTY", "Product catalog is empty.");
-        return;
-      }
-
-      const product =
-        (validation.data.productId && catalog.find((entry) => entry.id === validation.data.productId)) ||
-        catalog.find((entry) => entry.availability === "available") ||
-        catalog[0];
-      if (!product) {
-        sendError(res, 404, "PRODUCT_NOT_FOUND", "Requested product was not found.");
-        return;
-      }
-
-      const quantity = validation.data.quantity ?? 1;
-      const unitAmountMinor = product.priceMinor;
-      const lineTotalMinor = unitAmountMinor * quantity;
-      const subtotalMinor = lineTotalMinor;
-      const shippingMinor = Math.round(toNumber(process.env.FLAT_SHIPPING_RATE_MINOR, 3000));
-      const discountMinor = 0;
-      const taxRate = toNumber(process.env.CHECKOUT_TAX_RATE, 0.05);
-      const taxMinor = Math.round((subtotalMinor - discountMinor + shippingMinor) * taxRate);
-      const totalMinor = subtotalMinor - discountMinor + shippingMinor + taxMinor;
-      const now = new Date().toISOString();
-      const baseUrl = resolveBaseUrl();
-      const imageUrl = resolveImageUrl(product.image, baseUrl) || undefined;
-
-      order = {
-        id: randomUUID(),
-        paymentStatus: "paid",
-        idempotencyKey: `test-${randomUUID()}`,
-        cloverCheckoutId: "",
-        cloverCheckoutUrl: "",
-        paymentReference: "test-payment",
-        currency: "CAD",
-        subtotalMinor,
-        totalMinor,
-        pricing: {
-          discountCode: "",
-          discountMinor,
-          shippingMinor,
-          quotedShippingMinor: shippingMinor,
-          taxMinor,
-          freeShippingApplied: false,
-        },
-        customer: {
-          deliveryMethod: "shipping",
-          fullName: validation.data.customerName?.trim() || "Test Customer",
-          email: recipient,
-          phone: "403-555-0100",
-          address: "123 9 Ave SE",
-          city: "Calgary",
-          state: "AB",
-          postalCode: "T2G 0P6",
-          country: "Canada",
-        },
-        lineItems: [
-          {
-            productId: product.id,
-            name: product.name,
-            imageUrl,
-            unitAmountMinor,
-            quantity,
-            lineTotalMinor,
-          },
-        ],
-        shippingQuote: null,
-        shipment:
-          type === "tracking"
-            ? {
-                provider: "manual",
-                carrier: validation.data.carrier?.trim() || "Canada Post",
-                service: validation.data.service?.trim() || "Standard",
-                trackingCode:
-                  validation.data.trackingCode?.trim() || `TEST-${Math.random().toString(36).slice(2, 10)}`,
-                trackingUrl:
-                  validation.data.trackingUrl?.trim() ||
-                  buildCarrierTrackingUrl({
-                    carrier: validation.data.carrier?.trim() || "Canada Post",
-                    trackingCode: validation.data.trackingCode?.trim() || "TEST",
-                  }),
-                status: "pre_transit",
-                purchasedAt: now,
-              }
-            : null,
-        createdAt: now,
-        updatedAt: now,
-        paidAt: now,
-        confirmationEmailSentAt: "",
-        lastError: "",
-      };
-    }
-
-    const orderToSend: StoredOrder = {
-      ...order,
-      customer: {
-        ...order.customer,
-        email: recipient,
-        fullName: validation.data.customerName?.trim() || order.customer.fullName,
-      },
-    };
-
-    if (type === "tracking" && (!orderToSend.shipment || (!orderToSend.shipment.trackingCode && !orderToSend.shipment.trackingUrl))) {
-      sendError(res, 409, "TRACKING_NOT_READY", "Tracking information is not available yet.");
-      return;
-    }
-
-    try {
-      if (type === "confirmation") {
-        await sendOrderConfirmationEmail(orderToSend);
-      } else {
-        await sendTrackingEmail(orderToSend);
-      }
-
-      res.status(200).json({
-        ok: true,
-        type,
-        recipient,
-        productId: orderToSend.lineItems[0]?.productId || "",
-        orderId: orderToSend.id,
-      });
-    } catch (error) {
-      logger.error("admin-orders.email_test_failed", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      sendError(
-        res,
-        502,
-        "EMAIL_TEST_FAILED",
-        error instanceof Error ? error.message : "Unable to send the test email.",
-      );
-    }
-    return;
-  }
 
   if (validation.data.action === "update_tracking_manual") {
     if (order.shipment?.provider === "easypost") {

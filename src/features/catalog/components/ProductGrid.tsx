@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { useLocation, useNavigate, useNavigationType, useSearchParams } from "react-router-dom";
 import { type ProductDepartment, PRODUCT_DEPARTMENTS, products } from "@/features/catalog/data/products";
-import { useCurrency } from "@/features/currency/context/CurrencyContext";
+import { useCurrency } from "@/features/currency/context/useCurrency";
 import { consumePendingCollectionScrollPosition } from "@/lib/collection-scroll";
 import ProductCard from "./ProductCard";
 import { normalizeSearchText, scoreWeightedSearchDocument } from "@/lib/search";

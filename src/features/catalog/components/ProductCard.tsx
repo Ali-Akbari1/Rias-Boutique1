@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { type Product } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
-import { useCurrency } from "@/features/currency/context/CurrencyContext";
+import { useCurrency } from "@/features/currency/context/useCurrency";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { rememberCollectionScrollPosition } from "@/lib/collection-scroll";

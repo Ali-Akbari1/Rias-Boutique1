@@ -2,7 +2,7 @@ import type { FormEvent, RefObject } from "react";
 import { Link } from "react-router-dom";
 import { Search, X } from "lucide-react";
 import type { Product } from "@/features/catalog/data/products";
-import { useCurrency } from "@/features/currency/context/CurrencyContext";
+import { useCurrency } from "@/features/currency/context/useCurrency";
 import { Input } from "@/shared/ui/input";
 
 const POPULAR_SEARCH_TERMS = [

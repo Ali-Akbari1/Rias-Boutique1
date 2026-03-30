@@ -3,7 +3,7 @@ import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, Truck } from "lucide-react";
 import { getProductById } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
-import { useCurrency } from "@/features/currency/context/CurrencyContext";
+import { useCurrency } from "@/features/currency/context/useCurrency";
 import CartDrawer from "@/features/cart/components/CartDrawer";
 import Navbar from "@/features/navigation/components/Navbar";
 import { trustBadges } from "@/features/store/data/store-content";

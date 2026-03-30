@@ -1,15 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { type CurrencyCode, convertFromCad, formatCurrency } from "@/lib/money";
-
-interface CurrencyContextValue {
-  currency: CurrencyCode;
-  setCurrency: (value: CurrencyCode) => void;
-  cadToUsdRate: number;
-  formatPrice: (amountCad: number) => string;
-  isUsd: boolean;
-}
-
-const CurrencyContext = createContext<CurrencyContextValue | undefined>(undefined);
+import { CurrencyContext, type CurrencyContextValue } from "@/features/currency/context/currency-context";
 
 const STORAGE_KEY = "rias_boutique_currency_v1";
 const DEFAULT_CAD_TO_USD_RATE = 0.74;
@@ -57,13 +48,3 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
 
   return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;
 };
-
-export const useCurrency = () => {
-  const context = useContext(CurrencyContext);
-  if (!context) {
-    throw new Error("useCurrency must be used within a CurrencyProvider");
-  }
-
-  return context;
-};
-
