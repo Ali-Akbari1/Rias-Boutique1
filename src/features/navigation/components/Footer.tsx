@@ -21,7 +21,7 @@ const Footer = () => {
               Ria&apos;s <span className="text-white">Boutique</span>
             </h3>
             <p className="font-body leading-relaxed text-white/80">
-              Handcrafted Afghan clothing that bridges heritage and modern elegance.
+              Handcrafted Afghan clothing that bridges heritage and modern elegance, curated in Calgary.
             </p>
           </div>
           <div className="text-left md:justify-self-center md:text-center">

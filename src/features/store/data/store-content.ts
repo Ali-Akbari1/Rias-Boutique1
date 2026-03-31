@@ -125,7 +125,7 @@ export const trustBadges: TrustBadgeItem[] = [
   {
     id: "custom-orders",
     label: "Custom Orders Available on Request",
-    description: "Need a unique design or special sizing? Place a custom order directly with our team.",
+    description: "Need a custom fit? Order with our team.",
   },
 ];
 
