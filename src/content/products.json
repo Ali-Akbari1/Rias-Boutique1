@@ -805,6 +805,7 @@
       ],
       "name": "Blue Banaras Bridal Dress",
       "slug": "blue-banaras-dress",
+      "maxQuantity": 1,
       "colors": [
         "Blue "
       ],
