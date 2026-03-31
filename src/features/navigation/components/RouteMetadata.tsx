@@ -53,6 +53,43 @@ const ORGANIZATION_ID = `${SITE_URL}#organization`;
 const WEBSITE_ID = `${SITE_URL}#website`;
 const commerceConfig = getClientCommerceConfig();
 
+type JsonLdNode = Record<string, unknown>;
+
+type OfferShippingDetails = {
+  "@type": "OfferShippingDetails";
+  shippingLabel: string;
+  shippingRate: {
+    "@type": "MonetaryAmount";
+    value: number;
+    currency: string;
+  };
+  shippingDestination: {
+    "@type": "DefinedRegion";
+    addressCountry: string;
+  };
+  deliveryTime: {
+    "@type": "ShippingDeliveryTime";
+    handlingTime: {
+      "@type": "QuantitativeValue";
+      minValue: number;
+      maxValue: number;
+      unitCode: string;
+    };
+    transitTime: {
+      "@type": "QuantitativeValue";
+      minValue: number;
+      maxValue: number;
+      unitCode: string;
+    };
+  };
+  eligibleTransactionVolume?: {
+    "@type": "PriceSpecification";
+    price: number;
+    minPrice: number;
+    priceCurrency: string;
+  };
+};
+
 const toAbsoluteUrl = (value: string) => {
   const trimmed = value.trim();
   if (!trimmed) {
@@ -100,7 +137,7 @@ const toMetaDescription = (value: string) => {
   return `${normalized.slice(0, 157).trimEnd()}...`;
 };
 
-const buildOrganizationSchema = () => {
+const buildOrganizationSchema = (): JsonLdNode => {
   const pickupDetails = getStorePickupDetails();
   const instagramUrl = getInstagramProfileUrl();
   const sameAs = [instagramUrl].filter((url) => url && url !== "https://www.instagram.com/");
@@ -127,7 +164,7 @@ const buildOrganizationSchema = () => {
   };
 };
 
-const buildWebsiteSchema = () => ({
+const buildWebsiteSchema = (): JsonLdNode => ({
   "@type": "WebSite",
   "@id": WEBSITE_ID,
   name: STORE_NAME,
@@ -143,12 +180,12 @@ const buildWebsiteSchema = () => ({
   },
 });
 
-const buildShippingDetails = () => {
+const buildShippingDetails = (): OfferShippingDetails[] => {
   const standardRate = commerceConfig.shippingChargesEnabled
     ? commerceConfig.flatShippingRateMinor / 100
     : 0;
   const freeThreshold = commerceConfig.freeShippingThresholdMinor / 100;
-  const baseDetails = {
+  const baseDetails: Pick<OfferShippingDetails, "shippingDestination" | "deliveryTime"> = {
     shippingDestination: {
       "@type": "DefinedRegion",
       addressCountry: "CA",
@@ -170,7 +207,7 @@ const buildShippingDetails = () => {
     },
   };
 
-  const details = [
+  const details: OfferShippingDetails[] = [
     {
       "@type": "OfferShippingDetails",
       shippingLabel: "Standard shipping (Canada)",
@@ -205,7 +242,7 @@ const buildShippingDetails = () => {
   return details;
 };
 
-const buildMerchantReturnPolicy = () => ({
+const buildMerchantReturnPolicy = (): JsonLdNode => ({
   "@type": "MerchantReturnNotPermitted",
   returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
   applicableCountry: "CA",
@@ -215,7 +252,7 @@ const buildMerchantReturnPolicy = () => ({
 const toUniqueValues = (values: string[]) =>
   Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
 
-const buildProductSchema = (product: Product, canonicalUrl: string) => {
+const buildProductSchema = (product: Product, canonicalUrl: string): JsonLdNode => {
   const imageUrls = toUniqueValues(
     [product.image, ...product.galleryImages].filter((value): value is string => Boolean(value)),
   );
@@ -260,7 +297,7 @@ const buildProductSchema = (product: Product, canonicalUrl: string) => {
   };
 };
 
-const buildFaqSchema = () => ({
+const buildFaqSchema = (): JsonLdNode => ({
   "@type": "FAQPage",
   "@id": `${SITE_URL}/faq#faq`,
   mainEntity: faqItems.map((item) => ({
@@ -286,7 +323,11 @@ const departmentLabel = (department: string | undefined) => {
   }
 };
 
-const buildBreadcrumbSchema = (canonicalPath: string, canonicalUrl: string, product?: Product) => {
+const buildBreadcrumbSchema = (
+  canonicalPath: string,
+  canonicalUrl: string,
+  product?: Product,
+): JsonLdNode | null => {
   const items: Array<{ name: string; item: string }> = [{ name: "Home", item: `${SITE_URL}/` }];
 
   if (canonicalPath.startsWith("/collection")) {
@@ -428,7 +469,7 @@ const RouteMetadata = () => {
     updateMetaProperty("rb-og-title", "og:title", metadata.title);
     updateMetaProperty("rb-og-description", "og:description", metadata.description);
 
-    const schemaGraph = [buildOrganizationSchema(), buildWebsiteSchema()];
+    const schemaGraph: JsonLdNode[] = [buildOrganizationSchema(), buildWebsiteSchema()];
     if (product) {
       schemaGraph.push(buildProductSchema(product, canonicalUrl));
     }

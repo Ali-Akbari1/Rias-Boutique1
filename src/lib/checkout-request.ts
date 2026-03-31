@@ -1,4 +1,4 @@
-import type { CartItem } from "@/features/cart/context/CartContext";
+import type { CartItem } from "@/features/cart/context/cart-types";
 import { extractApiErrorMessage, requestJson } from "@/lib/api-client";
 
 interface CheckoutItemPayload {

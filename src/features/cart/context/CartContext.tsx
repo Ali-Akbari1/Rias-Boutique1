@@ -2,18 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { track } from "@vercel/analytics/react";
 import { getProductById, type Product } from "@/features/catalog/data/products";
 import { getMaxQuantityForProduct } from "@/features/cart/context/cart-quantity";
-
-export interface ProductSelection {
-  size: string;
-  color: string;
-}
-
-export interface CartItem {
-  id: string;
-  product: Product;
-  selection: ProductSelection;
-  quantity: number;
-}
+import { type CartItem, type ProductSelection } from "@/features/cart/context/cart-types";
 
 interface CartContextType {
   items: CartItem[];

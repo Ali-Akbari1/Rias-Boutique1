@@ -93,6 +93,12 @@ const adminShipmentActionSchema = z.discriminatedUnion("action", [
   manualTrackingSchema,
 ]);
 
+type AdminShipmentAction = z.infer<typeof adminShipmentActionSchema>;
+type SendTestEmailAction = z.infer<typeof sendTestEmailSchema>;
+
+const isSendTestEmailAction = (value: AdminShipmentAction): value is SendTestEmailAction =>
+  value.action === "send_test_email";
+
 const toNumber = (value: string | undefined, fallback: number) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
@@ -194,8 +200,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  if (validation.data.action === "send_test_email") {
-    const payload = validation.data as z.infer<typeof sendTestEmailSchema>;
+  const actionData = validation.data;
+
+  if (isSendTestEmailAction(actionData)) {
+    const payload = actionData;
 
     if (!isEmailTestEnabled() || (isProductionEnv() && !allowEmailTestInProd())) {
       sendError(
@@ -364,7 +372,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const order = await findOrderById(validation.data.orderId);
+  const orderId = actionData.orderId;
+  if (!orderId) {
+    sendError(res, 400, "MISSING_ORDER_ID", "Order id is required.");
+    return;
+  }
+
+  const order = await findOrderById(orderId);
   if (!order) {
     sendError(res, 404, "ORDER_NOT_FOUND", "Order not found.");
     return;
@@ -380,7 +394,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  if (validation.data.action === "send_tracking_email") {
+  if (actionData.action === "send_tracking_email") {
     if (!order.shipment || (!order.shipment.trackingCode && !order.shipment.trackingUrl)) {
       sendError(res, 409, "TRACKING_NOT_READY", "Tracking information is not available yet for this order.");
       return;
@@ -409,16 +423,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
 
-  if (validation.data.action === "update_tracking_manual") {
+  if (actionData.action === "update_tracking_manual") {
     if (order.shipment?.provider === "easypost") {
       sendError(res, 409, "SHIPMENT_ALREADY_PURCHASED", "This order already has a purchased shipping label.");
       return;
     }
 
-    const trackingCode = (validation.data.trackingCode || "").trim();
-    const trackingUrl = (validation.data.trackingUrl || "").trim();
-    const carrier = (validation.data.carrier || "").trim();
-    const service = (validation.data.service || "").trim();
+    const trackingCode = (actionData.trackingCode || "").trim();
+    const trackingUrl = (actionData.trackingUrl || "").trim();
+    const carrier = (actionData.carrier || "").trim();
+    const service = (actionData.service || "").trim();
     const generatedTrackingUrl = !trackingUrl
       ? buildCarrierTrackingUrl({ carrier, trackingCode })
       : "";
@@ -462,7 +476,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  if (validation.data.action === "retry_label_purchase") {
+  if (actionData.action === "retry_label_purchase") {
     if (order.shippingQuote?.provider !== "easypost") {
       sendError(
         res,
