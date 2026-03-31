@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { prefetchCollectionPage } from "@/lib/prefetch";
 import { STANDARD_SIZE_KEYS, standardSizeLabel, type StandardSizeKey, normalizeToStandardSizeKey } from "@/lib/size";
+import { formatProductAlt } from "@/lib/seo";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
@@ -183,6 +184,7 @@ const ProductDetails = () => {
   const primaryImage = selectedImage || galleryImages[0] || product?.image || "/placeholder.svg";
   const isAdding = addState === "adding";
   const isAdded = addState === "added";
+  const productAlt = product ? formatProductAlt(product) : "Product image";
 
   useEffect(() => {
     if (!product || !primaryImage || primaryImage === activeImage) {
@@ -242,14 +244,14 @@ const ProductDetails = () => {
                 src={primaryImage}
                 images={galleryImages}
                 initialIndex={selectedImageIndex}
-                alt={product.name}
+                alt={productAlt}
                 title={`${product.name} image`}
               >
                 <button type="button" className="relative block h-full w-full cursor-zoom-in">
                   <div className="relative h-[380px] w-full bg-muted/20 sm:h-[500px] lg:h-[620px]">
                     <img
                       src={activeImage || primaryImage}
-                      alt={product.name}
+                      alt={productAlt}
                       className={`absolute inset-0 h-full w-full object-contain ${
                         transitionImage ? "motion-safe:animate-image-crossfade-out" : ""
                       }`}
@@ -257,7 +259,7 @@ const ProductDetails = () => {
                     {transitionImage ? (
                       <img
                         src={transitionImage}
-                        alt={product.name}
+                        alt={productAlt}
                         className="pointer-events-none absolute inset-0 h-full w-full object-contain opacity-0 motion-safe:animate-image-crossfade-in"
                       />
                     ) : null}
@@ -281,7 +283,7 @@ const ProductDetails = () => {
                 >
                   <img
                     src={image}
-                    alt={`${product.name} view ${index + 1}`}
+                    alt={`${productAlt} view ${index + 1}`}
                     className="h-28 w-full object-contain bg-muted/20"
                   />
                 </button>

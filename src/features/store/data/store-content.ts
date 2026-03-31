@@ -58,7 +58,7 @@ export const shippingPolicy = {
 };
 
 export const returnPolicy =
-  "";
+  "All sales are final. We do not accept returns or offer refunds. Please review product details and sizing before placing your order.";
 
 export const faqItems: FaqItem[] = [
   {

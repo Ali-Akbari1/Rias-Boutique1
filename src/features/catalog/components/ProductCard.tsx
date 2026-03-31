@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { rememberCollectionScrollPosition } from "@/lib/collection-scroll";
 import { prefetchProductDetailsPage } from "@/lib/prefetch";
+import { formatProductAlt } from "@/lib/seo";
 import BagIcon from "@/shared/ui/BagIcon";
 
 interface ProductCardProps {
@@ -137,7 +138,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         >
           <img
             src={product.image}
-            alt={product.name}
+            alt={formatProductAlt(product)}
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
           />

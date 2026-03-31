@@ -37,6 +37,7 @@ import {
   returnPolicy,
   shippingPolicy,
 } from "@/features/store/data/store-content";
+import { formatProductAlt } from "@/lib/seo";
 
 type DeliveryMethod = "shipping" | "pickup";
 type AddressVerificationStatus = "idle" | "verifying" | "verified" | "invalid" | "skipped";
@@ -1402,7 +1403,7 @@ const Checkout = () => {
                   <div key={id} className="flex min-w-0 gap-2.5 rounded-md border border-border bg-background p-2.5 sm:gap-3 sm:p-3">
                     <img
                       src={product.image}
-                      alt={product.name}
+                      alt={formatProductAlt(product)}
                       className="h-16 w-14 rounded-sm object-cover sm:h-20 sm:w-16"
                       loading="lazy"
                     />

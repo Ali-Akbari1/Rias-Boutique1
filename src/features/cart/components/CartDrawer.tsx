@@ -4,6 +4,7 @@ import { getMaxQuantityForProduct } from "@/features/cart/context/cart-quantity"
 import { useCart } from "@/features/cart/context/CartContext";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import { isCheckoutEnabled } from "@/lib/checkout";
+import { formatProductAlt } from "@/lib/seo";
 import BagIcon from "@/shared/ui/BagIcon";
 
 interface CartDrawerProps {
@@ -54,7 +55,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                   <div key={id} className="flex gap-3 sm:gap-4">
                     <img
                       src={product.image}
-                      alt={product.name}
+                      alt={formatProductAlt(product)}
                       className="h-20 w-16 rounded-sm object-cover sm:h-24 sm:w-20"
                     />
                     <div className="flex-1 min-w-0">

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Search, X } from "lucide-react";
 import type { Product } from "@/features/catalog/data/products";
 import { useCurrency } from "@/features/currency/context/useCurrency";
+import { formatProductAlt } from "@/lib/seo";
 import { Input } from "@/shared/ui/input";
 
 const POPULAR_SEARCH_TERMS = [
@@ -167,7 +168,7 @@ const SearchOverlay = ({
                         <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-muted/20">
                           <img
                             src={product.image}
-                            alt={product.name}
+                            alt={formatProductAlt(product)}
                             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                             loading={index < 4 ? "eager" : "lazy"}
                           />
@@ -208,7 +209,7 @@ const SearchOverlay = ({
                     <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-muted/20">
                       <img
                         src={product.image}
-                        alt={product.name}
+                        alt={formatProductAlt(product)}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                         loading={index < 4 ? "eager" : "lazy"}
                       />
