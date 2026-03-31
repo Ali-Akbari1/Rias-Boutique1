@@ -797,6 +797,32 @@
       "description": "Dark blue cheerma dozi dress with wide leg pants. ",
       "category": "Party Wear",
       "fitInfo": "Bust: 38in \nLength of dress: 37in "
+    },
+    {
+      "fabric": "Banaras",
+      "price": 550,
+      "galleryImages": [
+        "/uploads/img_1327.jpg",
+        "/uploads/img_1328.jpg",
+        "/uploads/img_1329.jpg",
+        "/uploads/img_1330.jpg"
+      ],
+      "name": "Blue Banaras Bridal Dress",
+      "slug": "blue-banaras-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "Blue "
+      ],
+      "sizes": [
+        "Large"
+      ],
+      "department": "women",
+      "id": "blue-banaras-dress",
+      "image": "/uploads/img_1327.jpg",
+      "inventory": "available",
+      "description": "Beautiful long blue banaras bridal dress",
+      "category": "Bridal",
+      "fitInfo": "Bust: \n\n48in\n\n"
     }
   ]
 }
