@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, Truck } from "lucide-react";
 import { getProductById } from "@/features/catalog/data/products";
@@ -9,6 +9,7 @@ import Navbar from "@/features/navigation/components/Navbar";
 import { trustBadges } from "@/features/store/data/store-content";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
+import { prefetchCollectionPage } from "@/lib/prefetch";
 import { STANDARD_SIZE_KEYS, standardSizeLabel, type StandardSizeKey, normalizeToStandardSizeKey } from "@/lib/size";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
@@ -25,6 +26,9 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedImage, setSelectedImage] = useState(product?.galleryImages?.[0] ?? product?.image ?? "");
+  const [addState, setAddState] = useState<"idle" | "adding" | "added">("idle");
+  const addTimerRef = useRef<number | null>(null);
+  const addedTimerRef = useRef<number | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const checkoutEnabled = isCheckoutEnabled();
   const backToCollectionHref = useMemo(() => {
@@ -34,6 +38,35 @@ const ProductDetails = () => {
     }
     return "/collection";
   }, [location.search]);
+
+  useEffect(() => {
+    return () => {
+      if (addTimerRef.current) {
+        window.clearTimeout(addTimerRef.current);
+      }
+      if (addedTimerRef.current) {
+        window.clearTimeout(addedTimerRef.current);
+      }
+    };
+  }, []);
+
+  const triggerAddFeedback = () => {
+    setAddState("adding");
+    if (addTimerRef.current) {
+      window.clearTimeout(addTimerRef.current);
+    }
+    if (addedTimerRef.current) {
+      window.clearTimeout(addedTimerRef.current);
+    }
+    addTimerRef.current = window.setTimeout(() => {
+      setAddState("added");
+      addTimerRef.current = null;
+      addedTimerRef.current = window.setTimeout(() => {
+        setAddState("idle");
+        addedTimerRef.current = null;
+      }, 900);
+    }, 350);
+  };
 
   const handleAddToCart = () => {
     if (!product) {
@@ -70,6 +103,7 @@ const ProductDetails = () => {
     }
 
     addToCart(product, { size: chosenSize, color: chosenColor });
+    triggerAddFeedback();
     toast({
       title: "Added to cart",
       description: `${product.name} (${chosenSize}, ${chosenColor}) was added to your bag.`,
@@ -147,6 +181,8 @@ const ProductDetails = () => {
   const resolvedColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
   const canAddToCart = !isSoldOut && Boolean(resolvedSize && resolvedColor);
   const primaryImage = selectedImage || galleryImages[0] || product.image || "/placeholder.svg";
+  const isAdding = addState === "adding";
+  const isAdded = addState === "added";
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,6 +191,8 @@ const ProductDetails = () => {
         <Link
           to={backToCollectionHref}
           state={{ restoreCollectionScroll: true }}
+          onMouseEnter={() => void prefetchCollectionPage()}
+          onFocus={() => void prefetchCollectionPage()}
           className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -293,9 +331,22 @@ const ProductDetails = () => {
                 type="button"
                 className="h-12 w-full text-base font-semibold"
                 onClick={handleAddToCart}
-                disabled={!canAddToCart || !checkoutEnabled}
+                disabled={!canAddToCart || !checkoutEnabled || isAdding || isAdded}
               >
-                {isSoldOut ? "Sold Out" : checkoutEnabled ? "Add to Bag" : "Add to Bag (Coming Soon)"}
+                {isSoldOut ? (
+                  "Sold Out"
+                ) : isAdded ? (
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                    Added to Bag
+                  </span>
+                ) : isAdding ? (
+                  "Adding..."
+                ) : checkoutEnabled ? (
+                  "Add to Bag"
+                ) : (
+                  "Add to Bag (Coming Soon)"
+                )}
               </Button>
 
               {!checkoutEnabled ? (

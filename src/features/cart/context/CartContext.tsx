@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { track } from "@vercel/analytics/react";
 import { getProductById, type Product } from "@/features/catalog/data/products";
 import { getMaxQuantityForProduct } from "@/features/cart/context/cart-quantity";
@@ -23,6 +23,7 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  isAdding: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -107,6 +108,8 @@ const restoreCartFromStorage = (): CartItem[] => {
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>(() => restoreCartFromStorage());
+  const [isAdding, setIsAdding] = useState(false);
+  const addFeedbackTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -114,6 +117,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [items]);
+
+  useEffect(() => {
+    return () => {
+      if (addFeedbackTimeoutRef.current) {
+        window.clearTimeout(addFeedbackTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const addToCart = (product: Product, selection: ProductSelection) => {
     let didAdd = false;
@@ -135,6 +146,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (didAdd) {
+      setIsAdding(true);
+      if (addFeedbackTimeoutRef.current) {
+        window.clearTimeout(addFeedbackTimeoutRef.current);
+      }
+      addFeedbackTimeoutRef.current = window.setTimeout(() => {
+        setIsAdding(false);
+        addFeedbackTimeoutRef.current = null;
+      }, 800);
       track("Add to Cart", {
         productId: product.id,
         name: product.name,
@@ -183,7 +202,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const totalPrice = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}>
+    <CartContext.Provider
+      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice, isAdding }}
+    >
       {children}
     </CartContext.Provider>
   );

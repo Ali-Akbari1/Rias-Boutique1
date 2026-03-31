@@ -118,6 +118,14 @@ const Checkout = () => {
   const [addressVerificationMessage, setAddressVerificationMessage] = useState("");
   const [addressVerificationError, setAddressVerificationError] = useState("");
   const [verifiedAddressFingerprint, setVerifiedAddressFingerprint] = useState("");
+  const [touchedFields, setTouchedFields] = useState({
+    fullName: false,
+    email: false,
+    phone: false,
+  });
+  const setFieldTouched = (field: keyof typeof touchedFields) => {
+    setTouchedFields((current) => (current[field] ? current : { ...current, [field]: true }));
+  };
   const [lastVerifiedAddressFingerprint, setLastVerifiedAddressFingerprint] = useState("");
   const googleReviewsUrl = getGoogleReviewsUrl();
   const pickupDetails = getStorePickupDetails();
@@ -167,6 +175,9 @@ const Checkout = () => {
   const total = totalMinor / 100;
   const addressFieldsReady = isAddressFieldsComplete(checkoutForm);
   const shippingAddressReady = isShippingAddressComplete(checkoutForm);
+  const fullNameValid = checkoutForm.fullName.trim().length >= 2;
+  const emailValid = looksLikeEmail(checkoutForm.email);
+  const phoneValid = checkoutForm.phone.trim().length >= 7;
   const currentAddressFingerprint = useMemo(() => buildAddressFingerprint(checkoutForm), [checkoutForm]);
   const isAddressVerified =
     !isPickupInStore &&
@@ -935,8 +946,22 @@ const Checkout = () => {
                         maxLength={120}
                         value={checkoutForm.fullName}
                         onChange={handleFormChange("fullName")}
+                        onBlur={() => setFieldTouched("fullName")}
                         autoComplete="name"
                       />
+                      {touchedFields.fullName ? (
+                        fullNameValid ? (
+                          <p className="inline-flex items-center gap-1 text-xs text-emerald-600">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Looks good
+                          </p>
+                        ) : (
+                          <p className="inline-flex items-center gap-1 text-xs text-destructive">
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            Enter your full name
+                          </p>
+                        )
+                      ) : null}
                     </div>
 
                     <div className="space-y-2 sm:col-span-2">
@@ -950,8 +975,22 @@ const Checkout = () => {
                         maxLength={160}
                         value={checkoutForm.email}
                         onChange={handleFormChange("email")}
+                        onBlur={() => setFieldTouched("email")}
                         autoComplete="email"
                       />
+                      {touchedFields.email ? (
+                        emailValid ? (
+                          <p className="inline-flex items-center gap-1 text-xs text-emerald-600">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Email looks good
+                          </p>
+                        ) : (
+                          <p className="inline-flex items-center gap-1 text-xs text-destructive">
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            Enter a valid email address
+                          </p>
+                        )
+                      ) : null}
                     </div>
 
                     <div className="space-y-2 sm:col-span-2">
@@ -966,8 +1005,22 @@ const Checkout = () => {
                         maxLength={22}
                         value={checkoutForm.phone}
                         onChange={handleFormChange("phone")}
+                        onBlur={() => setFieldTouched("phone")}
                         autoComplete="tel"
                       />
+                      {touchedFields.phone ? (
+                        phoneValid ? (
+                          <p className="inline-flex items-center gap-1 text-xs text-emerald-600">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Phone looks good
+                          </p>
+                        ) : (
+                          <p className="inline-flex items-center gap-1 text-xs text-destructive">
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            Enter a valid phone number
+                          </p>
+                        )
+                      ) : null}
                     </div>
 
                       {launchDiscountActive ? (

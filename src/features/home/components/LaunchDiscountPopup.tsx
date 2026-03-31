@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -39,6 +40,7 @@ const LaunchDiscountPopup = () => {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
+  const [emailTouched, setEmailTouched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -72,12 +74,13 @@ const LaunchDiscountPopup = () => {
     };
   }, [launchDiscountActive, shouldHidePopup]);
 
+  const isEmailValid = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()), [email]);
   const canSubmit = useMemo(() => {
     if (!launchDiscountActive || isSubmitting || isSuccess) {
       return false;
     }
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  }, [email, isSubmitting, isSuccess, launchDiscountActive]);
+    return isEmailValid;
+  }, [isEmailValid, isSubmitting, isSuccess, launchDiscountActive]);
 
   const submitButtonLabel = isSubmitting
     ? "Sending..."
@@ -179,10 +182,24 @@ const LaunchDiscountPopup = () => {
                 maxLength={160}
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
+                onBlur={() => setEmailTouched(true)}
                 placeholder="you@example.com"
                 autoComplete="email"
                 disabled={isSubmitting}
               />
+              {emailTouched && !isSuccess ? (
+                isEmailValid ? (
+                  <p className="inline-flex items-center gap-1 text-xs text-emerald-600">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Email looks good
+                  </p>
+                ) : (
+                  <p className="inline-flex items-center gap-1 text-xs text-destructive">
+                    <AlertTriangle className="h-3.5 w-3.5" />
+                    Enter a valid email address
+                  </p>
+                )
+              ) : null}
 
               <Button type="submit" className="h-11 w-full text-sm font-semibold" disabled={!canSubmit}>
                 {submitButtonLabel}

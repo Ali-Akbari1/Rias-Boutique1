@@ -1,11 +1,13 @@
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { type Product } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { rememberCollectionScrollPosition } from "@/lib/collection-scroll";
+import { prefetchProductDetailsPage } from "@/lib/prefetch";
 import BagIcon from "@/shared/ui/BagIcon";
 
 interface ProductCardProps {
@@ -20,6 +22,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
   const { toast } = useToast();
+  const [addState, setAddState] = useState<"idle" | "adding" | "added">("idle");
+  const addTimerRef = useRef<number | null>(null);
+  const addedTimerRef = useRef<number | null>(null);
   const returnTo = `${location.pathname}${location.search}`;
   const detailsPath = `/products/${product.id}?returnTo=${encodeURIComponent(returnTo)}`;
   const handleOpenDetails = () => {
@@ -31,6 +36,35 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   const canDirectAdd = product.sizes.length === 1 && product.colors.length === 1;
+
+  useEffect(() => {
+    return () => {
+      if (addTimerRef.current) {
+        window.clearTimeout(addTimerRef.current);
+      }
+      if (addedTimerRef.current) {
+        window.clearTimeout(addedTimerRef.current);
+      }
+    };
+  }, []);
+
+  const triggerAddFeedback = () => {
+    setAddState("adding");
+    if (addTimerRef.current) {
+      window.clearTimeout(addTimerRef.current);
+    }
+    if (addedTimerRef.current) {
+      window.clearTimeout(addedTimerRef.current);
+    }
+    addTimerRef.current = window.setTimeout(() => {
+      setAddState("added");
+      addTimerRef.current = null;
+      addedTimerRef.current = window.setTimeout(() => {
+        setAddState("idle");
+        addedTimerRef.current = null;
+      }, 900);
+    }, 350);
+  };
 
   const handleAddToBag = () => {
     if (isSoldOut) {
@@ -72,11 +106,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
     }
 
     addToCart(product, { size, color });
+    triggerAddFeedback();
     toast({
       title: "Added to bag",
       description: `${product.name} (${size}, ${color}) was added to your bag.`,
     });
   };
+
+  const isAdding = addState === "adding";
+  const isAdded = addState === "added";
 
   return (
     <div className="group relative mx-auto flex h-full min-w-0 w-full max-w-[23.5rem] flex-col overflow-hidden rounded-sm bg-card shadow-boutique transition-all duration-500 hover:shadow-boutique">
@@ -90,7 +128,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
             Sale {product.salePercent}% OFF
           </span>
         ) : null}
-        <Link to={detailsPath} className="block h-full w-full" onClick={handleOpenDetails}>
+        <Link
+          to={detailsPath}
+          className="block h-full w-full"
+          onClick={handleOpenDetails}
+          onMouseEnter={() => void prefetchProductDetailsPage()}
+          onFocus={() => void prefetchProductDetailsPage()}
+        >
           <img
             src={product.image}
             alt={product.name}
@@ -125,14 +169,31 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <button
               type="button"
               onClick={handleAddToBag}
-              className="inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm border border-border px-2.5 py-1.5 text-xs font-body font-semibold text-foreground transition-colors hover:bg-secondary sm:text-sm"
+              disabled={isSoldOut || isAdding || isAdded}
+              className="inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm border border-border px-2.5 py-1.5 text-xs font-body font-semibold text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-70 sm:text-sm"
             >
-              <BagIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              {isSoldOut ? "Sold Out" : "Add to Bag"}
+              {isSoldOut ? (
+                <>
+                  <BagIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  Sold Out
+                </>
+              ) : isAdded ? (
+                <>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 sm:h-4 sm:w-4" />
+                  Added
+                </>
+              ) : (
+                <>
+                  <BagIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  {isAdding ? "Adding..." : "Add to Bag"}
+                </>
+              )}
             </button>
             <Link
               to={detailsPath}
               onClick={handleOpenDetails}
+              onMouseEnter={() => void prefetchProductDetailsPage()}
+              onFocus={() => void prefetchProductDetailsPage()}
               className="inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm bg-primary px-2.5 py-1.5 text-xs font-body text-primary-foreground transition-colors hover:bg-burgundy-light sm:text-sm"
             >
               View Details

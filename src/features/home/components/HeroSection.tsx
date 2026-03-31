@@ -1,5 +1,6 @@
 import heroBg from "@/assets/hero-bg.webp";
 import { Link } from "react-router-dom";
+import { prefetchCollectionPage } from "@/lib/prefetch";
 
 const HeroSection = () => {
   const heroCtaClass =
@@ -32,12 +33,16 @@ const HeroSection = () => {
             <Link
               to="/collection/women"
               className={heroCtaClass}
+              onMouseEnter={() => void prefetchCollectionPage()}
+              onFocus={() => void prefetchCollectionPage()}
             >
               Shop Women's
             </Link>
             <Link
               to="/collection/men"
               className={heroCtaClass}
+              onMouseEnter={() => void prefetchCollectionPage()}
+              onFocus={() => void prefetchCollectionPage()}
             >
               Shop Men's
             </Link>

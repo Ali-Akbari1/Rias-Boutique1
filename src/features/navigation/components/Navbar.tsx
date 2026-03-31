@@ -14,7 +14,7 @@ interface NavbarProps {
 }
 
 const Navbar = ({ onCartClick }: NavbarProps) => {
-  const { totalItems } = useCart();
+  const { totalItems, isAdding } = useCart();
   const { currency, setCurrency } = useCurrency();
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
@@ -277,6 +277,12 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
             aria-label="Shopping cart"
           >
             <BagIcon className="h-6 w-6" />
+            {isAdding ? (
+              <span
+                className="absolute -bottom-0.5 -left-0.5 h-3.5 w-3.5 animate-spin rounded-full border-2 border-foreground/40 border-t-transparent"
+                aria-hidden="true"
+              />
+            ) : null}
             {totalItems > 0 ? (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
                 {totalItems}
