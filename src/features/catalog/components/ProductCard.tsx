@@ -194,10 +194,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
               onClick={handleOpenDetails}
               onMouseEnter={() => void prefetchProductDetailsPage()}
               onFocus={() => void prefetchProductDetailsPage()}
-              className="inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm bg-primary px-2.5 py-1.5 text-xs font-body text-primary-foreground transition-colors hover:bg-burgundy-light sm:text-sm"
+              className="group inline-flex h-10 w-full items-center justify-center gap-1 rounded-sm bg-primary px-2.5 py-1.5 text-xs font-body text-primary-foreground transition-colors hover:bg-burgundy-light sm:text-sm"
             >
               View Details
-              <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 ease-out group-hover:translate-x-0.5 sm:h-4 sm:w-4" />
             </Link>
           </div>
         </div>

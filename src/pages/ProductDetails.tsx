@@ -26,9 +26,12 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedImage, setSelectedImage] = useState(product?.galleryImages?.[0] ?? product?.image ?? "");
+  const [activeImage, setActiveImage] = useState(selectedImage);
+  const [transitionImage, setTransitionImage] = useState<string | null>(null);
   const [addState, setAddState] = useState<"idle" | "adding" | "added">("idle");
   const addTimerRef = useRef<number | null>(null);
   const addedTimerRef = useRef<number | null>(null);
+  const imageTransitionTimeoutRef = useRef<number | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const checkoutEnabled = isCheckoutEnabled();
   const backToCollectionHref = useMemo(() => {
@@ -46,6 +49,9 @@ const ProductDetails = () => {
       }
       if (addedTimerRef.current) {
         window.clearTimeout(addedTimerRef.current);
+      }
+      if (imageTransitionTimeoutRef.current) {
+        window.clearTimeout(imageTransitionTimeoutRef.current);
       }
     };
   }, []);
@@ -155,9 +161,12 @@ const ProductDetails = () => {
   );
 
   useEffect(() => {
+    const nextImage = product?.galleryImages?.[0] ?? product?.image ?? "";
     setSelectedSize("");
     setSelectedColor("");
-    setSelectedImage(product?.galleryImages?.[0] ?? product?.image ?? "");
+    setSelectedImage(nextImage);
+    setActiveImage(nextImage);
+    setTransitionImage(null);
   }, [product?.id, product?.image, product?.galleryImages]);
 
   useEffect(() => {
@@ -171,6 +180,36 @@ const ProductDetails = () => {
     }
   }, [product, availableSizeKeys.length, singleAvailableSizeLabel, colorOptions]);
 
+  const primaryImage = selectedImage || galleryImages[0] || product?.image || "/placeholder.svg";
+  const isAdding = addState === "adding";
+  const isAdded = addState === "added";
+
+  useEffect(() => {
+    if (!product || !primaryImage || primaryImage === activeImage) {
+      return;
+    }
+
+    const reduceMotion = typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      setActiveImage(primaryImage);
+      setTransitionImage(null);
+      return;
+    }
+
+    setTransitionImage(primaryImage);
+    if (imageTransitionTimeoutRef.current) {
+      window.clearTimeout(imageTransitionTimeoutRef.current);
+    }
+
+    imageTransitionTimeoutRef.current = window.setTimeout(() => {
+      setActiveImage(primaryImage);
+      setTransitionImage(null);
+      imageTransitionTimeoutRef.current = null;
+    }, 420);
+  }, [activeImage, primaryImage, product]);
+
   if (!product) {
     return <Navigate to="/" replace />;
   }
@@ -180,9 +219,6 @@ const ProductDetails = () => {
   const resolvedSize = selectedSize || singleAvailableSizeLabel;
   const resolvedColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
   const canAddToCart = !isSoldOut && Boolean(resolvedSize && resolvedColor);
-  const primaryImage = selectedImage || galleryImages[0] || product.image || "/placeholder.svg";
-  const isAdding = addState === "adding";
-  const isAdded = addState === "added";
 
   return (
     <div className="min-h-screen bg-background">
@@ -210,11 +246,22 @@ const ProductDetails = () => {
                 title={`${product.name} image`}
               >
                 <button type="button" className="relative block h-full w-full cursor-zoom-in">
-                  <img
-                    src={primaryImage}
-                    alt={product.name}
-                    className="h-[380px] w-full object-contain bg-muted/20 sm:h-[500px] lg:h-[620px]"
-                  />
+                  <div className="relative h-[380px] w-full bg-muted/20 sm:h-[500px] lg:h-[620px]">
+                    <img
+                      src={activeImage || primaryImage}
+                      alt={product.name}
+                      className={`absolute inset-0 h-full w-full object-contain ${
+                        transitionImage ? "motion-safe:animate-image-crossfade-out" : ""
+                      }`}
+                    />
+                    {transitionImage ? (
+                      <img
+                        src={transitionImage}
+                        alt={product.name}
+                        className="pointer-events-none absolute inset-0 h-full w-full object-contain opacity-0 motion-safe:animate-image-crossfade-in"
+                      />
+                    ) : null}
+                  </div>
                   <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-sm bg-background/80 px-2 py-1 text-xs font-semibold text-foreground">
                     <Search className="h-3.5 w-3.5" />
                     Zoom

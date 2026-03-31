@@ -21,7 +21,7 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [showPromo, setShowPromo] = useState(true);
+  const [showPromo, setShowPromo] = useState(false);
   const lastScrollY = useRef(0);
   const isTicking = useRef(false);
   const currencyRef = useRef<HTMLDivElement | null>(null);
@@ -44,6 +44,22 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
     setSearchOpen(false);
     setCurrencyOpen(false);
   }, [pathname, search]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      setShowPromo(true);
+      return;
+    }
+
+    const shouldShow = window.scrollY <= 8;
+    const timer = window.setTimeout(() => {
+      setShowPromo(shouldShow);
+    }, 60);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, []);
 
   useEffect(() => {
     if (!searchOpen) {
@@ -168,15 +184,13 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
   return (
     <nav className="fixed left-0 right-0 top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
       <div
-        className={`overflow-hidden bg-foreground text-background transition-all duration-300 ${
-          showPromo ? "max-h-14 opacity-100" : "max-h-0 opacity-0"
+        className={`overflow-hidden bg-foreground text-background transition-[max-height,opacity,transform] duration-300 ease-out motion-reduce:transition-none ${
+          showPromo ? "max-h-14 translate-y-0 opacity-100" : "max-h-0 -translate-y-2 opacity-0"
         }`}
         aria-hidden={!showPromo}
       >
         <div className="container mx-auto flex flex-col items-center justify-center gap-1 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] sm:flex-row sm:gap-2 sm:text-[11px] sm:tracking-[0.2em]">
-          <span>Free shipping on orders over $400</span>
-          <span className="hidden sm:inline">|</span>
-          <span>Worldwide shipping</span>
+          <span>Free shipping on orders over $400 | Worldwide shipping</span>
         </div>
       </div>
       <div className="container mx-auto flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center">
@@ -223,7 +237,7 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
               <div
                 role="listbox"
                 aria-label="Currency"
-                className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-2xl border border-border bg-background shadow-boutique"
+                className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-2xl border border-border bg-background shadow-boutique animate-in fade-in-0 slide-in-from-top-2 motion-reduce:animate-none"
               >
                 <button
                   type="button"
@@ -264,25 +278,23 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
           <button
             type="button"
             onClick={openSearchPanel}
-            className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-background/85 px-2 text-sm font-body text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:px-3"
+            className="group inline-flex h-9 items-center gap-2 rounded-full border border-border bg-background/85 px-2 text-sm font-body text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:px-3"
             aria-label="Open search"
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-4 w-4 transition-transform duration-200 ease-out group-hover:-translate-y-0.5" />
             <span className="hidden sm:inline">Search</span>
           </button>
 
           <button
             onClick={onCartClick}
-            className="relative rounded-sm p-1.5 text-foreground transition-colors hover:text-gold sm:p-2"
+            className="group relative rounded-sm p-1.5 text-foreground transition-colors hover:text-gold sm:p-2"
             aria-label="Shopping cart"
           >
-            <BagIcon className="h-6 w-6" />
-            {isAdding ? (
-              <span
-                className="absolute -bottom-0.5 -left-0.5 h-3.5 w-3.5 animate-spin rounded-full border-2 border-foreground/40 border-t-transparent"
-                aria-hidden="true"
-              />
-            ) : null}
+            <BagIcon
+              className={`h-6 w-6 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 ${
+                isAdding ? "motion-safe:animate-cart-shake" : ""
+              }`}
+            />
             {totalItems > 0 ? (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
                 {totalItems}
@@ -296,12 +308,16 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
               setSearchOpen(false);
               setMobileMenuOpen((open) => !open);
             }}
-            className="rounded-sm p-1.5 text-foreground transition-colors hover:text-gold md:hidden sm:p-2"
+            className="group rounded-sm p-1.5 text-foreground transition-colors hover:text-gold md:hidden sm:p-2"
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-navbar-menu"
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6 transition-transform duration-200 ease-out group-hover:-translate-y-0.5" />
+            ) : (
+              <Menu className="h-6 w-6 transition-transform duration-200 ease-out group-hover:-translate-y-0.5" />
+            )}
           </button>
         </div>
       </div>

@@ -20,7 +20,10 @@ const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
   const links = getPrimaryNavLinks(state);
 
   return (
-    <div id="mobile-navbar-menu" className="border-t border-border bg-background/95 backdrop-blur md:hidden">
+    <div
+      id="mobile-navbar-menu"
+      className="border-t border-border bg-background/95 backdrop-blur md:hidden animate-in fade-in-0 slide-in-from-top-2 motion-reduce:animate-none"
+    >
       <div className="container mx-auto flex flex-col gap-1 px-4 py-3 sm:px-6">
         {links.map((link) => {
           const handlePrefetch = () => {
