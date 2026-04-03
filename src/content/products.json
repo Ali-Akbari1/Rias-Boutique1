@@ -358,7 +358,6 @@
       ],
       "department": "women",
       "id": "red-gharara-bridal-dress",
-      "createdAt": "2026-02-19",
       "image": "/uploads/red-bridal-velvet-dress-1.webp",
       "inventory": 1,
       "description": "Bridal red velvet dress with wide-legged pants and beautiful beaded scarf. ",
@@ -433,7 +432,6 @@
       ],
       "department": "women",
       "id": "Burgundy-bridal-dress",
-      "createdAt": "2026-02-25",
       "image": "/uploads/burgundy-bridal-dress-with-mens-vest-1.webp",
       "inventory": "sold_out",
       "description": "Bridal burgundy dress with handmade cheerma and matching men's vest. ",
@@ -735,7 +733,6 @@
       ],
       "id": "teal-barosha-dress",
       "image": "/uploads/teal-barosha-dress-1.webp",
-      "createdAt": "2026-03-08",
       "inventory": "sold_out",
       "description": "Teal barosha dress with silver cheerma detailing. ",
       "category": "Party Wear",
@@ -765,7 +762,6 @@
       ],
       "id": "true-white-mens-parantoban",
       "image": "/uploads/men-s-white-parantoban-1.webp",
-      "createdAt": "2026-02-19",
       "inventory": "available",
       "description": "True white men's parantoban with white embroidery. ",
       "category": "Machine Made",
@@ -823,6 +819,26 @@
       "description": "Beautiful long blue banaras bridal dress",
       "category": "Bridal",
       "fitInfo": "Bust: 46in\nLength of dress: 58in\nLength of sleeves: 22in\n\n"
+    },
+    {
+      "fabric": "Velvet with gulabatoon ",
+      "price": 450,
+      "name": "Lilac Gulabatoon Dress",
+      "slug": "purple-gulabatoon-dress",
+      "maxQuantity": 2,
+      "colors": [
+        "Lilac"
+      ],
+      "sizes": [
+        "Large"
+      ],
+      "department": "women",
+      "id": "purple-gulabatoon-dress",
+      "image": "/uploads/img_1403.jpg",
+      "inventory": "available",
+      "description": "Purple velvet dress with gulabatoon detailing. ",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 44in \nSleeves: \nLength of Dress "
     }
   ]
 }
