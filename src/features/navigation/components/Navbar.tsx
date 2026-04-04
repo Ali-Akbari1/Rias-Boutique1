@@ -197,7 +197,7 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         <Link
           to="/"
           onClick={handleHomeClick}
-          className="flex items-center gap-2 rounded-sm text-sm font-brand uppercase tracking-[0.2em] text-foreground transition-colors hover:text-gold sm:text-base md:justify-self-start lg:text-lg"
+          className="flex max-w-[150px] items-center gap-2 rounded-sm text-[10px] font-brand uppercase leading-[1.35] tracking-[0.12em] text-foreground transition-colors hover:text-gold sm:max-w-none sm:text-base sm:leading-none sm:tracking-[0.2em] md:justify-self-start lg:text-lg"
           aria-label="Go to homepage"
         >
           <span>R I A ' S B O U T I Q U E</span>
