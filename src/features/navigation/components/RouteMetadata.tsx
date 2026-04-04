@@ -141,13 +141,32 @@ const buildOrganizationSchema = (): JsonLdNode => {
   const pickupDetails = getStorePickupDetails();
   const instagramUrl = getInstagramProfileUrl();
   const sameAs = [instagramUrl].filter((url) => url && url !== "https://www.instagram.com/");
+  const paymentAccepted = [
+    "Visa",
+    "Mastercard",
+    "American Express",
+    "Discover",
+    "Interac Online",
+    "UnionPay",
+    "JCB",
+    "Google Pay",
+    "Samsung Pay",
+    "Paze",
+  ];
 
   return {
     "@type": "Organization",
     "@id": ORGANIZATION_ID,
     name: STORE_NAME,
+    alternateName: "Ria's Afghan Boutique",
     url: SITE_URL,
     logo: toAbsoluteUrl(STORE_LOGO_PATH),
+    paymentAccepted,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: 5,
+      reviewCount: 28,
+    },
     contactPoint: {
       "@type": "ContactPoint",
       telephone: pickupDetails.phoneHref,
@@ -243,7 +262,7 @@ const buildShippingDetails = (): OfferShippingDetails[] => {
 };
 
 const buildMerchantReturnPolicy = (): JsonLdNode => ({
-  "@type": "MerchantReturnNotPermitted",
+  "@type": "MerchantReturnPolicy",
   returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
   applicableCountry: "CA",
   returnPolicyUrl: `${SITE_URL}/faq`,
