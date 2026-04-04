@@ -17,6 +17,7 @@ export default {
       fontFamily: {
         display: ["Playfair Display", "serif"],
         body: ["Crimson Pro", "serif"],
+        brand: ["Prata", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
