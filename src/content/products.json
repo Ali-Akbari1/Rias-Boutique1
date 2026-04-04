@@ -821,30 +821,12 @@
       "fitInfo": "Bust: 46in\nLength of dress: 58in\nLength of sleeves: 22in\n\n"
     },
     {
-      "fabric": "Velvet with gulabatoon ",
-      "price": 450,
-      "name": "Lilac Gulabatoon Dress",
-      "slug": "purple-gulabatoon-dress",
-      "maxQuantity": 2,
-      "colors": [
-        "Lilac"
-      ],
-      "sizes": [
-        "Large"
-      ],
-      "department": "women",
-      "id": "purple-gulabatoon-dress",
-      "image": "/uploads/img_1403.jpg",
-      "inventory": "available",
-      "description": "Purple velvet dress with gulabatoon detailing. ",
-      "category": "Party Wear",
-      "fitInfo": "Bust: 44in \nSleeves: \nLength of Dress "
-    },
-    {
       "fabric": "Velvet ",
       "price": 400,
       "galleryImages": [
-        "/uploads/img_1403.jpg"
+        "/uploads/img_1403.jpg",
+        "/uploads/img_1417-2.jpg",
+        "/uploads/img_1419.jpg"
       ],
       "name": "Lilac Gulabatoon Dress",
       "slug": "Lilac-purple-gulabatoon dress",
@@ -859,7 +841,7 @@
       "inventory": "available",
       "description": "Long lilac dress with gulabatoon detailing. ",
       "category": "Party Wear",
-      "fitInfo": "Bust: 44in "
+      "fitInfo": "Bust: 44in \n\n*Please note that the men's vest is sold separately. "
     }
   ]
 }
