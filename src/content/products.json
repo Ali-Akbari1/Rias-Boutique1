@@ -845,6 +845,34 @@
       "description": "Long lilac dress with gulabatoon detailing. ",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in \n\nDress comes with pants and scarf. \n\n*Please note that the men's vest is sold separately. Please look to the men's collection to order. "
+    },
+    {
+      "fabric": "Barosha ",
+      "price": 350,
+      "galleryImages": [
+        "/uploads/img_1383.jpg",
+        "/uploads/img_1395.jpg"
+      ],
+      "name": "Lilac Barosha Dress ",
+      "slug": "barosha-purple-shortdress",
+      "maxQuantity": 1,
+      "colors": [
+        "Lilac"
+      ],
+      "sizes": [
+        "Small",
+        "Medium"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "id": "barosha-purple-shortdress",
+      "image": "/uploads/img_1383.jpg",
+      "inventory": "available",
+      "description": "Lilac barosha short dress with mirror work.",
+      "category": "Party Wear",
+      "fitInfo": "Small - Bust: 38in\nMedium - Bust: 40in\n"
     }
   ]
 }
