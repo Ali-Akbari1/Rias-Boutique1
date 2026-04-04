@@ -20,7 +20,7 @@ const HeroSection = () => {
       <div className="relative z-10 container mx-auto flex flex-col items-start px-4 sm:px-6">
         <div className="max-w-xl animate-fade-in text-white">
           <p className="mb-4 pl-1.5 text-sm font-brand uppercase tracking-[0.28em] text-white sm:pl-2 sm:text-lg sm:tracking-[0.34em]">
-            R I A ' S B O U T I Q U E
+          Traditional Afghan Fashion
           </p>
           <h2 className="mb-6 text-4xl font-display font-bold leading-tight text-white sm:text-5xl md:text-7xl">
             Elevated Afghan Fashion, redefined

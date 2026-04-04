@@ -197,12 +197,10 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         <Link
           to="/"
           onClick={handleHomeClick}
-          className="flex items-center gap-2 rounded-sm text-lg font-display font-bold tracking-wide text-foreground transition-colors hover:text-gold sm:text-2xl md:justify-self-start"
+          className="flex items-center gap-2 rounded-sm text-sm font-brand uppercase tracking-[0.2em] text-foreground transition-colors hover:text-gold sm:text-base md:justify-self-start lg:text-lg"
           aria-label="Go to homepage"
         >
-          <span>
-            Ria&apos;s <span className="text-gold">Boutique</span>
-          </span>
+          <span>R I A ' S B O U T I Q U E</span>
         </Link>
 
         <DesktopNav
@@ -348,4 +346,3 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
 };
 
 export default Navbar;
-

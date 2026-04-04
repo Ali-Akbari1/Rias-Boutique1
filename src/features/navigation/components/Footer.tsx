@@ -17,8 +17,8 @@ const Footer = () => {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
           <div>
-            <h3 className="mb-4 font-display text-2xl font-bold">
-              Ria&apos;s <span className="text-white">Boutique</span>
+            <h3 className="mb-4 font-brand text-lg uppercase tracking-[0.2em] sm:text-xl">
+              R I A ' S B O U T I Q U E
             </h3>
             <p className="font-body leading-relaxed text-white/80">
               Handcrafted Afghan clothing that bridges heritage and modern elegance, curated in Calgary.
