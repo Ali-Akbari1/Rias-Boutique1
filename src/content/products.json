@@ -831,6 +831,9 @@
       "name": "Lilac Gulabatoon Dress",
       "slug": "Lilac-purple-gulabatoon dress",
       "maxQuantity": 1,
+      "colors": [
+        "Lilac"
+      ],
       "sizes": [
         "Large"
       ],
@@ -841,7 +844,7 @@
       "inventory": "available",
       "description": "Long lilac dress with gulabatoon detailing. ",
       "category": "Party Wear",
-      "fitInfo": "Bust: 44in \n\n*Please note that the men's vest is sold separately. "
+      "fitInfo": "Bust: 44in \n\nDress comes with pants and scarf. \n\n*Please note that the men's vest is sold separately. Please look to the men's collection to order. "
     }
   ]
 }
