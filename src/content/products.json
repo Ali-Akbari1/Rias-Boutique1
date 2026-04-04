@@ -839,6 +839,27 @@
       "description": "Purple velvet dress with gulabatoon detailing. ",
       "category": "Party Wear",
       "fitInfo": "Bust: 44in \nSleeves: \nLength of Dress "
+    },
+    {
+      "fabric": "Velvet ",
+      "price": 400,
+      "galleryImages": [
+        "/uploads/img_1403.jpg"
+      ],
+      "name": "Lilac Gulabatoon Dress",
+      "slug": "Lilac-purple-gulabatoon dress",
+      "maxQuantity": 1,
+      "sizes": [
+        "Large"
+      ],
+      "department": "women",
+      "id": "Lilac-purple-gulabatoon dress",
+      "createdAt": "2026-04-04",
+      "image": "/uploads/img_1403.jpg",
+      "inventory": "available",
+      "description": "Long lilac dress with gulabatoon detailing. ",
+      "category": "Party Wear",
+      "fitInfo": "Bust: 44in "
     }
   ]
 }
