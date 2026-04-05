@@ -7,24 +7,35 @@ const projectRoot = join(scriptDir, "..");
 
 const productsPath = join(projectRoot, "src", "content", "products.json");
 const routeManifestPath = join(projectRoot, "src", "features", "navigation", "route-manifest.data.json");
-const outputPath = join(projectRoot, "public", "google-merchant-feed.xml");
+const outputPathCad = join(projectRoot, "public", "google-merchant-feed.xml");
+const outputPathUsd = join(projectRoot, "public", "google-merchant-feed-us.xml");
 
 const DEFAULT_SITE_URL = "https://www.riasboutique.com";
 const DEFAULT_BRAND = "Ria's Boutique";
 const DEFAULT_CURRENCY = "CAD";
 const DEFAULT_SHIPPING_COUNTRY = "CA";
 const DEFAULT_SHIPPING_SERVICE = "Standard";
-const DEFAULT_SHIPPING_PRICE = 30;
+const DEFAULT_SHIPPING_PRICE_CAD = 30;
+const DEFAULT_US_SHIPPING_PRICE_CAD = 40;
+const DEFAULT_CAD_TO_USD_RATE = 0.74;
 
 const routeManifest = JSON.parse(readFileSync(routeManifestPath, "utf8"));
 const siteUrl = (process.env.SITE_URL ?? routeManifest.siteUrl ?? DEFAULT_SITE_URL).replace(/\/+$/, "");
 const brand = (process.env.MERCHANT_FEED_BRAND || DEFAULT_BRAND).trim() || DEFAULT_BRAND;
-const currency = ((process.env.MERCHANT_FEED_CURRENCY || DEFAULT_CURRENCY).trim() || DEFAULT_CURRENCY).toUpperCase();
-const shippingCountry =
-  ((process.env.MERCHANT_FEED_SHIPPING_COUNTRY || DEFAULT_SHIPPING_COUNTRY).trim() || DEFAULT_SHIPPING_COUNTRY)
-    .toUpperCase();
 const shippingService =
   (process.env.MERCHANT_FEED_SHIPPING_SERVICE || DEFAULT_SHIPPING_SERVICE).trim() || DEFAULT_SHIPPING_SERVICE;
+
+const cadToUsdRateRaw =
+  (process.env.VITE_CAD_TO_USD_RATE ||
+    process.env.MERCHANT_FEED_CAD_TO_USD_RATE ||
+    process.env.CAD_TO_USD_RATE ||
+    "")
+    .trim();
+const cadToUsdRateParsed = Number(cadToUsdRateRaw);
+const cadToUsdRate =
+  Number.isFinite(cadToUsdRateParsed) && cadToUsdRateParsed > 0
+    ? cadToUsdRateParsed
+    : DEFAULT_CAD_TO_USD_RATE;
 
 const rawProductContent = JSON.parse(readFileSync(productsPath, "utf8"));
 const productRows = Array.isArray(rawProductContent.products) ? rawProductContent.products : [];
@@ -54,8 +65,6 @@ const toNumber = (value, fallback = 0) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
 };
-
-const shippingPriceValue = Math.max(0, toNumber(process.env.MERCHANT_FEED_SHIPPING_PRICE, DEFAULT_SHIPPING_PRICE));
 
 const toStringArray = (value) => {
   if (!Array.isArray(value)) {
@@ -111,72 +120,10 @@ const toAbsoluteUrl = (value, fallbackPath = "/") => {
   return `${siteUrl}${normalizedPath}`;
 };
 
-const formatPrice = (value) => `${Math.max(0, value).toFixed(2)} ${currency}`;
-
-const productVariants = [];
-const skippedProducts = [];
-
-for (let index = 0; index < productRows.length; index += 1) {
-  const product = productRows[index];
-  const baseId = toStringValue(product?.id) || toStringValue(product?.slug) || `product-${index + 1}`;
-  const title = toStringValue(product?.name) || baseId;
-  const description = toStringValue(product?.description) || title;
-  const productType = toStringValue(product?.category) || "Fashion";
-  const department = toStringValue(product?.department);
-  const gender = normalizeGender(department || productType);
-  const availability = normalizeAvailability(product?.availability ?? product?.inventory);
-
-  const price = toNumber(product?.price, 0);
-  if (price <= 0) {
-    skippedProducts.push({ id: baseId, reason: "non-positive price" });
-    continue;
-  }
-
-  const compareAtPrice = toNumber(product?.compareAtPrice, 0);
-  const hasSalePrice = compareAtPrice > price;
-  const regularPrice = hasSalePrice ? compareAtPrice : price;
-
-  const primaryImage =
-    toStringValue(product?.image) ||
-    toStringArray(product?.galleryImages)[0] ||
-    "/placeholder.svg";
-  const galleryImages = toStringArray(product?.galleryImages).filter((image) => image !== primaryImage);
-
-  const sizes = toStringArray(product?.sizes);
-  const colors = toStringArray(product?.colors);
-  const normalizedSizes = sizes.length > 0 ? sizes : ["One Size"];
-  const normalizedColors = colors.length > 0 ? colors : ["Default"];
-
-  for (const size of normalizedSizes) {
-    for (const color of normalizedColors) {
-      const sizeSlug = slugify(size) || "one-size";
-      const colorSlug = slugify(color) || "default";
-      const variantId = `${baseId}-${sizeSlug}-${colorSlug}`;
-
-      productVariants.push({
-        id: variantId,
-        itemGroupId: baseId,
-        title,
-        description,
-        link: `${siteUrl}/products/${encodeURIComponent(baseId)}`,
-        imageLink: toAbsoluteUrl(primaryImage, "/placeholder.svg"),
-        additionalImageLinks: galleryImages.map((image) => toAbsoluteUrl(image, "/placeholder.svg")),
-        availability,
-        price: formatPrice(regularPrice),
-        salePrice: hasSalePrice ? formatPrice(price) : "",
-        productType,
-        brand,
-        gender,
-        ageGroup: "adult",
-        color,
-        size,
-        shippingCountry,
-        shippingService,
-        shippingPrice: formatPrice(shippingPriceValue),
-      });
-    }
-  }
-}
+const roundCurrency = (value) => Math.round(value * 100) / 100;
+const toUsd = (value) => roundCurrency(value * cadToUsdRate);
+const toCad = (value) => roundCurrency(value);
+const formatPrice = (value, currency) => `${Math.max(0, value).toFixed(2)} ${currency}`;
 
 const toItemXml = (variant) => {
   const colorNode =
@@ -228,28 +175,140 @@ const toItemXml = (variant) => {
     .join("\n");
 };
 
-const itemNodes = productVariants.map(toItemXml).join("\n");
+const buildFeed = ({
+  outputPath,
+  currency,
+  shippingCountry,
+  shippingPriceCad,
+  convertPrice,
+  titleSuffix,
+}) => {
+  const shippingPrice = formatPrice(convertPrice(shippingPriceCad), currency);
+  const productVariants = [];
+  const skippedProducts = [];
 
-const feedXml = [
-  '<?xml version="1.0" encoding="UTF-8"?>',
-  '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
-  "<channel>",
-  "  <title>Ria&apos;s Boutique Product Feed</title>",
-  `  <link>${escapeXml(`${siteUrl}/`)}</link>`,
-  "  <description>Google Merchant Center feed generated from src/content/products.json.</description>",
-  itemNodes,
-  "</channel>",
-  "</rss>",
-  "",
-].join("\n");
+  for (let index = 0; index < productRows.length; index += 1) {
+    const product = productRows[index];
+    const baseId = toStringValue(product?.id) || toStringValue(product?.slug) || `product-${index + 1}`;
+    const title = toStringValue(product?.name) || baseId;
+    const description = toStringValue(product?.description) || title;
+    const productType = toStringValue(product?.category) || "Fashion";
+    const department = toStringValue(product?.department);
+    const gender = normalizeGender(department || productType);
+    const availability = normalizeAvailability(product?.availability ?? product?.inventory);
 
-writeFileSync(outputPath, feedXml, "utf8");
+    const priceCad = toNumber(product?.price, 0);
+    if (priceCad <= 0) {
+      skippedProducts.push({ id: baseId, reason: "non-positive price" });
+      continue;
+    }
 
-console.log(`[merchant-feed] generated ${productVariants.length} item variants -> ${outputPath}`);
-if (skippedProducts.length > 0) {
-  console.warn(
-    `[merchant-feed] skipped ${skippedProducts.length} product(s) with invalid price: ${skippedProducts
-      .map((entry) => entry.id)
-      .join(", ")}`,
-  );
-}
+    const compareAtCad = toNumber(product?.compareAtPrice, 0);
+    const price = convertPrice(priceCad);
+    const compareAtPrice = convertPrice(compareAtCad);
+    const hasSalePrice = compareAtPrice > price;
+    const regularPrice = hasSalePrice ? compareAtPrice : price;
+
+    const primaryImage =
+      toStringValue(product?.image) ||
+      toStringArray(product?.galleryImages)[0] ||
+      "/placeholder.svg";
+    const galleryImages = toStringArray(product?.galleryImages).filter((image) => image !== primaryImage);
+
+    const sizes = toStringArray(product?.sizes);
+    const colors = toStringArray(product?.colors);
+    const normalizedSizes = sizes.length > 0 ? sizes : ["One Size"];
+    const normalizedColors = colors.length > 0 ? colors : ["Default"];
+
+    for (const size of normalizedSizes) {
+      for (const color of normalizedColors) {
+        const sizeSlug = slugify(size) || "one-size";
+        const colorSlug = slugify(color) || "default";
+        const variantId = `${baseId}-${sizeSlug}-${colorSlug}`;
+
+        productVariants.push({
+          id: variantId,
+          itemGroupId: baseId,
+          title,
+          description,
+          link: `${siteUrl}/products/${encodeURIComponent(baseId)}`,
+          imageLink: toAbsoluteUrl(primaryImage, "/placeholder.svg"),
+          additionalImageLinks: galleryImages.map((image) => toAbsoluteUrl(image, "/placeholder.svg")),
+          availability,
+          price: formatPrice(regularPrice, currency),
+          salePrice: hasSalePrice ? formatPrice(price, currency) : "",
+          productType,
+          brand,
+          gender,
+          ageGroup: "adult",
+          color,
+          size,
+          shippingCountry,
+          shippingService,
+          shippingPrice,
+        });
+      }
+    }
+  }
+
+  const itemNodes = productVariants.map(toItemXml).join("\n");
+  const feedTitle = titleSuffix
+    ? `Ria&apos;s Boutique Product Feed (${titleSuffix})`
+    : "Ria&apos;s Boutique Product Feed";
+
+  const feedXml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
+    "<channel>",
+    `  <title>${feedTitle}</title>`,
+    `  <link>${escapeXml(`${siteUrl}/`)}</link>`,
+    "  <description>Google Merchant Center feed generated from src/content/products.json.</description>",
+    itemNodes,
+    "</channel>",
+    "</rss>",
+    "",
+  ].join("\n");
+
+  writeFileSync(outputPath, feedXml, "utf8");
+
+  console.log(`[merchant-feed] generated ${productVariants.length} item variants -> ${outputPath}`);
+  if (skippedProducts.length > 0) {
+    console.warn(
+      `[merchant-feed] skipped ${skippedProducts.length} product(s) with invalid price: ${skippedProducts
+        .map((entry) => entry.id)
+        .join(", ")}`,
+    );
+  }
+};
+
+const currencyCad = (process.env.MERCHANT_FEED_CURRENCY || DEFAULT_CURRENCY).trim().toUpperCase();
+const shippingCountryCad =
+  ((process.env.MERCHANT_FEED_SHIPPING_COUNTRY || DEFAULT_SHIPPING_COUNTRY).trim() || DEFAULT_SHIPPING_COUNTRY)
+    .toUpperCase();
+const shippingPriceCad = Math.max(
+  0,
+  toNumber(process.env.MERCHANT_FEED_SHIPPING_PRICE, DEFAULT_SHIPPING_PRICE_CAD),
+);
+
+buildFeed({
+  outputPath: outputPathCad,
+  currency: currencyCad,
+  shippingCountry: shippingCountryCad,
+  shippingPriceCad,
+  convertPrice: toCad,
+  titleSuffix: currencyCad,
+});
+
+const usShippingPriceCad = Math.max(
+  0,
+  toNumber(process.env.MERCHANT_FEED_US_SHIPPING_PRICE_CAD, DEFAULT_US_SHIPPING_PRICE_CAD),
+);
+
+buildFeed({
+  outputPath: outputPathUsd,
+  currency: "USD",
+  shippingCountry: "US",
+  shippingPriceCad: usShippingPriceCad,
+  convertPrice: toUsd,
+  titleSuffix: "USD",
+});

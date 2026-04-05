@@ -52,9 +52,11 @@ export interface StorePickupDetails {
 }
 
 export const shippingPolicy = {
-  standardCost: `${formatCad(commerceConfig.flatShippingRateMinor / 100)} flat rate at checkout`,
+  standardCost: `${formatCad(commerceConfig.flatShippingRateMinor / 100)} in Canada | ${formatCad(
+    commerceConfig.flatShippingRateInternationalMinor / 100,
+  )} outside Canada`,
   freeShippingThreshold: `${formatCad(commerceConfig.freeShippingThresholdMinor / 100)}+`,
-  standardTimeline: "5-10 business days (Canada)",
+  standardTimeline: "5-10 business days (Canada) | International varies",
 };
 
 export const returnPolicy =
@@ -83,13 +85,13 @@ export const faqItems: FaqItem[] = [
     id: "faq-4",
     question: "What are your shipping rates and delivery times?",
     answer:
-      "We offer standard shipping within Canada for a CA$30.00 flat rate at checkout, with delivery typically taking 5–10 business days. Orders over CA$400.00 qualify for free standard shipping within Canada. International rates are calculated at checkout and delivery timelines vary by destination.",
+      "We offer standard shipping within Canada for a CA$30.00 flat rate at checkout, with delivery typically taking 5–10 business days. Orders over CA$400.00 qualify for free standard shipping within Canada. Outside Canada, standard shipping is CA$40.00 and delivery timelines vary by destination.",
   },
   {
     id: "faq-5",
     question: "How is shipping calculated?",
     answer:
-      "Shipping is charged at a flat rate during checkout unless your order qualifies for free shipping. Orders over CA$400.00 automatically receive free standard shipping within Canada. International rates are calculated at checkout.",
+      "Shipping is charged at a flat rate during checkout unless your order qualifies for free shipping. Orders over CA$400.00 automatically receive free standard shipping within Canada. Outside Canada, standard shipping is CA$40.00.",
   },
   {
     id: "faq-6",

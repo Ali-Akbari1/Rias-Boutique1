@@ -229,6 +229,9 @@ const buildShippingDetails = (): OfferShippingDetails[] => {
   const standardRate = commerceConfig.shippingChargesEnabled
     ? commerceConfig.flatShippingRateMinor / 100
     : 0;
+  const internationalRate = commerceConfig.shippingChargesEnabled
+    ? commerceConfig.flatShippingRateInternationalMinor / 100
+    : 0;
   const freeThreshold = commerceConfig.freeShippingThresholdMinor / 100;
   const baseDetails: Pick<OfferShippingDetails, "shippingDestination" | "deliveryTime"> = {
     shippingDestination: {
@@ -262,6 +265,20 @@ const buildShippingDetails = (): OfferShippingDetails[] => {
         currency: "CAD",
       },
       ...baseDetails,
+    },
+    {
+      "@type": "OfferShippingDetails",
+      shippingLabel: "Standard shipping (United States)",
+      shippingRate: {
+        "@type": "MonetaryAmount",
+        value: Number(internationalRate.toFixed(2)),
+        currency: "CAD",
+      },
+      shippingDestination: {
+        "@type": "DefinedRegion",
+        addressCountry: "US",
+      },
+      deliveryTime: baseDetails.deliveryTime,
     },
   ];
 

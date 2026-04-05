@@ -92,6 +92,23 @@ const buildAddressFingerprint = (form: CheckoutForm) =>
     .map((value) => value.trim().toLowerCase())
     .join("|");
 
+const normalizeCountryCode = (value: string) => {
+  const trimmed = value.trim().toLowerCase();
+  if (!trimmed) {
+    return "";
+  }
+
+  const compact = trimmed.replace(/[^a-z]/g, "");
+  if (["ca", "can", "canada"].includes(compact)) {
+    return "CA";
+  }
+  if (["us", "usa", "unitedstates", "unitedstatesofamerica"].includes(compact)) {
+    return "US";
+  }
+
+  return trimmed.toUpperCase();
+};
+
 const slugifyOption = (value: string) =>
   value
     .toLowerCase()
@@ -223,6 +240,7 @@ const Checkout = () => {
   const total = totalMinor / 100;
   const addressFieldsReady = isAddressFieldsComplete(checkoutForm);
   const shippingAddressReady = isShippingAddressComplete(checkoutForm);
+  const isCanadaDestination = normalizeCountryCode(checkoutForm.country) === "CA";
   const fullNameValid = checkoutForm.fullName.trim().length >= 2;
   const emailValid = looksLikeEmail(checkoutForm.email);
   const phoneValid = checkoutForm.phone.trim().length >= 7;
@@ -245,9 +263,15 @@ const Checkout = () => {
       ? "Pick up in store selected. No shipping fee will be charged."
       : freeShippingApplied && selectedShippingOption
       ? `Free shipping on orders over ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)}. Applied to ${selectedShippingOption.label}.`
+      : selectedShippingOption && !isCanadaDestination
+      ? `International shipping is a flat ${formatPrice(selectedShippingOption.customerRateMinor / 100)} at checkout.`
       : selectedShippingOption
       ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."} Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`
-      : `Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`;
+      : isCanadaDestination
+      ? `Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`
+      : `International shipping is a flat ${formatPrice(
+          clientCommerceConfig.flatShippingRateInternationalMinor / 100,
+        )} at checkout.`;
 
   const handleFormChange = (field: keyof CheckoutForm) => (event: ChangeEvent<HTMLInputElement>) => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));

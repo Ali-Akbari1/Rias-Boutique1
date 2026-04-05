@@ -5,6 +5,8 @@ export interface CommerceRuntimeEnv {
   VITE_ENABLE_SHIPPING_CHARGES?: string;
   FREE_SHIPPING_THRESHOLD_MINOR?: string;
   FLAT_SHIPPING_RATE_MINOR?: string;
+  FLAT_SHIPPING_RATE_INTL_MINOR?: string;
+  VITE_FLAT_SHIPPING_RATE_INTL_MINOR?: string;
   CHECKOUT_TAX_RATE?: string;
   SHIPPING_PROVIDER_MODE?: string;
   LAUNCH10_EXPIRES_AT?: string;
@@ -15,6 +17,7 @@ export interface ResolvedCommerceConfig {
   shippingChargesEnabled: boolean;
   freeShippingThresholdMinor: number;
   flatShippingRateMinor: number;
+  flatShippingRateInternationalMinor: number;
   checkoutTaxRate: number;
   shippingProviderMode: ShippingProviderMode;
   launchDiscountCode: string;
@@ -24,6 +27,7 @@ export interface ResolvedCommerceConfig {
 
 export const DEFAULT_FREE_SHIPPING_THRESHOLD_MINOR = 40_000;
 export const DEFAULT_FLAT_SHIPPING_RATE_MINOR = 3_000;
+export const DEFAULT_FLAT_SHIPPING_RATE_INTL_MINOR = 4_000;
 export const DEFAULT_CHECKOUT_TAX_RATE = 0.05;
 export const DEFAULT_LAUNCH_DISCOUNT_CODE = "LAUNCH10";
 export const DEFAULT_LAUNCH_DISCOUNT_RATE = 0.1;
@@ -56,6 +60,10 @@ export const resolveCommerceConfig = (env: CommerceRuntimeEnv): ResolvedCommerce
     DEFAULT_FREE_SHIPPING_THRESHOLD_MINOR,
   ),
   flatShippingRateMinor: toMinorInteger(env.FLAT_SHIPPING_RATE_MINOR, DEFAULT_FLAT_SHIPPING_RATE_MINOR),
+  flatShippingRateInternationalMinor: toMinorInteger(
+    env.FLAT_SHIPPING_RATE_INTL_MINOR ?? env.VITE_FLAT_SHIPPING_RATE_INTL_MINOR,
+    DEFAULT_FLAT_SHIPPING_RATE_INTL_MINOR,
+  ),
   checkoutTaxRate: toRate(env.CHECKOUT_TAX_RATE, DEFAULT_CHECKOUT_TAX_RATE),
   shippingProviderMode: resolveShippingProviderMode(env.SHIPPING_PROVIDER_MODE),
   launchDiscountCode: DEFAULT_LAUNCH_DISCOUNT_CODE,

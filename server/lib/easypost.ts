@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import { createDeterministicHash } from "./http.js";
 import { logger } from "./logger.js";
 import { canonicalizeCartItems } from "./security.js";
-import { getFlatShippingRateMinor } from "./checkout-pricing.js";
+import { getFlatShippingRateMinor, getInternationalFlatShippingRateMinor } from "./checkout-pricing.js";
 
 export interface QuoteCustomer {
   deliveryMethod?: "shipping" | "pickup";
@@ -842,15 +842,21 @@ export const createFlatRateShippingQuote = ({
   const { quoteSecret, quoteTtlMs } = getShippingQuoteConfig();
   const createdAt = new Date();
   const quoteExpiresAt = new Date(createdAt.getTime() + quoteTtlMs).toISOString();
-  const flatShippingRateMinor = getFlatShippingRateMinor();
-  const freeShippingApplied = subtotalMinor >= freeShippingThresholdMinor;
+  const destinationCountryCode = normalizeCountryCode(customer.country);
+  const isCanadaDestination = destinationCountryCode === "CA";
+  const flatShippingRateMinor = isCanadaDestination
+    ? getFlatShippingRateMinor()
+    : getInternationalFlatShippingRateMinor();
+  const freeShippingApplied = isCanadaDestination && subtotalMinor >= freeShippingThresholdMinor;
   const contextHash = buildShippingContextHash({ customer, items, subtotalMinor });
+  const formatCadMinor = (minor: number) => `CA$${(minor / 100).toFixed(2)}`;
+  const shippingLabel = isCanadaDestination ? "Standard Shipping (Canada)" : "Standard Shipping (International)";
 
   const payload: ShippingQuoteTokenPayload = {
     v: 1,
     provider: "flat_rate",
     shipmentId: "flat_rate",
-    rateId: "flat_standard",
+    rateId: isCanadaDestination ? "flat_standard_ca" : "flat_standard_intl",
     carrier: "Ria's Boutique",
     service: "Standard Shipping",
     quotedRateMinor: flatShippingRateMinor,
@@ -868,7 +874,7 @@ export const createFlatRateShippingQuote = ({
     token: encodeQuoteToken(payload, quoteSecret),
     carrier: payload.carrier,
     service: payload.service,
-    label: "Standard Shipping",
+    label: shippingLabel,
     quotedRateMinor: payload.quotedRateMinor,
     customerRateMinor: payload.customerRateMinor,
     currency: payload.currency,
@@ -887,7 +893,9 @@ export const createFlatRateShippingQuote = ({
     quoteExpiresAt,
     message: freeShippingApplied
       ? "Free shipping is applied automatically on orders over CA$400."
-      : "Standard shipping is a flat CA$30 at checkout.",
+      : isCanadaDestination
+        ? `Standard shipping is a flat ${formatCadMinor(flatShippingRateMinor)} at checkout.`
+        : `International shipping is a flat ${formatCadMinor(flatShippingRateMinor)} at checkout.`,
   };
 };
 

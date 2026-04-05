@@ -15,6 +15,8 @@ export const getFreeShippingThresholdMinor = () => getServerCommerceConfig().fre
 export const getShippingProviderMode = (): ShippingProviderMode => getServerCommerceConfig().shippingProviderMode;
 
 export const getFlatShippingRateMinor = () => getServerCommerceConfig().flatShippingRateMinor;
+export const getInternationalFlatShippingRateMinor = () =>
+  getServerCommerceConfig().flatShippingRateInternationalMinor;
 
 export const getCheckoutTaxRate = () => getServerCommerceConfig().checkoutTaxRate;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
 <channel>
-  <title>Ria&apos;s Boutique Product Feed (CAD)</title>
+  <title>Ria&apos;s Boutique Product Feed (USD)</title>
   <link>https://www.riasboutique.com/</link>
   <description>Google Merchant Center feed generated from src/content/products.json.</description>
   <item>
@@ -13,7 +13,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/burgundy-bridal-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/burgundy-bridal-dress-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -22,9 +22,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Red</g:color>
     <g:size>Medium</g:size>
@@ -38,7 +38,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/burgundy-bridal-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/burgundy-bridal-dress-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -47,9 +47,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Burgundy</g:color>
     <g:size>Medium</g:size>
@@ -65,7 +65,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/green-bridal-dress-3.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/green-bridal-dress-4.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>550.00 CAD</g:price>
+    <g:price>407.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -74,9 +74,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Green</g:color>
     <g:size>Large</g:size>
@@ -92,7 +92,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/blue-long-cheerma-dozi-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/blue-long-cheerma-dozi-dress-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>400.00 CAD</g:price>
+    <g:price>296.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -101,9 +101,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Blue</g:color>
     <g:size>Medium</g:size>
@@ -118,7 +118,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/royal-blue-3-piece-suit-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/royal-blue-3-piece-suit-3.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>250.00 CAD</g:price>
+    <g:price>185.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -127,9 +127,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Royal Blue</g:color>
     <g:size>Small</g:size>
@@ -147,7 +147,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-hazaragi-dress-3.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-hazaragi-dress-4.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>350.00 CAD</g:price>
+    <g:price>259.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -156,9 +156,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Teal</g:color>
     <g:size>Small</g:size>
@@ -174,7 +174,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/white-cheerma-dress-3.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/white-cheerma-dress-4.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>400.00 CAD</g:price>
+    <g:price>296.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -183,9 +183,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>White</g:color>
     <g:size>Medium</g:size>
@@ -200,7 +200,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/black-velvet-gulabatoon-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/black-velvet-gulabatoon-dress-3.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>380.00 CAD</g:price>
+    <g:price>281.20 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -209,9 +209,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Black with Gold</g:color>
     <g:size>Large</g:size>
@@ -226,7 +226,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/white-velvet-cheerma-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/white-velvet-cheerma-dress-3.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>400.00 CAD</g:price>
+    <g:price>296.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -235,9 +235,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>White and Silver</g:color>
     <g:size>Large</g:size>
@@ -251,7 +251,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -260,9 +260,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>Small</g:size>
@@ -276,7 +276,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -285,9 +285,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>Small</g:size>
@@ -301,7 +301,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -310,9 +310,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>Small</g:size>
@@ -326,7 +326,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -335,9 +335,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>Small</g:size>
@@ -351,7 +351,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -360,9 +360,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>Medium</g:size>
@@ -376,7 +376,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -385,9 +385,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>Medium</g:size>
@@ -401,7 +401,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -410,9 +410,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>Medium</g:size>
@@ -426,7 +426,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -435,9 +435,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>Medium</g:size>
@@ -451,7 +451,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -460,9 +460,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>Large</g:size>
@@ -476,7 +476,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -485,9 +485,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>Large</g:size>
@@ -501,7 +501,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -510,9 +510,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>Large</g:size>
@@ -526,7 +526,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -535,9 +535,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>Large</g:size>
@@ -551,7 +551,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -560,9 +560,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>X-Large</g:size>
@@ -576,7 +576,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -585,9 +585,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>X-Large</g:size>
@@ -601,7 +601,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -610,9 +610,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>X-Large</g:size>
@@ -626,7 +626,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-cheerma-dozi-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -635,9 +635,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>X-Large</g:size>
@@ -652,7 +652,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/pink-banaras-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/pink-banaras-dress-3.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>380.00 CAD</g:price>
+    <g:price>281.20 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -661,9 +661,9 @@
     <g:gender>unisex</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Pink</g:color>
     <g:size>Small</g:size>
@@ -677,7 +677,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/bridal-green-banaras-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/bridal-green-banaras-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>650.00 CAD</g:price>
+    <g:price>481.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -686,9 +686,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Green</g:color>
     <g:size>Small</g:size>
@@ -702,7 +702,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/bridal-green-banaras-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/bridal-green-banaras-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>650.00 CAD</g:price>
+    <g:price>481.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -711,9 +711,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Green</g:color>
     <g:size>Medium</g:size>
@@ -727,7 +727,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/bridal-green-banaras-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/bridal-green-banaras-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>650.00 CAD</g:price>
+    <g:price>481.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -736,9 +736,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Green</g:color>
     <g:size>Large</g:size>
@@ -752,7 +752,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/bridal-green-banaras-dress-pre-order-only-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/bridal-green-banaras-dress-pre-order-only-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>650.00 CAD</g:price>
+    <g:price>481.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -761,9 +761,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Green</g:color>
     <g:size>X-Large</g:size>
@@ -779,7 +779,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/purple-banaras-dress-3.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/purple-banaras-dress-4.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -788,9 +788,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Purple</g:color>
     <g:size>Small</g:size>
@@ -806,7 +806,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/red-bridal-velvet-dress-3.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/red-bridal-velvet-dress-4.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -815,9 +815,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Red</g:color>
     <g:size>Medium</g:size>
@@ -832,7 +832,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/burgundy-banaras-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/burgundy-banaras-dress-3.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -841,9 +841,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Burgundy</g:color>
     <g:size>Large</g:size>
@@ -856,7 +856,7 @@
     <link>https://www.riasboutique.com/products/Chapan-blue-gulabatoon</link>
     <g:image_link>https://www.riasboutique.com/uploads/dark-blue-chapan-1.webp</g:image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>200.00 CAD</g:price>
+    <g:price>148.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -865,9 +865,9 @@
     <g:gender>unisex</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Dark Blue</g:color>
     <g:size>Small</g:size>
@@ -880,7 +880,7 @@
     <link>https://www.riasboutique.com/products/Burgundy-bridal-dress</link>
     <g:image_link>https://www.riasboutique.com/uploads/burgundy-bridal-dress-with-mens-vest-1.webp</g:image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>650.00 CAD</g:price>
+    <g:price>481.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -889,9 +889,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Burgundy</g:color>
     <g:size>Medium</g:size>
@@ -906,7 +906,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-black-and-gold-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>81.40 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -915,9 +915,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Black with Gold</g:color>
   </item>
@@ -932,7 +932,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-mens-parantoban-in-black-3.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>225.00 CAD</g:price>
+    <g:price>166.50 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -941,9 +941,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Black</g:color>
     <g:size>X-Large</g:size>
@@ -958,7 +958,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-off-white-and-gold-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>81.40 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -967,9 +967,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Off-white</g:color>
     <g:size>Small</g:size>
@@ -984,7 +984,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-grey-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>81.40 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -993,9 +993,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Grey</g:color>
     <g:size>Large</g:size>
@@ -1010,7 +1010,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-handmade-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>225.00 CAD</g:price>
+    <g:price>166.50 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1019,9 +1019,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>White</g:color>
     <g:size>X-Large</g:size>
@@ -1036,7 +1036,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-off-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>81.40 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1045,9 +1045,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Off-White</g:color>
     <g:size>Medium</g:size>
@@ -1062,7 +1062,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-off-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>81.40 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1071,9 +1071,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Off-White</g:color>
     <g:size>XX-Large</g:size>
@@ -1087,7 +1087,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/hazaragi-dress-sage-green-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/hazaragi-dress-sage-green-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>180.00 CAD</g:price>
+    <g:price>133.20 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1096,9 +1096,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Sage Green</g:color>
     <g:size>Small</g:size>
@@ -1112,7 +1112,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/hazaragi-dress-sage-green-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/hazaragi-dress-sage-green-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>180.00 CAD</g:price>
+    <g:price>133.20 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1121,9 +1121,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Sage Green</g:color>
     <g:size>Large</g:size>
@@ -1137,7 +1137,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/green-hazaragi-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/green-hazaragi-dress-2.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>225.00 CAD</g:price>
+    <g:price>166.50 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1146,9 +1146,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Mustard Green</g:color>
     <g:size>Small</g:size>
@@ -1162,7 +1162,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/baby-blue-hazaragi-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/baby-blue-hazaragi-dress-2.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>180.00 CAD</g:price>
+    <g:price>133.20 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1171,9 +1171,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Baby Blue</g:color>
     <g:size>Large</g:size>
@@ -1188,7 +1188,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/green-gulabatoon-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/green-gulabatoon-dress-3.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>380.00 CAD</g:price>
+    <g:price>281.20 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1197,9 +1197,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Emerald Green</g:color>
     <g:size>Medium</g:size>
@@ -1214,7 +1214,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/teal-barosha-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/teal-barosha-dress-3.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>250.00 CAD</g:price>
+    <g:price>185.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1223,9 +1223,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Teal</g:color>
     <g:size>Small</g:size>
@@ -1240,7 +1240,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>81.40 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1249,9 +1249,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>True White</g:color>
     <g:size>Medium</g:size>
@@ -1266,7 +1266,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>81.40 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1275,9 +1275,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>True White</g:color>
     <g:size>Large</g:size>
@@ -1292,7 +1292,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>81.40 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1301,9 +1301,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>True White</g:color>
     <g:size>X-Large</g:size>
@@ -1318,7 +1318,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>81.40 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1327,9 +1327,9 @@
     <g:gender>male</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>True White</g:color>
     <g:size>XX-Large</g:size>
@@ -1344,7 +1344,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/dark-blue-cheerma-dozi-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/dark-blue-cheerma-dozi-dress-3.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>450.00 CAD</g:price>
+    <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1353,9 +1353,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Dark Blue</g:color>
     <g:size>Small</g:size>
@@ -1371,7 +1371,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/img_1329.jpg</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/img_1330.jpg</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>550.00 CAD</g:price>
+    <g:price>407.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1380,9 +1380,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Blue</g:color>
     <g:size>Large</g:size>
@@ -1397,7 +1397,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/img_1417-2.jpg</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/img_1419.jpg</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>400.00 CAD</g:price>
+    <g:price>296.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1406,9 +1406,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Lilac</g:color>
     <g:size>Large</g:size>
@@ -1422,7 +1422,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/img_1383.jpg</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/img_1395.jpg</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>380.00 CAD</g:price>
+    <g:price>281.20 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1431,9 +1431,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Lilac</g:color>
     <g:size>Small</g:size>
@@ -1447,7 +1447,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/img_1383.jpg</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/img_1395.jpg</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>380.00 CAD</g:price>
+    <g:price>281.20 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1456,9 +1456,9 @@
     <g:gender>female</g:gender>
     <g:age_group>adult</g:age_group>
     <g:shipping>
-      <g:country>CA</g:country>
+      <g:country>US</g:country>
       <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
+      <g:price>29.60 USD</g:price>
     </g:shipping>
     <g:color>Lilac</g:color>
     <g:size>Medium</g:size>
