@@ -51,6 +51,7 @@ const STORE_NAME = "Ria's Boutique";
 const STORE_LOGO_PATH = "/RAb.png";
 const ORGANIZATION_ID = `${SITE_URL}#organization`;
 const WEBSITE_ID = `${SITE_URL}#website`;
+const STORE_ID = `${SITE_URL}#store`;
 const commerceConfig = getClientCommerceConfig();
 
 type JsonLdNode = Record<string, unknown>;
@@ -198,6 +199,31 @@ const buildWebsiteSchema = (): JsonLdNode => ({
     "query-input": "required name=search_term_string",
   },
 });
+
+const buildLocalBusinessSchema = (): JsonLdNode => {
+  const pickupDetails = getStorePickupDetails();
+
+  return {
+    "@type": "ClothingStore",
+    "@id": STORE_ID,
+    name: "Ria's Afghan Boutique",
+    url: SITE_URL,
+    image: toAbsoluteUrl(STORE_LOGO_PATH),
+    telephone: pickupDetails.phoneHref,
+    hasMap: pickupDetails.mapsUrl,
+    parentOrganization: {
+      "@id": ORGANIZATION_ID,
+    },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: pickupDetails.address,
+      addressLocality: "Balzac",
+      addressRegion: "AB",
+      postalCode: "T4A 0X8",
+      addressCountry: "CA",
+    },
+  };
+};
 
 const buildShippingDetails = (): OfferShippingDetails[] => {
   const standardRate = commerceConfig.shippingChargesEnabled
@@ -361,6 +387,8 @@ const buildBreadcrumbSchema = (
     items.push({ name: "About", item: canonicalUrl });
   } else if (canonicalPath === "/faq") {
     items.push({ name: "FAQ", item: canonicalUrl });
+  } else if (canonicalPath === "/location") {
+    items.push({ name: "Location", item: canonicalUrl });
   } else if (canonicalPath.startsWith("/products/")) {
     items.push({ name: "Collection", item: `${SITE_URL}/collection` });
     if (product?.department) {
@@ -438,6 +466,14 @@ const getMetadataForCanonicalPath = (canonicalPath: string) => {
     };
   }
 
+  if (canonicalPath === "/location") {
+    return {
+      title: "Balzac Location | Ria's Boutique",
+      description:
+        "Visit Ria's Boutique in Balzac, Alberta for in-person shopping and local pickup.",
+    };
+  }
+
   if (canonicalPath.startsWith("/products/")) {
     const productId = canonicalPath.split("/")[2] || "";
     const product = getProductById(productId) || getProductBySlug(productId);
@@ -488,7 +524,11 @@ const RouteMetadata = () => {
     updateMetaProperty("rb-og-title", "og:title", metadata.title);
     updateMetaProperty("rb-og-description", "og:description", metadata.description);
 
-    const schemaGraph: JsonLdNode[] = [buildOrganizationSchema(), buildWebsiteSchema()];
+    const schemaGraph: JsonLdNode[] = [
+      buildOrganizationSchema(),
+      buildLocalBusinessSchema(),
+      buildWebsiteSchema(),
+    ];
     if (product) {
       schemaGraph.push(buildProductSchema(product, canonicalUrl));
     }

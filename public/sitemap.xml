@@ -16,6 +16,11 @@
     <priority>0.65</priority>
   </url>
   <url>
+    <loc>https://www.riasboutique.com/location</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
     <loc>https://www.riasboutique.com/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
@@ -111,6 +116,7 @@
     <loc>https://www.riasboutique.com/products/red-gharara-bridal-dress</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2026-02-19</lastmod>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/Burgundy-Banaras-Dress</loc>
@@ -136,7 +142,7 @@
     <lastmod>2026-02-24</lastmod>
   </url>
   <url>
-    <loc>https://www.riasboutique.com/products/Handmade-mens-parantoban</loc>
+    <loc>https://www.riasboutique.com/products/Handmade-mens-parantoban-black</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <lastmod>2026-02-24</lastmod>
@@ -170,5 +176,56 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <lastmod>2026-03-05</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/green-hazaragi-dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-03-07</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/baby-blue-du-domina</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-03-07</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/green-gulabatoon-dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-03-08</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/teal-barosha-dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-03-08</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/true-white-mens-parantoban</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-02-19</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/dark-blue-cheerma-dozi-machini</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/blue-banaras-dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/Lilac-purple-gulabatoon%20dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-04</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/barosha-purple-shortdress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

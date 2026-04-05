@@ -26,6 +26,7 @@ const AdminOrders = lazy(() => import("./pages/AdminOrders"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const FaqPage = lazy(() => import("./pages/FaqPage"));
+const LocationPage = lazy(() => import("./pages/LocationPage"));
 
 const AnalyticsTracker = () => {
   const location = useLocation();
@@ -67,6 +68,7 @@ const App = () => {
                   <Route path="/collection/:department" element={<CollectionPage />} />
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="/faq" element={<FaqPage />} />
+                  <Route path="/location" element={<LocationPage />} />
                   <Route path="/products/:productId" element={<ProductDetails />} />
                   <Route
                     path="/checkout"
