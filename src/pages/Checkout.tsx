@@ -1,5 +1,5 @@
 import { type ChangeEvent, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, Lock, RotateCcw, Search, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/features/cart/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
@@ -38,6 +38,7 @@ import {
   shippingPolicy,
 } from "@/features/store/data/store-content";
 import { formatProductAlt } from "@/lib/seo";
+import { getProductById, getProductBySlug, products, type Product } from "@/features/catalog/data/products";
 
 type DeliveryMethod = "shipping" | "pickup";
 type AddressVerificationStatus = "idle" | "verifying" | "verified" | "invalid" | "skipped";
@@ -91,6 +92,50 @@ const buildAddressFingerprint = (form: CheckoutForm) =>
     .map((value) => value.trim().toLowerCase())
     .join("|");
 
+const slugifyOption = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const buildVariantId = (baseId: string, size: string, color: string) => {
+  const sizeSlug = slugifyOption(size) || "one-size";
+  const colorSlug = slugifyOption(color) || "default";
+  return `${baseId}-${sizeSlug}-${colorSlug}`;
+};
+
+const getDefaultSelection = (product: Product) => ({
+  size: product.sizes[0] || "One Size",
+  color: product.colors[0] || "Default",
+});
+
+const findSelectionForItemId = (itemId: string) => {
+  const trimmed = itemId.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const directMatch = getProductById(trimmed) || getProductBySlug(trimmed);
+  if (directMatch) {
+    return { product: directMatch, selection: getDefaultSelection(directMatch) };
+  }
+
+  for (const product of products) {
+    const sizes = product.sizes.length > 0 ? product.sizes : ["One Size"];
+    const colors = product.colors.length > 0 ? product.colors : ["Default"];
+
+    for (const size of sizes) {
+      for (const color of colors) {
+        if (buildVariantId(product.id, size, color) === trimmed) {
+          return { product, selection: { size, color } };
+        }
+      }
+    }
+  }
+
+  return null;
+};
+
 const createAutocompleteSessionToken = () => {
   if (typeof globalThis.crypto?.randomUUID === "function") {
     return globalThis.crypto.randomUUID();
@@ -100,9 +145,10 @@ const createAutocompleteSessionToken = () => {
 };
 
 const Checkout = () => {
-  const { items, totalPrice } = useCart();
+  const { items, totalPrice, addToCart } = useCart();
   const { toast } = useToast();
   const { formatPrice, isUsd } = useCurrency();
+  const [searchParams] = useSearchParams();
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(initialForm);
   const [discountCode, setDiscountCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -143,6 +189,7 @@ const Checkout = () => {
   const addressVerificationControllerRef = useRef<AbortController | null>(null);
   const addressVerificationTimeoutRef = useRef<number | null>(null);
   const addressBlurTimeoutRef = useRef<number | null>(null);
+  const checkoutItemAppliedRef = useRef(false);
 
   const checkoutItems = useMemo(() => buildCheckoutItems(items), [items]);
   const subtotalMinor = Math.round(totalPrice * 100);
@@ -337,6 +384,23 @@ const Checkout = () => {
       addressBlurTimeoutRef.current = null;
     }
   };
+
+  useEffect(() => {
+    if (checkoutItemAppliedRef.current) {
+      return;
+    }
+
+    const itemId = searchParams.get("item_id") || "";
+    if (!itemId.trim()) {
+      return;
+    }
+
+    checkoutItemAppliedRef.current = true;
+    const match = findSelectionForItemId(itemId);
+    if (match) {
+      addToCart(match.product, match.selection);
+    }
+  }, [addToCart, searchParams]);
 
   useEffect(() => {
     if (!launchDiscountActive && discountCode) {
