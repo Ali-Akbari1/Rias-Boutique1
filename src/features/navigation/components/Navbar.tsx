@@ -197,10 +197,10 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         <Link
           to="/"
           onClick={handleHomeClick}
-          className="flex max-w-[150px] items-center gap-2 rounded-sm text-[10px] font-brand uppercase leading-[1.35] tracking-[0.12em] text-foreground transition-colors hover:text-gold sm:max-w-none sm:text-base sm:leading-none sm:tracking-[0.2em] md:justify-self-start lg:text-lg"
+          className="flex max-w-[210px] items-center gap-2 whitespace-nowrap rounded-sm text-[10px] font-brand uppercase leading-none tracking-[0.12em] text-foreground transition-colors hover:text-gold sm:max-w-none sm:text-base sm:tracking-[0.2em] md:justify-self-start lg:text-lg"
           aria-label="Go to homepage"
         >
-          <span>R I A ' S B O U T I Q U E</span>
+          <span>R I A &apos; S&nbsp;&nbsp;B O U T I Q U E</span>
         </Link>
 
         <DesktopNav
