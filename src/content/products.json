@@ -41,6 +41,9 @@
       ],
       "name": "Green Bridal Dress",
       "slug": "Green-Bridal-Dress",
+      "colors": [
+        "Green"
+      ],
       "sizes": [
         "Large "
       ],
@@ -94,6 +97,9 @@
       ],
       "name": "Royal Blue 3 Piece Suit ",
       "slug": "Royal-Blue",
+      "colors": [
+        "Royal Blue"
+      ],
       "sizes": [
         "Small "
       ],
@@ -725,6 +731,9 @@
       ],
       "name": "Teal Barosha Dress",
       "slug": "teal-barosha-dress",
+      "colors": [
+        "Teal"
+      ],
       "sizes": [
         "Small"
       ],

@@ -55,7 +55,7 @@
     <g:size>Medium</g:size>
   </item>
   <item>
-    <g:id>Green-Bridal-Dress-large-default</g:id>
+    <g:id>Green-Bridal-Dress-large-green</g:id>
     <g:item_group_id>Green-Bridal-Dress</g:item_group_id>
     <title>Green Bridal Dress</title>
     <description>Green bridal banaras dress with handmade cheerma</description>
@@ -78,6 +78,7 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:color>Green</g:color>
     <g:size>Large</g:size>
   </item>
   <item>
@@ -90,7 +91,7 @@
     <link>https://www.riasboutique.com/products/Blue-Cheerma-Dozi</link>
     <g:image_link>https://www.riasboutique.com/uploads/blue-long-cheerma-dozi-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/blue-long-cheerma-dozi-dress-2.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
+    <g:availability>out_of_stock</g:availability>
     <g:price>400.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -108,7 +109,7 @@
     <g:size>Medium</g:size>
   </item>
   <item>
-    <g:id>Royal-Blue-small-default</g:id>
+    <g:id>Royal-Blue-small-royal-blue</g:id>
     <g:item_group_id>Royal-Blue</g:item_group_id>
     <title>Royal Blue 3 Piece Suit</title>
     <description>3 piece velvet suit with gulabatoon embroidery</description>
@@ -116,7 +117,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/royal-blue-3-piece-suit-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/royal-blue-3-piece-suit-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/royal-blue-3-piece-suit-3.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
+    <g:availability>out_of_stock</g:availability>
     <g:price>250.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -130,6 +131,7 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:color>Royal Blue</g:color>
     <g:size>Small</g:size>
   </item>
   <item>
@@ -171,7 +173,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/white-cheerma-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/white-cheerma-dress-3.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/white-cheerma-dress-4.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
+    <g:availability>out_of_stock</g:availability>
     <g:price>400.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -649,7 +651,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/pink-banaras-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/pink-banaras-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/pink-banaras-dress-3.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
+    <g:availability>out_of_stock</g:availability>
     <g:price>380.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -829,7 +831,7 @@
     <g:image_link>https://www.riasboutique.com/uploads/burgundy-banaras-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/burgundy-banaras-dress-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/burgundy-banaras-dress-3.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
+    <g:availability>out_of_stock</g:availability>
     <g:price>450.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -895,15 +897,15 @@
     <g:size>Medium</g:size>
   </item>
   <item>
-    <g:id>men-black-gold-x-large-black</g:id>
+    <g:id>men-black-gold-one-size-black-with-gold</g:id>
     <g:item_group_id>men-black-gold</g:item_group_id>
-    <title>Black and Gold Men&apos;s Parantoban</title>
+    <title>Men&apos;s Black and Gold Parantoban</title>
     <description>Machine-made black men&apos;s parantoban with gold embroidery.</description>
     <link>https://www.riasboutique.com/products/men-black-gold</link>
     <g:image_link>https://www.riasboutique.com/uploads/men-s-black-and-gold-parantoban-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-black-and-gold-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
+    <g:availability>out_of_stock</g:availability>
     <g:price>110.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -917,67 +919,14 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
-    <g:color>Black</g:color>
-    <g:size>X-Large</g:size>
+    <g:color>Black with Gold</g:color>
   </item>
   <item>
-    <g:id>men-black-gold-xx-large-black</g:id>
-    <g:item_group_id>men-black-gold</g:item_group_id>
-    <title>Black and Gold Men&apos;s Parantoban</title>
-    <description>Machine-made black men&apos;s parantoban with gold embroidery.</description>
-    <link>https://www.riasboutique.com/products/men-black-gold</link>
-    <g:image_link>https://www.riasboutique.com/uploads/men-s-black-and-gold-parantoban-1.webp</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-black-and-gold-parantoban-2.webp</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ria&apos;s Boutique</g:brand>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Machine Made</g:product_type>
-    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-    <g:gender>male</g:gender>
-    <g:age_group>adult</g:age_group>
-    <g:shipping>
-      <g:country>CA</g:country>
-      <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
-    </g:shipping>
-    <g:color>Black</g:color>
-    <g:size>XX-Large</g:size>
-  </item>
-  <item>
-    <g:id>men-black-gold-small-black</g:id>
-    <g:item_group_id>men-black-gold</g:item_group_id>
-    <title>Black and Gold Men&apos;s Parantoban</title>
-    <description>Machine-made black men&apos;s parantoban with gold embroidery.</description>
-    <link>https://www.riasboutique.com/products/men-black-gold</link>
-    <g:image_link>https://www.riasboutique.com/uploads/men-s-black-and-gold-parantoban-1.webp</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-black-and-gold-parantoban-2.webp</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ria&apos;s Boutique</g:brand>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Machine Made</g:product_type>
-    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-    <g:gender>male</g:gender>
-    <g:age_group>adult</g:age_group>
-    <g:shipping>
-      <g:country>CA</g:country>
-      <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
-    </g:shipping>
-    <g:color>Black</g:color>
-    <g:size>Small</g:size>
-  </item>
-  <item>
-    <g:id>Handmade-mens-parantoban-x-large-black</g:id>
-    <g:item_group_id>Handmade-mens-parantoban</g:item_group_id>
-    <title>Handmade Mens Parantoban</title>
+    <g:id>Handmade-mens-parantoban-black-x-large-black</g:id>
+    <g:item_group_id>Handmade-mens-parantoban-black</g:item_group_id>
+    <title>Handmade Mens Parantoban in Black</title>
     <description>Handmade black mens parantoban with silver embroidery.</description>
-    <link>https://www.riasboutique.com/products/Handmade-mens-parantoban</link>
+    <link>https://www.riasboutique.com/products/Handmade-mens-parantoban-black</link>
     <g:image_link>https://www.riasboutique.com/uploads/handmade-mens-parantoban-in-black-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-mens-parantoban-in-black-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-mens-parantoban-in-black-3.webp</g:additional_image_link>
@@ -1000,61 +949,9 @@
     <g:size>X-Large</g:size>
   </item>
   <item>
-    <g:id>mens-offwhite-with-gold-large-off-white</g:id>
-    <g:item_group_id>mens-offwhite-with-gold</g:item_group_id>
-    <title>Men&apos;s Off-White Parantoban</title>
-    <description>Off-white machine made men&apos;s parantoban with gold embroidery.</description>
-    <link>https://www.riasboutique.com/products/mens-offwhite-with-gold</link>
-    <g:image_link>https://www.riasboutique.com/uploads/men-s-off-white-and-gold-parantoban-1.webp</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-off-white-and-gold-parantoban-2.webp</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ria&apos;s Boutique</g:brand>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Machine Made</g:product_type>
-    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-    <g:gender>male</g:gender>
-    <g:age_group>adult</g:age_group>
-    <g:shipping>
-      <g:country>CA</g:country>
-      <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
-    </g:shipping>
-    <g:color>Off-white</g:color>
-    <g:size>Large</g:size>
-  </item>
-  <item>
-    <g:id>mens-offwhite-with-gold-xx-large-off-white</g:id>
-    <g:item_group_id>mens-offwhite-with-gold</g:item_group_id>
-    <title>Men&apos;s Off-White Parantoban</title>
-    <description>Off-white machine made men&apos;s parantoban with gold embroidery.</description>
-    <link>https://www.riasboutique.com/products/mens-offwhite-with-gold</link>
-    <g:image_link>https://www.riasboutique.com/uploads/men-s-off-white-and-gold-parantoban-1.webp</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-off-white-and-gold-parantoban-2.webp</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ria&apos;s Boutique</g:brand>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Machine Made</g:product_type>
-    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-    <g:gender>male</g:gender>
-    <g:age_group>adult</g:age_group>
-    <g:shipping>
-      <g:country>CA</g:country>
-      <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
-    </g:shipping>
-    <g:color>Off-white</g:color>
-    <g:size>XX-Large</g:size>
-  </item>
-  <item>
     <g:id>mens-offwhite-with-gold-small-off-white</g:id>
     <g:item_group_id>mens-offwhite-with-gold</g:item_group_id>
-    <title>Men&apos;s Off-White Parantoban</title>
+    <title>Men&apos;s Off-White and Gold Parantoban</title>
     <description>Off-white machine made men&apos;s parantoban with gold embroidery.</description>
     <link>https://www.riasboutique.com/products/mens-offwhite-with-gold</link>
     <g:image_link>https://www.riasboutique.com/uploads/men-s-off-white-and-gold-parantoban-1.webp</g:image_link>
@@ -1102,58 +999,6 @@
     </g:shipping>
     <g:color>Grey</g:color>
     <g:size>Large</g:size>
-  </item>
-  <item>
-    <g:id>mens-white-handmade-parantoban-large-white</g:id>
-    <g:item_group_id>mens-white-handmade-parantoban</g:item_group_id>
-    <title>Men&apos;s White Handmade Parantoban</title>
-    <description>Handmade men&apos;s white parantoban with silver embroidery and mirror work.</description>
-    <link>https://www.riasboutique.com/products/mens-white-handmade-parantoban</link>
-    <g:image_link>https://www.riasboutique.com/uploads/men-s-white-handmade-parantoban-1.webp</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-handmade-parantoban-2.webp</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>225.00 CAD</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ria&apos;s Boutique</g:brand>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Handmade</g:product_type>
-    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-    <g:gender>male</g:gender>
-    <g:age_group>adult</g:age_group>
-    <g:shipping>
-      <g:country>CA</g:country>
-      <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
-    </g:shipping>
-    <g:color>White</g:color>
-    <g:size>Large</g:size>
-  </item>
-  <item>
-    <g:id>mens-white-handmade-parantoban-medium-white</g:id>
-    <g:item_group_id>mens-white-handmade-parantoban</g:item_group_id>
-    <title>Men&apos;s White Handmade Parantoban</title>
-    <description>Handmade men&apos;s white parantoban with silver embroidery and mirror work.</description>
-    <link>https://www.riasboutique.com/products/mens-white-handmade-parantoban</link>
-    <g:image_link>https://www.riasboutique.com/uploads/men-s-white-handmade-parantoban-1.webp</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-handmade-parantoban-2.webp</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>225.00 CAD</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ria&apos;s Boutique</g:brand>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Handmade</g:product_type>
-    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-    <g:gender>male</g:gender>
-    <g:age_group>adult</g:age_group>
-    <g:shipping>
-      <g:country>CA</g:country>
-      <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
-    </g:shipping>
-    <g:color>White</g:color>
-    <g:size>Medium</g:size>
   </item>
   <item>
     <g:id>mens-white-handmade-parantoban-x-large-white</g:id>
@@ -1206,6 +1051,32 @@
     </g:shipping>
     <g:color>Off-White</g:color>
     <g:size>Medium</g:size>
+  </item>
+  <item>
+    <g:id>mens-offwhite-with-white-xx-large-off-white</g:id>
+    <g:item_group_id>mens-offwhite-with-white</g:item_group_id>
+    <title>Men&apos;s Off-White Parantoban</title>
+    <description>Men&apos;s off-white parantoban with white embroidery.</description>
+    <link>https://www.riasboutique.com/products/mens-offwhite-with-white</link>
+    <g:image_link>https://www.riasboutique.com/uploads/men-s-off-white-parantoban-1.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-off-white-parantoban-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>110.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Machine Made</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>male</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Off-White</g:color>
+    <g:size>XX-Large</g:size>
   </item>
   <item>
     <g:id>hazaragi-dress-sage-green-small-sage-green</g:id>
@@ -1283,31 +1154,6 @@
     <g:size>Small</g:size>
   </item>
   <item>
-    <g:id>baby-blue-du-domina-medium-baby-blue</g:id>
-    <g:item_group_id>baby-blue-du-domina</g:item_group_id>
-    <title>Baby Blue Hazaragi Dress</title>
-    <description>Baby blue Hazaragi dress</description>
-    <link>https://www.riasboutique.com/products/baby-blue-du-domina</link>
-    <g:image_link>https://www.riasboutique.com/uploads/baby-blue-hazaragi-dress-1.webp</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/baby-blue-hazaragi-dress-2.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>180.00 CAD</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ria&apos;s Boutique</g:brand>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Party Wear</g:product_type>
-    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-    <g:gender>female</g:gender>
-    <g:age_group>adult</g:age_group>
-    <g:shipping>
-      <g:country>CA</g:country>
-      <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
-    </g:shipping>
-    <g:color>Baby Blue</g:color>
-    <g:size>Medium</g:size>
-  </item>
-  <item>
     <g:id>baby-blue-du-domina-large-baby-blue</g:id>
     <g:item_group_id>baby-blue-du-domina</g:item_group_id>
     <title>Baby Blue Hazaragi Dress</title>
@@ -1315,7 +1161,7 @@
     <link>https://www.riasboutique.com/products/baby-blue-du-domina</link>
     <g:image_link>https://www.riasboutique.com/uploads/baby-blue-hazaragi-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/baby-blue-hazaragi-dress-2.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
+    <g:availability>out_of_stock</g:availability>
     <g:price>180.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -1338,9 +1184,9 @@
     <title>Green Gulabatoon Dress</title>
     <description>Emerald green dress with gulabatoon detailing.</description>
     <link>https://www.riasboutique.com/products/green-gulabatoon-dress</link>
-    <g:image_link>https://www.riasboutique.com/uploads/green-gulabatoon-dress-1.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/green-gulabatoon-dress-2.jpg</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/green-gulabatoon-dress-3.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/green-gulabatoon-dress-1.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/green-gulabatoon-dress-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/green-gulabatoon-dress-3.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
     <g:price>380.00 CAD</g:price>
     <g:condition>new</g:condition>
@@ -1358,6 +1204,264 @@
     <g:color>Emerald Green</g:color>
     <g:size>Medium</g:size>
   </item>
+  <item>
+    <g:id>teal-barosha-dress-small-teal</g:id>
+    <g:item_group_id>teal-barosha-dress</g:item_group_id>
+    <title>Teal Barosha Dress</title>
+    <description>Teal barosha dress with silver cheerma detailing.</description>
+    <link>https://www.riasboutique.com/products/teal-barosha-dress</link>
+    <g:image_link>https://www.riasboutique.com/uploads/teal-barosha-dress-1.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/teal-barosha-dress-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/teal-barosha-dress-3.webp</g:additional_image_link>
+    <g:availability>out_of_stock</g:availability>
+    <g:price>250.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Teal</g:color>
+    <g:size>Small</g:size>
+  </item>
+  <item>
+    <g:id>true-white-mens-parantoban-medium-true-white</g:id>
+    <g:item_group_id>true-white-mens-parantoban</g:item_group_id>
+    <title>Men&apos;s White Parantoban</title>
+    <description>True white men&apos;s parantoban with white embroidery.</description>
+    <link>https://www.riasboutique.com/products/true-white-mens-parantoban</link>
+    <g:image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-1.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>110.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Machine Made</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>male</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>True White</g:color>
+    <g:size>Medium</g:size>
+  </item>
+  <item>
+    <g:id>true-white-mens-parantoban-large-true-white</g:id>
+    <g:item_group_id>true-white-mens-parantoban</g:item_group_id>
+    <title>Men&apos;s White Parantoban</title>
+    <description>True white men&apos;s parantoban with white embroidery.</description>
+    <link>https://www.riasboutique.com/products/true-white-mens-parantoban</link>
+    <g:image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-1.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>110.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Machine Made</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>male</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>True White</g:color>
+    <g:size>Large</g:size>
+  </item>
+  <item>
+    <g:id>true-white-mens-parantoban-x-large-true-white</g:id>
+    <g:item_group_id>true-white-mens-parantoban</g:item_group_id>
+    <title>Men&apos;s White Parantoban</title>
+    <description>True white men&apos;s parantoban with white embroidery.</description>
+    <link>https://www.riasboutique.com/products/true-white-mens-parantoban</link>
+    <g:image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-1.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>110.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Machine Made</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>male</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>True White</g:color>
+    <g:size>X-Large</g:size>
+  </item>
+  <item>
+    <g:id>true-white-mens-parantoban-xx-large-true-white</g:id>
+    <g:item_group_id>true-white-mens-parantoban</g:item_group_id>
+    <title>Men&apos;s White Parantoban</title>
+    <description>True white men&apos;s parantoban with white embroidery.</description>
+    <link>https://www.riasboutique.com/products/true-white-mens-parantoban</link>
+    <g:image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-1.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>110.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Machine Made</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>male</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>True White</g:color>
+    <g:size>XX-Large</g:size>
+  </item>
+  <item>
+    <g:id>dark-blue-cheerma-dozi-machini-small-dark-blue</g:id>
+    <g:item_group_id>dark-blue-cheerma-dozi-machini</g:item_group_id>
+    <title>Dark Blue Cheerma Dozi Dress</title>
+    <description>Dark blue cheerma dozi dress with wide leg pants.</description>
+    <link>https://www.riasboutique.com/products/dark-blue-cheerma-dozi-machini</link>
+    <g:image_link>https://www.riasboutique.com/uploads/dark-blue-cheerma-dozi-dress-1.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/dark-blue-cheerma-dozi-dress-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/dark-blue-cheerma-dozi-dress-3.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>450.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Dark Blue</g:color>
+    <g:size>Small</g:size>
+  </item>
+  <item>
+    <g:id>blue-banaras-dress-large-blue</g:id>
+    <g:item_group_id>blue-banaras-dress</g:item_group_id>
+    <title>Blue Banaras Bridal Dress</title>
+    <description>Beautiful long blue banaras bridal dress</description>
+    <link>https://www.riasboutique.com/products/blue-banaras-dress</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1327.jpg</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1328.jpg</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1329.jpg</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1330.jpg</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>550.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Bridal</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Blue</g:color>
+    <g:size>Large</g:size>
+  </item>
+  <item>
+    <g:id>Lilac-purple-gulabatoon dress-large-lilac</g:id>
+    <g:item_group_id>Lilac-purple-gulabatoon dress</g:item_group_id>
+    <title>Lilac Gulabatoon Dress</title>
+    <description>Long lilac dress with gulabatoon detailing.</description>
+    <link>https://www.riasboutique.com/products/Lilac-purple-gulabatoon%20dress</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1403.jpg</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1417-2.jpg</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1419.jpg</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>400.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Lilac</g:color>
+    <g:size>Large</g:size>
+  </item>
+  <item>
+    <g:id>barosha-purple-shortdress-small-lilac</g:id>
+    <g:item_group_id>barosha-purple-shortdress</g:item_group_id>
+    <title>Lilac Barosha Dress</title>
+    <description>Lilac barosha short dress with mirror work.</description>
+    <link>https://www.riasboutique.com/products/barosha-purple-shortdress</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1383.jpg</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1395.jpg</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>380.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Lilac</g:color>
+    <g:size>Small</g:size>
+  </item>
+  <item>
+    <g:id>barosha-purple-shortdress-medium-lilac</g:id>
+    <g:item_group_id>barosha-purple-shortdress</g:item_group_id>
+    <title>Lilac Barosha Dress</title>
+    <description>Lilac barosha short dress with mirror work.</description>
+    <link>https://www.riasboutique.com/products/barosha-purple-shortdress</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1383.jpg</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1395.jpg</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>380.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Lilac</g:color>
+    <g:size>Medium</g:size>
+  </item>
 </channel>
 </rss>
-
