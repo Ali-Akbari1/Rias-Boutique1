@@ -16,7 +16,14 @@ const CheckoutSuccess = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [statusMessage, setStatusMessage] = useState("Verifying your payment confirmation.");
+  const [gcrPayload, setGcrPayload] = useState<{
+    orderId: string;
+    email: string;
+    deliveryCountry: string;
+    estimatedDeliveryDate: string;
+  } | null>(null);
   const trackedRef = useRef(false);
+  const gcrRenderedRef = useRef(false);
 
   useEffect(() => {
     if (isConfirmed && !clearedRef.current) {
@@ -58,6 +65,15 @@ const CheckoutSuccess = () => {
           return;
         }
 
+        if (payload.orderId && payload.customerEmail && payload.deliveryCountry && payload.estimatedDeliveryDate) {
+          setGcrPayload({
+            orderId: payload.orderId,
+            email: payload.customerEmail,
+            deliveryCountry: payload.deliveryCountry,
+            estimatedDeliveryDate: payload.estimatedDeliveryDate,
+          });
+        }
+
         if (payload.confirmed) {
           setIsConfirmed(true);
           setIsLoading(false);
@@ -93,6 +109,45 @@ const CheckoutSuccess = () => {
       window.clearInterval(interval);
     };
   }, [isConfirmed, orderId, sessionId]);
+
+  useEffect(() => {
+    if (!isConfirmed || !gcrPayload || gcrRenderedRef.current) {
+      return;
+    }
+
+    const merchantId = (import.meta.env.VITE_GCR_MERCHANT_ID || "5741454598").trim();
+    if (!merchantId) {
+      return;
+    }
+
+    gcrRenderedRef.current = true;
+    window.renderOptIn = () => {
+      window.gapi?.load("surveyoptin", () => {
+        window.gapi?.surveyoptin?.render({
+          merchant_id: Number(merchantId),
+          order_id: gcrPayload.orderId,
+          email: gcrPayload.email,
+          delivery_country: gcrPayload.deliveryCountry,
+          estimated_delivery_date: gcrPayload.estimatedDeliveryDate,
+        });
+      });
+    };
+
+    const existingScript = document.querySelector<HTMLScriptElement>('script[data-gcr-optin="true"]');
+    if (existingScript) {
+      if (window.gapi?.surveyoptin) {
+        window.renderOptIn?.();
+      }
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://apis.google.com/js/platform.js?onload=renderOptIn";
+    script.async = true;
+    script.defer = true;
+    script.setAttribute("data-gcr-optin", "true");
+    document.body.appendChild(script);
+  }, [gcrPayload, isConfirmed]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8 sm:px-6">

@@ -65,6 +65,34 @@ const isRetryableCloverLookupError = (error: unknown) => {
   return message.includes("not found") || message.includes("unauthorized") || message.includes("forbidden");
 };
 
+const normalizeCountryCode = (value: string) => {
+  const trimmed = value.trim().toLowerCase();
+  if (!trimmed) {
+    return "";
+  }
+
+  const compact = trimmed.replace(/[^a-z]/g, "");
+  if (["ca", "can", "canada"].includes(compact)) {
+    return "CA";
+  }
+  if (["us", "usa", "unitedstates", "unitedstatesofamerica"].includes(compact)) {
+    return "US";
+  }
+
+  return trimmed.toUpperCase();
+};
+
+const toDateOnly = (value: string) => {
+  if (!value) {
+    return "";
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.valueOf())) {
+    return "";
+  }
+  return parsed.toISOString().slice(0, 10);
+};
+
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "GET") {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
@@ -266,6 +294,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const confirmed = order.paymentStatus === "paid";
   const pending = order.paymentStatus === "pending";
+  const deliveryCountry = normalizeCountryCode(order.customer.country);
+  const deliveryDateFromQuote = toDateOnly(order.shippingQuote?.deliveryDate || "");
+  let estimatedDeliveryDate = deliveryDateFromQuote;
+
+  if (!estimatedDeliveryDate) {
+    const baseDate = new Date(order.paidAt || order.createdAt || Date.now());
+    const offsetDays = order.customer.deliveryMethod === "pickup" ? 1 : 7;
+    baseDate.setDate(baseDate.getDate() + offsetDays);
+    estimatedDeliveryDate = baseDate.toISOString().slice(0, 10);
+  }
 
   res.status(200).json({
     orderId: order.id,
@@ -274,5 +312,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     pending,
     createdAt: order.createdAt,
     paidAt: order.paidAt || null,
+    customerEmail: order.customer.email || null,
+    deliveryCountry: deliveryCountry || null,
+    estimatedDeliveryDate: estimatedDeliveryDate || null,
   });
 }

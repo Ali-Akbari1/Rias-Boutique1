@@ -11,6 +11,9 @@ interface OrderStatusResponse {
   confirmed?: boolean;
   pending?: boolean;
   error?: string | { message?: string };
+  customerEmail?: string | null;
+  deliveryCountry?: string | null;
+  estimatedDeliveryDate?: string | null;
 }
 
 export const requestDiscountSignup = (payload: {

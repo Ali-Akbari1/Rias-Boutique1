@@ -26,6 +26,7 @@ const TrustSection = () => {
   const [totalRatings, setTotalRatings] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(googleReviewsApiEnabled);
   const defaultGoogleUrl = getGoogleReviewsUrl();
+  const gcrMerchantId = (import.meta.env.VITE_GCR_MERCHANT_ID || "5741454598").trim();
 
   useEffect(() => {
     if (!googleReviewsApiEnabled) {
@@ -90,6 +91,24 @@ const TrustSection = () => {
       window.clearInterval(rotationInterval);
     };
   }, [reviews]);
+
+  useEffect(() => {
+    if (!gcrMerchantId) {
+      return;
+    }
+
+    const existingScript = document.querySelector<HTMLScriptElement>('script[data-gcr-badge-inline="true"]');
+    if (existingScript) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://apis.google.com/js/platform.js";
+    script.async = true;
+    script.defer = true;
+    script.setAttribute("data-gcr-badge-inline", "true");
+    document.body.appendChild(script);
+  }, [gcrMerchantId]);
 
   const rotatingReviews = useMemo(() => {
     if (reviews.length === 0) {
@@ -159,6 +178,18 @@ const TrustSection = () => {
             </Reveal>
           ))}
         </div>
+
+        {gcrMerchantId && (
+          <div className="flex flex-col items-center gap-2">
+            <div
+              className="rounded-full border border-border bg-background px-6 py-3 shadow-sm"
+              dangerouslySetInnerHTML={{
+                __html: `<g:ratingbadge merchant_id="${gcrMerchantId}"></g:ratingbadge>`,
+              }}
+            />
+            <p className="text-xs text-muted-foreground">Google Customer Reviews badge (desktop only).</p>
+          </div>
+        )}
 
         <div className="flex flex-col items-center gap-2">
           <Button asChild className="h-11 px-6 text-base font-semibold group">
