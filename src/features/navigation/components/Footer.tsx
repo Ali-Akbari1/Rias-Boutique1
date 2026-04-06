@@ -131,11 +131,7 @@ const Footer = () => {
                 className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/95 px-3 py-2 shadow-[0_6px_16px_rgba(0,0,0,0.12)]"
                 aria-label={item.label}
               >
-                {"src" in item ? (
-                  <img src={item.src} alt={item.label} className="h-5 w-auto sm:h-7" loading="lazy" />
-                ) : (
-                  item.svg
-                )}
+                <img src={item.src} alt={item.label} className="h-5 w-auto sm:h-7" loading="lazy" />
               </span>
             ))}
           </div>
