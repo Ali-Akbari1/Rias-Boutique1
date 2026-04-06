@@ -1,6 +1,9 @@
 /// <reference types="vite/client" />
 
 interface Window {
+  ___gcfg?: {
+    lang?: string;
+  };
   renderOptIn?: () => void;
   gapi?: {
     load: (name: string, callback: () => void) => void;
@@ -12,6 +15,9 @@ interface Window {
         delivery_country: string;
         estimated_delivery_date: string;
       }) => void;
+    };
+    ratingbadge?: {
+      render: (container: HTMLElement, config: { merchant_id: number }) => void;
     };
   };
   merchantwidget?: {
