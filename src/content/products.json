@@ -41,9 +41,6 @@
       ],
       "name": "Green Bridal Dress",
       "slug": "Green-Bridal-Dress",
-      "colors": [
-        "Green"
-      ],
       "sizes": [
         "Large "
       ],
@@ -97,9 +94,6 @@
       ],
       "name": "Royal Blue 3 Piece Suit ",
       "slug": "Royal-Blue",
-      "colors": [
-        "Royal Blue"
-      ],
       "sizes": [
         "Small "
       ],
@@ -364,7 +358,6 @@
       ],
       "department": "women",
       "id": "red-gharara-bridal-dress",
-      "createdAt": "2026-02-19",
       "image": "/uploads/red-bridal-velvet-dress-1.webp",
       "inventory": 1,
       "description": "Bridal red velvet dress with wide-legged pants and beautiful beaded scarf. ",
@@ -661,7 +654,7 @@
       "id": "green-hazaragi-dress",
       "createdAt": "2026-03-07",
       "image": "/uploads/green-hazaragi-dress-1.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Mustard green long dress with white scarf. ",
       "category": "Formal",
       "fitInfo": "Dress comes with a simple white scarf. \n\nSmall (Bust: 40in)\n"
@@ -731,9 +724,6 @@
       ],
       "name": "Teal Barosha Dress",
       "slug": "teal-barosha-dress",
-      "colors": [
-        "Teal"
-      ],
       "sizes": [
         "Small"
       ],
@@ -743,7 +733,6 @@
       ],
       "id": "teal-barosha-dress",
       "image": "/uploads/teal-barosha-dress-1.webp",
-      "createdAt": "2026-03-08",
       "inventory": "sold_out",
       "description": "Teal barosha dress with silver cheerma detailing. ",
       "category": "Party Wear",
@@ -773,7 +762,6 @@
       ],
       "id": "true-white-mens-parantoban",
       "image": "/uploads/men-s-white-parantoban-1.webp",
-      "createdAt": "2026-02-19",
       "inventory": "available",
       "description": "True white men's parantoban with white embroidery. ",
       "category": "Machine Made",
