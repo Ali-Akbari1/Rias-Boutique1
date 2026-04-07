@@ -240,7 +240,10 @@ const Checkout = () => {
   const total = totalMinor / 100;
   const addressFieldsReady = isAddressFieldsComplete(checkoutForm);
   const shippingAddressReady = isShippingAddressComplete(checkoutForm);
-  const isCanadaDestination = normalizeCountryCode(checkoutForm.country) === "CA";
+  const normalizedCountry = normalizeCountryCode(checkoutForm.country);
+  const isCanadaDestination = normalizedCountry === "CA";
+  const isUsDestination = normalizedCountry === "US";
+  const isCanadaOrUsDestination = isCanadaDestination || isUsDestination;
   const fullNameValid = checkoutForm.fullName.trim().length >= 2;
   const emailValid = looksLikeEmail(checkoutForm.email);
   const phoneValid = checkoutForm.phone.trim().length >= 7;
@@ -262,13 +265,19 @@ const Checkout = () => {
     isPickupInStore
       ? "Pick up in store selected. No shipping fee will be charged."
       : freeShippingApplied && selectedShippingOption
-      ? `Free shipping on orders over ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)}. Applied to ${selectedShippingOption.label}.`
-      : selectedShippingOption && !isCanadaDestination
+      ? `Free shipping on orders over ${formatPrice(
+          clientCommerceConfig.freeShippingThresholdMinor / 100,
+        )} (Canada & US only). Applied to ${selectedShippingOption.label}.`
+      : selectedShippingOption && !isCanadaOrUsDestination
       ? `International shipping is a flat ${formatPrice(selectedShippingOption.customerRateMinor / 100)} at checkout.`
       : selectedShippingOption
-      ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."} Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`
-      : isCanadaDestination
-      ? `Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(clientCommerceConfig.flatShippingRateMinor / 100)} shipping.`
+      ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."} Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(selectedShippingOption.customerRateMinor / 100)} shipping.`
+      : isCanadaOrUsDestination
+      ? `Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(
+          (isUsDestination
+            ? clientCommerceConfig.flatShippingRateInternationalMinor
+            : clientCommerceConfig.flatShippingRateMinor) / 100,
+        )} shipping.`
       : `International shipping is a flat ${formatPrice(
           clientCommerceConfig.flatShippingRateInternationalMinor / 100,
         )} at checkout.`;

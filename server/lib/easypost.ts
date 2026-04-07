@@ -534,13 +534,16 @@ const selectDisplayRates = ({
   rates,
   subtotalMinor,
   freeShippingThresholdMinor,
+  freeShippingEligible,
 }: {
   rates: EasyPostRate[];
   subtotalMinor: number;
   freeShippingThresholdMinor: number;
+  freeShippingEligible: boolean;
 }) => {
   const preferredCarriers = getPreferredCarriers();
   const preferredServices = getPreferredServices();
+  const freeShippingAllowed = freeShippingEligible && subtotalMinor >= freeShippingThresholdMinor;
 
   const normalized = rates
     .map((rate) => {
@@ -562,7 +565,7 @@ const selectDisplayRates = ({
         carrierRank: getPreferenceRank(carrier, preferredCarriers),
         serviceRank: getPreferenceRank(service, preferredServices),
         quotedRateMinor,
-        customerRateMinor: subtotalMinor >= freeShippingThresholdMinor ? 0 : quotedRateMinor,
+        customerRateMinor: freeShippingAllowed ? 0 : quotedRateMinor,
         currency: currency || "CAD",
         deliveryDays: normalizeDeliveryDays(rate),
         deliveryDate: normalizeString(rate.delivery_date),
@@ -590,7 +593,7 @@ const selectDisplayRates = ({
       return a.label.localeCompare(b.label);
     });
 
-  if (subtotalMinor >= freeShippingThresholdMinor) {
+  if (freeShippingAllowed) {
     return rankedRates.slice(0, 1);
   }
 
@@ -724,6 +727,9 @@ export const createShippingRatesQuote = async ({
   const quoteExpiresAt = new Date(createdAt.getTime() + quoteTtlMs).toISOString();
   const originCountryCode = normalizeCountryCode(origin.country);
   const destinationCountryCode = verifiedAddress.normalizedAddress.countryCode;
+  const isCanadaDestination = destinationCountryCode === "CA";
+  const isUsDestination = destinationCountryCode === "US";
+  const freeShippingEligible = isCanadaDestination || isUsDestination;
   const carrierAccounts = getCarrierAccountIds();
   const shipment = await easypostRequest<EasyPostShipmentResponse>({
     endpoint: "/shipments",
@@ -760,6 +766,7 @@ export const createShippingRatesQuote = async ({
     rates: Array.isArray(shipment.rates) ? shipment.rates : [],
     subtotalMinor,
     freeShippingThresholdMinor,
+    freeShippingEligible,
   });
   if (displayRates.length === 0) {
     const shipmentMessages = formatShipmentMessages(shipment.messages);
@@ -797,7 +804,7 @@ export const createShippingRatesQuote = async ({
       currency: rate.currency,
       deliveryDays: rate.deliveryDays,
       deliveryDate: rate.deliveryDate,
-      freeShippingApplied: subtotalMinor >= freeShippingThresholdMinor,
+      freeShippingApplied: freeShippingEligible && subtotalMinor >= freeShippingThresholdMinor,
       selectedAt: createdAt.toISOString(),
       expiresAt: quoteExpiresAt,
       contextHash,
@@ -817,7 +824,7 @@ export const createShippingRatesQuote = async ({
     } satisfies ShippingRateOption;
   });
 
-  const freeShippingApplied = subtotalMinor >= freeShippingThresholdMinor;
+  const freeShippingApplied = freeShippingEligible && subtotalMinor >= freeShippingThresholdMinor;
 
   return {
     provider: "easypost",
@@ -844,19 +851,25 @@ export const createFlatRateShippingQuote = ({
   const quoteExpiresAt = new Date(createdAt.getTime() + quoteTtlMs).toISOString();
   const destinationCountryCode = normalizeCountryCode(customer.country);
   const isCanadaDestination = destinationCountryCode === "CA";
+  const isUsDestination = destinationCountryCode === "US";
+  const freeShippingEligible = isCanadaDestination || isUsDestination;
   const flatShippingRateMinor = isCanadaDestination
     ? getFlatShippingRateMinor()
     : getInternationalFlatShippingRateMinor();
-  const freeShippingApplied = isCanadaDestination && subtotalMinor >= freeShippingThresholdMinor;
+  const freeShippingApplied = freeShippingEligible && subtotalMinor >= freeShippingThresholdMinor;
   const contextHash = buildShippingContextHash({ customer, items, subtotalMinor });
   const formatCadMinor = (minor: number) => `CA$${(minor / 100).toFixed(2)}`;
-  const shippingLabel = isCanadaDestination ? "Standard Shipping (Canada)" : "Standard Shipping (International)";
+  const shippingLabel = isCanadaDestination
+    ? "Standard Shipping (Canada)"
+    : isUsDestination
+      ? "Standard Shipping (US)"
+      : "Standard Shipping (International)";
 
   const payload: ShippingQuoteTokenPayload = {
     v: 1,
     provider: "flat_rate",
     shipmentId: "flat_rate",
-    rateId: isCanadaDestination ? "flat_standard_ca" : "flat_standard_intl",
+    rateId: isCanadaDestination ? "flat_standard_ca" : isUsDestination ? "flat_standard_us" : "flat_standard_intl",
     carrier: "Ria's Boutique",
     service: "Standard Shipping",
     quotedRateMinor: flatShippingRateMinor,
@@ -892,10 +905,12 @@ export const createFlatRateShippingQuote = ({
     selectedOptionToken: option.token,
     quoteExpiresAt,
     message: freeShippingApplied
-      ? "Free shipping is applied automatically on orders over CA$400."
+      ? "Free shipping is applied automatically on orders over CA$400 in Canada & US."
       : isCanadaDestination
-        ? `Standard shipping is a flat ${formatCadMinor(flatShippingRateMinor)} at checkout.`
-        : `International shipping is a flat ${formatCadMinor(flatShippingRateMinor)} at checkout.`,
+        ? `Standard shipping in Canada is a flat ${formatCadMinor(flatShippingRateMinor)} at checkout.`
+        : isUsDestination
+          ? `Standard shipping in the US is a flat ${formatCadMinor(flatShippingRateMinor)} at checkout.`
+          : `International shipping is a flat ${formatCadMinor(flatShippingRateMinor)} at checkout.`,
   };
 };
 

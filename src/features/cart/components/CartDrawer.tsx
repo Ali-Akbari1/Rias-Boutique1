@@ -12,11 +12,17 @@ interface CartDrawerProps {
   onClose: () => void;
 }
 
+const FREE_SHIPPING_THRESHOLD_CAD = 400;
+
 const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
-  const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
+  const { items, removeFromCart, updateQuantity, totalItems, totalPrice, clearCart, isAdding } = useCart();
   const navigate = useNavigate();
   const checkoutEnabled = isCheckoutEnabled();
   const { formatPrice, isUsd } = useCurrency();
+  const freeShippingRemainingCad = Math.max(0, FREE_SHIPPING_THRESHOLD_CAD - totalPrice);
+  const qualifiesForFreeShipping = totalPrice >= FREE_SHIPPING_THRESHOLD_CAD;
+  const freeShippingProgress = Math.min(1, totalPrice / FREE_SHIPPING_THRESHOLD_CAD);
+  const lastAddedItem = items[items.length - 1];
 
   const handleCheckout = () => {
     if (!checkoutEnabled) {
@@ -30,7 +36,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-foreground/40 z-50" onClick={onClose} />
+      <div className="fixed inset-0 bg-foreground/20 backdrop-blur-[1px] z-50" onClick={onClose} />
       <div className="fixed right-0 top-0 bottom-0 z-50 flex w-full flex-col bg-background shadow-2xl animate-slide-in sm:max-w-md">
         <div className="flex items-center justify-between border-b border-border p-4 sm:p-6">
           <h2 className="font-display text-xl font-bold text-foreground sm:text-2xl">Your Bag</h2>
@@ -100,29 +106,90 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
               })}
             </div>
 
-            <div className="space-y-4 border-t border-border p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6">
-              <div className="flex justify-between items-center">
-                <span className="font-body text-lg text-muted-foreground">Total</span>
-                <span className="font-display text-2xl font-bold text-foreground">{formatPrice(totalPrice)}</span>
-              </div>
-              {isUsd ? (
-                <p className="text-xs font-body text-muted-foreground">
-                  USD totals are estimates. Final charges are processed in CAD at checkout.
-                </p>
+            <div className="space-y-4 border-t border-border p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+              {isAdding && lastAddedItem ? (
+                <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 sm:p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Product added</p>
+                  <div className="mt-2 flex items-center gap-3">
+                    <img
+                      src={lastAddedItem.product.image}
+                      alt={formatProductAlt(lastAddedItem.product)}
+                      className="h-14 w-11 rounded-sm object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-display text-sm font-semibold text-foreground">
+                        {lastAddedItem.product.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground font-body">
+                        Size: {lastAddedItem.selection.size} | Color: {lastAddedItem.selection.color}
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold text-foreground">
+                      {formatPrice(lastAddedItem.product.price * lastAddedItem.quantity)}
+                    </span>
+                  </div>
+                </div>
               ) : null}
-              <button
-                onClick={handleCheckout}
-                disabled={!checkoutEnabled}
-                className="w-full rounded-sm border border-foreground bg-background px-4 py-3.5 font-body text-base font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground sm:py-4 sm:text-lg"
-              >
-                {checkoutEnabled ? "Checkout" : "Checkout Coming Soon"}
-              </button>
-              <button
-                onClick={clearCart}
-                className="w-full text-center text-sm text-muted-foreground font-body hover:text-foreground transition-colors"
-              >
-                Clear Bag
-              </button>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  <span>Cart summary</span>
+                  <span>
+                    {totalItems} item{totalItems === 1 ? "" : "s"}
+                  </span>
+                </div>
+                <div className="flex items-end justify-between">
+                  <span className="font-body text-sm text-muted-foreground">Total</span>
+                  <span className="font-display text-2xl font-bold text-foreground">{formatPrice(totalPrice)}</span>
+                </div>
+                {isUsd ? (
+                  <p className="text-xs font-body text-muted-foreground">
+                    USD totals are estimates. Final charges are processed in CAD at checkout.
+                  </p>
+                ) : null}
+                <button
+                  onClick={handleCheckout}
+                  disabled={!checkoutEnabled}
+                  className="w-full rounded-sm border border-foreground bg-background px-4 py-3.5 font-body text-base font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground sm:py-4 sm:text-lg"
+                >
+                  {checkoutEnabled ? "Checkout" : "Checkout Coming Soon"}
+                </button>
+                <div className="rounded-md border border-border/70 bg-card/40 p-3">
+                  <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    <span>Free Shipping</span>
+                    <span>
+                      {formatPrice(Math.min(totalPrice, FREE_SHIPPING_THRESHOLD_CAD))} /{" "}
+                      {formatPrice(FREE_SHIPPING_THRESHOLD_CAD)}
+                    </span>
+                  </div>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-foreground transition-all duration-300"
+                      style={{ width: `${freeShippingProgress * 100}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 text-xs font-body text-muted-foreground">
+                    {qualifiesForFreeShipping
+                      ? "You qualify for free shipping"
+                      : `You're ${formatPrice(freeShippingRemainingCad)} away from free shipping`}
+                  </p>
+                  {isUsd ? (
+                    <p className="text-[11px] font-body text-muted-foreground">
+                      Threshold is CA$400 (USD shown is an estimate).
+                    </p>
+                  ) : (
+                    <p className="text-[11px] font-body text-muted-foreground">
+                      Applies to Canada & US orders over CA$400.
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={clearCart}
+                  className="w-full text-center text-sm text-muted-foreground font-body hover:text-foreground transition-colors"
+                >
+                  Clear Bag
+                </button>
+              </div>
             </div>
           </>
         )}

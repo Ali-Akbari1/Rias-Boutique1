@@ -1,16 +1,16 @@
-import { useState } from "react";
 import CartDrawer from "@/features/cart/components/CartDrawer";
+import { useCartDrawer } from "@/features/cart/context/CartDrawerContext";
 import Footer from "@/features/navigation/components/Footer";
 import Navbar from "@/features/navigation/components/Navbar";
 import { getStorePickupDetails } from "@/features/store/data/store-content";
 
 const LocationPage = () => {
-  const [cartOpen, setCartOpen] = useState(false);
+  const { isOpen, openDrawer, closeDrawer } = useCartDrawer();
   const pickupDetails = getStorePickupDetails();
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar onCartClick={() => setCartOpen(true)} />
+      <Navbar onCartClick={openDrawer} />
 
       <main className="pt-28 sm:pt-32">
         <section className="container mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
@@ -58,7 +58,7 @@ const LocationPage = () => {
       </main>
 
       <Footer />
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <CartDrawer open={isOpen} onClose={closeDrawer} />
     </div>
   );
 };

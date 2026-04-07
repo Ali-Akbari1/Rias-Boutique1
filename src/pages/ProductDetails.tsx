@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, Truck } from "lucide-react";
 import { getProductById } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
+import { useCartDrawer } from "@/features/cart/context/CartDrawerContext";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import CartDrawer from "@/features/cart/components/CartDrawer";
 import Navbar from "@/features/navigation/components/Navbar";
@@ -33,7 +34,7 @@ const ProductDetails = () => {
   const addTimerRef = useRef<number | null>(null);
   const addedTimerRef = useRef<number | null>(null);
   const imageTransitionTimeoutRef = useRef<number | null>(null);
-  const [cartOpen, setCartOpen] = useState(false);
+  const { isOpen, openDrawer, closeDrawer } = useCartDrawer();
   const checkoutEnabled = isCheckoutEnabled();
   const backToCollectionHref = useMemo(() => {
     const candidate = new URLSearchParams(location.search).get("returnTo")?.trim() || "";
@@ -111,10 +112,7 @@ const ProductDetails = () => {
 
     addToCart(product, { size: chosenSize, color: chosenColor });
     triggerAddFeedback();
-    toast({
-      title: "Added to cart",
-      description: `${product.name} (${chosenSize}, ${chosenColor}) was added to your bag.`,
-    });
+    openDrawer();
   };
 
   const galleryImages = useMemo(
@@ -224,7 +222,7 @@ const ProductDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar onCartClick={() => setCartOpen(true)} />
+      <Navbar onCartClick={openDrawer} />
       <main className="container mx-auto space-y-8 px-4 pb-6 pt-28 sm:px-6 sm:pb-8 sm:pt-32">
         <Link
           to={backToCollectionHref}
@@ -452,7 +450,7 @@ const ProductDetails = () => {
           })}
         </section>
       </main>
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <CartDrawer open={isOpen} onClose={closeDrawer} />
     </div>
   );
 };

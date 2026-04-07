@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import ProductGrid from "@/features/catalog/components/ProductGrid";
 import CartDrawer from "@/features/cart/components/CartDrawer";
+import { useCartDrawer } from "@/features/cart/context/CartDrawerContext";
 import Footer from "@/features/navigation/components/Footer";
 import Navbar from "@/features/navigation/components/Navbar";
 import { type ProductDepartment, PRODUCT_DEPARTMENTS } from "@/features/catalog/data/products";
@@ -18,7 +19,7 @@ const normalizeDepartment = (value?: string | null): ProductDepartment | null =>
 };
 
 const CollectionPage = () => {
-  const [cartOpen, setCartOpen] = useState(false);
+  const { isOpen, openDrawer, closeDrawer } = useCartDrawer();
   const { department } = useParams<{ department?: string }>();
   const [searchParams] = useSearchParams();
 
@@ -39,13 +40,13 @@ const CollectionPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar onCartClick={() => setCartOpen(true)} />
+      <Navbar onCartClick={openDrawer} />
       <main className="pt-24 sm:pt-28">
         <ProductGrid initialDepartment={initialDepartment} initialQuery={initialSearch} />
       </main>
 
       <Footer />
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <CartDrawer open={isOpen} onClose={closeDrawer} />
     </div>
   );
 };

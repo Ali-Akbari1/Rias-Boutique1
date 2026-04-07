@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { type Product } from "@/features/catalog/data/products";
 import { useCart } from "@/features/cart/context/CartContext";
+import { useCartDrawer } from "@/features/cart/context/CartDrawerContext";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import { useToast } from "@/hooks/use-toast";
 import { isCheckoutEnabled } from "@/lib/checkout";
@@ -21,6 +22,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const isOnSale = !isSoldOut && Boolean(product.salePercent && product.compareAtPrice);
   const checkoutEnabled = isCheckoutEnabled();
   const { addToCart } = useCart();
+  const { openDrawer } = useCartDrawer();
   const { formatPrice } = useCurrency();
   const { toast } = useToast();
   const [addState, setAddState] = useState<"idle" | "adding" | "added">("idle");
@@ -108,10 +110,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
     addToCart(product, { size, color });
     triggerAddFeedback();
-    toast({
-      title: "Added to bag",
-      description: `${product.name} (${size}, ${color}) was added to your bag.`,
-    });
+    openDrawer();
   };
 
   const isAdding = addState === "adding";
