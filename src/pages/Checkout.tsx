@@ -7,7 +7,6 @@ import { track } from "@vercel/analytics/react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/shared/ui/accordion";
 import { getClientCommerceConfig } from "@/lib/commerce-config";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import { buildCheckoutPricing, calculateLaunchDiscountMinor } from "@/shared/config/commerce";
@@ -30,13 +29,7 @@ import {
   type AddressAutocompleteSuggestion,
   type ShippingRateOption,
 } from "@/lib/checkout-request";
-import {
-  faqItems,
-  getGoogleReviewsUrl,
-  getStorePickupDetails,
-  returnPolicy,
-  shippingPolicy,
-} from "@/features/store/data/store-content";
+import { getStorePickupDetails, returnPolicy, shippingPolicy } from "@/features/store/data/store-content";
 import { formatProductAlt } from "@/lib/seo";
 import { getProductById, getProductBySlug, products, type Product } from "@/features/catalog/data/products";
 
@@ -191,7 +184,6 @@ const Checkout = () => {
     setTouchedFields((current) => (current[field] ? current : { ...current, [field]: true }));
   };
   const [lastVerifiedAddressFingerprint, setLastVerifiedAddressFingerprint] = useState("");
-  const googleReviewsUrl = getGoogleReviewsUrl();
   const pickupDetails = getStorePickupDetails();
   const shippingChargesEnabled = clientCommerceConfig.shippingChargesEnabled;
   const launchDiscountActive = isLaunchDiscountActive();
@@ -238,6 +230,11 @@ const Checkout = () => {
   const shipping = shippingMinor / 100;
   const tax = taxMinor / 100;
   const total = totalMinor / 100;
+  const freeShippingThresholdCad = clientCommerceConfig.freeShippingThresholdMinor / 100;
+  const freeShippingRemainingCad = Math.max(0, freeShippingThresholdCad - subtotal);
+  const qualifiesForFreeShipping = freeShippingThresholdCad > 0 && subtotal >= freeShippingThresholdCad;
+  const freeShippingProgress =
+    freeShippingThresholdCad > 0 ? Math.min(1, subtotal / freeShippingThresholdCad) : 1;
   const addressFieldsReady = isAddressFieldsComplete(checkoutForm);
   const shippingAddressReady = isShippingAddressComplete(checkoutForm);
   const normalizedCountry = normalizeCountryCode(checkoutForm.country);
@@ -1438,13 +1435,13 @@ const Checkout = () => {
 
             <Card>
               <CardHeader className="pb-4">
-                <CardTitle className="font-display text-2xl">Shipping, Returns & FAQs</CardTitle>
+                <CardTitle className="font-display text-2xl">Shipping & Returns</CardTitle>
                 <CardDescription className="font-body text-base">
                   Transparent policies before payment.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-5 pt-0 font-body text-sm text-muted-foreground">
-                  <div className="grid gap-3 rounded-md border border-border bg-muted/20 p-4 sm:grid-cols-2">
+                <div className="grid gap-3 rounded-md border border-border bg-muted/20 p-4 sm:grid-cols-2">
                   <div>
                     <p className="font-semibold text-foreground">Standard shipping</p>
                     <p>
@@ -1464,25 +1461,6 @@ const Checkout = () => {
                 <div>
                   <p className="mt-1">{returnPolicy}</p>
                 </div>
-
-                <Accordion type="single" collapsible className="w-full">
-                  {faqItems.map((faq) => (
-                    <AccordionItem key={faq.id} value={faq.id}>
-                      <AccordionTrigger className="text-left font-semibold text-foreground">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent>{faq.answer}</AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-
-                <p className="text-xs">
-                  Want to see customer feedback?{" "}
-                  <a href={googleReviewsUrl} target="_blank" rel="noreferrer" className="underline hover:text-foreground">
-                    Read our Google Reviews
-                  </a>
-                  .
-                </p>
               </CardContent>
             </Card>
           </div>
@@ -1520,7 +1498,7 @@ const Checkout = () => {
                 ))}
               </div>
 
-                <div className="space-y-2 border-t border-border pt-4 text-sm">
+              <div className="space-y-2 border-t border-border pt-4 text-sm">
                   <div className="flex items-center justify-between text-muted-foreground">
                     <span>Subtotal</span>
                     <span>{formatPrice(subtotal)}</span>
@@ -1546,6 +1524,37 @@ const Checkout = () => {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground">{freeShippingThresholdNote}</p>
+                  {!isPickupInStore && freeShippingThresholdCad > 0 ? (
+                    <div className="rounded-md border border-border/70 bg-card/40 p-3">
+                      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        <span>Free Shipping</span>
+                        <span>
+                          {formatPrice(Math.min(subtotal, freeShippingThresholdCad))} /{" "}
+                          {formatPrice(freeShippingThresholdCad)}
+                        </span>
+                      </div>
+                      <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-foreground transition-all duration-300"
+                          style={{ width: `${freeShippingProgress * 100}%` }}
+                        />
+                      </div>
+                      <p className="mt-2 text-xs font-body text-muted-foreground">
+                        {qualifiesForFreeShipping
+                          ? "You qualify for free shipping in Canada & US."
+                          : `You're ${formatPrice(freeShippingRemainingCad)} away from free shipping in Canada & US.`}
+                      </p>
+                      {isUsd ? (
+                        <p className="text-[11px] font-body text-muted-foreground">
+                          Threshold is CA$400 (USD shown is an estimate).
+                        </p>
+                      ) : (
+                        <p className="text-[11px] font-body text-muted-foreground">
+                          Applies to Canada & US orders over CA$400.
+                        </p>
+                      )}
+                    </div>
+                  ) : null}
                   {!isPickupInStore && selectedShippingOption ? (
                     <p className="text-xs text-muted-foreground">
                       Selected rate: {selectedShippingOption.label}
