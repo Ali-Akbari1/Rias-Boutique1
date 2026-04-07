@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { X, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getMaxQuantityForProduct } from "@/features/cart/context/cart-quantity";
@@ -13,6 +14,8 @@ interface CartDrawerProps {
 }
 
 const FREE_SHIPPING_THRESHOLD_CAD = 400;
+const CLOSE_ANIMATION_DELAY_MS = 120;
+const CLOSE_ANIMATION_DURATION_MS = 350;
 
 const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
   const { items, removeFromCart, updateQuantity, totalItems, totalPrice, clearCart, isAdding } = useCart();
@@ -23,6 +26,26 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
   const qualifiesForFreeShipping = totalPrice >= FREE_SHIPPING_THRESHOLD_CAD;
   const freeShippingProgress = Math.min(1, totalPrice / FREE_SHIPPING_THRESHOLD_CAD);
   const lastAddedItem = items[items.length - 1];
+  const [isMounted, setIsMounted] = useState(open);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setIsMounted(true);
+      setIsClosing(false);
+      return;
+    }
+
+    if (isMounted) {
+      setIsClosing(true);
+      const timeout = window.setTimeout(() => {
+        setIsMounted(false);
+        setIsClosing(false);
+      }, CLOSE_ANIMATION_DELAY_MS + CLOSE_ANIMATION_DURATION_MS);
+
+      return () => window.clearTimeout(timeout);
+    }
+  }, [open, isMounted]);
 
   const handleCheckout = () => {
     if (!checkoutEnabled) {
@@ -32,12 +55,16 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
     navigate("/checkout");
   };
 
-  if (!open) return null;
+  if (!isMounted) return null;
 
   return (
     <>
       <div className="fixed inset-0 bg-foreground/20 backdrop-blur-[1px] z-50" onClick={onClose} />
-      <div className="fixed right-0 top-0 bottom-0 z-50 flex w-full flex-col bg-background shadow-2xl animate-slide-in sm:max-w-md">
+      <div
+        className={`fixed right-0 top-0 bottom-0 z-50 flex w-full flex-col bg-background shadow-2xl sm:max-w-md ${
+          isClosing ? "animate-slide-out [animation-delay:120ms]" : "animate-slide-in"
+        }`}
+      >
         <div className="flex items-center justify-between border-b border-border p-4 sm:p-6">
           <h2 className="font-display text-xl font-bold text-foreground sm:text-2xl">Your Bag</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -199,4 +226,3 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
 };
 
 export default CartDrawer;
-
