@@ -1,7 +1,8 @@
 import { type ChangeEvent, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
-import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, Lock, RotateCcw, Search, ShieldCheck, Truck } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, Lock, Minus, Plus, RotateCcw, Search, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/features/cart/context/CartContext";
+import { getMaxQuantityForProduct } from "@/features/cart/context/cart-quantity";
 import { useToast } from "@/hooks/use-toast";
 import { track } from "@vercel/analytics/react";
 import { Button } from "@/shared/ui/button";
@@ -155,7 +156,7 @@ const createAutocompleteSessionToken = () => {
 };
 
 const Checkout = () => {
-  const { items, totalPrice, addToCart } = useCart();
+  const { items, totalPrice, addToCart, updateQuantity, removeFromCart } = useCart();
   const { toast } = useToast();
   const { formatPrice, isUsd } = useCurrency();
   const [searchParams] = useSearchParams();
@@ -1474,42 +1475,92 @@ const Checkout = () => {
             </CardHeader>
             <CardContent className="space-y-4 pt-0">
               <div className="max-h-[300px] space-y-2.5 overflow-auto pr-1 sm:space-y-3">
-                {items.map(({ id, product, selection, quantity }) => (
-                  <div key={id} className="flex min-w-0 gap-2.5 rounded-md border border-border bg-background p-2.5 sm:gap-3 sm:p-3">
-                    <img
-                      src={product.image}
-                      alt={formatProductAlt(product)}
-                      className="h-16 w-14 rounded-sm object-cover sm:h-20 sm:w-16"
-                      loading="lazy"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="break-words font-display text-sm font-semibold text-foreground sm:text-base">{product.name}</p>
-                      <p className="font-body text-xs text-muted-foreground sm:text-sm">
-                        {formatPrice(product.price)} x {quantity}
-                      </p>
-                      <p className="font-body text-xs text-muted-foreground">
-                        Size: {selection.size} | Color: {selection.color}
-                      </p>
+                {items.map(({ id, product, selection, quantity }) => {
+                  const maxQuantity = getMaxQuantityForProduct(product);
+                  const isMaxQuantity = maxQuantity <= 0 || quantity >= maxQuantity;
+
+                  return (
+                    <div
+                      key={id}
+                      className="grid min-w-0 grid-cols-[auto_1fr_auto] gap-2.5 rounded-md border border-border bg-background p-2.5 sm:gap-3 sm:p-3"
+                    >
+                      <img
+                        src={product.image}
+                        alt={formatProductAlt(product)}
+                        className="h-16 w-14 rounded-sm object-cover sm:h-20 sm:w-16"
+                        loading="lazy"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="break-words font-display text-sm font-semibold text-foreground sm:text-base">
+                          {product.name}
+                        </p>
+                        <p className="font-body text-xs text-muted-foreground sm:text-sm">
+                          {formatPrice(product.price)} x {quantity}
+                        </p>
+                        <p className="font-body text-xs text-muted-foreground">
+                          Size: {selection.size} | Color: {selection.color}
+                        </p>
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(id, quantity - 1)}
+                              className="h-7 w-7 rounded-sm border border-border flex items-center justify-center text-foreground hover:bg-secondary transition-colors"
+                              aria-label="Decrease quantity"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="font-body text-xs text-foreground">{quantity}</span>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(id, quantity + 1)}
+                              disabled={isMaxQuantity}
+                              title={
+                                isMaxQuantity
+                                  ? maxQuantity <= 0
+                                    ? "Sold out"
+                                    : `Limit ${maxQuantity} per item`
+                                  : "Increase quantity"
+                              }
+                              className={`h-7 w-7 rounded-sm border border-border flex items-center justify-center text-foreground transition-colors ${
+                                isMaxQuantity ? "cursor-not-allowed opacity-40" : "hover:bg-secondary"
+                              }`}
+                              aria-label="Increase quantity"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex h-full flex-col items-end justify-between">
+                        <p className="font-display text-sm font-semibold text-foreground sm:text-base">
+                          {formatPrice(product.price * quantity)}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => removeFromCart(id)}
+                          className="text-xs text-muted-foreground hover:text-destructive font-body transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
-                    <p className="font-display text-sm font-semibold text-foreground sm:text-base">
-                      {formatPrice(product.price * quantity)}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="space-y-2 border-t border-border pt-4 text-sm">
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(subtotal)}</span>
+                </div>
+                {discountMinor > 0 ? (
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span>Subtotal</span>
-                    <span>{formatPrice(subtotal)}</span>
+                    <span>Discount ({LAUNCH_DISCOUNT_CODE})</span>
+                    <span>-{formatPrice(discount)}</span>
                   </div>
-                  {discountMinor > 0 ? (
-                    <div className="flex items-center justify-between text-muted-foreground">
-                      <span>Discount ({LAUNCH_DISCOUNT_CODE})</span>
-                      <span>-{formatPrice(discount)}</span>
-                    </div>
-                  ) : null}
-                  <div className="flex items-center justify-between text-muted-foreground">
+                ) : null}
+                <div className="flex items-center justify-between text-muted-foreground">
                     <span>{isPickupInStore ? "Pickup" : "Shipping"}</span>
                     <span>
                       {isPickupInStore
