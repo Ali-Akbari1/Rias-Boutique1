@@ -1,11 +1,27 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useLocation, useParams } from "react-router-dom";
-import { ArrowLeft, ChevronLeft, ChevronRight, BadgeCheck, CheckCircle2, Search, ShieldCheck, Truck } from "lucide-react";
-import { getProductById } from "@/features/catalog/data/products";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Mail,
+  Search,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
+import {
+  getProductById,
+  hasDisplayPrice,
+  isInquiryOnlyProduct,
+} from "@/features/catalog/data/products";
 import { useCartActions } from "@/features/cart/context/CartContext";
 import { useCartDrawer } from "@/features/cart/context/CartDrawerContext";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import CartDrawer from "@/features/cart/components/CartDrawer";
+import ProductRecommendationRail from "@/features/catalog/components/ProductRecommendationRail";
+import { getSimilarProducts } from "@/features/catalog/lib/recommendations";
 import Navbar from "@/features/navigation/components/Navbar";
 import { trustBadges } from "@/features/store/data/store-content";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +33,7 @@ import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import ZoomableImageDialog from "@/features/product/components/ZoomableImageDialog";
+import ProductInquirySheet from "@/features/product/components/ProductInquirySheet";
 
 const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -31,6 +48,7 @@ const ProductDetails = () => {
   const [activeImage, setActiveImage] = useState(selectedImage);
   const [transitionImage, setTransitionImage] = useState<string | null>(null);
   const [addState, setAddState] = useState<"idle" | "adding" | "added">("idle");
+  const [isInquiryOpen, setIsInquiryOpen] = useState(false);
   const addTimerRef = useRef<number | null>(null);
   const addedTimerRef = useRef<number | null>(null);
   const imageTransitionTimeoutRef = useRef<number | null>(null);
@@ -81,6 +99,11 @@ const ProductDetails = () => {
       return;
     }
 
+    if (isInquiryOnlyProduct(product)) {
+      setIsInquiryOpen(true);
+      return;
+    }
+
     if (product.availability === "sold_out") {
       toast({
         title: "Sold out",
@@ -117,6 +140,11 @@ const ProductDetails = () => {
         description: "This item is currently sold out and cannot be added to your bag.",
         variant: "destructive",
       });
+      return;
+    }
+
+    if (result === "inquiry_only") {
+      setIsInquiryOpen(true);
       return;
     }
 
@@ -222,6 +250,10 @@ const ProductDetails = () => {
   const isAdding = addState === "adding";
   const isAdded = addState === "added";
   const productAlt = product ? formatProductAlt(product) : "Product image";
+  const recommendedProducts = useMemo(
+    () => (product ? getSimilarProducts(product, { limit: 6 }) : []),
+    [product],
+  );
 
   useEffect(() => {
     if (!product || !primaryImage || primaryImage === activeImage) {
@@ -253,11 +285,12 @@ const ProductDetails = () => {
     return <Navigate to="/" replace />;
   }
 
-  const isSoldOut = product.availability === "sold_out";
-  const isOnSale = !isSoldOut && Boolean(product.salePercent && product.compareAtPrice);
+  const isInquiryOnly = isInquiryOnlyProduct(product);
+  const isSoldOut = !isInquiryOnly && product.availability === "sold_out";
+  const isOnSale = !isSoldOut && !isInquiryOnly && Boolean(product.salePercent && product.compareAtPrice);
   const resolvedSize = selectedSize || singleAvailableSizeLabel;
   const resolvedColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
-  const canAddToCart = !isSoldOut && Boolean(resolvedSize && resolvedColor);
+  const canAddToCart = !isInquiryOnly && !isSoldOut && Boolean(resolvedSize && resolvedColor);
 
   return (
     <div className="min-h-screen bg-background">
@@ -367,9 +400,15 @@ const ProductDetails = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 text-sm">
-              <Badge variant="secondary" className="font-body">
-                {formatPrice(product.price)}
-              </Badge>
+              {isInquiryOnly ? (
+                <Badge className="bg-amber-100 font-body uppercase tracking-[0.08em] text-amber-950 hover:bg-amber-100">
+                  Inquiry Only
+                </Badge>
+              ) : hasDisplayPrice(product) ? (
+                <Badge variant="secondary" className="font-body">
+                  {formatPrice(product.price)}
+                </Badge>
+              ) : null}
               {isOnSale ? (
                 <span className="text-sm text-muted-foreground line-through">
                   {formatPrice(product.compareAtPrice ?? 0)}
@@ -385,8 +424,17 @@ const ProductDetails = () => {
                 </Badge>
               ) : null}
               <span className="inline-flex items-center gap-1 text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 text-primary" />
-                {checkoutEnabled ? "Secure Clover checkout" : "Checkout coming soon"}
+                {isInquiryOnly ? (
+                  <>
+                    <Mail className="h-4 w-4 text-primary" />
+                    Personal quote and boutique support
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="h-4 w-4 text-primary" />
+                    {checkoutEnabled ? "Secure Clover checkout" : "Checkout coming soon"}
+                  </>
+                )}
               </span>
             </div>
 
@@ -444,37 +492,60 @@ const ProductDetails = () => {
                 </div>
               </div>
 
-              <Button
-                type="button"
-                className="h-12 w-full text-base font-semibold"
-                onClick={handleAddToCart}
-                disabled={!canAddToCart || !checkoutEnabled || isAdding || isAdded}
-              >
-                {isSoldOut ? (
-                  "Sold Out"
-                ) : isAdded ? (
-                  <span className="inline-flex items-center justify-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                    Added to Bag
-                  </span>
-                ) : isAdding ? (
-                  "Adding..."
-                ) : checkoutEnabled ? (
-                  "Add to Bag"
-                ) : (
-                  "Add to Bag (Coming Soon)"
-                )}
-              </Button>
+              {isInquiryOnly ? (
+                <>
+                  <div className="rounded-md border border-amber-200 bg-amber-50/70 p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className="bg-amber-100 uppercase tracking-[0.08em] text-amber-950 hover:bg-amber-100">
+                        Inquiry Only
+                      </Badge>
+                      <span className="text-sm text-amber-950/80">
+                        This piece is quoted individually based on timing, location, and your selected details.
+                      </span>
+                    </div>
+                  </div>
+                  <Button type="button" className="h-12 w-full text-base font-semibold" onClick={() => setIsInquiryOpen(true)}>
+                    Make an Inquiry
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    We&apos;ll capture your location, required-by date, and notes, then follow up with a personalized quote.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    className="h-12 w-full text-base font-semibold"
+                    onClick={handleAddToCart}
+                    disabled={!canAddToCart || !checkoutEnabled || isAdding || isAdded}
+                  >
+                    {isSoldOut ? (
+                      "Sold Out"
+                    ) : isAdded ? (
+                      <span className="inline-flex items-center justify-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                        Added to Bag
+                      </span>
+                    ) : isAdding ? (
+                      "Adding..."
+                    ) : checkoutEnabled ? (
+                      "Add to Bag"
+                    ) : (
+                      "Add to Bag (Coming Soon)"
+                    )}
+                  </Button>
 
-              {!checkoutEnabled ? (
-                <p className="text-sm text-muted-foreground">Checkout is temporarily disabled. Coming soon.</p>
-              ) : isSoldOut ? (
-                <p className="text-sm text-muted-foreground">This item is currently sold out.</p>
-              ) : !canAddToCart ? (
-                <p className="text-sm text-muted-foreground">
-                  Please select both size and color before adding this product to your bag.
-                </p>
-              ) : null}
+                  {!checkoutEnabled ? (
+                    <p className="text-sm text-muted-foreground">Checkout is temporarily disabled. Coming soon.</p>
+                  ) : isSoldOut ? (
+                    <p className="text-sm text-muted-foreground">This item is currently sold out.</p>
+                  ) : !canAddToCart ? (
+                    <p className="text-sm text-muted-foreground">
+                      Please select both size and color before adding this product to your bag.
+                    </p>
+                  ) : null}
+                </>
+              )}
             </div>
 
             <Card>
@@ -507,6 +578,12 @@ const ProductDetails = () => {
           </div>
         </section>
 
+        <ProductRecommendationRail
+          title="You May Also Like"
+          description="More styles with a similar look and feel you might love."
+          products={recommendedProducts}
+        />
+
         <section className="grid gap-4 rounded-md border border-border bg-card/40 p-4 text-center sm:grid-cols-3 sm:p-5">
           {trustBadges.map((badge) => {
             const Icon =
@@ -520,6 +597,13 @@ const ProductDetails = () => {
           })}
         </section>
       </main>
+      <ProductInquirySheet
+        open={isInquiryOpen}
+        onOpenChange={setIsInquiryOpen}
+        product={product}
+        selectedSize={resolvedSize}
+        selectedColor={resolvedColor}
+      />
       <CartDrawer open={isOpen} onClose={closeDrawer} />
     </div>
   );

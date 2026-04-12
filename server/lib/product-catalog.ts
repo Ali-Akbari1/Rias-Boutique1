@@ -16,13 +16,22 @@ const productSchema = z.object({
   name: z.string().trim().min(1).max(180),
   image: z.string().trim().optional(),
   price: z
-    .union([z.number(), z.string()])
-    .transform((value) => Number(value))
-    .refine((value) => Number.isFinite(value) && value >= 0, "price must be a non-negative number"),
+    .union([z.number(), z.string(), z.null(), z.undefined()])
+    .transform((value) => {
+      if (value === null || value === undefined || value === "") {
+        return null;
+      }
+
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    })
+    .refine((value) => value === null || value >= 0, "price must be a non-negative number"),
   // Kept as "inventory" to support Decap CMS schema and legacy numeric values.
   inventory: z.union([z.number(), z.string(), z.null(), z.undefined()]).optional(),
   availability: z.string().optional(),
   maxQuantity: z.union([z.number(), z.string(), z.null(), z.undefined()]).optional(),
+  price_on_inquiry: z.union([z.boolean(), z.string(), z.number(), z.null(), z.undefined()]).optional(),
+  priceOnInquiry: z.union([z.boolean(), z.string(), z.number(), z.null(), z.undefined()]).optional(),
 });
 
 const contentSchema = z.object({
@@ -72,6 +81,22 @@ const normalizeMaxQuantity = (value: unknown) => {
   return Math.max(0, Math.floor(parsed));
 };
 
+const normalizeBoolean = (value: unknown) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value > 0;
+  }
+
+  const normalized = String(value ?? "")
+    .trim()
+    .toLowerCase();
+
+  return ["true", "1", "yes", "on"].includes(normalized);
+};
+
 export const loadCatalog = async () => {
   if (cache && Date.now() - cache.loadedAt < CACHE_TTL_MS) {
     return cache.products;
@@ -81,26 +106,34 @@ export const loadCatalog = async () => {
   const parsed = contentSchema.parse(JSON.parse(raw));
   const uniqueIds = new Set<string>();
 
-  const products: CatalogProduct[] = parsed.products.map((product) => {
-    const id = product.id.trim();
-    if (!id) {
-      throw new Error("Product catalog contains an empty product id.");
-    }
+  const mappedProducts: Array<CatalogProduct | null> = parsed.products
+    .map((product) => {
+      const id = product.id.trim();
+      if (!id) {
+        throw new Error("Product catalog contains an empty product id.");
+      }
 
-    if (uniqueIds.has(id)) {
-      throw new Error(`Product catalog contains duplicate product id: ${id}`);
-    }
-    uniqueIds.add(id);
+      if (uniqueIds.has(id)) {
+        throw new Error(`Product catalog contains duplicate product id: ${id}`);
+      }
+      uniqueIds.add(id);
 
-    return {
-      id,
-      name: product.name,
-      image: product.image,
-      priceMinor: Math.round(product.price * 100),
-      availability: normalizeAvailability(product.availability ?? product.inventory),
-      maxQuantity: normalizeMaxQuantity(product.maxQuantity),
-    };
-  });
+      const priceOnInquiry = normalizeBoolean(product.priceOnInquiry ?? product.price_on_inquiry);
+      if (priceOnInquiry || product.price === null || product.price <= 0) {
+        return null;
+      }
+
+      return {
+        id,
+        name: product.name,
+        image: product.image,
+        priceMinor: Math.round(product.price * 100),
+        availability: normalizeAvailability(product.availability ?? product.inventory),
+        maxQuantity: normalizeMaxQuantity(product.maxQuantity),
+      };
+    });
+
+  const products: CatalogProduct[] = mappedProducts.filter((product): product is CatalogProduct => product !== null);
 
   cache = { loadedAt: Date.now(), products };
   return products;

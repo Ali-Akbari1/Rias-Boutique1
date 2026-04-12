@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { useLocation, useNavigate, useNavigationType, useSearchParams } from "react-router-dom";
-import { type ProductDepartment, PRODUCT_DEPARTMENTS, products } from "@/features/catalog/data/products";
+import {
+  hasDisplayPrice,
+  isInquiryOnlyProduct,
+  type ProductDepartment,
+  PRODUCT_DEPARTMENTS,
+  products,
+} from "@/features/catalog/data/products";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import { consumePendingCollectionScrollPosition } from "@/lib/collection-scroll";
 import ProductCard from "./ProductCard";
@@ -82,7 +88,7 @@ const scoreProductSearchMatch = (normalizedQuery: string, product: (typeof produ
       category: product.category,
       department: product.department,
       description: product.description,
-      keywords: [product.fabric, product.fitInfo, product.colors.join(" ")].join(" "),
+      keywords: [product.fabric, product.fitInfo, product.colors.join(" "), product.tags.join(" ")].join(" "),
     },
     normalizedQuery,
   );
@@ -205,6 +211,47 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   }, [initialDepartment]);
 
   useEffect(() => {
+    setCategory(initialCategory);
+  }, [initialCategory]);
+
+  useEffect(() => {
+    setAvailability(initialAvailability === "available" || initialAvailability === "sold_out" ? initialAvailability : "all");
+  }, [initialAvailability]);
+
+  useEffect(() => {
+    setSaleFilter(
+      initialSaleFilter === "on-sale" || initialSaleFilter === "regular-price" ? initialSaleFilter : "all",
+    );
+  }, [initialSaleFilter]);
+
+  useEffect(() => {
+    setSize(initialSize);
+  }, [initialSize]);
+
+  useEffect(() => {
+    setMinPriceInput(initialMinPrice);
+  }, [initialMinPrice]);
+
+  useEffect(() => {
+    setMaxPriceInput(initialMaxPrice);
+  }, [initialMaxPrice]);
+
+  useEffect(() => {
+    setSortBy(
+      initialSortBy === "alphabetical" ||
+        initialSortBy === "price-low" ||
+        initialSortBy === "price-high" ||
+        initialSortBy === "popular"
+        ? initialSortBy
+        : "newest",
+    );
+  }, [initialSortBy]);
+
+  useEffect(() => {
+    setCurrentPage(initialPage);
+  }, [initialPage]);
+
+  useEffect(() => {
     setQueryInput(normalizedInitialQuery);
     setDebouncedQuery(normalizeSearchText(normalizedInitialQuery));
   }, [normalizedInitialQuery]);
@@ -227,7 +274,10 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   }, [department]);
 
   const purchasableDepartmentProducts = useMemo(
-    () => departmentScopedProducts.filter((product) => product.availability === "available"),
+    () =>
+      departmentScopedProducts.filter(
+        (product) => product.availability === "available" || isInquiryOnlyProduct(product),
+      ),
     [departmentScopedProducts],
   );
 
@@ -336,9 +386,10 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
           (saleFilter === "on-sale" && isOnSale) ||
           (saleFilter === "regular-price" && !isOnSale);
         const inSize = size === "all" || product.sizes.some((productSize) => sizeKey(productSize) === size);
-        const inPriceRange =
-          (resolvedMinPriceCad === null || product.price >= resolvedMinPriceCad) &&
-          (resolvedMaxPriceCad === null || product.price <= resolvedMaxPriceCad);
+        const inPriceRange = hasDisplayPrice(product)
+          ? (resolvedMinPriceCad === null || product.price >= resolvedMinPriceCad) &&
+            (resolvedMaxPriceCad === null || product.price <= resolvedMaxPriceCad)
+          : resolvedMinPriceCad === null && resolvedMaxPriceCad === null;
         const matchesQuery = !debouncedQuery || searchScore > 0;
 
         return (
@@ -356,10 +407,14 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
           return a.product.name.localeCompare(b.product.name, undefined, { sensitivity: "base" });
         }
         if (sortBy === "price-low") {
-          return a.product.price - b.product.price;
+          const aPrice = hasDisplayPrice(a.product) ? a.product.price : Number.POSITIVE_INFINITY;
+          const bPrice = hasDisplayPrice(b.product) ? b.product.price : Number.POSITIVE_INFINITY;
+          return aPrice - bPrice;
         }
         if (sortBy === "price-high") {
-          return b.product.price - a.product.price;
+          const aPrice = hasDisplayPrice(a.product) ? a.product.price : Number.NEGATIVE_INFINITY;
+          const bPrice = hasDisplayPrice(b.product) ? b.product.price : Number.NEGATIVE_INFINITY;
+          return bPrice - aPrice;
         }
         if (sortBy === "popular") {
           return b.product.popularity - a.product.popularity;

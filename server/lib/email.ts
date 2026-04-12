@@ -234,11 +234,11 @@ export interface PromotionalEmailResult extends DispatchResult {
 }
 
 interface OrderEmailMessage extends ResendDispatchInput {
-  recipientType: "merchant" | "customer";
+  recipientType: "merchant" | "customer" | "inquiry";
 }
 
 interface EmailDispatchRecord {
-  recipientType: "merchant" | "customer";
+  recipientType: "merchant" | "customer" | "inquiry";
   to: string;
   subject: string;
   provider: "resend" | "mock";
@@ -458,6 +458,216 @@ export const sendLaunchDiscountEmail = async ({
       attempt: {
         recipientType: "customer",
         to: recipient,
+        subject,
+        provider: "resend",
+        status: "failed",
+        externalId: "",
+        error: safeErrorMessage(error),
+        timestamp,
+      },
+    });
+    throw error;
+  }
+};
+
+export const sendProductInquiryEmail = async ({
+  productId,
+  productName,
+  productSku,
+  productUrl,
+  selectedVariant,
+  fullName,
+  email,
+  phone,
+  location,
+  requiredByDate,
+  occasion,
+  sizeNotes,
+  message,
+}: {
+  productId: string;
+  productName: string;
+  productSku?: string;
+  productUrl: string;
+  selectedVariant?: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  location: string;
+  requiredByDate: string;
+  occasion?: string;
+  sizeNotes?: string;
+  message: string;
+}): Promise<PromotionalEmailResult> => {
+  const merchantRecipient =
+    process.env.MERCHANT_ORDER_EMAIL?.trim() || process.env.ORDER_ALERT_EMAIL?.trim() || "";
+  if (!isLikelyEmail(merchantRecipient)) {
+    throw new Error("Product inquiry email recipient is not configured.");
+  }
+
+  const customerEmail = email.trim().toLowerCase();
+  if (!isLikelyEmail(customerEmail)) {
+    throw new Error("A valid customer email is required.");
+  }
+
+  const brandName = process.env.STORE_BRAND_NAME?.trim() || "Ria's Boutique";
+  const websiteUrl = cleanUrl(process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "", "https://www.riasboutique.com");
+  const logoUrl = cleanUrl(process.env.EMAIL_LOGO_URL?.trim() || "", `${websiteUrl.replace(/\/+$/, "")}/RAb.png`);
+  const productLink = cleanUrl(productUrl, `${websiteUrl.replace(/\/+$/, "")}/collection`);
+  const trimmedVariant = selectedVariant?.trim() || "Not selected";
+  const trimmedPhone = phone?.trim() || "-";
+  const trimmedOccasion = occasion?.trim() || "-";
+  const trimmedSizeNotes = sizeNotes?.trim() || "-";
+  const trimmedSku = productSku?.trim() || productId.trim() || "-";
+  const subject = `New inquiry: ${productName.trim() || "Product inquiry"}`;
+  const text = [
+    `New inquiry received for ${productName.trim()}.`,
+    "",
+    `Customer: ${fullName.trim()}`,
+    `Email: ${customerEmail}`,
+    `Phone: ${trimmedPhone}`,
+    `Location: ${location.trim()}`,
+    `Required By: ${requiredByDate.trim()}`,
+    `Occasion: ${trimmedOccasion}`,
+    `Size / Measurements: ${trimmedSizeNotes}`,
+    "",
+    `Product: ${productName.trim()}`,
+    `SKU: ${trimmedSku}`,
+    `Selected Variant: ${trimmedVariant}`,
+    `Product URL: ${productLink}`,
+    "",
+    "Message:",
+    message.trim(),
+  ].join("\n");
+
+  const html = `
+    <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;color:#111827;">
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f5f5;padding:24px 12px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:640px;background:#ffffff;border:1px solid #ececec;border-radius:10px;overflow:hidden;">
+              <tr>
+                <td style="padding:24px 24px 16px 24px;border-bottom:1px solid #ececec;background:#ffffff;">
+                  <img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(brandName)}" style="height:34px;display:block;margin-bottom:12px;" />
+                  <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">${escapeHtml(
+                    brandName,
+                  )}</p>
+                  <h1 style="margin:8px 0 6px 0;font-size:24px;line-height:1.25;color:#111827;">New product inquiry</h1>
+                  <p style="margin:0;font-size:15px;color:#4b5563;">A shopper has requested pricing and availability details.</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:20px 24px 8px 24px;">
+                  <h2 style="margin:0 0 10px 0;font-size:18px;color:#111827;">Customer</h2>
+                  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Name</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(fullName.trim())}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Email</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;"><a href="mailto:${escapeHtml(
+                        customerEmail,
+                      )}" style="color:#111827;text-decoration:underline;">${escapeHtml(customerEmail)}</a></td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Phone</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(trimmedPhone)}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Location</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(location.trim())}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Required By</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(requiredByDate.trim())}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Occasion</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(trimmedOccasion)}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Size / Measurements</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(trimmedSizeNotes)}</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:8px 24px 8px 24px;">
+                  <h2 style="margin:0 0 10px 0;font-size:18px;color:#111827;">Product</h2>
+                  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Product</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(productName.trim())}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">SKU</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(trimmedSku)}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Selected Variant</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;">${escapeHtml(trimmedVariant)}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#6b7280;">Product URL</td>
+                      <td align="right" style="padding:6px 0;font-size:14px;color:#111827;"><a href="${escapeHtml(
+                        productLink,
+                      )}" style="color:#111827;text-decoration:underline;">Open product</a></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:8px 24px 24px 24px;">
+                  <h2 style="margin:0 0 10px 0;font-size:18px;color:#111827;">Message</h2>
+                  <div style="border:1px solid #ececec;border-radius:8px;padding:14px;background:#fafafa;font-size:14px;line-height:1.6;color:#374151;white-space:pre-wrap;">${escapeHtml(
+                    message.trim(),
+                  )}</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+
+  const timestamp = new Date().toISOString();
+  try {
+    const dispatch = (await sendWithResend({
+      to: merchantRecipient,
+      subject,
+      text,
+      html,
+      replyTo: customerEmail,
+    })) || {
+      provider: "mock" as const,
+      status: "queued" as const,
+      externalId: "",
+    };
+
+    await persistEmailLog({
+      attempt: {
+        recipientType: "inquiry",
+        to: merchantRecipient,
+        subject,
+        provider: dispatch.provider,
+        status: dispatch.status,
+        externalId: dispatch.externalId,
+        timestamp,
+      },
+    });
+
+    return {
+      ...dispatch,
+      recipient: merchantRecipient,
+    };
+  } catch (error) {
+    await persistEmailLog({
+      attempt: {
+        recipientType: "inquiry",
+        to: merchantRecipient,
         subject,
         provider: "resend",
         status: "failed",

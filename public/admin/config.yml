@@ -29,7 +29,23 @@ collections:
               - { label: "ID", name: "id", widget: "string", hint: "Unique number/string like 7 or afghan-blue-1" }
               - { label: "Slug", name: "slug", widget: "string", hint: "URL-safe text, e.g. emerald-zarbaft-gown" }
               - { label: "Name", name: "name", widget: "string" }
-              - { label: "Price (CAD)", name: "price", widget: "number", value_type: "int", min: 1 }
+              - {
+                  label: "Price on Inquiry",
+                  name: "price_on_inquiry",
+                  widget: "boolean",
+                  required: false,
+                  default: false,
+                  hint: "Turn this on for custom-quote or consultation-based products."
+                }
+              - {
+                  label: "Price (CAD)",
+                  name: "price",
+                  widget: "number",
+                  value_type: "int",
+                  min: 1,
+                  required: false,
+                  hint: "Leave blank when Price on Inquiry is enabled."
+                }
               - label: "Department"
                 name: "department"
                 widget: "select"
@@ -87,6 +103,12 @@ collections:
                 required: false
                 field: { label: "Image", name: "image", widget: "image", choose_url: false }
               - { label: "Description", name: "description", widget: "text", required: false }
+              - label: "Recommendation Tags"
+                name: "tags"
+                widget: "list"
+                required: false
+                hint: "Used for smart recommendations, e.g. bridal, mirror-work, velvet, wedding."
+                field: { label: "Tag", name: "tag", widget: "string" }
               - label: "Available Sizes"
                 name: "sizes"
                 widget: "list"

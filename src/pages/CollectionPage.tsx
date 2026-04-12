@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import ProductGrid from "@/features/catalog/components/ProductGrid";
+import CollectionRelatedCategories from "@/features/catalog/components/CollectionRelatedCategories";
 import CartDrawer from "@/features/cart/components/CartDrawer";
 import { useCartDrawer } from "@/features/cart/context/CartDrawerContext";
 import Footer from "@/features/navigation/components/Footer";
@@ -43,6 +44,7 @@ const CollectionPage = () => {
       <Navbar onCartClick={openDrawer} />
       <main className="pt-24 sm:pt-28">
         <ProductGrid initialDepartment={initialDepartment} initialQuery={initialSearch} />
+        <CollectionRelatedCategories department={initialDepartment} />
       </main>
 
       <Footer />

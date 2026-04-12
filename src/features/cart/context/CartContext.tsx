@@ -10,11 +10,11 @@ import {
   type ReactNode,
 } from "react";
 import { track } from "@vercel/analytics/react";
-import { getProductById, type Product } from "@/features/catalog/data/products";
+import { getProductById, isPurchasableProduct, type Product } from "@/features/catalog/data/products";
 import { getMaxQuantityForProduct } from "@/features/cart/context/cart-quantity";
 import { type CartItem, type ProductSelection } from "@/features/cart/context/cart-types";
 
-export type CartAddResult = "added" | "already_in_cart" | "sold_out";
+export type CartAddResult = "added" | "already_in_cart" | "sold_out" | "inquiry_only";
 
 interface CartStateContextType {
   items: CartItem[];
@@ -144,6 +144,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const addToCart = useCallback((product: Product, selection: ProductSelection): CartAddResult => {
+    if (!isPurchasableProduct(product)) {
+      return "inquiry_only";
+    }
+
     const maxQuantity = getMaxQuantityForProduct(product);
     if (maxQuantity <= 0) {
       return "sold_out";
@@ -230,7 +234,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
-  const totalPrice = useMemo(() => items.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [items]);
+  const totalPrice = useMemo(
+    () => items.reduce((sum, item) => sum + (item.product.price ?? 0) * item.quantity, 0),
+    [items],
+  );
   const stateValue = useMemo<CartStateContextType>(
     () => ({
       items,

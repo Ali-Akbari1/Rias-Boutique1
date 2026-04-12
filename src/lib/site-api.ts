@@ -16,6 +16,12 @@ interface OrderStatusResponse {
   estimatedDeliveryDate?: string | null;
 }
 
+interface ProductInquiryResponse {
+  success?: boolean;
+  emailProvider?: "resend" | "mock";
+  emailStatus?: "sent" | "queued";
+}
+
 export const requestDiscountSignup = (payload: {
   email: string;
   source: string;
@@ -34,6 +40,29 @@ export const requestGoogleReviews = () =>
     path: "/api/google-reviews",
     method: "GET",
     fallbackErrorMessage: "Failed to fetch Google reviews.",
+  });
+
+export const requestProductInquiry = (payload: {
+  productId: string;
+  productName: string;
+  productSku?: string;
+  productUrl: string;
+  selectedVariant?: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  location: string;
+  requiredByDate: string;
+  occasion?: string;
+  sizeNotes?: string;
+  message: string;
+  website: string;
+}) =>
+  requestJson<ProductInquiryResponse>({
+    path: "/api/product-inquiry",
+    method: "POST",
+    body: payload,
+    fallbackErrorMessage: "Unable to send your inquiry right now.",
   });
 
 export const requestOrderStatus = (params: { orderId?: string; checkoutId?: string }) => {

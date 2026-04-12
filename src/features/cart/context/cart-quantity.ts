@@ -1,4 +1,4 @@
-import { type Product } from "@/features/catalog/data/products";
+import { isPurchasableProduct, type Product } from "@/features/catalog/data/products";
 
 const HARD_MAX_ITEM_QUANTITY = 10;
 
@@ -16,7 +16,7 @@ const normalizeMaxQuantity = (value: unknown) => {
 };
 
 export const getMaxQuantityForProduct = (product: Product) => {
-  if (product.availability === "sold_out") {
+  if (!isPurchasableProduct(product)) {
     return 0;
   }
 

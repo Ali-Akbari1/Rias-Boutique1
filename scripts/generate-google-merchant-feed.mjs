@@ -66,6 +66,18 @@ const toNumber = (value, fallback = 0) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const toBoolean = (value) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value > 0;
+  }
+
+  const normalized = toStringValue(value).toLowerCase();
+  return ["true", "1", "yes", "on"].includes(normalized);
+};
+
 const toStringArray = (value) => {
   if (!Array.isArray(value)) {
     return [];
@@ -196,6 +208,11 @@ const buildFeed = ({
     const department = toStringValue(product?.department);
     const gender = normalizeGender(department || productType);
     const availability = normalizeAvailability(product?.availability ?? product?.inventory);
+    const priceOnInquiry = toBoolean(product?.priceOnInquiry ?? product?.price_on_inquiry);
+    if (priceOnInquiry) {
+      skippedProducts.push({ id: baseId, reason: "price on inquiry" });
+      continue;
+    }
 
     const priceCad = toNumber(product?.price, 0);
     if (priceCad <= 0) {

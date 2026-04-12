@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { CartProvider } from "@/features/cart/context/CartContext";
 import { CurrencyProvider } from "@/features/currency/context/CurrencyContext";
-import { products } from "@/features/catalog/data/products";
+import { isPurchasableProduct, products } from "@/features/catalog/data/products";
 import * as checkoutRequest from "@/lib/checkout-request";
 
 const CART_STORAGE_KEY = "rias_boutique_cart_v1";
@@ -20,7 +20,7 @@ const renderCheckout = async () => {
   );
 };
 
-const getAvailableProduct = () => products.find((product) => product.availability === "available") || products[0];
+const getAvailableProduct = () => products.find((product) => isPurchasableProduct(product)) || products[0];
 
 describe("checkout flow", () => {
   beforeEach(() => {

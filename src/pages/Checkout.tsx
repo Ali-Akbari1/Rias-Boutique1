@@ -1478,6 +1478,7 @@ const Checkout = () => {
                 {items.map(({ id, product, selection, quantity }) => {
                   const maxQuantity = getMaxQuantityForProduct(product);
                   const isMaxQuantity = maxQuantity <= 0 || quantity >= maxQuantity;
+                  const unitPrice = product.price ?? 0;
 
                   return (
                     <div
@@ -1495,7 +1496,7 @@ const Checkout = () => {
                           {product.name}
                         </p>
                         <p className="font-body text-xs text-muted-foreground sm:text-sm">
-                          {formatPrice(product.price)} x {quantity}
+                          {formatPrice(unitPrice)} x {quantity}
                         </p>
                         <p className="font-body text-xs text-muted-foreground">
                           Size: {selection.size} | Color: {selection.color}
@@ -1534,7 +1535,7 @@ const Checkout = () => {
                       </div>
                       <div className="flex h-full flex-col items-end justify-between">
                         <p className="font-display text-sm font-semibold text-foreground sm:text-base">
-                          {formatPrice(product.price * quantity)}
+                          {formatPrice(unitPrice * quantity)}
                         </p>
                         <button
                           type="button"

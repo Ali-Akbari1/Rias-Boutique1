@@ -1,7 +1,7 @@
 import type { FormEvent, RefObject } from "react";
 import { Link } from "react-router-dom";
 import { Search, X } from "lucide-react";
-import type { Product } from "@/features/catalog/data/products";
+import { hasDisplayPrice, isInquiryOnlyProduct, type Product } from "@/features/catalog/data/products";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import { formatProductAlt } from "@/lib/seo";
 import { Input } from "@/shared/ui/input";
@@ -181,7 +181,11 @@ const SearchOverlay = ({
                         </p>
                         <p className="line-clamp-1 text-[11px] text-muted-foreground sm:text-xs">{product.category}</p>
                         <p className="mt-0.5 text-xs font-medium text-foreground sm:text-sm">
-                          {formatPrice(product.price)}
+                          {isInquiryOnlyProduct(product)
+                            ? "Inquiry Only"
+                            : hasDisplayPrice(product)
+                              ? formatPrice(product.price)
+                              : "View Details"}
                         </p>
                       </Link>
                     ))}
@@ -222,7 +226,11 @@ const SearchOverlay = ({
                     </p>
                     <p className="line-clamp-1 text-[11px] text-muted-foreground sm:text-xs">{product.category}</p>
                     <p className="mt-0.5 text-xs font-medium text-foreground sm:text-sm">
-                      {formatPrice(product.price)}
+                      {isInquiryOnlyProduct(product)
+                        ? "Inquiry Only"
+                        : hasDisplayPrice(product)
+                          ? formatPrice(product.price)
+                          : "View Details"}
                     </p>
                   </Link>
                 ))}

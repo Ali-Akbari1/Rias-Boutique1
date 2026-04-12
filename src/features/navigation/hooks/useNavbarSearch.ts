@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type Product, products } from "@/features/catalog/data/products";
+import { isInquiryOnlyProduct, type Product, products } from "@/features/catalog/data/products";
 import { normalizeSearchText, normalizedTextMatchesQuery, scoreWeightedSearchDocument } from "@/lib/search";
 
 const SEARCH_RESULTS_LIMIT = 8;
@@ -17,7 +17,7 @@ const scoreProductSearchResult = (product: Product, normalizedQuery: string) =>
       category: product.category,
       department: product.department,
       description: product.description,
-      keywords: [product.fabric, product.colors.join(" ")].join(" "),
+      keywords: [product.fabric, product.colors.join(" "), product.tags.join(" ")].join(" "),
     },
     normalizedQuery,
   );
@@ -30,7 +30,7 @@ export const useNavbarSearch = ({ pathname, search }: { pathname: string; search
   const availableProducts = useMemo(
     () =>
       products
-        .filter((product) => product.availability === "available")
+        .filter((product) => product.availability === "available" || isInquiryOnlyProduct(product))
         .sort((a, b) => toTimestamp(b.createdAt) - toTimestamp(a.createdAt)),
     [],
   );

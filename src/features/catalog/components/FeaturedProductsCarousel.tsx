@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/shared/ui/button";
-import { type Product, products } from "@/features/catalog/data/products";
+import { isInquiryOnlyProduct, type Product, products } from "@/features/catalog/data/products";
 import ProductCard from "./ProductCard";
 
 const MOBILE_GROUP_SIZE = 1;
@@ -121,7 +121,9 @@ const FeaturedProductsCarousel = () => {
   const groupSize = isMobile ? MOBILE_GROUP_SIZE : DESKTOP_GROUP_SIZE;
   const rotationIntervalMs = isMobile ? MOBILE_ROTATION_INTERVAL_MS : DESKTOP_ROTATION_INTERVAL_MS;
   const featuredProducts = useMemo(() => {
-    const availableProducts = products.filter((product) => product.availability === "available");
+    const availableProducts = products.filter(
+      (product) => product.availability === "available" || isInquiryOnlyProduct(product),
+    );
 
     if (availableProducts.length <= MAX_FEATURED_ITEMS) {
       return [...availableProducts].sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt));

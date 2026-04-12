@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { resolveCanonicalPath, toCanonicalUrl, SITE_URL } from "@/features/navigation/route-manifest";
-import { getProductById, getProductBySlug, type Product } from "@/features/catalog/data/products";
+import { getProductById, getProductBySlug, hasDisplayPrice, type Product } from "@/features/catalog/data/products";
 import { getClientCommerceConfig } from "@/lib/commerce-config";
 import { faqItems, getInstagramProfileUrl, getStorePickupDetails } from "@/features/store/data/store-content";
 
@@ -345,7 +345,7 @@ const buildProductSchema = (product: Product, canonicalUrl: string): JsonLdNode 
     caption: product.name,
   }));
 
-  return {
+  const schema: JsonLdNode = {
     "@type": "Product",
     "@id": `${canonicalUrl}#product`,
     name: product.name,
@@ -360,6 +360,14 @@ const buildProductSchema = (product: Product, canonicalUrl: string): JsonLdNode 
       name: STORE_NAME,
     },
     image: imageObjects,
+  };
+
+  if (!hasDisplayPrice(product)) {
+    return schema;
+  }
+
+  return {
+    ...schema,
     offers: {
       "@type": "Offer",
       url: canonicalUrl,

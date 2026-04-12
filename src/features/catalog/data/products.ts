@@ -7,7 +7,7 @@ export interface Product {
   id: string;
   slug: string;
   name: string;
-  price: number;
+  price: number | null;
   maxQuantity?: number;
   compareAtPrice?: number;
   salePercent?: number;
@@ -17,6 +17,8 @@ export interface Product {
   category: string;
   description: string;
   availability: "available" | "sold_out";
+  priceOnInquiry: boolean;
+  tags: string[];
   sizes: string[];
   colors: string[];
   fabric: string;
@@ -31,7 +33,7 @@ interface RawProduct {
   id?: string | number;
   slug?: string;
   name?: string;
-  price?: number | string;
+  price?: number | string | null;
   maxQuantity?: number | string | null;
   image?: string;
   galleryImages?: string[];
@@ -40,6 +42,9 @@ interface RawProduct {
   description?: string;
   inventory?: number | string | null;
   availability?: string;
+  price_on_inquiry?: boolean | string | number | null;
+  priceOnInquiry?: boolean | string | number | null;
+  tags?: unknown;
   sizes?: string[];
   colors?: string[];
   fabric?: string;
@@ -116,6 +121,32 @@ const getNumber = (value: unknown, fallback: number) => {
 
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const getBoolean = (value: unknown) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value > 0;
+  }
+
+  const normalized = getString(value).toLowerCase();
+  return ["true", "1", "yes", "on"].includes(normalized);
+};
+
+const getOptionalNumber = (value: unknown) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
 };
 
 const normalizeMaxQuantity = (value: unknown) => {
@@ -239,9 +270,12 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
   const category = getString(product.category) || "Party Wear";
   const department = normalizeDepartment(product.department, category);
   const availability = normalizeAvailability(product.availability ?? product.inventory);
-  const price = Math.max(0, getNumber(product.price, 0));
+  const priceOnInquiry = getBoolean(product.priceOnInquiry ?? product.price_on_inquiry);
+  const rawPrice = getOptionalNumber(product.price);
+  const price = priceOnInquiry ? (rawPrice !== null ? Math.max(0, rawPrice) : null) : Math.max(0, rawPrice ?? 0);
   const maxQuantity = normalizeMaxQuantity(product.maxQuantity);
-  const saleData = normalizeSaleData(price, product.salePercent, product.compareAtPrice);
+  const saleData =
+    priceOnInquiry || price === null ? {} : normalizeSaleData(price, product.salePercent, product.compareAtPrice);
 
   return {
     id,
@@ -257,6 +291,8 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
     category,
     description: getString(product.description),
     availability,
+    priceOnInquiry,
+    tags: getStringArray(product.tags, ["tag", "label", "value", "name"]),
     sizes: sizes.length > 0 ? sizes : ["One Size"],
     colors: colors.length > 0 ? colors : ["Default"],
     fabric: getString(product.fabric) || "Please contact us for detailed fabric information.",
@@ -274,3 +310,15 @@ export const products: Product[] = (productContent.products ?? []).map(normalize
 export const getProductById = (id: string) => products.find((product) => product.id === id);
 
 export const getProductBySlug = (slug: string) => products.find((product) => product.slug === slug);
+
+export const isInquiryOnlyProduct = (product: Pick<Product, "priceOnInquiry">) => product.priceOnInquiry;
+
+export const hasDisplayPrice = <T extends Pick<Product, "priceOnInquiry" | "price">>(
+  product: T,
+): product is T & { priceOnInquiry: false; price: number } =>
+  !product.priceOnInquiry && typeof product.price === "number" && Number.isFinite(product.price) && product.price > 0;
+
+export const isPurchasableProduct = <T extends Pick<Product, "availability" | "priceOnInquiry" | "price">>(
+  product: T,
+): product is T & { availability: "available"; priceOnInquiry: false; price: number } =>
+  product.availability !== "sold_out" && hasDisplayPrice(product);
