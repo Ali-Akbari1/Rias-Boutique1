@@ -18,14 +18,14 @@ const CLOSE_ANIMATION_DELAY_MS = 120;
 const CLOSE_ANIMATION_DURATION_MS = 350;
 
 const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
-  const { items, removeFromCart, updateQuantity, totalItems, totalPrice, clearCart, isAdding } = useCart();
+  const { items, removeFromCart, updateQuantity, totalItems, totalPrice, clearCart, isAdding, lastAddedItem } =
+    useCart();
   const navigate = useNavigate();
   const checkoutEnabled = isCheckoutEnabled();
   const { formatPrice, isUsd } = useCurrency();
   const freeShippingRemainingCad = Math.max(0, FREE_SHIPPING_THRESHOLD_CAD - totalPrice);
   const qualifiesForFreeShipping = totalPrice >= FREE_SHIPPING_THRESHOLD_CAD;
   const freeShippingProgress = Math.min(1, totalPrice / FREE_SHIPPING_THRESHOLD_CAD);
-  const lastAddedItem = items[items.length - 1];
   const [isMounted, setIsMounted] = useState(open);
   const [isClosing, setIsClosing] = useState(false);
 

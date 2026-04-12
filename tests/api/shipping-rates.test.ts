@@ -21,7 +21,7 @@ describe("shipping rates endpoint", () => {
     process.env.EASYPOST_CUSTOMS_EEL_PFC = "NOEEI 30.37(a)";
   });
 
-  it("returns a flat CA$30 shipping quote by default without calling EasyPost", async () => {
+  it("returns the default flat US shipping quote without calling EasyPost", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
@@ -61,8 +61,8 @@ describe("shipping rates endpoint", () => {
         {
           carrier: "Ria's Boutique",
           service: "Standard Shipping",
-          quotedRateMinor: 3000,
-          customerRateMinor: 3000,
+          quotedRateMinor: 4000,
+          customerRateMinor: 4000,
         },
       ],
     });

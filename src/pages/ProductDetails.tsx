@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, Truck } from "lucide-react";
 import { getProductById } from "@/features/catalog/data/products";
-import { useCart } from "@/features/cart/context/CartContext";
+import { useCartActions } from "@/features/cart/context/CartContext";
 import { useCartDrawer } from "@/features/cart/context/CartDrawerContext";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import CartDrawer from "@/features/cart/components/CartDrawer";
@@ -22,7 +22,7 @@ const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
   const location = useLocation();
   const product = getProductById(productId ?? "");
-  const { addToCart } = useCart();
+  const { addToCart } = useCartActions();
   const { formatPrice } = useCurrency();
   const { toast } = useToast();
   const [selectedSize, setSelectedSize] = useState("");
@@ -110,7 +110,21 @@ const ProductDetails = () => {
       return;
     }
 
-    addToCart(product, { size: chosenSize, color: chosenColor });
+    const result = addToCart(product, { size: chosenSize, color: chosenColor });
+    if (result === "sold_out") {
+      toast({
+        title: "Sold out",
+        description: "This item is currently sold out and cannot be added to your bag.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (result === "already_in_cart") {
+      openDrawer();
+      return;
+    }
+
     triggerAddFeedback();
     openDrawer();
   };

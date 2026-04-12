@@ -1,22 +1,40 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { track } from "@vercel/analytics/react";
 import { getProductById, type Product } from "@/features/catalog/data/products";
 import { getMaxQuantityForProduct } from "@/features/cart/context/cart-quantity";
 import { type CartItem, type ProductSelection } from "@/features/cart/context/cart-types";
 
-interface CartContextType {
+export type CartAddResult = "added" | "already_in_cart" | "sold_out";
+
+interface CartStateContextType {
   items: CartItem[];
-  addToCart: (product: Product, selection: ProductSelection) => void;
-  removeFromCart: (itemId: string) => void;
-  updateQuantity: (itemId: string, quantity: number) => void;
-  clearCart: () => void;
   totalItems: number;
   totalPrice: number;
   isAdding: boolean;
+  lastAddedItem: CartItem | null;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+interface CartActionsContextType {
+  addToCart: (product: Product, selection: ProductSelection) => CartAddResult;
+  removeFromCart: (itemId: string) => void;
+  updateQuantity: (itemId: string, quantity: number) => void;
+  clearCart: () => void;
+}
+
+const CartStateContext = createContext<CartStateContextType | undefined>(undefined);
+const CartActionsContext = createContext<CartActionsContextType | undefined>(undefined);
 const CART_STORAGE_KEY = "rias_boutique_cart_v1";
+const ADD_FEEDBACK_DURATION_MS = 800;
 
 const buildCartItemId = (productId: string, selection: ProductSelection) =>
   `${productId}-${selection.size}-${selection.color}`;
@@ -98,13 +116,23 @@ const restoreCartFromStorage = (): CartItem[] => {
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>(() => restoreCartFromStorage());
   const [isAdding, setIsAdding] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
   const addFeedbackTimeoutRef = useRef<number | null>(null);
+  const itemsRef = useRef(items);
+  const pendingAddItemIdsRef = useRef(new Set<string>());
 
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
     }
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
+
+  useEffect(() => {
+    itemsRef.current = items;
+    for (const item of items) {
+      pendingAddItemIdsRef.current.delete(item.id);
+    }
   }, [items]);
 
   useEffect(() => {
@@ -115,51 +143,61 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const addToCart = (product: Product, selection: ProductSelection) => {
-    let didAdd = false;
+  const addToCart = useCallback((product: Product, selection: ProductSelection): CartAddResult => {
+    const maxQuantity = getMaxQuantityForProduct(product);
+    if (maxQuantity <= 0) {
+      return "sold_out";
+    }
+
+    const itemId = buildCartItemId(product.id, selection);
+    if (pendingAddItemIdsRef.current.has(itemId) || itemsRef.current.some((item) => item.id === itemId)) {
+      return "already_in_cart";
+    }
+
+    const nextItem: CartItem = {
+      id: itemId,
+      product,
+      selection,
+      quantity: Math.min(1, maxQuantity),
+    };
+
+    pendingAddItemIdsRef.current.add(itemId);
     setItems((prev) => {
-      const maxQuantity = getMaxQuantityForProduct(product);
-      if (maxQuantity <= 0) {
+      if (prev.some((item) => item.id === itemId)) {
         return prev;
       }
-
-      const itemId = buildCartItemId(product.id, selection);
-      const existing = prev.find((item) => item.id === itemId);
-
-      if (existing) {
-        return prev;
-      }
-
-      didAdd = true;
-      return [...prev, { id: itemId, product, selection, quantity: Math.min(1, maxQuantity) }];
+      return [...prev, nextItem];
     });
 
-    if (didAdd) {
-      setIsAdding(true);
-      if (addFeedbackTimeoutRef.current) {
-        window.clearTimeout(addFeedbackTimeoutRef.current);
-      }
-      addFeedbackTimeoutRef.current = window.setTimeout(() => {
-        setIsAdding(false);
-        addFeedbackTimeoutRef.current = null;
-      }, 800);
-      track("Add to Cart", {
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        size: selection.size,
-        color: selection.color,
-        category: product.category,
-      });
+    setLastAddedItem(nextItem);
+    setIsAdding(true);
+    if (addFeedbackTimeoutRef.current) {
+      window.clearTimeout(addFeedbackTimeoutRef.current);
     }
-  };
+    addFeedbackTimeoutRef.current = window.setTimeout(() => {
+      setIsAdding(false);
+      addFeedbackTimeoutRef.current = null;
+    }, ADD_FEEDBACK_DURATION_MS);
 
-  const removeFromCart = (itemId: string) => {
+    track("Add to Cart", {
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      size: selection.size,
+      color: selection.color,
+      category: product.category,
+    });
+
+    return "added";
+  }, []);
+
+  const removeFromCart = useCallback((itemId: string) => {
+    pendingAddItemIdsRef.current.delete(itemId);
     setItems((prev) => prev.filter((item) => item.id !== itemId));
-  };
+  }, []);
 
-  const updateQuantity = (itemId: string, quantity: number) => {
+  const updateQuantity = useCallback((itemId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(itemId);
       return;
@@ -183,28 +221,71 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
       return prev.map((item) => (item.id === itemId ? { ...item, quantity: nextQuantity } : item));
     });
-  };
+  }, [removeFromCart]);
 
-  const clearCart = () => setItems([]);
+  const clearCart = useCallback(() => {
+    pendingAddItemIdsRef.current.clear();
+    setLastAddedItem(null);
+    setItems([]);
+  }, []);
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
+  const totalPrice = useMemo(() => items.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [items]);
+  const stateValue = useMemo<CartStateContextType>(
+    () => ({
+      items,
+      totalItems,
+      totalPrice,
+      isAdding,
+      lastAddedItem,
+    }),
+    [isAdding, items, lastAddedItem, totalItems, totalPrice],
+  );
+  const actionsValue = useMemo<CartActionsContextType>(
+    () => ({
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+    }),
+    [addToCart, clearCart, removeFromCart, updateQuantity],
+  );
 
   return (
-    <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice, isAdding }}
-    >
-      {children}
-    </CartContext.Provider>
+    <CartStateContext.Provider value={stateValue}>
+      <CartActionsContext.Provider value={actionsValue}>{children}</CartActionsContext.Provider>
+    </CartStateContext.Provider>
   );
 };
 
-export const useCart = () => {
-  const context = useContext(CartContext);
+export const useCartState = () => {
+  const context = useContext(CartStateContext);
   if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
+    throw new Error("useCartState must be used within a CartProvider");
   }
 
   return context;
+};
+
+export const useCartActions = () => {
+  const context = useContext(CartActionsContext);
+  if (!context) {
+    throw new Error("useCartActions must be used within a CartProvider");
+  }
+
+  return context;
+};
+
+export const useCart = () => {
+  const state = useCartState();
+  const actions = useCartActions();
+
+  return useMemo(
+    () => ({
+      ...state,
+      ...actions,
+    }),
+    [actions, state],
+  );
 };
 

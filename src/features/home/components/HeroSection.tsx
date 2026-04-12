@@ -13,6 +13,8 @@ const HeroSection = () => {
         alt=""
         aria-hidden="true"
         loading="eager"
+        fetchPriority="high"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover object-[70%_85%] sm:object-[60%_48%] lg:object-[60%_85%]"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/12 to-transparent" />

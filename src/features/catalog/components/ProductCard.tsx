@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { type Product } from "@/features/catalog/data/products";
-import { useCart } from "@/features/cart/context/CartContext";
+import { useCartActions } from "@/features/cart/context/CartContext";
 import { useCartDrawer } from "@/features/cart/context/CartDrawerContext";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +21,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const isSoldOut = product.availability === "sold_out";
   const isOnSale = !isSoldOut && Boolean(product.salePercent && product.compareAtPrice);
   const checkoutEnabled = isCheckoutEnabled();
-  const { addToCart } = useCart();
+  const { addToCart } = useCartActions();
   const { openDrawer } = useCartDrawer();
   const { formatPrice } = useCurrency();
   const { toast } = useToast();
@@ -108,7 +108,21 @@ const ProductCard = ({ product }: ProductCardProps) => {
       return;
     }
 
-    addToCart(product, { size, color });
+    const result = addToCart(product, { size, color });
+    if (result === "sold_out") {
+      toast({
+        title: "Sold out",
+        description: "This item is currently sold out and cannot be added to your bag.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (result === "already_in_cart") {
+      openDrawer();
+      return;
+    }
+
     triggerAddFeedback();
     openDrawer();
   };

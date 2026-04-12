@@ -322,6 +322,43 @@ const findMemoryOrderBy = (predicate: (order: StoredOrder) => boolean) => {
   return null;
 };
 
+const decrementMemoryInventory = (lineItems: OrderLineItem[]) => {
+  const nextInventory = new Map(memoryInventory);
+  const updatedAt = nowIso();
+
+  for (const item of lineItems) {
+    const productId = item.productId.trim();
+    const quantity = Math.max(0, Math.floor(item.quantity));
+
+    if (!productId || quantity <= 0) {
+      continue;
+    }
+
+    const currentRecord = nextInventory.get(productId) || { quantity: null, updatedAt };
+    if (currentRecord.quantity === null) {
+      nextInventory.set(productId, {
+        quantity: null,
+        updatedAt,
+      });
+      continue;
+    }
+
+    if (currentRecord.quantity < quantity) {
+      throw new Error(`Insufficient inventory for product ${productId}`);
+    }
+
+    nextInventory.set(productId, {
+      quantity: currentRecord.quantity - quantity,
+      updatedAt,
+    });
+  }
+
+  memoryInventory.clear();
+  for (const [productId, record] of nextInventory.entries()) {
+    memoryInventory.set(productId, { ...record });
+  }
+};
+
 export const seedInventoryFromCatalog = async (catalog: CatalogProduct[]) => {
   void catalog;
 };
@@ -585,6 +622,7 @@ export const markOrderPaidAndDecrementInventory = async ({
     }
 
     const paidAt = nowIso();
+    decrementMemoryInventory(order.lineItems);
     order.paymentStatus = "paid";
     order.paymentReference = normalizePaymentReference(paymentReference);
     order.paidAt = paidAt;
@@ -603,24 +641,19 @@ export const markOrderPaidAndDecrementInventory = async ({
     return existingOrder;
   }
 
-  const paidAt = nowIso();
-  const { error } = await supabase
-    .from("orders")
-    .update({
-      payment_status: "paid",
-      payment_reference: normalizePaymentReference(paymentReference) || null,
-      paid_at: paidAt,
-      updated_at: paidAt,
-      last_error: "",
+  const { data, error } = await supabase
+    .rpc("mark_order_paid_and_decrement_inventory", {
+      p_order_id: orderId,
+      p_payment_reference: normalizePaymentReference(paymentReference) || null,
     })
-    .eq("id", orderId);
-  ensureNoSupabaseError(error, "mark order as paid");
+    .single();
+  ensureNoSupabaseError(error, "mark order as paid and decrement inventory");
 
-  const updatedOrder = await findOrderById(orderId);
-  if (!updatedOrder) {
+  if (!data || typeof data !== "object") {
     throw new Error(`Order ${orderId} could not be loaded after payment update.`);
   }
-  return updatedOrder;
+
+  return parseOrderRow(data as Record<string, unknown>);
 };
 
 export const markConfirmationEmailSent = async (orderId: string) => {

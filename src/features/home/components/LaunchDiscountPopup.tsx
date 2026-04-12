@@ -142,7 +142,8 @@ const LaunchDiscountPopup = () => {
             src="/RAb.png"
             alt="Ria's Boutique"
             className="mx-auto h-11 w-auto object-contain"
-            loading="eager"
+            loading="lazy"
+            decoding="async"
           />
           {!isSuccess ? (
             <p className="mt-3 text-xs uppercase tracking-[0.28em] text-muted-foreground">

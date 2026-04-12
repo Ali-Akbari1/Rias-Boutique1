@@ -3,12 +3,12 @@ import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
-import { useCart } from "@/features/cart/context/CartContext";
+import { useCartActions } from "@/features/cart/context/CartContext";
 import { requestOrderStatus } from "@/lib/site-api";
 import { track } from "@vercel/analytics/react";
 
 const CheckoutSuccess = () => {
-  const { clearCart } = useCart();
+  const { clearCart } = useCartActions();
   const [searchParams] = useSearchParams();
   const clearedRef = useRef(false);
   const sessionId = searchParams.get("session_id");

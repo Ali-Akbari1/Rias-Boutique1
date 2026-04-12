@@ -1,7 +1,7 @@
 ﻿import { FormEvent, useEffect, useRef, useState } from "react";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useCart } from "@/features/cart/context/CartContext";
+import { useCartState } from "@/features/cart/context/CartContext";
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import DesktopNav from "@/features/navigation/components/navbar/DesktopNav";
 import MobileNav from "@/features/navigation/components/navbar/MobileNav";
@@ -14,7 +14,7 @@ interface NavbarProps {
 }
 
 const Navbar = ({ onCartClick }: NavbarProps) => {
-  const { totalItems, isAdding } = useCart();
+  const { totalItems, isAdding } = useCartState();
   const { currency, setCurrency } = useCurrency();
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
