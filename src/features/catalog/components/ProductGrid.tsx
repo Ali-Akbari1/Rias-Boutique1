@@ -81,6 +81,12 @@ const toPositiveInt = (value: string | null, fallback: number) => {
   return parsed;
 };
 
+const normalizeSearchParamsString = (params: URLSearchParams | string) => {
+  const normalizedParams = new URLSearchParams(params);
+  normalizedParams.delete("department");
+  return normalizedParams.toString();
+};
+
 const scoreProductSearchMatch = (normalizedQuery: string, product: (typeof products)[number]) =>
   scoreWeightedSearchDocument(
     {
@@ -169,6 +175,8 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
   const didMountDepartmentResetEffectRef = useRef(false);
   const didMountSizeResetEffectRef = useRef(false);
   const isDepartmentUserDrivenRef = useRef(false);
+  const lastInternalSearchQueryRef = useRef(normalizeSearchParamsString(searchParams));
+  const isHydratingFromUrlRef = useRef(false);
 
   const departments = useMemo(() => ["all", ...PRODUCT_DEPARTMENTS] as DepartmentOption[], []);
   const minPrice = useMemo(() => parsePriceInput(minPriceInput), [minPriceInput]);
@@ -255,6 +263,16 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
     setQueryInput(normalizedInitialQuery);
     setDebouncedQuery(normalizeSearchText(normalizedInitialQuery));
   }, [normalizedInitialQuery]);
+
+  useEffect(() => {
+    const currentQuery = normalizeSearchParamsString(searchParams);
+    if (currentQuery === lastInternalSearchQueryRef.current) {
+      return;
+    }
+
+    // URL-driven filter changes should hydrate local state before we write back to the URL.
+    isHydratingFromUrlRef.current = true;
+  }, [searchParams]);
 
   useEffect(() => {
     const debounceTimer = window.setTimeout(() => {
@@ -550,13 +568,23 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
       nextParams.set("page", String(safePage));
     }
 
-    const currentParams = new URLSearchParams(searchParams);
-    currentParams.delete("department");
-    const currentQuery = currentParams.toString();
+    const currentQuery = normalizeSearchParamsString(searchParams);
     const nextQuery = nextParams.toString();
-    if (currentQuery !== nextQuery) {
-      setSearchParams(nextParams, { replace: true });
+    if (isHydratingFromUrlRef.current) {
+      if (currentQuery === nextQuery) {
+        isHydratingFromUrlRef.current = false;
+        lastInternalSearchQueryRef.current = currentQuery;
+      }
+      return;
     }
+
+    if (currentQuery !== nextQuery) {
+      lastInternalSearchQueryRef.current = nextQuery;
+      setSearchParams(nextParams, { replace: true });
+      return;
+    }
+
+    lastInternalSearchQueryRef.current = currentQuery;
   }, [
     availability,
     category,

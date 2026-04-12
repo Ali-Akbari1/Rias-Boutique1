@@ -94,7 +94,7 @@ const ProductInquirySheet = ({
 
       toast({
         title: "Inquiry sent",
-        description: "We’ve received your request and will follow up with pricing details soon.",
+        description: "We've received your request and will follow up with pricing details soon.",
       });
       setFullName("");
       setEmail("");
@@ -120,9 +120,9 @@ const ProductInquirySheet = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         hideCloseButton
-        className="left-auto right-0 top-0 h-[100dvh] max-w-xl translate-x-0 translate-y-0 gap-0 overflow-hidden rounded-none border-l px-0 py-0 data-[state=closed]:slide-out-to-right data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-right data-[state=open]:slide-in-from-top-0"
+        className="left-auto right-0 top-0 flex h-[100dvh] max-w-xl translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-l px-0 py-0 data-[state=closed]:slide-out-to-right data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-right data-[state=open]:slide-in-from-top-0"
       >
-        <div className="flex h-full flex-col">
+        <div className="flex h-full min-h-0 flex-col">
           <DialogHeader className="border-b border-border bg-card/70 px-6 py-5 text-left">
             <div className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-900">
               <Sparkles className="h-3.5 w-3.5" />
@@ -134,173 +134,175 @@ const ProductInquirySheet = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto px-6 py-5">
-            <div className="mb-5 rounded-2xl border border-border bg-card/40 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Product of Interest</p>
-              <p className="mt-2 font-display text-xl text-foreground">{product.name}</p>
-              <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
-                <p>
-                  <span className="font-semibold text-foreground">SKU:</span> {product.id}
-                </p>
-                <p>
-                  <span className="font-semibold text-foreground">Selected variant:</span> {selectedVariant}
-                </p>
-              </div>
-            </div>
-
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <label htmlFor="inquiry-product-name" className="text-sm font-semibold text-foreground">
-                  Product Name
-                </label>
-                <Input id="inquiry-product-name" value={product.name} readOnly className="bg-muted/30" />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="inquiry-full-name" className="text-sm font-semibold text-foreground">
-                  Full Name
-                </label>
-                <Input
-                  id="inquiry-full-name"
-                  value={fullName}
-                  onChange={(event) => setFullName(event.target.value)}
-                  placeholder="Your name"
-                  autoComplete="name"
-                  required
-                />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="inquiry-email" className="text-sm font-semibold text-foreground">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="inquiry-email"
-                      type="email"
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      placeholder="you@example.com"
-                      autoComplete="email"
-                      required
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="inquiry-phone" className="text-sm font-semibold text-foreground">
-                    Phone
-                  </label>
-                  <div className="relative">
-                    <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="inquiry-phone"
-                      type="tel"
-                      value={phone}
-                      onChange={(event) => setPhone(event.target.value)}
-                      placeholder="Optional"
-                      autoComplete="tel"
-                      className="pl-10"
-                    />
-                  </div>
+          <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit}>
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+              <div className="mb-5 rounded-2xl border border-border bg-card/40 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Product of Interest</p>
+                <p className="mt-2 font-display text-xl text-foreground">{product.name}</p>
+                <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
+                  <p>
+                    <span className="font-semibold text-foreground">SKU:</span> {product.id}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-foreground">Selected variant:</span> {selectedVariant}
+                  </p>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="inquiry-location" className="text-sm font-semibold text-foreground">
-                  Location
-                </label>
-                <Input
-                  id="inquiry-location"
-                  value={location}
-                  onChange={(event) => setLocation(event.target.value)}
-                  placeholder="City, Province / State"
-                  autoComplete="address-level2"
-                  required
-                />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-4 pb-6">
                 <div className="space-y-2">
-                  <label htmlFor="inquiry-required-date" className="text-sm font-semibold text-foreground">
-                    Required By Date
+                  <label htmlFor="inquiry-product-name" className="text-sm font-semibold text-foreground">
+                    Product Name
                   </label>
-                  <div className="relative">
-                    <CalendarClock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="inquiry-required-date"
-                      type="date"
-                      value={requiredByDate}
-                      min={minDate}
-                      onChange={(event) => setRequiredByDate(event.target.value)}
-                      required
-                      className="pl-10"
-                    />
-                  </div>
+                  <Input id="inquiry-product-name" value={product.name} readOnly className="bg-muted/30" />
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="inquiry-occasion" className="text-sm font-semibold text-foreground">
-                    Occasion
+                  <label htmlFor="inquiry-full-name" className="text-sm font-semibold text-foreground">
+                    Full Name
                   </label>
                   <Input
-                    id="inquiry-occasion"
-                    value={occasion}
-                    onChange={(event) => setOccasion(event.target.value)}
-                    placeholder="Wedding, birthday, prom..."
+                    id="inquiry-full-name"
+                    value={fullName}
+                    onChange={(event) => setFullName(event.target.value)}
+                    placeholder="Your name"
+                    autoComplete="name"
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label htmlFor="inquiry-email" className="text-sm font-semibold text-foreground">
+                      Email
+                    </label>
+                    <div className="relative">
+                      <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="inquiry-email"
+                        type="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        placeholder="you@example.com"
+                        autoComplete="email"
+                        required
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="inquiry-phone" className="text-sm font-semibold text-foreground">
+                      Phone
+                    </label>
+                    <div className="relative">
+                      <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="inquiry-phone"
+                        type="tel"
+                        value={phone}
+                        onChange={(event) => setPhone(event.target.value)}
+                        placeholder="Optional"
+                        autoComplete="tel"
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="inquiry-location" className="text-sm font-semibold text-foreground">
+                    Location
+                  </label>
+                  <Input
+                    id="inquiry-location"
+                    value={location}
+                    onChange={(event) => setLocation(event.target.value)}
+                    placeholder="City, Province / State"
+                    autoComplete="address-level2"
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label htmlFor="inquiry-required-date" className="text-sm font-semibold text-foreground">
+                      Required By Date
+                    </label>
+                    <div className="relative">
+                      <CalendarClock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="inquiry-required-date"
+                        type="date"
+                        value={requiredByDate}
+                        min={minDate}
+                        onChange={(event) => setRequiredByDate(event.target.value)}
+                        required
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="inquiry-occasion" className="text-sm font-semibold text-foreground">
+                      Occasion
+                    </label>
+                    <Input
+                      id="inquiry-occasion"
+                      value={occasion}
+                      onChange={(event) => setOccasion(event.target.value)}
+                      placeholder="Wedding, birthday, prom..."
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="inquiry-size-notes" className="text-sm font-semibold text-foreground">
+                    Size or Measurements
+                  </label>
+                  <Input
+                    id="inquiry-size-notes"
+                    value={sizeNotes}
+                    onChange={(event) => setSizeNotes(event.target.value)}
+                    placeholder="Optional details to help with your quote"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="inquiry-message" className="text-sm font-semibold text-foreground">
+                    Message
+                  </label>
+                  <textarea
+                    id="inquiry-message"
+                    value={message}
+                    onChange={(event) => setMessage(event.target.value)}
+                    placeholder="Tell us about your event, preferred details, or any special requests."
+                    required
+                    rows={6}
+                    className={cn(
+                      "flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm",
+                      "disabled:cursor-not-allowed disabled:opacity-50",
+                    )}
                   />
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <label htmlFor="inquiry-size-notes" className="text-sm font-semibold text-foreground">
-                  Size or Measurements
-                </label>
-                <Input
-                  id="inquiry-size-notes"
-                  value={sizeNotes}
-                  onChange={(event) => setSizeNotes(event.target.value)}
-                  placeholder="Optional details to help with your quote"
-                />
+            <div className="shrink-0 border-t border-border bg-background/95 px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-background/80">
+              <p className="text-xs leading-5 text-muted-foreground">
+                We&apos;ll use your selected product details and current page link automatically so you don&apos;t have to repeat yourself.
+              </p>
+              <div className="mt-3 flex gap-3">
+                <Button type="button" variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1 gap-2" disabled={isSubmitting}>
+                  <Send className="h-4 w-4" />
+                  {isSubmitting ? "Sending..." : "Send Inquiry"}
+                </Button>
               </div>
-
-              <div className="space-y-2">
-                <label htmlFor="inquiry-message" className="text-sm font-semibold text-foreground">
-                  Message
-                </label>
-                <textarea
-                  id="inquiry-message"
-                  value={message}
-                  onChange={(event) => setMessage(event.target.value)}
-                  placeholder="Tell us about your event, preferred details, or any special requests."
-                  required
-                  rows={6}
-                  className={cn(
-                    "flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm",
-                    "disabled:cursor-not-allowed disabled:opacity-50",
-                  )}
-                />
-              </div>
-
-              <div className="sticky bottom-0 flex flex-col gap-3 border-t border-border bg-background/95 pt-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-                <p className="text-xs leading-5 text-muted-foreground">
-                  We’ll use your selected product details and current page link automatically so you don’t have to repeat yourself.
-                </p>
-                <div className="flex gap-3">
-                  <Button type="button" variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="flex-1 gap-2" disabled={isSubmitting}>
-                    <Send className="h-4 w-4" />
-                    {isSubmitting ? "Sending..." : "Send Inquiry"}
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </DialogContent>
     </Dialog>

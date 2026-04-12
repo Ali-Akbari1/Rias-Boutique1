@@ -44,10 +44,11 @@ const CollectionRelatedCategories = ({ department, activeCategory = "all" }: Col
       new Map<string, { key: string; label: string; count: number; leadProduct: (typeof products)[number] }>(),
     ).values(),
   )
+    .filter((category) => category.key !== activeCategory)
     .sort((a, b) => b.count - a.count || b.leadProduct.popularity - a.leadProduct.popularity)
     .slice(0, 4);
 
-  if (activeCategory !== "all" || categories.length === 0) {
+  if (categories.length === 0) {
     return null;
   }
 
