@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useLocation, useParams } from "react-router-dom";
-import { ArrowLeft, BadgeCheck, CheckCircle2, Search, ShieldCheck, Truck } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, BadgeCheck, CheckCircle2, Search, ShieldCheck, Truck } from "lucide-react";
 import { getProductById } from "@/features/catalog/data/products";
 import { useCartActions } from "@/features/cart/context/CartContext";
 import { useCartDrawer } from "@/features/cart/context/CartDrawerContext";
@@ -140,6 +140,31 @@ const ProductDetails = () => {
     const index = galleryImages.findIndex((image) => image === selectedImage);
     return index >= 0 ? index : 0;
   }, [galleryImages, selectedImage]);
+  const hasMultipleImages = galleryImages.length > 1;
+
+  const showPreviousImage = () => {
+    if (!hasMultipleImages) {
+      return;
+    }
+
+    const previousIndex = (selectedImageIndex - 1 + galleryImages.length) % galleryImages.length;
+    const previousImage = galleryImages[previousIndex];
+    if (previousImage) {
+      setSelectedImage(previousImage);
+    }
+  };
+
+  const showNextImage = () => {
+    if (!hasMultipleImages) {
+      return;
+    }
+
+    const nextIndex = (selectedImageIndex + 1) % galleryImages.length;
+    const nextImage = galleryImages[nextIndex];
+    if (nextImage) {
+      setSelectedImage(nextImage);
+    }
+  };
 
   const availableSizeKeys = useMemo<StandardSizeKey[]>(() => {
     const keys = new Set<StandardSizeKey>();
@@ -251,7 +276,7 @@ const ProductDetails = () => {
 
         <section className="grid gap-8 lg:grid-cols-[1fr_1fr]">
           <div className="space-y-4">
-            <div className="overflow-hidden rounded-md border border-border bg-card">
+            <div className="relative overflow-hidden rounded-md border border-border bg-card">
               <ZoomableImageDialog
                 src={primaryImage}
                 images={galleryImages}
@@ -282,6 +307,37 @@ const ProductDetails = () => {
                   </span>
                 </button>
               </ZoomableImageDialog>
+
+              {hasMultipleImages ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      showPreviousImage();
+                    }}
+                    className="absolute left-3 top-1/2 z-10 h-10 w-10 -translate-y-1/2 rounded-full bg-background/90 shadow-sm hover:bg-secondary"
+                    aria-label="View previous product image"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      showNextImage();
+                    }}
+                    className="absolute right-3 top-1/2 z-10 h-10 w-10 -translate-y-1/2 rounded-full bg-background/90 shadow-sm hover:bg-secondary"
+                    aria-label="View next product image"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </>
+              ) : null}
             </div>
             <div className="grid grid-cols-3 gap-3">
               {galleryImages.map((image, index) => (
