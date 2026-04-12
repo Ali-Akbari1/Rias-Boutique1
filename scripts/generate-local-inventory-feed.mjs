@@ -7,7 +7,9 @@ const projectRoot = join(scriptDir, "..");
 const productsPath = join(projectRoot, "src", "content", "products.json");
 const outputPath = join(projectRoot, "public", "local-inventory-feed.txt");
 
-const DEFAULT_STORE_CODE = "5741454598";
+// Default to the currently linked Business Profile store code.
+// LOCAL_INVENTORY_STORE_CODE should override this if the store code changes.
+const DEFAULT_STORE_CODE = "16335217184145401742";
 const DEFAULT_CURRENCY = "CAD";
 
 const storeCode =
@@ -67,21 +69,10 @@ const normalizeAvailability = (value) => {
   return "in_stock";
 };
 
-const getQuantity = (value) => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return Math.max(0, Math.floor(value));
-  }
-  const normalized = toStringValue(value).toLowerCase();
-  if (["sold_out", "out_of_stock", "unavailable"].includes(normalized)) {
-    return 0;
-  }
-  return 1;
-};
-
 const formatPrice = (value, currencyCode) => `${Math.max(0, value).toFixed(2)} ${currencyCode}`;
 
 const rows = [];
-rows.push(["store_code", "id", "availability", "quantity", "price"].join("\t"));
+rows.push(["store_code", "id", "availability", "price"].join("\t"));
 
 for (let index = 0; index < productRows.length; index += 1) {
   const product = productRows[index];
@@ -91,7 +82,6 @@ for (let index = 0; index < productRows.length; index += 1) {
   const normalizedSizes = sizes.length > 0 ? sizes : ["One Size"];
   const normalizedColors = colors.length > 0 ? colors : ["Default"];
   const availability = normalizeAvailability(product?.availability ?? product?.inventory);
-  const quantity = getQuantity(product?.inventory ?? product?.availability);
   const priceCad = toNumber(product?.price, 0);
   if (priceCad <= 0) {
     continue;
@@ -103,7 +93,7 @@ for (let index = 0; index < productRows.length; index += 1) {
       const sizeSlug = slugify(size) || "one-size";
       const colorSlug = slugify(color) || "default";
       const variantId = `${baseId}-${sizeSlug}-${colorSlug}`;
-      rows.push([storeCode, variantId, availability, String(quantity), formattedPrice].join("\t"));
+      rows.push([storeCode, variantId, availability, formattedPrice].join("\t"));
     }
   }
 }

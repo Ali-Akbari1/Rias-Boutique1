@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "npm run sitemap:generate && npm run merchant-feed:generate",
+    "prebuild": "npm run sitemap:generate && npm run merchant-feed:generate && npm run local-inventory-feed:generate",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "typecheck": "npm run typecheck:app && npm run typecheck:server",
@@ -15,6 +15,7 @@
     "media:hygiene": "node scripts/media-hygiene.mjs",
     "sitemap:generate": "node scripts/generate-sitemap.mjs",
     "merchant-feed:generate": "node scripts/generate-google-merchant-feed.mjs",
+    "local-inventory-feed:generate": "node scripts/generate-local-inventory-feed.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
