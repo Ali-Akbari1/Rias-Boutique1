@@ -13,6 +13,14 @@ const categoryParam = (value: string) => value.trim().toLowerCase().replace(/[^a
 
 const CollectionRelatedCategories = ({ department }: CollectionRelatedCategoriesProps) => {
   const scopedProducts = department === "all" ? products : products.filter((product) => product.department === department);
+  const scrollToCollection = () => {
+    const collectionSection = document.getElementById("collection");
+    if (!collectionSection) {
+      return;
+    }
+
+    collectionSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const categories = Array.from(
     scopedProducts.reduce(
@@ -64,6 +72,7 @@ const CollectionRelatedCategories = ({ department }: CollectionRelatedCategories
                   pathname,
                   search: `?category=${encodeURIComponent(category.key)}`,
                 }}
+                onClick={scrollToCollection}
                 className="group overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-foreground/20 hover:shadow-boutique"
               >
                 <div className="aspect-[4/5] overflow-hidden bg-muted/20">

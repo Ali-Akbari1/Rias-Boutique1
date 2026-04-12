@@ -17,6 +17,10 @@
       "handle": "filesystem"
     },
     {
+      "src": "/api/health",
+      "dest": "/api/order-status?health=1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/"
     }

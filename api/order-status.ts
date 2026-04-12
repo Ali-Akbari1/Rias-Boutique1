@@ -17,6 +17,9 @@ import {
 import { CloverApiError, fetchCloverCheckoutStatus } from "../server/lib/clover.js";
 import { sendOrderConfirmationEmail } from "../server/lib/email.js";
 import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
+import { getShippingProviderMode } from "../server/lib/checkout-pricing.js";
+import { isEasyPostConfigured } from "../server/lib/easypost.js";
+import { hasSupabaseAdminConfig } from "../server/lib/supabase-admin.js";
 import { z } from "zod";
 
 const DEFAULT_RATE_LIMIT = 120;
@@ -98,6 +101,25 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
     return;
   }
+
+  if (getQueryValue(req, "health").trim() === "1") {
+    res.setHeader("Cache-Control", "no-store");
+    res.status(200).json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      services: {
+        orderStoreConfigured: isOrderStoreConfigured(),
+        supabaseAdminConfigured: hasSupabaseAdminConfig(),
+        shippingProviderMode: getShippingProviderMode(),
+        easypostConfigured: isEasyPostConfigured(),
+        upstashConfigured: Boolean(
+          process.env.UPSTASH_REDIS_REST_URL?.trim() && process.env.UPSTASH_REDIS_REST_TOKEN?.trim(),
+        ),
+      },
+    });
+    return;
+  }
+
   const requestId = createRequestId();
   const debugLogs = isDebugLoggingEnabled();
   res.setHeader("X-Request-Id", requestId);

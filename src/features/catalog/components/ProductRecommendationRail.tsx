@@ -1,5 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   hasDisplayPrice,
   isInquiryOnlyProduct,
@@ -24,25 +25,136 @@ const ProductRecommendationRail = ({
 }: ProductRecommendationRailProps) => {
   const location = useLocation();
   const { formatPrice } = useCurrency();
-
-  if (products.length === 0) {
-    return null;
-  }
+  const railRef = useRef<HTMLDivElement | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(products.length <= 1);
+  const hasMiniCarouselControls = compact && products.length > 1;
 
   const returnTo = location.pathname.startsWith("/collection")
     ? `${location.pathname}${location.search}`
     : "/collection";
 
+  const syncRailState = () => {
+    const rail = railRef.current;
+    if (!rail) {
+      return;
+    }
+
+    const cards = Array.from(rail.children) as HTMLElement[];
+    if (cards.length === 0) {
+      return;
+    }
+
+    const scrollLeft = rail.scrollLeft;
+    const maxScrollLeft = Math.max(0, rail.scrollWidth - rail.clientWidth);
+    const closestIndex = cards.reduce((bestIndex, card, index) => {
+      const bestCard = cards[bestIndex];
+      return Math.abs(card.offsetLeft - scrollLeft) < Math.abs(bestCard.offsetLeft - scrollLeft) ? index : bestIndex;
+    }, 0);
+
+    setActiveIndex(closestIndex);
+    setIsAtStart(scrollLeft <= 8);
+    setIsAtEnd(scrollLeft >= maxScrollLeft - 8);
+  };
+
+  const scrollToCard = (index: number) => {
+    const rail = railRef.current;
+    const card = rail?.children[index];
+    if (!(card instanceof HTMLElement)) {
+      return;
+    }
+
+    card.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "start",
+    });
+  };
+
+  useEffect(() => {
+    setActiveIndex(0);
+    setIsAtStart(true);
+    setIsAtEnd(products.length <= 1);
+  }, [products.length]);
+
+  useEffect(() => {
+    if (!hasMiniCarouselControls) {
+      return;
+    }
+
+    const rail = railRef.current;
+    if (!rail) {
+      return;
+    }
+
+    let frameId = 0;
+    const handleRailPositionChange = () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        syncRailState();
+        frameId = 0;
+      });
+    };
+
+    syncRailState();
+    rail.addEventListener("scroll", handleRailPositionChange, { passive: true });
+    window.addEventListener("resize", handleRailPositionChange);
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+      rail.removeEventListener("scroll", handleRailPositionChange);
+      window.removeEventListener("resize", handleRailPositionChange);
+    };
+  }, [hasMiniCarouselControls, products.length]);
+
+  if (products.length === 0) {
+    return null;
+  }
+
   return (
     <section className="space-y-3">
-      <div className="space-y-1">
-        <h2 className={compact ? "font-display text-xl text-foreground" : "font-display text-3xl text-foreground"}>
-          {title}
-        </h2>
-        <p className="max-w-2xl text-sm text-muted-foreground">{description}</p>
+      <div className={`gap-4 ${hasMiniCarouselControls ? "flex items-start justify-between" : "space-y-1"}`}>
+        <div className="space-y-1">
+          <h2 className={compact ? "font-display text-xl text-foreground" : "font-display text-3xl text-foreground"}>
+            {title}
+          </h2>
+          <p className="max-w-2xl text-sm text-muted-foreground">{description}</p>
+        </div>
+
+        {hasMiniCarouselControls ? (
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              aria-label="Show previous recommendation"
+              onClick={() => scrollToCard(Math.max(0, activeIndex - 1))}
+              disabled={isAtStart}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              aria-label="Show next recommendation"
+              onClick={() => scrollToCard(Math.min(products.length - 1, activeIndex + 1))}
+              disabled={isAtEnd}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        ) : null}
       </div>
 
-      <div className={`-mx-1 flex snap-x overflow-x-auto px-1 ${compact ? "gap-3 pb-1" : "gap-4 pb-2"}`}>
+      <div
+        ref={railRef}
+        className={`-mx-1 flex snap-x overflow-x-auto px-1 scroll-smooth ${compact ? "gap-3 pb-1" : "gap-4 pb-2"}`}
+      >
         {products.map((product) => {
           const inquiryOnly = isInquiryOnlyProduct(product);
           const detailsPath = `/products/${product.id}?returnTo=${encodeURIComponent(returnTo)}`;
@@ -148,6 +260,23 @@ const ProductRecommendationRail = ({
           );
         })}
       </div>
+
+      {hasMiniCarouselControls ? (
+        <div className="flex items-center justify-center gap-2">
+          {products.map((product, index) => (
+            <button
+              key={product.id}
+              type="button"
+              aria-label={`Go to recommendation ${index + 1}`}
+              aria-current={activeIndex === index}
+              onClick={() => scrollToCard(index)}
+              className={`h-2.5 rounded-full transition-all ${
+                activeIndex === index ? "w-6 bg-foreground" : "w-2.5 bg-border hover:bg-muted-foreground/70"
+              }`}
+            />
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 };

@@ -14,13 +14,30 @@ import { sendProductInquiryEmail } from "../server/lib/email.js";
 const DEFAULT_RATE_LIMIT = 12;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
 
+type ProductInquiryPayload = {
+  productId: string;
+  productName: string;
+  productSku?: string;
+  productUrl: string;
+  selectedVariant?: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  location: string;
+  requiredByDate: string;
+  occasion?: string;
+  sizeNotes?: string;
+  message: string;
+  website?: string;
+};
+
 const getTodayDateString = () => {
   const now = new Date();
   const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
   return localDate.toISOString().slice(0, 10);
 };
 
-const inquirySchema = z
+const inquirySchema: z.ZodType<ProductInquiryPayload> = z
   .object({
     productId: z.string().trim().min(1).max(120),
     productName: z.string().trim().min(1).max(180),
@@ -96,7 +113,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   try {
-    const emailDispatch = await sendProductInquiryEmail(parsed.data);
+    const { website: _website, ...emailPayload } = parsed.data;
+    const emailDispatch = await sendProductInquiryEmail(emailPayload);
     res.status(200).json({
       success: true,
       emailProvider: emailDispatch.provider,
