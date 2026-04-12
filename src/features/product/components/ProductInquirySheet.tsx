@@ -251,7 +251,7 @@ const ProductInquirySheet = ({
                       id="inquiry-occasion"
                       value={occasion}
                       onChange={(event) => setOccasion(event.target.value)}
-                      placeholder="Wedding, birthday, prom..."
+                      placeholder="Wedding, Nikkah, Birthday..."
                     />
                   </div>
                 </div>
