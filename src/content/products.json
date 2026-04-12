@@ -887,6 +887,27 @@
       "description": "Lilac barosha short dress with mirror work.",
       "category": "Party Wear",
       "fitInfo": "Small - Bust: 38in\nMedium - Bust: 40in\n"
+    },
+    {
+      "galleryImages": [
+        "/uploads/img_1497.jpg"
+      ],
+      "name": "Bridal 2-Layer 925 Set ",
+      "slug": "mashadi-bridal-2layer-set",
+      "maxQuantity": 1,
+      "department": "women",
+      "tags": [
+        "Bridal",
+        "Jewelry"
+      ],
+      "id": "mashadi-bridal-2layer-set",
+      "createdAt": "2026-04-12",
+      "image": "/uploads/img_1497.jpg",
+      "inventory": "available",
+      "description": "Bridal 2 Layer 925 (Noqrah Set)",
+      "price_on_inquiry": true,
+      "category": "925 Silver",
+      "fitInfo": "Set comes with: bracelet, earrings, ring and 2-layer necklace. "
     }
   ]
 }
