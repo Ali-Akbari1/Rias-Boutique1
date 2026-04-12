@@ -146,6 +146,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                     title="Before You Go"
                     description="A few more pieces worth a quick look before checkout."
                     products={recommendedProducts}
+                    onProductClick={onClose}
                   />
                 </div>
               ) : null}

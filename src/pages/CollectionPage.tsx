@@ -39,12 +39,17 @@ const CollectionPage = () => {
     return searchQuery ? searchQuery.trim() : "";
   }, [searchParams]);
 
+  const activeCategory = useMemo(() => {
+    const category = searchParams.get("category");
+    return category ? category.trim() : "all";
+  }, [searchParams]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar onCartClick={openDrawer} />
       <main className="pt-24 sm:pt-28">
         <ProductGrid initialDepartment={initialDepartment} initialQuery={initialSearch} />
-        <CollectionRelatedCategories department={initialDepartment} />
+        <CollectionRelatedCategories department={initialDepartment} activeCategory={activeCategory} />
       </main>
 
       <Footer />

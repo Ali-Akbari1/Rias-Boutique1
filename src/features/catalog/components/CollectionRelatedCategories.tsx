@@ -7,11 +7,12 @@ import {
 
 interface CollectionRelatedCategoriesProps {
   department: "all" | ProductDepartment;
+  activeCategory?: string;
 }
 
 const categoryParam = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
 
-const CollectionRelatedCategories = ({ department }: CollectionRelatedCategoriesProps) => {
+const CollectionRelatedCategories = ({ department, activeCategory = "all" }: CollectionRelatedCategoriesProps) => {
   const scopedProducts = department === "all" ? products : products.filter((product) => product.department === department);
   const scrollToCollection = () => {
     const collectionSection = document.getElementById("collection");
@@ -46,7 +47,7 @@ const CollectionRelatedCategories = ({ department }: CollectionRelatedCategories
     .sort((a, b) => b.count - a.count || b.leadProduct.popularity - a.leadProduct.popularity)
     .slice(0, 4);
 
-  if (categories.length === 0) {
+  if (activeCategory !== "all" || categories.length === 0) {
     return null;
   }
 

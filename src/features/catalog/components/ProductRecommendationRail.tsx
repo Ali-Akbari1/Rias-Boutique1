@@ -15,6 +15,7 @@ interface ProductRecommendationRailProps {
   description: string;
   products: Product[];
   compact?: boolean;
+  onProductClick?: () => void;
 }
 
 const ProductRecommendationRail = ({
@@ -22,6 +23,7 @@ const ProductRecommendationRail = ({
   description,
   products,
   compact = false,
+  onProductClick,
 }: ProductRecommendationRailProps) => {
   const location = useLocation();
   const { formatPrice } = useCurrency();
@@ -170,6 +172,7 @@ const ProductRecommendationRail = ({
               <Link
                 key={product.id}
                 to={detailsPath}
+                onClick={onProductClick}
                 onMouseEnter={() => void prefetchProductDetailsPage()}
                 onFocus={() => void prefetchProductDetailsPage()}
                 className="group flex w-[18rem] shrink-0 snap-start gap-3 rounded-2xl border border-border bg-card/80 p-3 transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-boutique"
@@ -215,6 +218,7 @@ const ProductRecommendationRail = ({
             <Link
               key={product.id}
               to={detailsPath}
+              onClick={onProductClick}
               onMouseEnter={() => void prefetchProductDetailsPage()}
               onFocus={() => void prefetchProductDetailsPage()}
               className={`group flex shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border bg-card/70 transition-all duration-300 hover:-translate-y-1 hover:border-foreground/20 hover:shadow-boutique ${
