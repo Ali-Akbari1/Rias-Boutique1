@@ -2,7 +2,7 @@
   "products": [
     {
       "fabric": "Velvet",
-      "price": 450,
+      "price": "",
       "galleryImages": [
         "/uploads/burgundy-bridal-dress-1.webp",
         "/uploads/burgundy-bridal-dress-2.webp"
@@ -27,6 +27,7 @@
       "deliveryEstimate": "",
       "inventory": "sold_out",
       "description": "3 Piece Burgundy Bridal Dress\n",
+      "price_on_inquiry": true,
       "category": "Bridal",
       "fitInfo": "*Jewelry Sold Separately"
     },
@@ -743,8 +744,8 @@
         "Dry Clean Only "
       ],
       "id": "teal-barosha-dress",
-      "image": "/uploads/teal-barosha-dress-1.webp",
       "createdAt": "2026-03-08",
+      "image": "/uploads/teal-barosha-dress-1.webp",
       "inventory": "sold_out",
       "description": "Teal barosha dress with silver cheerma detailing. ",
       "category": "Party Wear",
@@ -773,8 +774,8 @@
         "Dry Clean Only"
       ],
       "id": "true-white-mens-parantoban",
-      "image": "/uploads/men-s-white-parantoban-1.webp",
       "createdAt": "2026-02-19",
+      "image": "/uploads/men-s-white-parantoban-1.webp",
       "inventory": "available",
       "description": "True white men's parantoban with white embroidery. ",
       "category": "Machine Made",
