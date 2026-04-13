@@ -338,6 +338,8 @@ const buildProductSchema = (product: Product, canonicalUrl: string): JsonLdNode 
   const imageUrls = toUniqueValues(
     [product.image, ...product.galleryImages].filter((value): value is string => Boolean(value)),
   );
+  const colorOptions = toUniqueValues(product.colors);
+  const sizeOptions = toUniqueValues(product.sizes);
   const imageObjects = imageUrls.map((url, index) => ({
     "@type": "ImageObject",
     "@id": `${canonicalUrl}#image-${index + 1}`,
@@ -352,14 +354,14 @@ const buildProductSchema = (product: Product, canonicalUrl: string): JsonLdNode 
     description: normalizeDescription(product.description) || `Shop ${product.name} at ${STORE_NAME}.`,
     sku: product.id,
     category: product.category,
-    color: product.colors,
-    size: product.sizes,
     material: product.fabric,
     brand: {
       "@type": "Brand",
       name: STORE_NAME,
     },
     image: imageObjects,
+    ...(colorOptions.length === 1 ? { color: colorOptions[0] } : {}),
+    ...(sizeOptions.length === 1 ? { size: sizeOptions[0] } : {}),
   };
 
   if (!hasDisplayPrice(product)) {
