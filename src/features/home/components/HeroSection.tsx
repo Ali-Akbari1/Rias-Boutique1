@@ -11,7 +11,7 @@ const heroCtas: Array<{ to: string; label: string; icon: LucideIcon }> = [
 
 const HeroSection = () => {
   const heroCtaClass =
-    "group inline-flex h-14 min-w-[10.75rem] items-center gap-3 rounded-[1.15rem] border border-white/24 bg-background/92 px-4 pr-4 text-sm font-body font-semibold tracking-[0.06em] text-foreground shadow-[0_16px_36px_rgba(0,0,0,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:border-white/40 hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent sm:h-[3.75rem] sm:min-w-[11.25rem] sm:px-4";
+    "group inline-flex h-14 min-w-[10.75rem] items-center gap-3 rounded-[1.15rem] border border-white bg-white px-4 pr-4 text-sm font-body font-semibold tracking-[0.06em] text-foreground shadow-[0_16px_36px_rgba(0,0,0,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent sm:h-[3.75rem] sm:min-w-[11.25rem] sm:px-4";
 
   return (
     <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden pt-16 sm:min-h-[80vh]">
