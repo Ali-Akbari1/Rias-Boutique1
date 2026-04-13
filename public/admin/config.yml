@@ -129,7 +129,11 @@ collections:
                 required: false
                 field: { label: "Color", name: "color", widget: "string" }
               - { label: "Fabric", name: "fabric", widget: "text", required: false }
-              - { label: "Fit Information", name: "fitInfo", widget: "text", required: false }
+              - label: "Fit Information"
+                name: "fitInfo"
+                widget: "text"
+                required: false
+                hint: "Press Enter to put each measurement or note on its own line."
               - label: "Care Instructions"
                 name: "careInstructions"
                 widget: "list"

@@ -598,7 +598,8 @@ const ProductDetails = () => {
                     </p>
                     {product.fitInfo ? (
                       <p>
-                        <span className="font-semibold text-foreground">Details:</span> {product.fitInfo}
+                        <span className="mb-1 block font-semibold text-foreground">Details:</span>
+                        <span className="block whitespace-pre-line">{product.fitInfo}</span>
                       </p>
                     ) : null}
                     {product.deliveryEstimate ? (
@@ -610,7 +611,8 @@ const ProductDetails = () => {
                 ) : (
                   <>
                     <p>
-                      <span className="font-semibold text-foreground">Fit:</span> {product.fitInfo}
+                      <span className="mb-1 block font-semibold text-foreground">Fit:</span>
+                      <span className="block whitespace-pre-line">{product.fitInfo}</span>
                     </p>
                     <p>
                       <span className="font-semibold text-foreground">Fabric:</span> {product.fabric}
