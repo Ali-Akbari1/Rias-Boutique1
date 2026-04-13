@@ -32,7 +32,13 @@ import {
 } from "@/lib/checkout-request";
 import { getStorePickupDetails, returnPolicy, shippingPolicy } from "@/features/store/data/store-content";
 import { formatProductAlt } from "@/lib/seo";
-import { getProductById, getProductBySlug, products, type Product } from "@/features/catalog/data/products";
+import {
+  formatProductSelectionSummary,
+  getProductById,
+  getProductBySlug,
+  products,
+  type Product,
+} from "@/features/catalog/data/products";
 
 type DeliveryMethod = "shipping" | "pickup";
 type AddressVerificationStatus = "idle" | "verifying" | "verified" | "invalid" | "skipped";
@@ -1479,6 +1485,7 @@ const Checkout = () => {
                   const maxQuantity = getMaxQuantityForProduct(product);
                   const isMaxQuantity = maxQuantity <= 0 || quantity >= maxQuantity;
                   const unitPrice = product.price ?? 0;
+                  const selectionSummary = formatProductSelectionSummary(product, selection);
 
                   return (
                     <div
@@ -1498,9 +1505,9 @@ const Checkout = () => {
                         <p className="font-body text-xs text-muted-foreground sm:text-sm">
                           {formatPrice(unitPrice)} x {quantity}
                         </p>
-                        <p className="font-body text-xs text-muted-foreground">
-                          Size: {selection.size} | Color: {selection.color}
-                        </p>
+                        {selectionSummary ? (
+                          <p className="font-body text-xs text-muted-foreground">{selectionSummary}</p>
+                        ) : null}
                         <div className="mt-2 flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <button

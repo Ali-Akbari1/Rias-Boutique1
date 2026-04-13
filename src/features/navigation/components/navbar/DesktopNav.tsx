@@ -3,15 +3,17 @@ import { prefetchAboutPage, prefetchCollectionPage, prefetchFaqPage } from "@/li
 import { getPrimaryNavLinks, type PrimaryNavState } from "./nav-links";
 
 const desktopNavLinkClass = (isActive: boolean) =>
-  `transition-colors hover:text-foreground hover:underline underline-offset-4 ${
-    isActive ? "text-foreground underline" : "text-muted-foreground"
+  `relative inline-flex items-center py-2 text-[0.95rem] font-semibold tracking-[0.04em] transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-center after:bg-foreground after:transition-transform after:duration-200 after:ease-out ${
+    isActive
+      ? "text-foreground after:scale-x-100"
+      : "text-muted-foreground after:scale-x-0 hover:text-foreground hover:after:scale-x-100"
   }`;
 
 const DesktopNav = (state: PrimaryNavState) => {
   const links = getPrimaryNavLinks(state);
 
   return (
-    <div className="justify-self-center hidden items-center gap-8 font-body text-lg md:flex">
+    <div className="hidden items-center justify-self-center gap-7 font-body md:flex lg:gap-8">
       {links.map((link) => {
         const handlePrefetch = () => {
           if (link.to.startsWith("/collection")) {
@@ -30,6 +32,7 @@ const DesktopNav = (state: PrimaryNavState) => {
             className={desktopNavLinkClass(link.isActive)}
             onMouseEnter={handlePrefetch}
             onFocus={handlePrefetch}
+            aria-current={link.isActive ? "page" : undefined}
           >
             {link.label}
           </Link>

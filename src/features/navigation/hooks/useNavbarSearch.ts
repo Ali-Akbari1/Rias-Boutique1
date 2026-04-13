@@ -100,17 +100,17 @@ export const useNavbarSearch = ({ pathname, search }: { pathname: string; search
     ).slice(0, SEARCH_RESULTS_LIMIT);
   }, [availableProducts, normalizedSearchQuery]);
 
-  const activeDepartment = useMemo<"women" | "men" | null>(() => {
+  const activeDepartment = useMemo<"women" | "men" | "jewelry" | null>(() => {
     if (pathname.startsWith("/collection/")) {
       const routeDepartment = pathname.split("/")[2]?.trim().toLowerCase();
-      if (routeDepartment === "women" || routeDepartment === "men") {
-        return routeDepartment;
+      if (routeDepartment === "women" || routeDepartment === "men" || routeDepartment === "jewelry") {
+        return routeDepartment as "women" | "men" | "jewelry";
       }
     }
 
     const queryDepartment = new URLSearchParams(search).get("department")?.trim().toLowerCase();
-    if (queryDepartment === "women" || queryDepartment === "men") {
-      return queryDepartment;
+    if (queryDepartment === "women" || queryDepartment === "men" || queryDepartment === "jewelry") {
+      return queryDepartment as "women" | "men" | "jewelry";
     }
 
     return null;
@@ -119,6 +119,7 @@ export const useNavbarSearch = ({ pathname, search }: { pathname: string; search
   const isCollectionRoute = pathname.startsWith("/collection");
   const isWomensActive = isCollectionRoute && activeDepartment === "women";
   const isMensActive = isCollectionRoute && activeDepartment === "men";
+  const isJewelryActive = isCollectionRoute && activeDepartment === "jewelry";
 
   return {
     searchInputRef,
@@ -130,6 +131,7 @@ export const useNavbarSearch = ({ pathname, search }: { pathname: string; search
     suggestionTerms,
     isWomensActive,
     isMensActive,
+    isJewelryActive,
     isAboutActive: pathname === "/about",
     isFaqActive: pathname === "/faq",
   };

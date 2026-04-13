@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import {
+  getDefaultProductSelection,
   hasDisplayPrice,
+  hasProductVariantOptions,
   isInquiryOnlyProduct,
   isPurchasableProduct,
   type Product,
@@ -43,8 +45,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
       scrollY: window.scrollY,
     });
   };
+  const defaultSelection = getDefaultProductSelection(product);
+  const requiresVariantSelection = product.sizes.length > 1 || product.colors.length > 1;
+  const variantPrompt =
+    product.sizes.length > 1 && product.colors.length > 1
+      ? "size and color"
+      : product.sizes.length > 1
+        ? "size"
+        : "color";
 
-  const canDirectAdd = isPurchasableProduct(product) && product.sizes.length === 1 && product.colors.length === 1;
+  const canDirectAdd = isPurchasableProduct(product) && product.sizes.length <= 1 && product.colors.length <= 1;
 
   useEffect(() => {
     return () => {
@@ -103,26 +113,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
     if (!canDirectAdd) {
       toast({
-        title: "Select size and color",
-        description: "Please open View Details to choose size and color before adding this item to your bag.",
+        title: `Select ${variantPrompt}`,
+        description: `Please open View Details to choose ${variantPrompt} before adding this item to your bag.`,
         variant: "destructive",
       });
       return;
     }
 
-    const size = product.sizes[0];
-    const color = product.colors[0];
-
-    if (!size || !color) {
-      toast({
-        title: "Select size and color",
-        description: "Please open View Details to choose size and color before adding this item to your bag.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const result = addToCart(product, { size, color });
+    const result = addToCart(product, defaultSelection);
     if (result === "sold_out") {
       toast({
         title: "Sold out",
@@ -211,7 +209,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <p className="mb-1 text-left text-xs font-body text-muted-foreground">
-          {isInquiryOnly ? "Request a quote from the product page" : "Select size and color on product page"}
+          {isInquiryOnly
+            ? "Request a quote from the product page"
+            : requiresVariantSelection
+              ? "Choose your options from the product page"
+              : hasProductVariantOptions(product)
+                ? "Ready to add to bag or view details"
+                : "No size or color selection needed"}
         </p>
 
         <div className="mt-auto pt-1.5">
@@ -270,4 +274,3 @@ const ProductCard = ({ product }: ProductCardProps) => {
 };
 
 export default ProductCard;
-

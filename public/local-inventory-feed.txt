@@ -1,6 +1,6 @@
 store_code	id	availability	price
-16335217184145401742	Burgundy-Bridal-Dress-medium-red	out_of_stock	450.00 CAD
-16335217184145401742	Burgundy-Bridal-Dress-medium-burgundy	out_of_stock	450.00 CAD
+16335217184145401742	Burgundy-Bridal-Dress-medium-red	in_stock	450.00 CAD
+16335217184145401742	Burgundy-Bridal-Dress-medium-burgundy	in_stock	450.00 CAD
 16335217184145401742	Green-Bridal-Dress-large-green	in_stock	550.00 CAD
 16335217184145401742	Blue-Cheerma-Dozi-medium-blue	out_of_stock	400.00 CAD
 16335217184145401742	Royal-Blue-small-royal-blue	out_of_stock	250.00 CAD

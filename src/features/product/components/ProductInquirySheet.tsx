@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { CalendarClock, Mail, Phone, Send, Sparkles } from "lucide-react";
-import { type Product } from "@/features/catalog/data/products";
+import { formatProductSelectionSummary, type Product } from "@/features/catalog/data/products";
 import { useToast } from "@/hooks/use-toast";
 import { requestProductInquiry } from "@/lib/site-api";
 import { cn } from "@/lib/utils";
@@ -46,14 +46,15 @@ const ProductInquirySheet = ({
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const minDate = useMemo(() => getTodayDateString(), []);
-  const selectedVariant = useMemo(() => {
-    const parts = [
-      selectedSize ? `Size: ${selectedSize}` : "",
-      selectedColor ? `Color: ${selectedColor}` : "",
-    ].filter(Boolean);
-
-    return parts.length > 0 ? parts.join(" | ") : "Not selected";
-  }, [selectedColor, selectedSize]);
+  const selectedVariant = useMemo(
+    () => formatProductSelectionSummary(product, { size: selectedSize, color: selectedColor }),
+    [product, selectedColor, selectedSize],
+  );
+  const sizeNotesLabel = product.department === "jewelry" ? "Details or Notes" : "Size or Measurements";
+  const sizeNotesPlaceholder =
+    product.department === "jewelry"
+      ? "Optional notes to help with your inquiry"
+      : "Optional details to help with your quote";
 
   useEffect(() => {
     if (open && !requiredByDate) {
@@ -143,9 +144,11 @@ const ProductInquirySheet = ({
                   <p>
                     <span className="font-semibold text-foreground">SKU:</span> {product.id}
                   </p>
-                  <p>
-                    <span className="font-semibold text-foreground">Selected variant:</span> {selectedVariant}
-                  </p>
+                  {selectedVariant ? (
+                    <p>
+                      <span className="font-semibold text-foreground">Selected variant:</span> {selectedVariant}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
@@ -258,13 +261,13 @@ const ProductInquirySheet = ({
 
                 <div className="space-y-2">
                   <label htmlFor="inquiry-size-notes" className="text-sm font-semibold text-foreground">
-                    Size or Measurements
+                    {sizeNotesLabel}
                   </label>
                   <Input
                     id="inquiry-size-notes"
                     value={sizeNotes}
                     onChange={(event) => setSizeNotes(event.target.value)}
-                    placeholder="Optional details to help with your quote"
+                    placeholder={sizeNotesPlaceholder}
                   />
                 </div>
 

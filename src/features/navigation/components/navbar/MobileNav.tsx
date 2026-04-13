@@ -1,3 +1,4 @@
+import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { prefetchAboutPage, prefetchCollectionPage, prefetchFaqPage } from "@/lib/prefetch";
 import { getPrimaryNavLinks, type PrimaryNavState } from "./nav-links";
@@ -8,8 +9,15 @@ interface MobileNavProps extends PrimaryNavState {
 }
 
 const mobileNavLinkClass = (isActive: boolean) =>
-  `rounded-sm px-2 py-2 font-body text-base transition-colors hover:bg-secondary hover:text-foreground ${
-    isActive ? "bg-secondary text-foreground" : "text-muted-foreground"
+  `group flex items-center justify-between gap-4 border-b border-border/60 py-3.5 font-body transition-colors last:border-b-0 ${
+    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+  }`;
+
+const mobileNavIconClass = (isActive: boolean) =>
+  `flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors ${
+    isActive
+      ? "border-foreground/20 bg-foreground text-background"
+      : "border-border bg-background text-muted-foreground group-hover:border-foreground/20 group-hover:text-foreground"
   }`;
 
 const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
@@ -24,8 +32,9 @@ const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
       id="mobile-navbar-menu"
       className="border-t border-border bg-background/95 backdrop-blur md:hidden animate-in fade-in-0 slide-in-from-top-2 motion-reduce:animate-none"
     >
-      <div className="container mx-auto flex flex-col gap-1 px-4 py-3 sm:px-6">
+      <div className="container mx-auto flex flex-col gap-0 px-4 py-2 sm:px-6">
         {links.map((link) => {
+          const Icon = link.icon;
           const handlePrefetch = () => {
             if (link.to.startsWith("/collection")) {
               void prefetchCollectionPage();
@@ -45,8 +54,29 @@ const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
               onFocus={handlePrefetch}
               onTouchStart={handlePrefetch}
               className={mobileNavLinkClass(link.isActive)}
+              aria-current={link.isActive ? "page" : undefined}
             >
-              {link.label}
+              <span className="flex min-w-0 items-center gap-3">
+                <span className={mobileNavIconClass(link.isActive)}>
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span className="text-base font-semibold tracking-[0.04em]">{link.label}</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <span
+                  className={`h-px w-7 bg-foreground transition-opacity duration-200 ${
+                    link.isActive ? "opacity-100" : "opacity-0 group-hover:opacity-40"
+                  }`}
+                  aria-hidden="true"
+                />
+                <ChevronRight
+                  className={`h-4 w-4 transition-all duration-200 ${
+                    link.isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground group-hover:translate-x-0.5 group-hover:text-foreground"
+                  }`}
+                />
+              </span>
             </Link>
           );
         })}

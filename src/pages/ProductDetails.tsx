@@ -12,6 +12,8 @@ import {
   Truck,
 } from "lucide-react";
 import {
+  formatProductSelectionSummary,
+  getDefaultProductSelection,
   getProductById,
   hasDisplayPrice,
   isInquiryOnlyProduct,
@@ -54,6 +56,10 @@ const ProductDetails = () => {
   const imageTransitionTimeoutRef = useRef<number | null>(null);
   const { isOpen, openDrawer, closeDrawer } = useCartDrawer();
   const checkoutEnabled = isCheckoutEnabled();
+  const defaultSelection = useMemo(
+    () => (product ? getDefaultProductSelection(product) : { size: "One Size", color: "Default" }),
+    [product],
+  );
   const backToCollectionHref = useMemo(() => {
     const candidate = new URLSearchParams(location.search).get("returnTo")?.trim() || "";
     if (candidate.startsWith("/collection")) {
@@ -121,13 +127,22 @@ const ProductDetails = () => {
       return;
     }
 
-    const chosenSize = selectedSize || singleAvailableSizeLabel;
-    const chosenColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
+    const chosenSize = availableSizeKeys.length > 0 ? selectedSize || singleAvailableSizeLabel : defaultSelection.size;
+    const chosenColor =
+      colorOptions.length > 0
+        ? selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "")
+        : defaultSelection.color;
 
     if (!chosenSize || !chosenColor) {
+      const selectionRequirement =
+        availableSizeKeys.length > 0 && colorOptions.length > 0
+          ? "size and color"
+          : availableSizeKeys.length > 0
+            ? "size"
+            : "color";
       toast({
-        title: "Select size and color",
-        description: "Please choose both size and color before adding this item to your bag.",
+        title: `Select ${selectionRequirement}`,
+        description: `Please choose ${selectionRequirement} before adding this item to your bag.`,
         variant: "destructive",
       });
       return;
@@ -214,7 +229,7 @@ const ProductDetails = () => {
     availableSizeKeys.length === 1 ? standardSizeLabel(availableSizeKeys[0]) : "";
 
   const colorOptions = useMemo(
-    () => (Array.isArray(product?.colors) && product.colors.length > 0 ? product.colors : ["Default"]),
+    () => (Array.isArray(product?.colors) && product.colors.length > 0 ? product.colors : []),
     [product?.colors],
   );
 
@@ -240,8 +255,10 @@ const ProductDetails = () => {
       return;
     }
 
-    if (availableSizeKeys.length === 1 && colorOptions.length === 1) {
+    if (availableSizeKeys.length === 1) {
       setSelectedSize((current) => current || singleAvailableSizeLabel);
+    }
+    if (colorOptions.length === 1) {
       setSelectedColor((current) => current || colorOptions[0] || "");
     }
   }, [product, availableSizeKeys.length, singleAvailableSizeLabel, colorOptions]);
@@ -288,9 +305,24 @@ const ProductDetails = () => {
   const isInquiryOnly = isInquiryOnlyProduct(product);
   const isSoldOut = !isInquiryOnly && product.availability === "sold_out";
   const isOnSale = !isSoldOut && !isInquiryOnly && Boolean(product.salePercent && product.compareAtPrice);
-  const resolvedSize = selectedSize || singleAvailableSizeLabel;
-  const resolvedColor = selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "");
-  const canAddToCart = !isInquiryOnly && !isSoldOut && Boolean(resolvedSize && resolvedColor);
+  const hasSizeOptions = availableSizeKeys.length > 0;
+  const hasColorOptions = colorOptions.length > 0;
+  const resolvedSize = hasSizeOptions ? selectedSize || singleAvailableSizeLabel : defaultSelection.size;
+  const resolvedColor = hasColorOptions
+    ? selectedColor || (colorOptions.length === 1 ? colorOptions[0] || "" : "")
+    : defaultSelection.color;
+  const selectionRequirement =
+    hasSizeOptions && hasColorOptions ? "size and color" : hasSizeOptions ? "size" : "color";
+  const canAddToCart =
+    !isInquiryOnly &&
+    !isSoldOut &&
+    Boolean((!hasSizeOptions || resolvedSize) && (!hasColorOptions || resolvedColor));
+  const selectionSummary = formatProductSelectionSummary(product, {
+    size: resolvedSize,
+    color: resolvedColor,
+  });
+  const detailsTitle = product.department === "jewelry" ? "Material & Details" : "Fit, Fabric & Delivery";
+  const materialValue = product.fabric || product.category || "Please contact us for material details.";
 
   return (
     <div className="min-h-screen bg-background">
@@ -439,58 +471,64 @@ const ProductDetails = () => {
             </div>
 
             <div className="space-y-4 rounded-md border border-border bg-card p-4 sm:p-5">
-              <div>
-                <p className="mb-2 text-sm font-semibold text-foreground">Choose size</p>
-                <div className="flex flex-wrap gap-2">
-                  {STANDARD_SIZE_KEYS.map((sizeKey) => {
-                    const label = standardSizeLabel(sizeKey);
-                    const isAvailable = availableSizeKeys.includes(sizeKey);
-                    const isSelected = isAvailable && selectedSize === label;
+              {hasSizeOptions ? (
+                <div>
+                  <p className="mb-2 text-sm font-semibold text-foreground">Choose size</p>
+                  <div className="flex flex-wrap gap-2">
+                    {STANDARD_SIZE_KEYS.map((sizeKey) => {
+                      const label = standardSizeLabel(sizeKey);
+                      const isAvailable = availableSizeKeys.includes(sizeKey);
+                      const isSelected = isAvailable && selectedSize === label;
 
-                    return (
+                      return (
+                        <button
+                          key={sizeKey}
+                          type="button"
+                          onClick={() => {
+                            if (isAvailable) {
+                              setSelectedSize(label);
+                            }
+                          }}
+                          disabled={!isAvailable}
+                          className={`relative min-w-12 rounded-sm border px-3 py-2 text-sm font-medium transition ${
+                            isSelected
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : isAvailable
+                                ? "border-border bg-background text-foreground hover:bg-secondary"
+                                : "cursor-not-allowed border-border/60 bg-muted/30 text-muted-foreground/80 line-through decoration-muted-foreground/80"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
+              {hasColorOptions ? (
+                <div>
+                  <p className="mb-2 text-sm font-semibold text-foreground">Choose color</p>
+                  <div className="flex flex-wrap gap-2">
+                    {colorOptions.map((color) => (
                       <button
-                        key={sizeKey}
+                        key={color}
                         type="button"
-                        onClick={() => {
-                          if (isAvailable) {
-                            setSelectedSize(label);
-                          }
-                        }}
-                        disabled={!isAvailable}
-                        className={`relative min-w-12 rounded-sm border px-3 py-2 text-sm font-medium transition ${
-                          isSelected
+                        onClick={() => setSelectedColor(color)}
+                        className={`rounded-sm border px-3 py-2 text-sm font-medium transition ${
+                          selectedColor === color
                             ? "border-primary bg-primary text-primary-foreground"
-                            : isAvailable
-                              ? "border-border bg-background text-foreground hover:bg-secondary"
-                              : "cursor-not-allowed border-border/60 bg-muted/30 text-muted-foreground/80 line-through decoration-muted-foreground/80"
+                            : "border-border bg-background text-foreground hover:bg-secondary"
                         }`}
                       >
-                        {label}
+                        {color}
                       </button>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : null}
 
-              <div>
-                <p className="mb-2 text-sm font-semibold text-foreground">Choose color</p>
-                <div className="flex flex-wrap gap-2">
-                  {colorOptions.map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      onClick={() => setSelectedColor(color)}
-                      className={`rounded-sm border px-3 py-2 text-sm font-medium transition ${
-                        selectedColor === color
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-background text-foreground hover:bg-secondary"
-                      }`}
-                    >
-                      {color}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              {selectionSummary ? <p className="text-sm text-muted-foreground">Selected: {selectionSummary}</p> : null}
 
               {isInquiryOnly ? (
                 <>
@@ -539,9 +577,9 @@ const ProductDetails = () => {
                     <p className="text-sm text-muted-foreground">Checkout is temporarily disabled. Coming soon.</p>
                   ) : isSoldOut ? (
                     <p className="text-sm text-muted-foreground">This item is currently sold out.</p>
-                  ) : !canAddToCart ? (
+                  ) : !canAddToCart && (hasSizeOptions || hasColorOptions) ? (
                     <p className="text-sm text-muted-foreground">
-                      Please select both size and color before adding this product to your bag.
+                      Please select {selectionRequirement} before adding this product to your bag.
                     </p>
                   ) : null}
                 </>
@@ -550,18 +588,38 @@ const ProductDetails = () => {
 
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="font-display text-2xl">Fit, Fabric & Delivery</CardTitle>
+                <CardTitle className="font-display text-2xl">{detailsTitle}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm font-body text-muted-foreground">
-                <p>
-                  <span className="font-semibold text-foreground">Fit:</span> {product.fitInfo}
-                </p>
-                <p>
-                  <span className="font-semibold text-foreground">Fabric:</span> {product.fabric}
-                </p>
-                <p>
-                  <span className="font-semibold text-foreground">Delivery:</span> {product.deliveryEstimate}
-                </p>
+                {product.department === "jewelry" ? (
+                  <>
+                    <p>
+                      <span className="font-semibold text-foreground">Material:</span> {materialValue}
+                    </p>
+                    {product.fitInfo ? (
+                      <p>
+                        <span className="font-semibold text-foreground">Details:</span> {product.fitInfo}
+                      </p>
+                    ) : null}
+                    {product.deliveryEstimate ? (
+                      <p>
+                        <span className="font-semibold text-foreground">Delivery:</span> {product.deliveryEstimate}
+                      </p>
+                    ) : null}
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      <span className="font-semibold text-foreground">Fit:</span> {product.fitInfo}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-foreground">Fabric:</span> {product.fabric}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-foreground">Delivery:</span> {product.deliveryEstimate}
+                    </p>
+                  </>
+                )}
                 <div>
                   <p className="mb-1 font-semibold text-foreground">Care instructions</p>
                   <ul className="space-y-1">

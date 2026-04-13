@@ -29,6 +29,11 @@ export interface Product {
   createdAt: string;
 }
 
+export interface ProductSelectionSummary {
+  size: string;
+  color: string;
+}
+
 interface RawProduct {
   id?: string | number;
   slug?: string;
@@ -272,6 +277,9 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
   const availability = normalizeAvailability(product.availability ?? product.inventory);
   const priceOnInquiry = getBoolean(product.priceOnInquiry ?? product.price_on_inquiry);
   const rawPrice = getOptionalNumber(product.price);
+  const fabric = getString(product.fabric);
+  const fitInfo = getString(product.fitInfo);
+  const deliveryEstimate = getString(product.deliveryEstimate);
   const price = priceOnInquiry ? (rawPrice !== null ? Math.max(0, rawPrice) : null) : Math.max(0, rawPrice ?? 0);
   const maxQuantity = normalizeMaxQuantity(product.maxQuantity);
   const saleData =
@@ -293,13 +301,21 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
     availability,
     priceOnInquiry,
     tags: getStringArray(product.tags, ["tag", "label", "value", "name"]),
-    sizes: sizes.length > 0 ? sizes : ["One Size"],
-    colors: colors.length > 0 ? colors : ["Default"],
-    fabric: getString(product.fabric) || "Please contact us for detailed fabric information.",
-    fitInfo: getString(product.fitInfo) || "Please contact us for detailed sizing and fit information.",
+    sizes: department === "jewelry" ? sizes : sizes.length > 0 ? sizes : ["One Size"],
+    colors: department === "jewelry" ? colors : colors.length > 0 ? colors : ["Default"],
+    fabric:
+      fabric ||
+      (department === "jewelry" ? "" : "Please contact us for detailed fabric information."),
+    fitInfo:
+      fitInfo ||
+      (department === "jewelry" ? "" : "Please contact us for detailed sizing and fit information."),
     careInstructions:
       careInstructions.length > 0 ? careInstructions : ["Care instructions available upon request."],
-    deliveryEstimate: getString(product.deliveryEstimate) || "You will receive an estimated delivery date upon completing your order.",
+    deliveryEstimate:
+      deliveryEstimate ||
+      (department === "jewelry"
+        ? ""
+        : "You will receive an estimated delivery date upon completing your order."),
     popularity: Math.min(100, Math.max(0, getNumber(product.popularity, 0))),
     createdAt,
   };
@@ -312,6 +328,31 @@ export const getProductById = (id: string) => products.find((product) => product
 export const getProductBySlug = (slug: string) => products.find((product) => product.slug === slug);
 
 export const isInquiryOnlyProduct = (product: Pick<Product, "priceOnInquiry">) => product.priceOnInquiry;
+
+export const hasProductVariantOptions = <T extends Pick<Product, "sizes" | "colors">>(product: T) =>
+  product.sizes.length > 0 || product.colors.length > 0;
+
+export const getDefaultProductSelection = <T extends Pick<Product, "sizes" | "colors">>(
+  product: T,
+): ProductSelectionSummary => ({
+  size: product.sizes[0]?.trim() || "One Size",
+  color: product.colors[0]?.trim() || "Default",
+});
+
+export const formatProductSelectionSummary = <
+  T extends Pick<Product, "sizes" | "colors">,
+  U extends Partial<ProductSelectionSummary>,
+>(
+  product: T,
+  selection: U,
+) => {
+  const parts = [
+    product.sizes.length > 0 && selection.size?.trim() ? `Size: ${selection.size.trim()}` : "",
+    product.colors.length > 0 && selection.color?.trim() ? `Color: ${selection.color.trim()}` : "",
+  ].filter(Boolean);
+
+  return parts.join(" | ");
+};
 
 export const hasDisplayPrice = <T extends Pick<Product, "priceOnInquiry" | "price">>(
   product: T,

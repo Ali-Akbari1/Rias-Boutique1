@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { X, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProductRecommendationRail from "@/features/catalog/components/ProductRecommendationRail";
+import { formatProductSelectionSummary } from "@/features/catalog/data/products";
 import { getCartRecommendations } from "@/features/catalog/lib/recommendations";
 import { getMaxQuantityForProduct } from "@/features/cart/context/cart-quantity";
 import { useCart } from "@/features/cart/context/CartContext";
@@ -34,6 +35,9 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
     () => getCartRecommendations(items.map((item) => item.product), { limit: 4 }),
     [items],
   );
+  const lastAddedSelectionSummary = lastAddedItem
+    ? formatProductSelectionSummary(lastAddedItem.product, lastAddedItem.selection)
+    : "";
 
   useEffect(() => {
     if (open) {
@@ -90,6 +94,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                 const maxQuantity = getMaxQuantityForProduct(product);
                 const isMaxQuantity = maxQuantity <= 0 || quantity >= maxQuantity;
                 const unitPrice = product.price ?? 0;
+                const selectionSummary = formatProductSelectionSummary(product, selection);
 
                 return (
                   <div key={id} className="flex gap-3 sm:gap-4">
@@ -101,9 +106,9 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-display truncate font-semibold text-foreground">{product.name}</h3>
                       <p className="text-sm text-muted-foreground font-body">{formatPrice(unitPrice)}</p>
-                      <p className="text-xs text-muted-foreground font-body mt-1">
-                        Size: {selection.size} | Color: {selection.color}
-                      </p>
+                      {selectionSummary ? (
+                        <p className="mt-1 text-xs font-body text-muted-foreground">{selectionSummary}</p>
+                      ) : null}
                       <div className="flex items-center gap-3 mt-2">
                         <button
                           onClick={() => updateQuantity(id, quantity - 1)}
@@ -166,9 +171,9 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                       <p className="truncate font-display text-sm font-semibold text-foreground">
                         {lastAddedItem.product.name}
                       </p>
-                      <p className="text-xs text-muted-foreground font-body">
-                        Size: {lastAddedItem.selection.size} | Color: {lastAddedItem.selection.color}
-                      </p>
+                      {lastAddedSelectionSummary ? (
+                        <p className="text-xs font-body text-muted-foreground">{lastAddedSelectionSummary}</p>
+                      ) : null}
                     </div>
                     <span className="text-sm font-semibold text-foreground">
                       {formatPrice((lastAddedItem.product.price ?? 0) * lastAddedItem.quantity)}

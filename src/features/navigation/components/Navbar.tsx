@@ -35,6 +35,7 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
     suggestionTerms,
     isWomensActive,
     isMensActive,
+    isJewelryActive,
     isAboutActive,
     isFaqActive,
   } = useNavbarSearch({ pathname, search });
@@ -206,6 +207,7 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         <DesktopNav
           isWomensActive={isWomensActive}
           isMensActive={isMensActive}
+          isJewelryActive={isJewelryActive}
           isAboutActive={isAboutActive}
           isFaqActive={isFaqActive}
         />
@@ -325,6 +327,7 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         onClose={closeMobileMenu}
         isWomensActive={isWomensActive}
         isMensActive={isMensActive}
+        isJewelryActive={isJewelryActive}
         isAboutActive={isAboutActive}
         isFaqActive={isFaqActive}
       />

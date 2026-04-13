@@ -1,10 +1,17 @@
+import { ArrowUpRight, Gem, Shirt, Sparkles, type LucideIcon } from "lucide-react";
 import heroBg from "@/assets/hero-bg.webp";
 import { Link } from "react-router-dom";
 import { prefetchCollectionPage } from "@/lib/prefetch";
 
+const heroCtas: Array<{ to: string; label: string; icon: LucideIcon }> = [
+  { to: "/collection/women", label: "Shop Women's", icon: Sparkles },
+  { to: "/collection/men", label: "Shop Men's", icon: Shirt },
+  { to: "/collection/jewelry", label: "Shop Jewelry", icon: Gem },
+];
+
 const HeroSection = () => {
   const heroCtaClass =
-    "inline-flex h-10 w-40 items-center justify-center rounded-sm border-2 border-foreground bg-background px-4 text-sm font-body font-semibold tracking-wide text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.28)] transition-colors hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground sm:h-auto sm:w-auto sm:px-7 sm:py-3.5 sm:text-base";
+    "group inline-flex min-w-[13rem] items-center justify-between gap-3 rounded-[1.15rem] border border-white/25 bg-white/94 px-5 py-3 text-sm font-body font-semibold tracking-[0.08em] text-foreground shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent sm:min-w-[13.5rem] sm:px-6 sm:py-3.5";
 
   return (
     <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden pt-16 sm:min-h-[80vh]">
@@ -30,23 +37,28 @@ const HeroSection = () => {
           <p className="mb-8 max-w-md text-lg font-body leading-relaxed text-white sm:text-xl">
             Hand-finished embroidery, shipped worldwide, and designed to stand out.
           </p>
-          <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-4">
-            <Link
-              to="/collection/women"
-              className={heroCtaClass}
-              onMouseEnter={() => void prefetchCollectionPage()}
-              onFocus={() => void prefetchCollectionPage()}
-            >
-              Shop Women's
-            </Link>
-            <Link
-              to="/collection/men"
-              className={heroCtaClass}
-              onMouseEnter={() => void prefetchCollectionPage()}
-              onFocus={() => void prefetchCollectionPage()}
-            >
-              Shop Men's
-            </Link>
+          <div className="inline-flex flex-col items-start gap-3 rounded-[1.75rem] border border-white/15 bg-white/10 p-2 shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:flex-row sm:flex-wrap sm:items-center">
+            {heroCtas.map((cta) => {
+              const Icon = cta.icon;
+
+              return (
+                <Link
+                  key={cta.to}
+                  to={cta.to}
+                  className={heroCtaClass}
+                  onMouseEnter={() => void prefetchCollectionPage()}
+                  onFocus={() => void prefetchCollectionPage()}
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span>{cta.label}</span>
+                  </span>
+                  <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
