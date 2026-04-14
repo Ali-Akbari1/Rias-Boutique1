@@ -17,8 +17,8 @@ interface CartDrawerProps {
 }
 
 const FREE_SHIPPING_THRESHOLD_CAD = 400;
-const CLOSE_ANIMATION_DELAY_MS = 120;
-const CLOSE_ANIMATION_DURATION_MS = 350;
+const OPEN_ANIMATION_DURATION_MS = 280;
+const CLOSE_ANIMATION_DURATION_MS = 220;
 
 const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
   const { items, removeFromCart, updateQuantity, totalItems, totalPrice, clearCart, isAdding, lastAddedItem } =
@@ -51,7 +51,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
       const timeout = window.setTimeout(() => {
         setIsMounted(false);
         setIsClosing(false);
-      }, CLOSE_ANIMATION_DELAY_MS + CLOSE_ANIMATION_DURATION_MS);
+      }, CLOSE_ANIMATION_DURATION_MS);
 
       return () => window.clearTimeout(timeout);
     }
@@ -71,9 +71,10 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
     <>
       <div className="fixed inset-0 bg-foreground/20 backdrop-blur-[1px] z-50" onClick={onClose} />
       <div
-        className={`fixed right-0 top-0 bottom-0 z-50 flex w-full flex-col bg-background shadow-2xl sm:max-w-md ${
-          isClosing ? "animate-slide-out [animation-delay:120ms]" : "animate-slide-in"
+        className={`fixed bottom-0 right-0 top-0 z-50 flex w-full transform-gpu flex-col bg-background shadow-2xl will-change-transform sm:max-w-md ${
+          isClosing ? "animate-slide-out" : "animate-slide-in"
         }`}
+        style={{ animationDuration: `${isClosing ? CLOSE_ANIMATION_DURATION_MS : OPEN_ANIMATION_DURATION_MS}ms` }}
       >
         <div className="flex items-center justify-between border-b border-border p-4 sm:p-6">
           <h2 className="font-display text-xl font-bold text-foreground sm:text-2xl">Your Bag</h2>
