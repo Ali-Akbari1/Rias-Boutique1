@@ -13,13 +13,6 @@ const mobileNavLinkClass = (isActive: boolean) =>
     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
   }`;
 
-const mobileNavIconClass = (isActive: boolean) =>
-  `flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors ${
-    isActive
-      ? "border-foreground/20 bg-foreground text-background"
-      : "border-border bg-background text-muted-foreground group-hover:border-foreground/20 group-hover:text-foreground"
-  }`;
-
 const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
   if (!open) {
     return null;
@@ -34,7 +27,6 @@ const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
     >
       <div className="container mx-auto flex flex-col gap-0 px-4 py-2 sm:px-6">
         {links.map((link) => {
-          const Icon = link.icon;
           const handlePrefetch = () => {
             if (link.to.startsWith("/collection")) {
               void prefetchCollectionPage();
@@ -56,12 +48,7 @@ const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
               className={mobileNavLinkClass(link.isActive)}
               aria-current={link.isActive ? "page" : undefined}
             >
-              <span className="flex min-w-0 items-center gap-3">
-                <span className={mobileNavIconClass(link.isActive)}>
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span className="text-base font-semibold tracking-[0.04em]">{link.label}</span>
-              </span>
+              <span className="text-base font-semibold tracking-[0.04em]">{link.label}</span>
               <span className="flex items-center gap-2">
                 <span
                   className={`h-px w-7 bg-foreground transition-opacity duration-200 ${
