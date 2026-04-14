@@ -2,7 +2,7 @@
   "products": [
     {
       "fabric": "Velvet",
-      "price": "450",
+      "price": "",
       "galleryImages": [
         "/uploads/burgundy-bridal-dress-1.webp",
         "/uploads/burgundy-bridal-dress-2.webp"
@@ -25,9 +25,9 @@
       "createdAt": "2026-02-14",
       "image": "/uploads/burgundy-bridal-dress-1.webp",
       "deliveryEstimate": "",
-      "inventory": "sold_out",
+      "inventory": "available",
       "description": "3 Piece Burgundy Bridal Dress\n",
-      "price_on_inquiry": false,
+      "price_on_inquiry": true,
       "category": "Bridal",
       "fitInfo": "*Jewelry Sold Separately"
     },
@@ -908,6 +908,28 @@
       "price_on_inquiry": true,
       "category": "925 Silver",
       "fitInfo": "Set comes with: bracelet, earrings, ring and 2-layer necklace. "
+    },
+    {
+      "fabric": "Banaras",
+      "price": 451,
+      "galleryImages": [
+        "/uploads/img_1508.jpg",
+        "/uploads/img_1510-2.jpg",
+        "/uploads/img_1511.jpg"
+      ],
+      "name": "Short Banaras Red Dress",
+      "slug": "Short-Banaras-dress",
+      "maxQuantity": 1,
+      "department": "women",
+      "tags": [
+        "banaras"
+      ],
+      "id": "Short-Banaras-red-dress",
+      "image": "/uploads/img_1508.jpg",
+      "inventory": "available",
+      "description": "Measurements: Sleeves: 22in \nBust: 40in \nLength of dress: 41in ",
+      "price_on_inquiry": false,
+      "category": "Party Wear"
     }
   ]
 }
