@@ -930,6 +930,38 @@
       "description": "Measurements: Sleeves: 22in \nBust: 40in \nLength of dress: 41in ",
       "price_on_inquiry": false,
       "category": "Party Wear"
+    },
+    {
+      "fabric": "Banaras",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_1528.jpg",
+        "/uploads/img_1531.jpg"
+      ],
+      "name": "Dual Colour Banaras Pink Dress",
+      "slug": "dual-color-banaras-pink-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "Pink"
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only "
+      ],
+      "tags": [
+        "banaras"
+      ],
+      "id": "dual-color-banaras-pink-dress",
+      "createdAt": "2026-04-14",
+      "image": "/uploads/img_1528.jpg",
+      "inventory": "available",
+      "description": "Pink dual-colour short banaras dress. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements\nLength of Dress:40in\nBust: 40in\nSleeves: 23in \n\n"
     }
   ]
 }
