@@ -358,8 +358,9 @@
         "/uploads/red-bridal-velvet-dress-3.webp",
         "/uploads/red-bridal-velvet-dress-4.webp"
       ],
-      "name": "Red Bridal Velvet Dress",
+      "name": "Red Bridal Cheerma Dozi Dress",
       "slug": "red-gharara-bridal-dress",
+      "maxQuantity": 1,
       "colors": [
         "Red"
       ],
@@ -367,15 +368,19 @@
         "Medium"
       ],
       "department": "women",
+      "tags": [
+        "cheerma dozi"
+      ],
       "id": "red-gharara-bridal-dress",
       "createdAt": "2026-02-19",
       "image": "/uploads/red-bridal-velvet-dress-1.webp",
-      "inventory": 1,
+      "inventory": "available",
       "description": "Bridal red velvet dress with wide-legged pants and beautiful beaded scarf. ",
       "category": "Bridal",
-      "fitInfo": "Bust: 42in \nSleeves: 22in\nDress Length: 25in\nPants Length: 40in\n"
+      "fitInfo": "Measurements- \nBust: 42in \nSleeves: 22in\nPants Length: 40in\n"
     },
     {
+      "fabric": "Banaras",
       "price": 450,
       "galleryImages": [
         "/uploads/burgundy-banaras-dress-1.webp",
@@ -400,7 +405,7 @@
       "inventory": "sold_out",
       "description": "Burgundy banaras dress with kochi pants and heavy embroidered scarf. ",
       "category": "Party Wear",
-      "fitInfo": "Bust: 44in "
+      "fitInfo": "Measurements-\nBust: 44in "
     },
     {
       "fabric": "Velvet",
@@ -430,7 +435,7 @@
       "inventory": "available",
       "description": "Dark blue chapan with gulabatoon detailing. ",
       "category": "Party Wear",
-      "fitInfo": "Measurements- \nBust: 40in\n\n1 piece"
+      "fitInfo": "Measurements- \nBust: 40in\n\nWhat's Included-\n1 Chapan"
     },
     {
       "fabric": "Velvet with handmade cheerma detailing. ",
@@ -537,13 +542,16 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
+      "tags": [
+        "mens "
+      ],
       "id": "mens-offwhite-with-gold",
       "createdAt": "2026-02-25",
       "image": "/uploads/men-s-off-white-and-gold-parantoban-1.webp",
       "inventory": "available",
       "description": "Off-white machine made men's parantoban with gold embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n"
     },
     {
       "price": 110,
@@ -570,7 +578,7 @@
       "inventory": "sold_out",
       "description": "Machine made men's grey parantoban with silver and grey embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements.\n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
       "fabric": "*Mirror work is handmade ",
@@ -598,7 +606,7 @@
       "inventory": "available",
       "description": "Handmade men's white parantoban with silver embroidery and mirror work. ",
       "category": "Handmade",
-      "fitInfo": "Please check our size chart for all specific measurements.\n\nPlease measure before ordering. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n"
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n\nPlease measure before ordering. \n"
     },
     {
       "price": 110,
@@ -626,7 +634,7 @@
       "inventory": "available",
       "description": "Men's off-white parantoban with white embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements before ordering.\n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n\nPlease measure before ordering. "
     },
     {
       "fabric": "Hazaragi (Du-Domina) ",
@@ -764,7 +772,7 @@
       "inventory": "sold_out",
       "description": "Teal barosha dress with silver cheerma detailing. ",
       "category": "Party Wear",
-      "fitInfo": "Bust: 38in \nSleeves: 21in\nLength of Dress: 36in\n\n\n"
+      "fitInfo": "Measurements-\nBust: 38in \nSleeves: 21in\nLength of Dress: 36in\n\n\n"
     },
     {
       "price": 110,
@@ -794,7 +802,7 @@
       "inventory": "available",
       "description": "True white men's parantoban with white embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements before ordering. \n\n*Please note: Elastic and/or an ezar band for the pants are not included."
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n\nPlease measure before ordering. "
     },
     {
       "fabric": "Velvet ",
@@ -821,7 +829,7 @@
       "inventory": "available",
       "description": "Dark blue cheerma dozi dress with wide leg pants. ",
       "category": "Party Wear",
-      "fitInfo": "Bust: 38in \nLength of dress: 37in "
+      "fitInfo": "Measurements-\nBust: 38in \nLength of dress: 37in \n\nWhats Included- \nDress, pants, and scarf"
     },
     {
       "fabric": "Banaras",
@@ -847,7 +855,7 @@
       "inventory": "available",
       "description": "Beautiful long blue banaras bridal dress",
       "category": "Bridal",
-      "fitInfo": "Bust: 46in\nLength of dress: 58in\nLength of sleeves: 22in\n\n"
+      "fitInfo": "Measurements-\nBust: 46in\nLength of dress: 58in\nLength of sleeves: 22in\n\nWhats Included- \nDress and scarf\n"
     },
     {
       "fabric": "Velvet ",
@@ -922,11 +930,11 @@
       "description": "Bridal 2 Layer 925 (Noqrah Set)",
       "price_on_inquiry": true,
       "category": "925 Silver",
-      "fitInfo": "Set comes with: bracelet, earrings, ring and 2-layer necklace. "
+      "fitInfo": "Whats Included- \n2-layer necklace, bracelet, ring, and earrings."
     },
     {
       "fabric": "Banaras",
-      "price": 451,
+      "price": 450,
       "galleryImages": [
         "/uploads/img_1508.jpg",
         "/uploads/img_1510-2.jpg",
@@ -935,6 +943,12 @@
       "name": "Short Banaras Red Dress",
       "slug": "Short-Banaras-dress",
       "maxQuantity": 1,
+      "colors": [
+        "Red"
+      ],
+      "sizes": [
+        "Small"
+      ],
       "department": "women",
       "tags": [
         "banaras"
@@ -942,9 +956,10 @@
       "id": "Short-Banaras-red-dress",
       "image": "/uploads/img_1508.jpg",
       "inventory": "available",
-      "description": "Measurements: Sleeves: 22in \nBust: 40in \nLength of dress: 41in ",
+      "description": "Red banaras short dress",
       "price_on_inquiry": false,
-      "category": "Party Wear"
+      "category": "Party Wear",
+      "fitInfo": "Measurements- \nSleeves: 22in \nBust: 40in \nLength of dress: 41in \n\nWhats Included-\nDress, pants, and scarf"
     },
     {
       "fabric": "Banaras",
@@ -976,7 +991,7 @@
       "description": "Pink dual-colour short banaras dress. ",
       "price_on_inquiry": false,
       "category": "Party Wear",
-      "fitInfo": "Measurements\nLength of Dress:40in\nBust: 40in\nSleeves: 23in \n\n"
+      "fitInfo": "Measurements-\nLength of Dress:40in\nBust: 40in\nSleeves: 23in \n\nWhats Included- \nDress, pants, and shawl\n\n"
     }
   ]
 }
