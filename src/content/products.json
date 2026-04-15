@@ -252,10 +252,13 @@
       ],
       "department": "women",
       "popularity": 100,
+      "tags": [
+        "cheerma dozi"
+      ],
       "id": "Cheerma-dozi-3-piece",
       "createdAt": "2026-02-18",
       "image": "/uploads/handmade-cheerma-dozi-dress-pre-order-only-1.webp",
-      "deliveryEstimate": "Custom Order: Minimum 4-6 weeks needed outside of shipping time. Please contact us for more details.",
+      "deliveryEstimate": "Custom Order: Minimum 6-8 weeks needed outside of shipping time. Please contact us for more details.",
       "inventory": "available",
       "description": "Handmade cheerma dozi dress with wide legged pants.",
       "category": "Party Wear"
@@ -407,6 +410,7 @@
       ],
       "name": "Dark Blue Chapan ",
       "slug": "Chapan-blue-gulabatoon",
+      "maxQuantity": 1,
       "colors": [
         "Dark Blue "
       ],
@@ -416,13 +420,17 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
+      "tags": [
+        "Gulabatoon",
+        "Chapan"
+      ],
       "id": "Chapan-blue-gulabatoon",
       "createdAt": "2026-02-23",
       "image": "/uploads/dark-blue-chapan-1.webp",
-      "inventory": 1,
+      "inventory": "available",
       "description": "Dark blue chapan with gulabatoon detailing. ",
-      "category": "Casual",
-      "fitInfo": "Bust: 40in\n\n1 piece"
+      "category": "Party Wear",
+      "fitInfo": "Measurements- \nBust: 40in\n\n1 piece"
     },
     {
       "fabric": "Velvet with handmade cheerma detailing. ",
@@ -465,13 +473,16 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
+      "tags": [
+        "black"
+      ],
       "id": "men-black-gold",
       "createdAt": "2026-02-24",
       "image": "/uploads/men-s-black-and-gold-parantoban-1.webp",
       "inventory": "sold_out",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements. \n\nPlease note: Elastic and/or an ezar band for the pants are not included. "
+      "fitInfo": "Please check our size chart for all specific measurements. \n\nPlease note: Elastic and/or an ezar band are not included with the pants."
     },
     {
       "fabric": "*Mirror work is handmade. ",
@@ -495,11 +506,15 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
+      "tags": [
+        "mirror-work",
+        "black"
+      ],
       "id": "Handmade-mens-parantoban-black",
       "createdAt": "2026-02-24",
       "image": "/uploads/handmade-mens-parantoban-in-black-1.webp",
       "inventory": "available",
-      "description": "Handmade black mens parantoban with silver embroidery. ",
+      "description": "Black mens parantoban with handmade silver and mirror embroidery. ",
       "category": "Handmade",
       "fitInfo": "Please check our size chart for all specific measurements. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
