@@ -992,6 +992,35 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements-\nLength of Dress:40in\nBust: 40in\nSleeves: 23in \n\nWhats Included- \nDress, pants, and shawl\n\n"
+    },
+    {
+      "fabric": "Banaras",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_1564.jpg",
+        "/uploads/img_1567.jpg"
+      ],
+      "name": "Dual Color Short Dress",
+      "slug": "dual-color-short-blue",
+      "colors": [
+        "Blue"
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "tags": [
+        "dual colour",
+        "banaras"
+      ],
+      "id": "dual-color-short-blue",
+      "createdAt": "2026-04-14",
+      "image": "/uploads/img_1564.jpg",
+      "inventory": "available",
+      "description": "Dual colour short dress with beautiful shawl. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements-\nBust: 36in\nSleeves: 21in\nLength of dress: 38in\n\nWhats Included-\nDress, pants, and shawl"
     }
   ]
 }
