@@ -2,7 +2,7 @@
   "products": [
     {
       "fabric": "Velvet",
-      "price": "",
+      "price": "450",
       "galleryImages": [
         "/uploads/burgundy-bridal-dress-1.webp",
         "/uploads/burgundy-bridal-dress-2.webp"
@@ -25,9 +25,9 @@
       "createdAt": "2026-02-14",
       "image": "/uploads/burgundy-bridal-dress-1.webp",
       "deliveryEstimate": "",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "3 Piece Burgundy Bridal Dress\n",
-      "price_on_inquiry": true,
+      "price_on_inquiry": false,
       "category": "Bridal",
       "fitInfo": "*Jewelry Sold Separately"
     },
