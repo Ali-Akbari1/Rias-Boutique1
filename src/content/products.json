@@ -825,6 +825,7 @@
         "Dry Clean Only "
       ],
       "id": "dark-blue-cheerma-dozi-machini",
+      "createdAt": "2026-04-04",
       "image": "/uploads/dark-blue-cheerma-dozi-dress-1.webp",
       "inventory": "available",
       "description": "Dark blue cheerma dozi dress with wide leg pants. ",
@@ -851,6 +852,7 @@
       ],
       "department": "women",
       "id": "blue-banaras-dress",
+      "createdAt": "2026-04-04",
       "image": "/uploads/img_1327.jpg",
       "inventory": "available",
       "description": "Beautiful long blue banaras bridal dress",
@@ -905,6 +907,7 @@
         "Dry Clean Only"
       ],
       "id": "barosha-purple-shortdress",
+      "createdAt": "2026-04-04",
       "image": "/uploads/img_1383.jpg",
       "inventory": "available",
       "description": "Lilac barosha short dress with mirror work.",
