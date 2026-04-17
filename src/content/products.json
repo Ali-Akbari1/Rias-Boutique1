@@ -2,7 +2,7 @@
   "products": [
     {
       "fabric": "Velvet",
-      "price": "450",
+      "price": "",
       "galleryImages": [
         "/uploads/burgundy-bridal-dress-1.webp",
         "/uploads/burgundy-bridal-dress-2.webp"
@@ -25,9 +25,9 @@
       "createdAt": "2026-02-14",
       "image": "/uploads/burgundy-bridal-dress-1.webp",
       "deliveryEstimate": "",
-      "inventory": "sold_out",
+      "inventory": "available",
       "description": "3 Piece Burgundy Bridal Dress\n",
-      "price_on_inquiry": false,
+      "price_on_inquiry": true,
       "category": "Bridal",
       "fitInfo": "*Jewelry Sold Separately"
     },
@@ -1053,6 +1053,31 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements\n- Bust: 42in\n- Length of dress: 40in\n- Sleeves: 22in\n- Shoulders: 17in\n- Length of pants: 40in\n\nWhats Included\n- dress\n- scarf\n- pants"
+    },
+    {
+      "fabric": "Barosha",
+      "price": 380,
+      "galleryImages": [
+        "/uploads/img_1420.jpg",
+        "/uploads/img_1430.jpg"
+      ],
+      "name": "Light Blue Barosha Dress",
+      "slug": "barosha-wide-legged-pants",
+      "sizes": [
+        "Large"
+      ],
+      "department": "women",
+      "tags": [
+        "Barosha"
+      ],
+      "id": "barosha-wide-legged-pants",
+      "createdAt": "2026-04-16",
+      "image": "/uploads/img_1420.jpg",
+      "inventory": "available",
+      "description": "Light blue barosha dress with wide-legged pants.",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements\n- Bust: 44in\n\nWhats Included\n- Dress\n- Wide-legged pants\n- Scarf"
     }
   ]
 }
