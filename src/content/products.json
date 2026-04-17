@@ -2,7 +2,7 @@
   "products": [
     {
       "fabric": "Velvet",
-      "price": "450",
+      "price": "",
       "galleryImages": [
         "/uploads/burgundy-bridal-dress-1.webp",
         "/uploads/burgundy-bridal-dress-2.webp"
@@ -25,9 +25,9 @@
       "createdAt": "2026-02-14",
       "image": "/uploads/burgundy-bridal-dress-1.webp",
       "deliveryEstimate": "",
-      "inventory": "sold_out",
+      "inventory": "available",
       "description": "3 Piece Burgundy Bridal Dress\n",
-      "price_on_inquiry": false,
+      "price_on_inquiry": true,
       "category": "Bridal",
       "fitInfo": "*Jewelry Sold Separately"
     },
@@ -468,7 +468,7 @@
       "fitInfo": "Bust: 42in \n\n*Price includes both dress and vest. \n*Men's paratoban and women's jewelry sold separately"
     },
     {
-      "price": 110,
+      "price": 116,
       "galleryImages": [
         "/uploads/men-s-black-and-gold-parantoban-1.webp",
         "/uploads/men-s-black-and-gold-parantoban-2.webp",
@@ -531,7 +531,7 @@
       "fitInfo": "Please check our size chart for all specific measurements. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
     },
     {
-      "price": 110,
+      "price": 115,
       "galleryImages": [
         "/uploads/men-s-off-white-and-gold-parantoban-1.webp",
         "/uploads/men-s-off-white-and-gold-parantoban-2.webp",
@@ -616,7 +616,7 @@
       "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n\nPlease measure before ordering. \n"
     },
     {
-      "price": 110,
+      "price": 115,
       "galleryImages": [
         "/uploads/men-s-off-white-parantoban-1.webp",
         "/uploads/men-s-off-white-parantoban-2.webp",
@@ -782,7 +782,7 @@
       "fitInfo": "Measurements-\nBust: 38in \nSleeves: 21in\nLength of Dress: 36in\n\n\n"
     },
     {
-      "price": 110,
+      "price": 115,
       "galleryImages": [
         "/uploads/men-s-white-parantoban-1.webp",
         "/uploads/men-s-white-parantoban-2.webp",
@@ -832,7 +832,6 @@
         "Dry Clean Only "
       ],
       "id": "dark-blue-cheerma-dozi-machini",
-      "createdAt": "2026-04-04",
       "image": "/uploads/dark-blue-cheerma-dozi-dress-1.webp",
       "inventory": "available",
       "description": "Dark blue cheerma dozi dress with wide leg pants. ",
@@ -859,7 +858,6 @@
       ],
       "department": "women",
       "id": "blue-banaras-dress",
-      "createdAt": "2026-04-04",
       "image": "/uploads/img_1327.jpg",
       "inventory": "available",
       "description": "Beautiful long blue banaras bridal dress",
@@ -914,7 +912,6 @@
         "Dry Clean Only"
       ],
       "id": "barosha-purple-shortdress",
-      "createdAt": "2026-04-04",
       "image": "/uploads/img_1383.jpg",
       "inventory": "available",
       "description": "Lilac barosha short dress with mirror work.",
