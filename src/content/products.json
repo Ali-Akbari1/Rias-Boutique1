@@ -294,6 +294,7 @@
       "fabric": "Banaras",
       "price": 650,
       "galleryImages": [
+        "/uploads/5adac91d-aa0c-4cba-bdfd-f741193aac06.jpg",
         "/uploads/bridal-green-banaras-dress-pre-order-only-1.webp",
         "/uploads/bridal-green-banaras-dress-pre-order-only-2.webp"
       ],
@@ -312,11 +313,16 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
+      "tags": [
+        "Banaras",
+        "Bridal"
+      ],
       "id": "Bridal-green-banaras",
       "createdAt": "2026-02-19",
-      "image": "/uploads/bridal-green-banaras-dress-pre-order-only-1.webp",
+      "image": "/uploads/5adac91d-aa0c-4cba-bdfd-f741193aac06.jpg",
       "inventory": "sold_out",
       "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
+      "price_on_inquiry": true,
       "category": "Bridal",
       "fitInfo": "*Bridal Shawl sold separately"
     },
