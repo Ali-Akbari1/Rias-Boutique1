@@ -18,17 +18,17 @@ const MAX_DELAY_MS = 10000;
 const getRandomDelay = () =>
   Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) + MIN_DELAY_MS;
 
-const readLocalStorageState = () => {
+const readSessionStorageState = () => {
   try {
-    return window.localStorage.getItem(POPUP_STORAGE_KEY) || "";
+    return window.sessionStorage.getItem(POPUP_STORAGE_KEY) || "";
   } catch {
     return "";
   }
 };
 
-const writeLocalStorageState = (value: string) => {
+const writeSessionStorageState = (value: string) => {
   try {
-    window.localStorage.setItem(POPUP_STORAGE_KEY, value);
+    window.sessionStorage.setItem(POPUP_STORAGE_KEY, value);
   } catch {
     // ignore storage errors
   }
@@ -53,7 +53,7 @@ const LaunchDiscountPopup = () => {
   useEffect(() => {
     if (!welcomeDiscountActive) {
       setOpen(false);
-      writeLocalStorageState("");
+      writeSessionStorageState("");
       return;
     }
 
@@ -62,7 +62,7 @@ const LaunchDiscountPopup = () => {
       return;
     }
 
-    const existingState = readLocalStorageState();
+    const existingState = readSessionStorageState();
     if (existingState === "dismissed" || existingState === "subscribed") {
       return;
     }
@@ -93,13 +93,13 @@ const LaunchDiscountPopup = () => {
         : "Enter your email address";
 
   const closeWithoutOffer = () => {
-    writeLocalStorageState("dismissed");
+    writeSessionStorageState("dismissed");
     setOpen(false);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && !isSuccess) {
-      writeLocalStorageState("dismissed");
+      writeSessionStorageState("dismissed");
     }
     setOpen(nextOpen);
   };
@@ -120,7 +120,7 @@ const LaunchDiscountPopup = () => {
         website: "",
       });
 
-      writeLocalStorageState("subscribed");
+      writeSessionStorageState("subscribed");
       setIsSuccess(true);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Unable to submit your email right now.");
