@@ -292,16 +292,17 @@
     },
     {
       "fabric": "Banaras",
-      "price": 650,
+      "price": 1,
       "galleryImages": [
         "/uploads/5adac91d-aa0c-4cba-bdfd-f741193aac06.jpg",
         "/uploads/bridal-green-banaras-dress-pre-order-only-1.webp",
         "/uploads/bridal-green-banaras-dress-pre-order-only-2.webp"
       ],
-      "name": "Bridal Green Banaras Dress (Pre-Order Only)",
-      "slug": "Bridal-green-banaras",
+      "name": "Bridal Green Banaras Dress ",
+      "slug": "Bridal-green-banaras-2-layer-cheerma",
       "colors": [
-        "Green "
+        "Green ",
+        "Red"
       ],
       "sizes": [
         "Small",
