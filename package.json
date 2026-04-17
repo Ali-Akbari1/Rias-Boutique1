@@ -13,6 +13,7 @@
     "typecheck:server": "npx tsc --noEmit -p tsconfig.node.json",
     "images:convert": "node scripts/convert-images.mjs",
     "media:hygiene": "node scripts/media-hygiene.mjs",
+    "discount:resend": "node scripts/resend-discount-emails.mjs",
     "sitemap:generate": "node scripts/generate-sitemap.mjs",
     "merchant-feed:generate": "node scripts/generate-google-merchant-feed.mjs",
     "local-inventory-feed:generate": "node scripts/generate-local-inventory-feed.mjs",

@@ -25,10 +25,6 @@ store_code	id	availability	price
 16335217184145401742	Cheerma-dozi-3-piece-x-large-red-pre-order	in_stock	450.00 CAD
 16335217184145401742	Cheerma-dozi-3-piece-x-large-blue-pre-order	in_stock	450.00 CAD
 16335217184145401742	pink-banaras-dress-small-pink	out_of_stock	380.00 CAD
-16335217184145401742	Bridal-green-banaras-small-green	out_of_stock	650.00 CAD
-16335217184145401742	Bridal-green-banaras-medium-green	out_of_stock	650.00 CAD
-16335217184145401742	Bridal-green-banaras-large-green	out_of_stock	650.00 CAD
-16335217184145401742	Bridal-green-banaras-x-large-green	out_of_stock	650.00 CAD
 16335217184145401742	Purple-Banaras-Dress-small-purple	out_of_stock	450.00 CAD
 16335217184145401742	red-gharara-bridal-dress-medium-red	in_stock	450.00 CAD
 16335217184145401742	Burgundy-Banaras-Dress-large-burgundy	out_of_stock	450.00 CAD
@@ -56,3 +52,8 @@ store_code	id	availability	price
 16335217184145401742	Lilac-purple-gulabatoon dress-large-lilac	in_stock	400.00 CAD
 16335217184145401742	barosha-purple-shortdress-small-lilac	in_stock	380.00 CAD
 16335217184145401742	barosha-purple-shortdress-medium-lilac	in_stock	380.00 CAD
+16335217184145401742	Short-Banaras-red-dress-small-red	in_stock	450.00 CAD
+16335217184145401742	dual-color-banaras-pink-dress-small-pink	in_stock	450.00 CAD
+16335217184145401742	dual-color-short-blue-small-blue	in_stock	450.00 CAD
+16335217184145401742	white-gulabatoon-short-dress-medium-white	in_stock	380.00 CAD
+16335217184145401742	barosha-wide-legged-pants-large-default	in_stock	380.00 CAD

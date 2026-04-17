@@ -212,11 +212,13 @@
     <loc>https://www.riasboutique.com/products/dark-blue-cheerma-dozi-machini</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2026-04-04</lastmod>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/blue-banaras-dress</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2026-04-04</lastmod>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/Lilac-purple-gulabatoon%20dress</loc>
@@ -228,11 +230,41 @@
     <loc>https://www.riasboutique.com/products/barosha-purple-shortdress</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2026-04-04</lastmod>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/mashadi-bridal-2layer-set</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <lastmod>2026-04-12</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/Short-Banaras-red-dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/dual-color-banaras-pink-dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-14</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/dual-color-short-blue</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-14</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/white-gulabatoon-short-dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-15</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/barosha-wide-legged-pants</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-16</lastmod>
   </url>
 </urlset>

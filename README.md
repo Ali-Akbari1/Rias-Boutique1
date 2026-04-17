@@ -75,12 +75,25 @@ The storefront runs at `http://localhost:8080`.
 | `npm run typecheck` | Run app and server TypeScript checks |
 | `npm run test` | Run the Vitest suite once |
 | `npm run test:watch` | Run Vitest in watch mode |
+| `npm run discount:resend -- --email=you@example.com` | Dry-run the welcome-offer resend for one subscriber |
+| `npm run discount:resend -- --apply --limit=25` | Send the welcome-offer email to a limited subscriber batch |
 | `npm run sitemap:generate` | Rebuild `public/sitemap.xml` from route and product data |
 | `npm run merchant-feed:generate` | Rebuild `public/google-merchant-feed.xml` for Google Merchant Center |
 | `npm run local-inventory-feed:generate` | Rebuild `public/local-inventory-feed.txt` for Merchant Center local inventory |
 | `npm run images:convert` | Generate `.webp` derivatives and normalize product image refs |
 | `npm run media:hygiene` | Dry-run orphan cleanup and oversized upload compression |
 | `npm run media:hygiene -- --apply` | Apply upload cleanup and compression changes |
+
+## Bulk welcome resend
+
+Use `npm run discount:resend` to resend the welcome discount email to subscribers without adding another Vercel serverless function.
+
+- Dry-run first: `npm run discount:resend -- --email=you@example.com`
+- Send to a small batch: `npm run discount:resend -- --apply --limit=25`
+- Send a new code to everyone: `npm run discount:resend -- --apply --code=WELCOME15 --campaign=welcome15_relaunch`
+- Only target records with no previous send timestamp: `npm run discount:resend -- --apply --only-never-emailed`
+
+The script loads `.env` automatically, reads subscribers from `discount_subscribers`, sends through Resend, writes to `email_logs`, and updates each subscriber's `campaign`, `code`, and `last_email_sent_at` after a successful send.
 
 ## Google Merchant feed
 
@@ -115,7 +128,7 @@ Merchant Center setup:
 | Origins and CORS | `ALLOWED_BROWSER_ORIGINS`, `ALLOWED_PRODUCTION_ORIGINS`, `ALLOWED_PREVIEW_ORIGINS`, `ALLOWED_DEV_ORIGINS`, `ALLOWED_CHECKOUT_ORIGINS`, `ALLOWED_PROMO_ORIGINS` | Always | Browser-facing APIs validate origin against these lists |
 | Clover checkout | `CLOVER_API_BASE_URL`, `CLOVER_MERCHANT_ID`, `CLOVER_PRIVATE_TOKEN`, `CLOVER_CHECKOUT_BASE_URL`, `CLOVER_ENABLE_TIPS`, `CLOVER_PAGE_CONFIG_UUID`, `CLOVER_TIMEOUT_MS`, `CLOVER_DEBUG_LOGS` | Checkout enabled | Hosted checkout session creation and payment verification |
 | Clover webhooks | `CLOVER_WEBHOOK_SECRET`, `CLOVER_WEBHOOK_SECRETS`, `CLOVER_WEBHOOK_SECRET_SANDBOX`, `CLOVER_WEBHOOK_SECRET_PRODUCTION`, `CLOVER_WEBHOOK_TOLERANCE_MS` | Webhooks enabled | Supports secret rotation and environment split |
-| Pricing and discounting | `FREE_SHIPPING_THRESHOLD_MINOR`, `FLAT_SHIPPING_RATE_MINOR`, `CHECKOUT_TAX_RATE`, `LAUNCH10_EXPIRES_AT`, `DISCOUNT_CAMPAIGN_NAME` | Checkout or promo signup enabled | Server-side source of truth for pricing and discount timing |
+| Pricing and discounting | `FREE_SHIPPING_THRESHOLD_MINOR`, `FLAT_SHIPPING_RATE_MINOR`, `CHECKOUT_TAX_RATE`, `WELCOME_DISCOUNT_CODE`, `WELCOME_DISCOUNT_RATE`, `WELCOME_DISCOUNT_EXPIRES_AT`, `LAUNCH10_EXPIRES_AT`, `DISCOUNT_CAMPAIGN_NAME` | Checkout or promo signup enabled | Server-side source of truth for pricing, welcome-offer timing, and bulk resend campaign labeling |
 | Order storage | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ORDER_STORE_ADAPTER` | Persistent orders | Use `ORDER_STORE_ADAPTER=memory` only for isolated local testing |
 | Client Supabase access | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Only if the browser needs Supabase | Not required for the checkout flow itself |
 | EasyPost shipping | `SHIPPING_PROVIDER_MODE`, `ENABLE_SHIPPING_CHARGES`, `EASYPOST_API_KEY`, `EASYPOST_API_BASE_URL`, `EASYPOST_QUOTE_SECRET`, `EASYPOST_QUOTE_TTL_MS`, `EASYPOST_CARRIER_ACCOUNT_IDS`, `EASYPOST_PREFERRED_CARRIERS`, `EASYPOST_PREFERRED_SERVICES`, `EASYPOST_FROM_*`, `EASYPOST_PARCEL_*`, `EASYPOST_ITEM_WEIGHT_OZ`, `EASYPOST_ADDITIONAL_ITEM_*`, `EASYPOST_PRODUCT_ORIGIN_COUNTRY`, `EASYPOST_DEFAULT_HS_TARIFF_NUMBER`, `EASYPOST_CUSTOMS_*` | `SHIPPING_PROVIDER_MODE=easypost` | Required for live quotes and label purchase |
