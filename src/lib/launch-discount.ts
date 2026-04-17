@@ -1,31 +1,45 @@
 import {
-  getLaunchDiscountExpiryDate as getResolvedLaunchDiscountExpiryDate,
-  isLaunchDiscountActiveForConfig,
+  getWelcomeDiscountExpiryDate as getResolvedWelcomeDiscountExpiryDate,
+  hasWelcomeDiscountExpiryForConfig,
+  isWelcomeDiscountActiveForConfig,
 } from "@/shared/config/commerce";
 import { getClientCommerceConfig } from "@/lib/commerce-config";
 
 const clientCommerceConfig = getClientCommerceConfig();
 
-export const LAUNCH_DISCOUNT_CODE = clientCommerceConfig.launchDiscountCode;
-export const LAUNCH_DISCOUNT_RATE = clientCommerceConfig.launchDiscountRate;
+export const WELCOME_DISCOUNT_CODE = clientCommerceConfig.welcomeDiscountCode;
+export const WELCOME_DISCOUNT_RATE = clientCommerceConfig.welcomeDiscountRate;
 
-export const getLaunchDiscountExpiryIso = () =>
-  clientCommerceConfig.launchDiscountExpiresAtIso;
+export const getWelcomeDiscountExpiryIso = () => clientCommerceConfig.welcomeDiscountExpiresAtIso;
 
-export const getLaunchDiscountExpiryDate = () => getResolvedLaunchDiscountExpiryDate(clientCommerceConfig);
+export const getWelcomeDiscountExpiryDate = () => getResolvedWelcomeDiscountExpiryDate(clientCommerceConfig);
 
-export const isLaunchDiscountActive = (now = new Date()) =>
-  isLaunchDiscountActiveForConfig(clientCommerceConfig, now);
+export const hasWelcomeDiscountExpiry = () => hasWelcomeDiscountExpiryForConfig(clientCommerceConfig);
 
-export const getLaunchDiscountExpiryDisplay = () =>
-  new Intl.DateTimeFormat("en-CA", {
+export const isWelcomeDiscountActive = (now = new Date()) =>
+  isWelcomeDiscountActiveForConfig(clientCommerceConfig, now);
+
+export const getWelcomeDiscountExpiryDisplay = () => {
+  const expiryDate = getWelcomeDiscountExpiryDate();
+  if (!expiryDate) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("en-CA", {
     dateStyle: "long",
     timeStyle: "short",
     timeZone: "America/Edmonton",
-  }).format(getLaunchDiscountExpiryDate());
+  }).format(expiryDate);
+};
 
-export const getLaunchDiscountExpiryDateLabel = () =>
-  new Intl.DateTimeFormat("en-CA", {
+export const getWelcomeDiscountExpiryDateLabel = () => {
+  const expiryDate = getWelcomeDiscountExpiryDate();
+  if (!expiryDate) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("en-CA", {
     dateStyle: "long",
     timeZone: "America/Edmonton",
-  }).format(getLaunchDiscountExpiryDate());
+  }).format(expiryDate);
+};

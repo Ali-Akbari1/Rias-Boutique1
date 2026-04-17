@@ -16,17 +16,21 @@ import {
   resolveAllowedOrigin,
 } from "../server/lib/security.js";
 import {
-  getLaunchDiscountExpiryDisplay,
-  getLaunchDiscountExpiryIso,
-  isLaunchDiscountActive,
-  LAUNCH_DISCOUNT_CODE,
+  getWelcomeDiscountExpiryDisplay,
+  getWelcomeDiscountExpiryIso,
+  isWelcomeDiscountActive,
+  WELCOME_DISCOUNT_CODE,
 } from "../server/lib/launch-discount.js";
-import { getSupabaseAdminClient, hasSupabaseAdminConfig } from "../server/lib/supabase-admin.js";
-import { sendLaunchDiscountEmail } from "../server/lib/email.js";
+import {
+  isDiscountSubscriberStoreConfigured,
+  markDiscountSubscriberEmailSent,
+  upsertDiscountSubscriber,
+} from "../server/lib/discount-subscribers.js";
+import { sendWelcomeDiscountEmail } from "../server/lib/email.js";
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
-const DEFAULT_CAMPAIGN_NAME = "launch10_2026_03_20";
+const DEFAULT_CAMPAIGN_NAME = "welcome10_first_order";
 const maskEmail = (email: string) => {
   const [local, domain] = email.split("@");
   if (!local || !domain) {
@@ -77,12 +81,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  if (!isLaunchDiscountActive()) {
+  if (!isWelcomeDiscountActive()) {
+    const expiryDisplay = getWelcomeDiscountExpiryDisplay();
     sendError(
       res,
       410,
       "DISCOUNT_EXPIRED",
-      `This launch offer expired on ${getLaunchDiscountExpiryDisplay()}.`,
+      expiryDisplay ? `This welcome offer expired on ${expiryDisplay}.` : "This welcome offer is not active right now.",
     );
     return;
   }
@@ -108,40 +113,21 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const signupInput = parsed.data;
   const email = signupInput.email.trim().toLowerCase();
   const fullName = (signupInput.fullName || "").trim();
-  const source = (signupInput.source || "launch-popup").trim() || "launch-popup";
+  const source = (signupInput.source || "welcome-popup").trim() || "welcome-popup";
 
-  if (hasSupabaseAdminConfig()) {
+  if (isDiscountSubscriberStoreConfigured()) {
     try {
-      const supabase = getSupabaseAdminClient();
-      const nowIso = new Date().toISOString();
-      const { error } = await supabase.from("discount_subscribers").upsert(
-        {
-          email,
-          full_name: fullName,
+      await upsertDiscountSubscriber({
+        email,
+        fullName,
+        source,
+        campaign: process.env.DISCOUNT_CAMPAIGN_NAME?.trim() || DEFAULT_CAMPAIGN_NAME,
+        code: WELCOME_DISCOUNT_CODE,
+        metadataJson: {
           source,
-          campaign: process.env.DISCOUNT_CAMPAIGN_NAME?.trim() || DEFAULT_CAMPAIGN_NAME,
-          code: LAUNCH_DISCOUNT_CODE,
-          metadata_json: {
-            source,
-            subscribedFrom: "website-popup",
-          },
-          subscribed_at: nowIso,
+          subscribedFrom: "website-popup",
         },
-        {
-          onConflict: "email",
-          ignoreDuplicates: false,
-        },
-      );
-
-      if (error) {
-        logger.error("discount-signup.store_failed", {
-          email: maskEmail(email),
-          source,
-          error: error.message,
-        });
-        sendError(res, 500, "SIGNUP_STORE_FAILED", "Unable to save your signup right now. Please try again.");
-        return;
-      }
+      });
     } catch (error) {
       logger.error("discount-signup.store_failed", {
         email: maskEmail(email),
@@ -152,29 +138,23 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       return;
     }
   } else {
-    logger.warn("discount-signup.supabase_not_configured", {
+    logger.warn("discount-signup.store_not_configured", {
       email: maskEmail(email),
       source,
     });
   }
 
   try {
-    const emailDispatch = await sendLaunchDiscountEmail({
+    const emailDispatch = await sendWelcomeDiscountEmail({
       to: email,
       fullName,
-      code: LAUNCH_DISCOUNT_CODE,
-      expiresAtDisplay: getLaunchDiscountExpiryDisplay(),
+      code: WELCOME_DISCOUNT_CODE,
+      expiresAtDisplay: getWelcomeDiscountExpiryDisplay(),
     });
 
-    if (hasSupabaseAdminConfig()) {
+    if (isDiscountSubscriberStoreConfigured()) {
       try {
-        const supabase = getSupabaseAdminClient();
-        await supabase
-          .from("discount_subscribers")
-          .update({
-            last_email_sent_at: new Date().toISOString(),
-          })
-          .eq("email", email);
+        await markDiscountSubscriberEmailSent(email);
       } catch (error) {
         logger.warn("discount-signup.store_last_email_timestamp_failed", {
           email: maskEmail(email),
@@ -186,8 +166,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     res.status(200).json({
       success: true,
-      expiresAt: getLaunchDiscountExpiryIso(),
-      expiresOn: getLaunchDiscountExpiryDisplay(),
+      expiresAt: getWelcomeDiscountExpiryIso() || null,
+      expiresOn: getWelcomeDiscountExpiryDisplay() || null,
       emailProvider: emailDispatch.provider,
       emailStatus: emailDispatch.status,
     });

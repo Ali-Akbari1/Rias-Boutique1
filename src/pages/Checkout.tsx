@@ -10,11 +10,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/sha
 import { Input } from "@/shared/ui/input";
 import { getClientCommerceConfig } from "@/lib/commerce-config";
 import { useCurrency } from "@/features/currency/context/useCurrency";
-import { buildCheckoutPricing, calculateLaunchDiscountMinor } from "@/shared/config/commerce";
+import { buildCheckoutPricing, calculateWelcomeDiscountMinor } from "@/shared/config/commerce";
 import {
-  getLaunchDiscountExpiryDateLabel,
-  isLaunchDiscountActive,
-  LAUNCH_DISCOUNT_CODE,
+  getWelcomeDiscountExpiryDateLabel,
+  hasWelcomeDiscountExpiry,
+  isWelcomeDiscountActive,
+  WELCOME_DISCOUNT_CODE,
 } from "@/lib/launch-discount";
 import {
   buildCheckoutItems,
@@ -193,8 +194,9 @@ const Checkout = () => {
   const [lastVerifiedAddressFingerprint, setLastVerifiedAddressFingerprint] = useState("");
   const pickupDetails = getStorePickupDetails();
   const shippingChargesEnabled = clientCommerceConfig.shippingChargesEnabled;
-  const launchDiscountActive = isLaunchDiscountActive();
-  const launchDiscountEndsLabel = getLaunchDiscountExpiryDateLabel();
+  const welcomeDiscountActive = isWelcomeDiscountActive();
+  const welcomeDiscountEndsLabel = getWelcomeDiscountExpiryDateLabel();
+  const welcomeDiscountHasExpiry = hasWelcomeDiscountExpiry();
   const checkoutControllerRef = useRef<AbortController | null>(null);
   const checkoutTimeoutRef = useRef<number | null>(null);
   const shippingControllerRef = useRef<AbortController | null>(null);
@@ -210,13 +212,13 @@ const Checkout = () => {
   const checkoutItems = useMemo(() => buildCheckoutItems(items), [items]);
   const subtotalMinor = Math.round(totalPrice * 100);
   const normalizedDiscountCode = discountCode.trim().toUpperCase();
-  const effectiveDiscountCode = launchDiscountActive ? normalizedDiscountCode : "";
-  const discountMinor = calculateLaunchDiscountMinor({
+  const effectiveDiscountCode = welcomeDiscountActive ? normalizedDiscountCode : "";
+  const discountMinor = calculateWelcomeDiscountMinor({
     subtotalMinor,
     submittedCode: effectiveDiscountCode,
-    launchDiscountCode: clientCommerceConfig.launchDiscountCode,
-    launchDiscountRate: clientCommerceConfig.launchDiscountRate,
-    launchDiscountActive,
+    welcomeDiscountCode: clientCommerceConfig.welcomeDiscountCode,
+    welcomeDiscountRate: clientCommerceConfig.welcomeDiscountRate,
+    welcomeDiscountActive,
   });
   const isPickupInStore = checkoutForm.deliveryMethod === "pickup";
   const selectedShippingOption =
@@ -440,10 +442,10 @@ const Checkout = () => {
   }, [addToCart, searchParams]);
 
   useEffect(() => {
-    if (!launchDiscountActive && discountCode) {
+    if (!welcomeDiscountActive && discountCode) {
       setDiscountCode("");
     }
-  }, [launchDiscountActive, discountCode]);
+  }, [welcomeDiscountActive, discountCode]);
 
   useEffect(() => {
     const handlePageShow = () => {
@@ -1125,7 +1127,7 @@ const Checkout = () => {
                       ) : null}
                     </div>
 
-                      {launchDiscountActive ? (
+                      {welcomeDiscountActive ? (
                         <div className="space-y-2 sm:col-span-2">
                           <label htmlFor="discountCode" className="font-body text-sm font-semibold text-foreground">
                             Discount code
@@ -1140,13 +1142,14 @@ const Checkout = () => {
                           />
                           {discountCode.trim() ? (
                             <p className="text-xs text-muted-foreground">
-                              {normalizedDiscountCode !== LAUNCH_DISCOUNT_CODE
-                                ? `Invalid code.`
-                                : `${LAUNCH_DISCOUNT_CODE} applied (10% off).`}
+                              {normalizedDiscountCode !== WELCOME_DISCOUNT_CODE
+                                ? "Invalid code."
+                                : `${WELCOME_DISCOUNT_CODE} entered. Eligibility is verified at checkout for email subscribers placing their first order.`}
                             </p>
                           ) : (
                             <p className="text-xs text-muted-foreground">
-                              Have a launch discount code? Enter it above to get 10% off. Offer ends {launchDiscountEndsLabel}.
+                              Have a welcome code? Enter it above for 10% off your first order.
+                              {welcomeDiscountHasExpiry ? ` Offer ends ${welcomeDiscountEndsLabel}.` : ""}
                             </p>
                           )}
                         </div>
@@ -1564,7 +1567,7 @@ const Checkout = () => {
                 </div>
                 {discountMinor > 0 ? (
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span>Discount ({LAUNCH_DISCOUNT_CODE})</span>
+                    <span>Estimated discount ({WELCOME_DISCOUNT_CODE})</span>
                     <span>-{formatPrice(discount)}</span>
                   </div>
                 ) : null}

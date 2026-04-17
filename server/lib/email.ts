@@ -336,7 +336,7 @@ const persistEmailLog = async ({ orderId, attempt }: { orderId?: string; attempt
   }
 };
 
-export const sendLaunchDiscountEmail = async ({
+export const sendWelcomeDiscountEmail = async ({
   to,
   fullName,
   code,
@@ -368,14 +368,18 @@ export const sendLaunchDiscountEmail = async ({
       ? fallbackReplyTo
       : "";
   const greetingName = fullName?.trim() || "there";
-  const subject = `${brandName} Launch Offer - 10% Off with ${code}`;
+  const hasExpiry = Boolean(expiresAtDisplay.trim());
+  const subject = `${brandName} Welcome Offer - 10% Off Your First Order`;
   const text = [
     `Hi ${greetingName},`,
     "",
-    `In honour of our website launch, enjoy 10% off any purchase with code ${code}.`,
-    `Offer valid until ${expiresAtDisplay}.`,
+    `Thanks for joining ${brandName}. Enjoy 10% off your first order with code ${code}.`,
+    "This welcome offer is reserved for email subscribers placing their first order.",
+    ...(hasExpiry ? [`Offer valid until ${expiresAtDisplay}.`] : []),
     "",
     `Start shopping: ${websiteUrl.replace(/\/+$/, "")}/collection`,
+    "",
+    "Use the same email address at checkout so we can verify your eligibility.",
     "",
     `Need help? Reply to this email${replyTo ? ` or contact ${replyTo}` : ""}.`,
   ].join("\n");
@@ -393,7 +397,7 @@ export const sendLaunchDiscountEmail = async ({
                     brandName,
                   )}</p>
                   <h1 style="margin:10px 0 0 0;font-size:34px;line-height:1.15;color:#111827;">Enjoy 10% Off</h1>
-                  <p style="margin:8px 0 0 0;font-size:15px;color:#4b5563;">In honour of our website launch, use your exclusive code below.</p>
+                  <p style="margin:8px 0 0 0;font-size:15px;color:#4b5563;">Use your welcome code below for 10% off your first order.</p>
                 </td>
               </tr>
               <tr>
@@ -401,7 +405,13 @@ export const sendLaunchDiscountEmail = async ({
                   <div style="display:inline-block;padding:10px 20px;border:1px dashed #111827;border-radius:8px;font-size:26px;letter-spacing:0.08em;font-weight:700;color:#111827;">
                     ${escapeHtml(code)}
                   </div>
-                  <p style="margin:14px 0 0 0;font-size:14px;color:#6b7280;">Valid until ${escapeHtml(expiresAtDisplay)}</p>
+                  <p style="margin:14px 0 0 0;font-size:14px;color:#6b7280;">Reserved for email subscribers on their first order.</p>
+                  ${
+                    hasExpiry
+                      ? `<p style="margin:8px 0 0 0;font-size:14px;color:#6b7280;">Valid until ${escapeHtml(expiresAtDisplay)}</p>`
+                      : ""
+                  }
+                  <p style="margin:8px 0 0 0;font-size:14px;color:#4b5563;">Use the same email address at checkout to apply it.</p>
                   <p style="margin:18px 0 0 0;">
                     <a href="${escapeHtml(
                       `${websiteUrl.replace(/\/+$/, "")}/collection`,
@@ -679,6 +689,8 @@ export const sendProductInquiryEmail = async ({
     throw error;
   }
 };
+
+export const sendLaunchDiscountEmail = sendWelcomeDiscountEmail;
 
 export const sendTrackingEmail = async (order: StoredOrder) => {
   if (order.customer.deliveryMethod === "pickup") {

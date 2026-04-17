@@ -9,6 +9,12 @@ export interface CommerceRuntimeEnv {
   VITE_FLAT_SHIPPING_RATE_INTL_MINOR?: string;
   CHECKOUT_TAX_RATE?: string;
   SHIPPING_PROVIDER_MODE?: string;
+  WELCOME_DISCOUNT_CODE?: string;
+  VITE_WELCOME_DISCOUNT_CODE?: string;
+  WELCOME_DISCOUNT_RATE?: string;
+  VITE_WELCOME_DISCOUNT_RATE?: string;
+  WELCOME_DISCOUNT_EXPIRES_AT?: string;
+  VITE_WELCOME_DISCOUNT_EXPIRES_AT?: string;
   LAUNCH10_EXPIRES_AT?: string;
   VITE_LAUNCH10_EXPIRES_AT?: string;
 }
@@ -20,18 +26,18 @@ export interface ResolvedCommerceConfig {
   flatShippingRateInternationalMinor: number;
   checkoutTaxRate: number;
   shippingProviderMode: ShippingProviderMode;
-  launchDiscountCode: string;
-  launchDiscountRate: number;
-  launchDiscountExpiresAtIso: string;
+  welcomeDiscountCode: string;
+  welcomeDiscountRate: number;
+  welcomeDiscountExpiresAtIso: string;
 }
 
 export const DEFAULT_FREE_SHIPPING_THRESHOLD_MINOR = 40_000;
 export const DEFAULT_FLAT_SHIPPING_RATE_MINOR = 3_000;
 export const DEFAULT_FLAT_SHIPPING_RATE_INTL_MINOR = 4_000;
 export const DEFAULT_CHECKOUT_TAX_RATE = 0.05;
-export const DEFAULT_LAUNCH_DISCOUNT_CODE = "LAUNCH10";
-export const DEFAULT_LAUNCH_DISCOUNT_RATE = 0.1;
-export const DEFAULT_LAUNCH_DISCOUNT_EXPIRES_AT = "2026-03-21T05:59:59.999Z";
+export const DEFAULT_WELCOME_DISCOUNT_CODE = "WELCOME10";
+export const DEFAULT_WELCOME_DISCOUNT_RATE = 0.1;
+export const DEFAULT_WELCOME_DISCOUNT_EXPIRES_AT = "2026-05-19T05:59:59.999Z";
 
 const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
 
@@ -66,48 +72,73 @@ export const resolveCommerceConfig = (env: CommerceRuntimeEnv): ResolvedCommerce
   ),
   checkoutTaxRate: toRate(env.CHECKOUT_TAX_RATE, DEFAULT_CHECKOUT_TAX_RATE),
   shippingProviderMode: resolveShippingProviderMode(env.SHIPPING_PROVIDER_MODE),
-  launchDiscountCode: DEFAULT_LAUNCH_DISCOUNT_CODE,
-  launchDiscountRate: DEFAULT_LAUNCH_DISCOUNT_RATE,
-  launchDiscountExpiresAtIso:
-    env.LAUNCH10_EXPIRES_AT?.trim() || env.VITE_LAUNCH10_EXPIRES_AT?.trim() || DEFAULT_LAUNCH_DISCOUNT_EXPIRES_AT,
+  welcomeDiscountCode:
+    env.WELCOME_DISCOUNT_CODE?.trim() ||
+    env.VITE_WELCOME_DISCOUNT_CODE?.trim() ||
+    DEFAULT_WELCOME_DISCOUNT_CODE,
+  welcomeDiscountRate: toRate(
+    env.WELCOME_DISCOUNT_RATE?.trim() || env.VITE_WELCOME_DISCOUNT_RATE?.trim(),
+    DEFAULT_WELCOME_DISCOUNT_RATE,
+  ),
+  welcomeDiscountExpiresAtIso:
+    env.WELCOME_DISCOUNT_EXPIRES_AT?.trim() ||
+    env.VITE_WELCOME_DISCOUNT_EXPIRES_AT?.trim() ||
+    env.LAUNCH10_EXPIRES_AT?.trim() ||
+    env.VITE_LAUNCH10_EXPIRES_AT?.trim() ||
+    DEFAULT_WELCOME_DISCOUNT_EXPIRES_AT,
 });
 
-export const getLaunchDiscountExpiryDate = (config: Pick<ResolvedCommerceConfig, "launchDiscountExpiresAtIso">) => {
-  const parsed = new Date(config.launchDiscountExpiresAtIso);
-  if (Number.isNaN(parsed.getTime())) {
-    return new Date(DEFAULT_LAUNCH_DISCOUNT_EXPIRES_AT);
+export const getWelcomeDiscountExpiryDate = (
+  config: Pick<ResolvedCommerceConfig, "welcomeDiscountExpiresAtIso">,
+) => {
+  const expiresAtIso = config.welcomeDiscountExpiresAtIso.trim();
+  if (!expiresAtIso) {
+    return null;
   }
+
+  const parsed = new Date(expiresAtIso);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
   return parsed;
 };
 
-export const isLaunchDiscountActiveForConfig = (
-  config: Pick<ResolvedCommerceConfig, "launchDiscountExpiresAtIso">,
-  now = new Date(),
-) => now.getTime() <= getLaunchDiscountExpiryDate(config).getTime();
+export const hasWelcomeDiscountExpiryForConfig = (
+  config: Pick<ResolvedCommerceConfig, "welcomeDiscountExpiresAtIso">,
+) => Boolean(getWelcomeDiscountExpiryDate(config));
 
-export const calculateLaunchDiscountMinor = ({
+export const isWelcomeDiscountActiveForConfig = (
+  config: Pick<ResolvedCommerceConfig, "welcomeDiscountExpiresAtIso">,
+  now = new Date(),
+) => {
+  const expiryDate = getWelcomeDiscountExpiryDate(config);
+  return !expiryDate || now.getTime() <= expiryDate.getTime();
+};
+
+export const calculateWelcomeDiscountMinor = ({
   subtotalMinor,
   submittedCode,
-  launchDiscountCode,
-  launchDiscountRate,
-  launchDiscountActive,
+  welcomeDiscountCode,
+  welcomeDiscountRate,
+  welcomeDiscountActive,
 }: {
   subtotalMinor: number;
   submittedCode: string;
-  launchDiscountCode: string;
-  launchDiscountRate: number;
-  launchDiscountActive: boolean;
+  welcomeDiscountCode: string;
+  welcomeDiscountRate: number;
+  welcomeDiscountActive: boolean;
 }) => {
-  if (!launchDiscountActive) {
+  if (!welcomeDiscountActive) {
     return 0;
   }
 
   const normalizedCode = submittedCode.trim().toUpperCase();
-  if (!normalizedCode || normalizedCode !== launchDiscountCode) {
+  if (!normalizedCode || normalizedCode !== welcomeDiscountCode) {
     return 0;
   }
 
-  return Math.round(subtotalMinor * launchDiscountRate);
+  return Math.round(subtotalMinor * welcomeDiscountRate);
 };
 
 export const buildCheckoutPricing = ({

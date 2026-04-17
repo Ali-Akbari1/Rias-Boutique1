@@ -1,25 +1,33 @@
 import {
-  getLaunchDiscountExpiryDate as getResolvedLaunchDiscountExpiryDate,
-  isLaunchDiscountActiveForConfig,
+  getWelcomeDiscountExpiryDate as getResolvedWelcomeDiscountExpiryDate,
+  hasWelcomeDiscountExpiryForConfig,
+  isWelcomeDiscountActiveForConfig,
   resolveCommerceConfig,
 } from "../../src/shared/config/commerce.js";
 
 const getServerCommerceConfig = () => resolveCommerceConfig(process.env as Record<string, string | undefined>);
 
-export const LAUNCH_DISCOUNT_CODE = getServerCommerceConfig().launchDiscountCode;
-export const LAUNCH_DISCOUNT_RATE = getServerCommerceConfig().launchDiscountRate;
+export const WELCOME_DISCOUNT_CODE = getServerCommerceConfig().welcomeDiscountCode;
+export const WELCOME_DISCOUNT_RATE = getServerCommerceConfig().welcomeDiscountRate;
 
-export const getLaunchDiscountExpiryIso = () =>
-  getServerCommerceConfig().launchDiscountExpiresAtIso;
+export const getWelcomeDiscountExpiryIso = () => getServerCommerceConfig().welcomeDiscountExpiresAtIso;
 
-export const getLaunchDiscountExpiryDate = () => getResolvedLaunchDiscountExpiryDate(getServerCommerceConfig());
+export const getWelcomeDiscountExpiryDate = () => getResolvedWelcomeDiscountExpiryDate(getServerCommerceConfig());
 
-export const isLaunchDiscountActive = (now = new Date()) =>
-  isLaunchDiscountActiveForConfig(getServerCommerceConfig(), now);
+export const hasWelcomeDiscountExpiry = () => hasWelcomeDiscountExpiryForConfig(getServerCommerceConfig());
 
-export const getLaunchDiscountExpiryDisplay = () =>
-  new Intl.DateTimeFormat("en-CA", {
+export const isWelcomeDiscountActive = (now = new Date()) =>
+  isWelcomeDiscountActiveForConfig(getServerCommerceConfig(), now);
+
+export const getWelcomeDiscountExpiryDisplay = () => {
+  const expiryDate = getWelcomeDiscountExpiryDate();
+  if (!expiryDate) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("en-CA", {
     dateStyle: "long",
     timeStyle: "short",
     timeZone: "America/Edmonton",
-  }).format(getLaunchDiscountExpiryDate());
+  }).format(expiryDate);
+};

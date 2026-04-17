@@ -6,11 +6,12 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { requestDiscountSignup } from "@/lib/site-api";
 import {
-  getLaunchDiscountExpiryDateLabel,
-  isLaunchDiscountActive,
+  getWelcomeDiscountExpiryDateLabel,
+  hasWelcomeDiscountExpiry,
+  isWelcomeDiscountActive,
 } from "@/lib/launch-discount";
 
-const POPUP_STORAGE_KEY = "rb_launch10_popup_v1";
+const POPUP_STORAGE_KEY = "rb_welcome10_popup_v1";
 const MIN_DELAY_MS = 5000;
 const MAX_DELAY_MS = 10000;
 
@@ -44,12 +45,13 @@ const LaunchDiscountPopup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const launchDiscountActive = isLaunchDiscountActive();
-  const launchDiscountEndsLabel = getLaunchDiscountExpiryDateLabel();
+  const welcomeDiscountActive = isWelcomeDiscountActive();
+  const welcomeDiscountEndsLabel = getWelcomeDiscountExpiryDateLabel();
+  const welcomeDiscountHasExpiry = hasWelcomeDiscountExpiry();
   const shouldHidePopup = shouldHidePopupOnPath(pathname);
 
   useEffect(() => {
-    if (!launchDiscountActive) {
+    if (!welcomeDiscountActive) {
       setOpen(false);
       writeLocalStorageState("");
       return;
@@ -72,22 +74,22 @@ const LaunchDiscountPopup = () => {
     return () => {
       window.clearTimeout(timer);
     };
-  }, [launchDiscountActive, shouldHidePopup]);
+  }, [welcomeDiscountActive, shouldHidePopup]);
 
   const isEmailValid = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()), [email]);
   const canSubmit = useMemo(() => {
-    if (!launchDiscountActive || isSubmitting || isSuccess) {
+    if (!welcomeDiscountActive || isSubmitting || isSuccess) {
       return false;
     }
     return isEmailValid;
-  }, [isEmailValid, isSubmitting, isSuccess, launchDiscountActive]);
+  }, [isEmailValid, isSubmitting, isSuccess, welcomeDiscountActive]);
 
   const submitButtonLabel = isSubmitting
     ? "Sending..."
     : isSuccess
       ? "Code sent to your email"
       : canSubmit
-        ? "Get 10% Off"
+        ? "Send My 10% Code"
         : "Enter your email address";
 
   const closeWithoutOffer = () => {
@@ -114,7 +116,7 @@ const LaunchDiscountPopup = () => {
     try {
       await requestDiscountSignup({
         email: email.trim(),
-        source: "launch-popup",
+        source: "welcome-popup",
         website: "",
       });
 
@@ -127,7 +129,7 @@ const LaunchDiscountPopup = () => {
     }
   };
 
-  if (!launchDiscountActive || shouldHidePopup) {
+  if (!welcomeDiscountActive || shouldHidePopup) {
     return null;
   }
 
@@ -162,23 +164,30 @@ const LaunchDiscountPopup = () => {
           </DialogTitle>
           <DialogDescription className="mt-3 text-center text-sm leading-relaxed text-muted-foreground sm:text-base">
             {isSuccess ? (
-              <>Your launch code has been emailed. Check your inbox (and spam folder) to use it at checkout.</>
+              <>Your welcome code is on the way. Check your inbox and use the same email at checkout for your first-order offer.</>
             ) : (
               <>
-                In honour of our website dropping, enjoy 10% off on any purchase from now until{" "}
-                <br />
-                {launchDiscountEndsLabel}. Enter your email to receive your launch offer code.
+                Join the email list to receive 10% off your first order.
+                {welcomeDiscountHasExpiry ? (
+                  <>
+                    {" "}
+                    This welcome offer is available until
+                    <br />
+                    {welcomeDiscountEndsLabel}.
+                  </>
+                ) : null}{" "}
+                Enter your email to receive your code.
               </>
             )}
           </DialogDescription>
 
           {!isSuccess ? (
             <form onSubmit={handleSubmit} className="mt-6 space-y-3 text-left">
-              <label htmlFor="launch-discount-email" className="block text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              <label htmlFor="welcome-discount-email" className="block text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                 Email address
               </label>
               <Input
-                id="launch-discount-email"
+                id="welcome-discount-email"
                 type="email"
                 maxLength={160}
                 value={email}
@@ -205,6 +214,9 @@ const LaunchDiscountPopup = () => {
               <Button type="submit" className="h-11 w-full text-sm font-semibold" disabled={!canSubmit}>
                 {submitButtonLabel}
               </Button>
+              <p className="text-xs text-muted-foreground">
+                This code is reserved for email subscribers and applies to first orders only.
+              </p>
             </form>
           ) : (
             <Button type="button" className="mt-6 h-11 w-full text-sm font-semibold" onClick={() => setOpen(false)}>
@@ -221,7 +233,7 @@ const LaunchDiscountPopup = () => {
               onClick={closeWithoutOffer}
               className="mt-5 text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
             >
-              Continue without the 10% off coupon
+              Continue shopping without the welcome code
             </button>
           ) : null}
         </div>

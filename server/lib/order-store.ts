@@ -152,6 +152,7 @@ const cloneOrder = (order: StoredOrder): StoredOrder => ({
 const asString = (value: unknown) => (typeof value === "string" ? value : "");
 const asNumber = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : 0);
 const asObject = (value: unknown) => (typeof value === "object" && value !== null ? (value as Record<string, unknown>) : null);
+const normalizeEmailAddress = (value: string) => value.trim().toLowerCase();
 
 const asJsonField = <T>(value: unknown, fallback: T): T => {
   if (typeof value === "string") {
@@ -183,6 +184,8 @@ const normalizeCustomer = (value: unknown): OrderCustomer => {
     country: asString(customer.country),
   };
 };
+
+const getNormalizedCustomerEmailFromValue = (value: unknown) => normalizeEmailAddress(normalizeCustomer(value).email);
 
 const normalizePricing = (value: unknown): OrderPricing => {
   const pricing = asJsonField<Partial<OrderPricing>>(value, {});
@@ -322,6 +325,9 @@ const findMemoryOrderBy = (predicate: (order: StoredOrder) => boolean) => {
   return null;
 };
 
+const matchesCustomerEmail = (order: StoredOrder, normalizedEmail: string, excludeOrderId = "") =>
+  order.id !== excludeOrderId && normalizeEmailAddress(order.customer.email) === normalizedEmail;
+
 const decrementMemoryInventory = (lineItems: OrderLineItem[]) => {
   const nextInventory = new Map(memoryInventory);
   const updatedAt = nowIso();
@@ -419,6 +425,70 @@ export const findOrderByIdempotencyKey = async (idempotencyKey: string) => {
   return data ? parseOrderRow(data as Record<string, unknown>) : null;
 };
 
+const shouldFallbackToCustomerJsonEmailLookup = (error: SupabaseErrorLike | null) => {
+  if (!error) {
+    return false;
+  }
+
+  const normalizedMessage = error.message.trim().toLowerCase();
+  return normalizedMessage.includes("customer_email");
+};
+
+const findOrderByCustomerEmailFromCustomerJson = async (normalizedEmail: string, excludeOrderId = "") => {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase.from("orders").select("id, customer_json").order("created_at", { ascending: false });
+  ensureNoSupabaseError(error, "look up order by customer email");
+
+  for (const row of data || []) {
+    const record = row as Record<string, unknown>;
+    const orderId = asString(record.id);
+    if (orderId === excludeOrderId) {
+      continue;
+    }
+
+    if (getNormalizedCustomerEmailFromValue(record.customer_json) === normalizedEmail) {
+      return orderId;
+    }
+  }
+
+  return "";
+};
+
+export const hasOrderForCustomerEmail = async (email: string, excludeOrderId = "") => {
+  const normalizedEmail = normalizeEmailAddress(email);
+  if (!normalizedEmail) {
+    return false;
+  }
+
+  if (isMemoryStoreEnabled()) {
+    for (const order of memoryOrders.values()) {
+      if (matchesCustomerEmail(order, normalizedEmail, excludeOrderId)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  let query = supabase.from("orders").select("id").eq("customer_email", normalizedEmail).limit(1);
+  if (excludeOrderId) {
+    query = query.neq("id", excludeOrderId);
+  }
+
+  const { data, error } = await query.maybeSingle();
+  if (error && error.code === "PGRST116") {
+    return false;
+  }
+
+  if (shouldFallbackToCustomerJsonEmailLookup(error)) {
+    return Boolean(await findOrderByCustomerEmailFromCustomerJson(normalizedEmail, excludeOrderId));
+  }
+
+  ensureNoSupabaseError(error, "look up order by customer email");
+  return Boolean(data);
+};
+
 export const createPendingOrder = async (input: CreatePendingOrderInput) => {
   const createdAt = nowIso();
 
@@ -455,6 +525,7 @@ export const createPendingOrder = async (input: CreatePendingOrderInput) => {
     payment_provider: "clover",
     payment_status: "pending",
     idempotency_key: input.idempotencyKey,
+    customer_email: normalizeEmailAddress(input.customer.email) || null,
     currency: DEFAULT_CURRENCY,
     subtotal_minor: input.subtotalMinor,
     total_minor: input.totalMinor,

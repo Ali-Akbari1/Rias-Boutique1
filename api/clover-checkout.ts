@@ -24,6 +24,7 @@ import {
   attachCheckoutSession,
   createPendingOrder,
   findOrderByIdempotencyKey,
+  hasOrderForCustomerEmail,
   isOrderStoreConfigured,
   markOrderFailed,
   type OrderLineItem,
@@ -36,11 +37,12 @@ import {
 } from "../server/lib/checkout-pricing.js";
 import { toQuoteCustomer, toQuoteLineItems, verifyShippingQuoteToken } from "../server/lib/easypost.js";
 import {
-  getLaunchDiscountExpiryDisplay,
-  isLaunchDiscountActive,
-  LAUNCH_DISCOUNT_CODE,
-  LAUNCH_DISCOUNT_RATE,
+  getWelcomeDiscountExpiryDisplay,
+  isWelcomeDiscountActive,
+  WELCOME_DISCOUNT_CODE,
+  WELCOME_DISCOUNT_RATE,
 } from "../server/lib/launch-discount.js";
+import { hasDiscountSubscriber } from "../server/lib/discount-subscribers.js";
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
@@ -260,20 +262,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const payload = bodyResult.data;
   const requestedDiscountCode = (payload.discountCode || payload.promoCode || "").trim().toUpperCase();
-  const launchDiscountActive = isLaunchDiscountActive();
-  if (requestedDiscountCode && requestedDiscountCode !== LAUNCH_DISCOUNT_CODE) {
-    sendError(res, 400, "INVALID_DISCOUNT_CODE", "Invalid discount code.");
-    return;
-  }
-  if (requestedDiscountCode === LAUNCH_DISCOUNT_CODE && !launchDiscountActive) {
-    sendError(
-      res,
-      400,
-      "DISCOUNT_CODE_EXPIRED",
-      `LAUNCH10 expired on ${getLaunchDiscountExpiryDisplay()}.`,
-    );
-    return;
-  }
+  const welcomeDiscountActive = isWelcomeDiscountActive();
 
   if (looksAutomatedTraffic(req)) {
     sendError(res, 403, "BOT_DETECTED", "Automated checkout attempts are not allowed.");
@@ -327,6 +316,82 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
   }
 
+  const shippingFingerprint = toShippingFingerprint(payload.customer);
+  const idempotencyKey =
+    payload.idempotencyKey ||
+    buildCheckoutIdempotencyKey({
+      email: payload.customer.email,
+      cartCanonical,
+      shippingFingerprint,
+    });
+
+  const existingOrder = await findOrderByIdempotencyKey(idempotencyKey);
+  if (existingOrder?.cloverCheckoutUrl && existingOrder.paymentStatus === "pending") {
+    if (debugLogs) {
+      logger.debug("clover-checkout.reused_pending_checkout", {
+        requestId,
+        orderId: existingOrder.id,
+        checkoutId: existingOrder.cloverCheckoutId,
+        paymentStatus: existingOrder.paymentStatus,
+        idempotencyKeyHash: createDeterministicHash(idempotencyKey).slice(0, 12),
+      });
+    }
+    res.status(200).json({
+      checkoutUrl: existingOrder.cloverCheckoutUrl,
+      orderId: existingOrder.id,
+      reused: true,
+    });
+    return;
+  }
+
+  if (existingOrder?.paymentStatus === "paid") {
+    sendError(res, 409, "ORDER_ALREADY_PAID", "This order has already been paid.");
+    return;
+  }
+
+  if (requestedDiscountCode && requestedDiscountCode !== WELCOME_DISCOUNT_CODE) {
+    sendError(res, 400, "INVALID_DISCOUNT_CODE", "Invalid discount code.");
+    return;
+  }
+
+  if (requestedDiscountCode === WELCOME_DISCOUNT_CODE && !welcomeDiscountActive) {
+    const expiryDisplay = getWelcomeDiscountExpiryDisplay();
+    sendError(
+      res,
+      400,
+      "DISCOUNT_CODE_EXPIRED",
+      expiryDisplay
+        ? `${WELCOME_DISCOUNT_CODE} expired on ${expiryDisplay}.`
+        : `${WELCOME_DISCOUNT_CODE} is not active right now.`,
+    );
+    return;
+  }
+
+  if (requestedDiscountCode === WELCOME_DISCOUNT_CODE) {
+    const normalizedCustomerEmail = payload.customer.email.trim().toLowerCase();
+    const subscriberExists = await hasDiscountSubscriber(normalizedCustomerEmail);
+    if (!subscriberExists) {
+      sendError(
+        res,
+        400,
+        "DISCOUNT_CODE_NOT_ELIGIBLE",
+        "This welcome code is reserved for customers who joined the email list with this checkout email.",
+      );
+      return;
+    }
+
+    const hasExistingOrder = await hasOrderForCustomerEmail(normalizedCustomerEmail);
+    if (hasExistingOrder) {
+      sendError(
+        res,
+        409,
+        "FIRST_ORDER_DISCOUNT_INELIGIBLE",
+        "This 10% welcome code is only available on a first order. Remove the code to continue.",
+      );
+      return;
+    }
+  }
+
   const catalogMap = await getCatalogMap();
 
   const lineItems: OrderLineItem[] = [];
@@ -368,8 +433,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const subtotalMinor = lineItems.reduce((sum, item) => sum + item.lineTotalMinor, 0);
   const discountMinor =
-    requestedDiscountCode === LAUNCH_DISCOUNT_CODE && launchDiscountActive
-      ? Math.round(subtotalMinor * LAUNCH_DISCOUNT_RATE)
+    requestedDiscountCode === WELCOME_DISCOUNT_CODE && welcomeDiscountActive
+      ? Math.round(subtotalMinor * WELCOME_DISCOUNT_RATE)
       : 0;
   const isPickupInStore = payload.customer.deliveryMethod === "pickup";
   const freeShippingThresholdMinor = getFreeShippingThresholdMinor();
@@ -414,39 +479,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     discountMinor,
     shippingMinor,
   });
-
-  const shippingFingerprint = toShippingFingerprint(payload.customer);
-  const idempotencyKey =
-    payload.idempotencyKey ||
-    buildCheckoutIdempotencyKey({
-      email: payload.customer.email,
-      cartCanonical,
-      shippingFingerprint,
-    });
-
-  const existingOrder = await findOrderByIdempotencyKey(idempotencyKey);
-  if (existingOrder?.cloverCheckoutUrl && existingOrder.paymentStatus === "pending") {
-    if (debugLogs) {
-      logger.debug("clover-checkout.reused_pending_checkout", {
-        requestId,
-        orderId: existingOrder.id,
-        checkoutId: existingOrder.cloverCheckoutId,
-        paymentStatus: existingOrder.paymentStatus,
-        idempotencyKeyHash: createDeterministicHash(idempotencyKey).slice(0, 12),
-      });
-    }
-    res.status(200).json({
-      checkoutUrl: existingOrder.cloverCheckoutUrl,
-      orderId: existingOrder.id,
-      reused: true,
-    });
-    return;
-  }
-
-  if (existingOrder?.paymentStatus === "paid") {
-    sendError(res, 409, "ORDER_ALREADY_PAID", "This order has already been paid.");
-    return;
-  }
 
   const checkoutLineItems = buildCloverLineItems({
     lineItems,

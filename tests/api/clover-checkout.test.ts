@@ -2,8 +2,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import handler from "../../api/clover-checkout";
 import { createMockRequest, createMockResponse, createSignedShippingQuoteToken } from "./test-utils/utils";
-import { closeOrderStoreForTests, resetOrderStoreForTests } from "../../server/lib/order-store.js";
+import {
+  closeOrderStoreForTests,
+  createPendingOrder,
+  resetOrderStoreForTests,
+} from "../../server/lib/order-store.js";
 import * as productCatalog from "../../server/lib/product-catalog";
+import {
+  resetDiscountSubscribersForTests,
+  seedDiscountSubscriberForTests,
+} from "../../server/lib/discount-subscribers.js";
 
 const makeCheckoutBody = () => {
   const customer = {
@@ -70,6 +78,7 @@ describe("clover checkout endpoint", () => {
     );
 
     await resetOrderStoreForTests();
+    await resetDiscountSubscribersForTests();
   });
 
   it("rejects malformed/tampered cart payload", async () => {
@@ -262,10 +271,108 @@ describe("clover checkout endpoint", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("applies LAUNCH10 discount to checkout line items", async () => {
-    process.env.LAUNCH10_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
+  it("rejects welcome discount when the checkout email is not subscribed", async () => {
+    process.env.WELCOME_DISCOUNT_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const request = createMockRequest({
+      method: "POST",
+      headers: {
+        origin: "https://www.riasboutique.com",
+        "user-agent": "Mozilla/5.0",
+      },
+      body: JSON.stringify({
+        ...makeCheckoutBody(),
+        discountCode: "WELCOME10",
+      }),
+    });
+    const response = createMockResponse();
+
+    await handler(request, response);
+
+    expect(response.statusCode).toBe(400);
+    expect(response.jsonBody).toMatchObject({
+      error: {
+        code: "DISCOUNT_CODE_NOT_ELIGIBLE",
+      },
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects welcome discount when the checkout email already has an order", async () => {
+    process.env.WELCOME_DISCOUNT_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
+    await seedDiscountSubscriberForTests({ email: "test@example.com" });
+    await createPendingOrder({
+      idempotencyKey: "existing-order-1234567890",
+      customer: {
+        deliveryMethod: "shipping",
+        fullName: "Existing Customer",
+        email: "test@example.com",
+        phone: "+1 (403) 555-0111",
+        address: "456 Other St",
+        city: "Calgary",
+        state: "Alberta",
+        postalCode: "T2X 1A1",
+        country: "Canada",
+      },
+      lineItems: [
+        {
+          productId: "Blue-Cheerma-Dozi",
+          name: "Blue Long Cheerma Dozi Dress",
+          unitAmountMinor: 40000,
+          quantity: 1,
+          lineTotalMinor: 40000,
+          selection: {
+            size: "One Size",
+            color: "Default",
+          },
+        },
+      ],
+      subtotalMinor: 40000,
+      totalMinor: 42000,
+      pricing: {
+        discountCode: "",
+        discountMinor: 0,
+        shippingMinor: 0,
+        quotedShippingMinor: 1800,
+        taxMinor: 2000,
+        freeShippingApplied: true,
+      },
+    });
+
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const request = createMockRequest({
+      method: "POST",
+      headers: {
+        origin: "https://www.riasboutique.com",
+        "user-agent": "Mozilla/5.0",
+      },
+      body: JSON.stringify({
+        ...makeCheckoutBody(),
+        discountCode: "WELCOME10",
+      }),
+    });
+    const response = createMockResponse();
+
+    await handler(request, response);
+
+    expect(response.statusCode).toBe(409);
+    expect(response.jsonBody).toMatchObject({
+      error: {
+        code: "FIRST_ORDER_DISCOUNT_INELIGIBLE",
+      },
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("applies WELCOME10 discount to checkout line items", async () => {
+    process.env.WELCOME_DISCOUNT_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
+    await seedDiscountSubscriberForTests({ email: "test@example.com" });
     const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "checkout_launch10", href: "https://checkout.clover.com/pay/checkout_launch10" }), {
+      new Response(JSON.stringify({ id: "checkout_welcome10", href: "https://checkout.clover.com/pay/checkout_welcome10" }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       }),
@@ -280,7 +387,7 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        discountCode: "launch10",
+        discountCode: "welcome10",
       }),
     });
     const response = createMockResponse();
@@ -363,6 +470,55 @@ describe("clover checkout endpoint", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const body = makeCheckoutBody();
+    const headers = {
+      origin: "https://www.riasboutique.com",
+      "user-agent": "Mozilla/5.0",
+    };
+
+    const firstResponse = createMockResponse();
+    await handler(
+      createMockRequest({
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      }),
+      firstResponse,
+    );
+
+    const secondResponse = createMockResponse();
+    await handler(
+      createMockRequest({
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      }),
+      secondResponse,
+    );
+
+    expect(firstResponse.statusCode).toBe(200);
+    expect(secondResponse.statusCode).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(secondResponse.jsonBody).toMatchObject({
+      reused: true,
+    });
+  });
+
+  it("reuses an existing discounted checkout session for duplicate submissions", async () => {
+    process.env.WELCOME_DISCOUNT_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
+    await seedDiscountSubscriberForTests({ email: "test@example.com" });
+
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_discounted", href: "https://checkout.clover.com/pay/checkout_discounted" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const body = {
+      ...makeCheckoutBody(),
+      discountCode: "WELCOME10",
+    };
     const headers = {
       origin: "https://www.riasboutique.com",
       "user-agent": "Mozilla/5.0",

@@ -3,6 +3,7 @@ create table if not exists orders (
   payment_provider text not null default 'clover',
   payment_status text not null check (payment_status in ('pending', 'paid', 'failed', 'canceled')),
   idempotency_key text not null unique,
+  customer_email text,
   clover_checkout_id text unique,
   clover_checkout_url text,
   payment_reference text,
@@ -24,9 +25,15 @@ create table if not exists orders (
 alter table orders add column if not exists pricing_json jsonb not null default '{}'::jsonb;
 alter table orders add column if not exists shipping_quote_json jsonb;
 alter table orders add column if not exists shipment_json jsonb;
+alter table orders add column if not exists customer_email text;
+
+update orders
+set customer_email = lower(trim(coalesce(customer_json ->> 'email', '')))
+where coalesce(customer_email, '') = '';
 
 create index if not exists idx_orders_payment_status on orders (payment_status);
 create index if not exists idx_orders_created_at on orders (created_at);
+create index if not exists idx_orders_customer_email on orders (customer_email);
 
 create table if not exists inventory (
   product_id text primary key,
@@ -64,13 +71,17 @@ create table if not exists discount_subscribers (
   id bigserial primary key,
   email text not null unique,
   full_name text not null default '',
-  source text not null default 'launch-popup',
-  campaign text not null default 'launch10_2026_03_20',
-  code text not null default 'LAUNCH10',
+  source text not null default 'welcome-popup',
+  campaign text not null default 'welcome10_first_order',
+  code text not null default 'WELCOME10',
   metadata_json jsonb not null default '{}'::jsonb,
   subscribed_at timestamptz not null default now(),
   last_email_sent_at timestamptz
 );
+
+alter table discount_subscribers alter column source set default 'welcome-popup';
+alter table discount_subscribers alter column campaign set default 'welcome10_first_order';
+alter table discount_subscribers alter column code set default 'WELCOME10';
 
 create index if not exists idx_discount_subscribers_subscribed_at on discount_subscribers (subscribed_at);
 create index if not exists idx_discount_subscribers_campaign on discount_subscribers (campaign);
