@@ -525,7 +525,7 @@
       "id": "Handmade-mens-parantoban-black",
       "createdAt": "2026-02-24",
       "image": "/uploads/handmade-mens-parantoban-in-black-1.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Black mens parantoban with handmade silver and mirror embroidery. ",
       "category": "Handmade",
       "fitInfo": "Please check our size chart for all specific measurements. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
@@ -1118,6 +1118,39 @@
       "price_on_inquiry": true,
       "category": "Bridal",
       "fitInfo": "Measurements-\nBust: 44in\nLength of dress: 56in"
+    },
+    {
+      "fabric": "Velvet",
+      "price": 250,
+      "galleryImages": [
+        "/uploads/img_1768.jpg",
+        "/uploads/img_1765.jpg"
+      ],
+      "name": "Burgundy 3 Piece Suit",
+      "maxQuantity": 1,
+      "colors": [
+        "Burgundy"
+      ],
+      "sizes": [
+        "Small",
+        "Medium",
+        "X-Large",
+        "XX-Large"
+      ],
+      "department": "women",
+      "tags": [
+        "gulabatoon",
+        "3 piece",
+        "wide-legged"
+      ],
+      "id": "burgundy-punjabi",
+      "createdAt": "2026-04-28",
+      "image": "/uploads/img_1768.jpg",
+      "inventory": "available",
+      "description": "3 piece velvet suit with gulabatoon detailing",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements (Bust) \nSmall- 40in \nMedium- 42in\nLarge-44in\nX-Large- 46in \nXX-Large- 48in \n\nWhat's Included\n"
     }
   ]
 }
