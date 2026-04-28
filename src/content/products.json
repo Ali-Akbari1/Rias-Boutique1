@@ -1090,11 +1090,15 @@
       "fabric": "Banaras",
       "galleryImages": [
         "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.png",
-        "/uploads/chatgpt-image-apr-28-2026-02_14_42-pm.png"
+        "/uploads/chatgpt-image-apr-28-2026-02_14_42-pm.png",
+        "/uploads/chatgpt-image-apr-28-2026-02_25_36-pm.png"
       ],
       "name": "Bridal Green Cheerma Dozi Dress",
       "slug": "bridal-green-cheerma-dozi",
       "maxQuantity": 1,
+      "colors": [
+        "Red"
+      ],
       "sizes": [
         "Large"
       ],
