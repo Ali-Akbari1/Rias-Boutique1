@@ -1127,6 +1127,7 @@
         "/uploads/img_1765.jpg"
       ],
       "name": "Burgundy 3 Piece Suit",
+      "slug": "burgundy-punjabi-3-piece-suit",
       "maxQuantity": 1,
       "colors": [
         "Burgundy"
@@ -1138,19 +1139,22 @@
         "XX-Large"
       ],
       "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
       "tags": [
         "gulabatoon",
         "3 piece",
         "wide-legged"
       ],
-      "id": "burgundy-punjabi",
+      "id": "burgundy-punjabi-3-piece-suit",
       "createdAt": "2026-04-28",
       "image": "/uploads/img_1768.jpg",
       "inventory": "available",
       "description": "3 piece velvet suit with gulabatoon detailing",
       "price_on_inquiry": false,
       "category": "Party Wear",
-      "fitInfo": "Measurements (Bust) \nSmall- 40in \nMedium- 42in\nLarge-44in\nX-Large- 46in \nXX-Large- 48in \n\nWhat's Included\n"
+      "fitInfo": "Measurements (Bust) \n-Small- 40in \n-Medium- 42in\n-Large-44in\n-X-Large- 46in \n-XX-Large- 48in \n\nWhat's Included\n-Top\n-Wide-Legged Pants\n-Scarf"
     }
   ]
 }
