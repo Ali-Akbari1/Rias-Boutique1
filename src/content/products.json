@@ -1085,6 +1085,34 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements\n- Bust: 44in\n\nWhats Included\n- Dress\n- Wide-legged pants\n- Scarf"
+    },
+    {
+      "fabric": "Banaras",
+      "galleryImages": [
+        "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.png"
+      ],
+      "name": "Bridal Green Cheerma Dozi Dress",
+      "slug": "bridal-green-cheerma-dozi",
+      "maxQuantity": 1,
+      "sizes": [
+        "Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "bridal",
+        "cheerma dozi"
+      ],
+      "id": "bridal-green-",
+      "createdAt": "2026-04-28",
+      "image": "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.png",
+      "inventory": "available",
+      "description": "Beautiful long bridal green dress with handmade cheerma dozi work. ",
+      "price_on_inquiry": true,
+      "category": "Bridal",
+      "fitInfo": "Measurements-\nBust: 44in\nLength of dress: 56in"
     }
   ]
 }
