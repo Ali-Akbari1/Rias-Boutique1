@@ -18,6 +18,8 @@ describe("shipping rates endpoint", () => {
     process.env.EASYPOST_FROM_ZIP = "T4A 0X8";
     process.env.EASYPOST_FROM_COUNTRY = "CA";
     process.env.EASYPOST_DEFAULT_HS_TARIFF_NUMBER = "620443";
+    process.env.EASYPOST_PRODUCT_ORIGIN_COUNTRY = "CA";
+    process.env.EASYPOST_ITEM_WEIGHT_OZ = "24";
     process.env.EASYPOST_CUSTOMS_EEL_PFC = "NOEEI 30.37(a)";
   });
 
