@@ -220,7 +220,7 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
             <button
               type="button"
               onClick={() => setCurrencyOpen((open) => !open)}
-              className="relative flex h-9 w-[96px] items-center justify-center rounded-full border border-border bg-background/85 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 sm:w-[120px] sm:text-[11px] sm:tracking-[0.14em]"
+              className="relative flex h-9 w-[84px] items-center justify-center rounded-full border border-border bg-background/85 px-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 sm:w-[106px] sm:text-[11px] sm:tracking-[0.12em]"
               aria-label="Select currency"
               aria-haspopup="listbox"
               aria-expanded={currencyOpen}

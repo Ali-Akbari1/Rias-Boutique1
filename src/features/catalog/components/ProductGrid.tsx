@@ -813,10 +813,12 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
             </div>
 
             {totalPages > 1 ? (
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
                 <Button
                   type="button"
                   variant="outline"
+                  size="lg"
+                  className="min-w-[116px] text-base"
                   onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
                   disabled={safePage === 1}
                   aria-label="Previous page"
@@ -824,13 +826,15 @@ const ProductGrid = ({ initialDepartment = "all", initialQuery = "" }: ProductGr
                   Previous
                 </Button>
 
-                <span className="px-2 text-sm font-body text-muted-foreground">
+                <span className="px-3 text-base font-body font-medium text-muted-foreground">
                   Page {safePage} of {totalPages}
                 </span>
 
                 <Button
                   type="button"
                   variant="outline"
+                  size="lg"
+                  className="min-w-[116px] text-base"
                   onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
                   disabled={safePage === totalPages}
                   aria-label="Next page"
