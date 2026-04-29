@@ -1,26 +1,37 @@
+interface RequestJsonOptions {
+  path: string;
+  method?: "GET" | "POST";
+  body?: unknown;
+  signal?: AbortSignal;
+  cache?: RequestCache;
+  headers?: Record<string, string>;
+  fallbackErrorMessage: string;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const getTrimmedString = (value: unknown) => (typeof value === "string" ? value.trim() : "");
+
 export const extractApiErrorMessage = (payload: unknown, fallback: string) => {
-  if (!payload || typeof payload !== "object") {
+  if (!isRecord(payload)) {
     return fallback;
   }
 
-  const record = payload as Record<string, unknown>;
-  const directError = record.error;
-  if (typeof directError === "string" && directError.trim()) {
-    return directError.trim();
+  const directErrorMessage = getTrimmedString(payload.error);
+  if (directErrorMessage) {
+    return directErrorMessage;
   }
 
-  if (directError && typeof directError === "object") {
-    const nested = directError as Record<string, unknown>;
-    if (typeof nested.message === "string" && nested.message.trim()) {
-      return nested.message.trim();
+  if (isRecord(payload.error)) {
+    const nestedErrorMessage = getTrimmedString(payload.error.message);
+    if (nestedErrorMessage) {
+      return nestedErrorMessage;
     }
   }
 
-  if (typeof record.message === "string" && record.message.trim()) {
-    return record.message.trim();
-  }
-
-  return fallback;
+  const topLevelMessage = getTrimmedString(payload.message);
+  return topLevelMessage || fallback;
 };
 
 export const requestJson = async <T>({
@@ -31,15 +42,7 @@ export const requestJson = async <T>({
   cache,
   headers,
   fallbackErrorMessage,
-}: {
-  path: string;
-  method?: "GET" | "POST";
-  body?: unknown;
-  signal?: AbortSignal;
-  cache?: RequestCache;
-  headers?: Record<string, string>;
-  fallbackErrorMessage: string;
-}) => {
+}: RequestJsonOptions): Promise<T> => {
   const response = await fetch(path, {
     method,
     signal,
@@ -51,10 +54,10 @@ export const requestJson = async <T>({
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
 
-  const payload = (await response.json().catch(() => ({}))) as T;
+  const payload = await response.json().catch((): unknown => ({}));
   if (!response.ok) {
     throw new Error(extractApiErrorMessage(payload, fallbackErrorMessage));
   }
 
-  return payload;
+  return payload as T;
 };

@@ -35,139 +35,40 @@ import { getStorePickupDetails, returnPolicy, shippingPolicy } from "@/features/
 import { formatProductAlt } from "@/lib/seo";
 import {
   formatProductSelectionSummary,
-  getProductById,
-  getProductBySlug,
-  products,
-  type Product,
 } from "@/features/catalog/data/products";
-
-type DeliveryMethod = "shipping" | "pickup";
-type AddressVerificationStatus = "idle" | "verifying" | "verified" | "invalid" | "skipped";
-
-interface CheckoutForm {
-  deliveryMethod: DeliveryMethod;
-  fullName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-}
-
-const initialForm: CheckoutForm = {
-  deliveryMethod: "shipping",
-  fullName: "",
-  email: "",
-  phone: "",
-  address: "",
-  city: "",
-  state: "",
-  postalCode: "",
-  country: "",
-};
+import {
+  buildAddressFingerprint,
+  buildFreeShippingThresholdNote,
+  createAutocompleteSessionToken,
+  findSelectionForItemId,
+  getCheckoutShippingGuard,
+  getNextSelectedShippingToken,
+  getSelectedShippingOption,
+  hasSameCheckoutAddress,
+  initialCheckoutForm,
+  initialTouchedCheckoutFields,
+  isAbortError,
+  isAddressFieldsComplete,
+  isAutocompleteNotConfiguredError,
+  isShippingAddressComplete,
+  looksLikeEmail,
+  mergeNormalizedAddress,
+  normalizeCountryCode,
+  resolveAddressSuggestionSelection,
+  type AddressVerificationStatus,
+  type CheckoutAddressFields,
+  type CheckoutForm,
+  type TouchedCheckoutFields,
+} from "@/pages/checkout-helpers";
 
 const clientCommerceConfig = getClientCommerceConfig();
-const looksLikeEmail = (value: string) => /\S+@\S+\.\S+/.test(value.trim());
-const isAddressFieldsComplete = (form: CheckoutForm) =>
-  form.deliveryMethod === "shipping" &&
-  form.address.trim().length >= 4 &&
-  form.city.trim().length >= 2 &&
-  form.state.trim().length >= 2 &&
-  form.postalCode.trim().length >= 3 &&
-  form.country.trim().length >= 2;
-const isShippingAddressComplete = (form: CheckoutForm) =>
-  isAddressFieldsComplete(form) &&
-  form.fullName.trim().length >= 2 &&
-  looksLikeEmail(form.email) &&
-  form.phone.trim().length >= 7;
-const buildAddressFingerprint = (form: CheckoutForm) =>
-  [
-    form.address,
-    form.city,
-    form.state,
-    form.postalCode,
-    form.country,
-  ]
-    .map((value) => value.trim().toLowerCase())
-    .join("|");
-
-const normalizeCountryCode = (value: string) => {
-  const trimmed = value.trim().toLowerCase();
-  if (!trimmed) {
-    return "";
-  }
-
-  const compact = trimmed.replace(/[^a-z]/g, "");
-  if (["ca", "can", "canada"].includes(compact)) {
-    return "CA";
-  }
-  if (["us", "usa", "unitedstates", "unitedstatesofamerica"].includes(compact)) {
-    return "US";
-  }
-
-  return trimmed.toUpperCase();
-};
-
-const slugifyOption = (value: string) =>
-  value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-const buildVariantId = (baseId: string, size: string, color: string) => {
-  const sizeSlug = slugifyOption(size) || "one-size";
-  const colorSlug = slugifyOption(color) || "default";
-  return `${baseId}-${sizeSlug}-${colorSlug}`;
-};
-
-const getDefaultSelection = (product: Product) => ({
-  size: product.sizes[0] || "One Size",
-  color: product.colors[0] || "Default",
-});
-
-const findSelectionForItemId = (itemId: string) => {
-  const trimmed = itemId.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  const directMatch = getProductById(trimmed) || getProductBySlug(trimmed);
-  if (directMatch) {
-    return { product: directMatch, selection: getDefaultSelection(directMatch) };
-  }
-
-  for (const product of products) {
-    const sizes = product.sizes.length > 0 ? product.sizes : ["One Size"];
-    const colors = product.colors.length > 0 ? product.colors : ["Default"];
-
-    for (const size of sizes) {
-      for (const color of colors) {
-        if (buildVariantId(product.id, size, color) === trimmed) {
-          return { product, selection: { size, color } };
-        }
-      }
-    }
-  }
-
-  return null;
-};
-
-const createAutocompleteSessionToken = () => {
-  if (typeof globalThis.crypto?.randomUUID === "function") {
-    return globalThis.crypto.randomUUID();
-  }
-
-  return `mapbox_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
-};
 
 const Checkout = () => {
   const { items, totalPrice, addToCart, updateQuantity, removeFromCart } = useCart();
   const { toast } = useToast();
   const { formatPrice, isUsd } = useCurrency();
   const [searchParams] = useSearchParams();
-  const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(initialForm);
+  const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(initialCheckoutForm);
   const [discountCode, setDiscountCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [shippingOptions, setShippingOptions] = useState<ShippingRateOption[]>([]);
@@ -183,12 +84,8 @@ const Checkout = () => {
   const [addressVerificationMessage, setAddressVerificationMessage] = useState("");
   const [addressVerificationError, setAddressVerificationError] = useState("");
   const [verifiedAddressFingerprint, setVerifiedAddressFingerprint] = useState("");
-  const [touchedFields, setTouchedFields] = useState({
-    fullName: false,
-    email: false,
-    phone: false,
-  });
-  const setFieldTouched = (field: keyof typeof touchedFields) => {
+  const [touchedFields, setTouchedFields] = useState<TouchedCheckoutFields>(initialTouchedCheckoutFields);
+  const setFieldTouched = (field: keyof TouchedCheckoutFields) => {
     setTouchedFields((current) => (current[field] ? current : { ...current, [field]: true }));
   };
   const [lastVerifiedAddressFingerprint, setLastVerifiedAddressFingerprint] = useState("");
@@ -221,8 +118,10 @@ const Checkout = () => {
     welcomeDiscountActive,
   });
   const isPickupInStore = checkoutForm.deliveryMethod === "pickup";
-  const selectedShippingOption =
-    shippingOptions.find((option) => option.token === selectedShippingToken) || shippingOptions[0] || null;
+  const selectedShippingOption = useMemo(
+    () => getSelectedShippingOption(shippingOptions, selectedShippingToken),
+    [selectedShippingToken, shippingOptions],
+  );
   const quotedShippingMinor = isPickupInStore ? 0 : selectedShippingOption?.quotedRateMinor || 0;
   const shippingMinor = isPickupInStore ? 0 : selectedShippingOption?.customerRateMinor || 0;
   const freeShippingApplied = !isPickupInStore && quotedShippingMinor > 0 && shippingMinor === 0;
@@ -267,26 +166,17 @@ const Checkout = () => {
         Boolean(selectedShippingOption) &&
         !isShippingLoading &&
         !shippingError));
-  const freeShippingThresholdNote =
-    isPickupInStore
-      ? "Pick up in store selected. No shipping fee will be charged."
-      : freeShippingApplied && selectedShippingOption
-      ? `Free shipping on orders over ${formatPrice(
-          clientCommerceConfig.freeShippingThresholdMinor / 100,
-        )} (Canada & US only). Applied to ${selectedShippingOption.label}.`
-      : selectedShippingOption && !isCanadaOrUsDestination
-      ? `International shipping is a flat ${formatPrice(selectedShippingOption.customerRateMinor / 100)} at checkout.`
-      : selectedShippingOption
-      ? `${selectedShippingOption.label}${selectedShippingOption.deliveryDays ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.` : "."} Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(selectedShippingOption.customerRateMinor / 100)} shipping.`
-      : isCanadaOrUsDestination
-      ? `Orders under ${formatPrice(clientCommerceConfig.freeShippingThresholdMinor / 100)} are charged ${formatPrice(
-          (isUsDestination
-            ? clientCommerceConfig.flatShippingRateInternationalMinor
-            : clientCommerceConfig.flatShippingRateMinor) / 100,
-        )} shipping.`
-      : `International shipping is a flat ${formatPrice(
-          clientCommerceConfig.flatShippingRateInternationalMinor / 100,
-        )} at checkout.`;
+  const freeShippingThresholdNote = buildFreeShippingThresholdNote({
+    isPickupInStore,
+    freeShippingApplied,
+    selectedShippingOption,
+    isCanadaOrUsDestination,
+    isUsDestination,
+    freeShippingThresholdMinor: clientCommerceConfig.freeShippingThresholdMinor,
+    flatShippingRateMinor: clientCommerceConfig.flatShippingRateMinor,
+    flatShippingRateInternationalMinor: clientCommerceConfig.flatShippingRateInternationalMinor,
+    formatPrice,
+  });
 
   const handleFormChange = (field: keyof CheckoutForm) => (event: ChangeEvent<HTMLInputElement>) => {
     setCheckoutForm((current) => ({ ...current, [field]: event.target.value }));
@@ -307,7 +197,7 @@ const Checkout = () => {
     state,
     postalCode,
     country,
-  }: Pick<CheckoutForm, "address" | "city" | "state" | "postalCode" | "country">) => {
+  }: CheckoutAddressFields) => {
     clearPendingAddressAutocompleteRequest();
     clearAddressBlurTimeout();
     setCheckoutForm((current) => ({
@@ -344,17 +234,11 @@ const Checkout = () => {
         sessionToken,
         signal: controller.signal,
       });
-      const resolvedAddress = payload.address || suggestion;
+      const resolvedAddress = payload.address;
       setAddressAutocompleteAvailable(payload.configured);
-      applySuggestedAddressSelection({
-        address: resolvedAddress.address || suggestion.address,
-        city: resolvedAddress.city || suggestion.city,
-        state: resolvedAddress.state || suggestion.state,
-        postalCode: resolvedAddress.postalCode || suggestion.postalCode,
-        country: resolvedAddress.country || suggestion.country,
-      });
+      applySuggestedAddressSelection(resolveAddressSuggestionSelection(suggestion, resolvedAddress));
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") {
+      if (isAbortError(error)) {
         return;
       }
 
@@ -536,13 +420,13 @@ const Checkout = () => {
           setIsAddressSuggestionsOpen(payload.suggestions.length > 0);
         })
         .catch((error) => {
-          if (error instanceof Error && error.name === "AbortError") {
+          if (isAbortError(error)) {
             return;
           }
 
           setAddressSuggestions([]);
           setIsAddressSuggestionsOpen(false);
-          if (error instanceof Error && error.message.includes("not configured")) {
+          if (isAutocompleteNotConfiguredError(error)) {
             setAddressAutocompleteAvailable(false);
           }
         })
@@ -613,27 +497,11 @@ const Checkout = () => {
         signal: controller.signal,
       })
         .then((payload) => {
-          const normalizedAddress = payload.normalizedAddress;
-          const nextForm = normalizedAddress
-            ? {
-                ...checkoutForm,
-                address: normalizedAddress.address,
-                city: normalizedAddress.city,
-                state: normalizedAddress.state,
-                postalCode: normalizedAddress.postalCode,
-                country: normalizedAddress.country,
-              }
-            : checkoutForm;
+          const nextForm = mergeNormalizedAddress(checkoutForm, payload.normalizedAddress);
           const nextFingerprint = buildAddressFingerprint(nextForm);
 
           setCheckoutForm((current) => {
-            if (
-              current.address === nextForm.address &&
-              current.city === nextForm.city &&
-              current.state === nextForm.state &&
-              current.postalCode === nextForm.postalCode &&
-              current.country === nextForm.country
-            ) {
+            if (hasSameCheckoutAddress(current, nextForm)) {
               return current;
             }
 
@@ -653,7 +521,7 @@ const Checkout = () => {
           setAddressVerificationError("");
         })
         .catch((error) => {
-          if (error instanceof Error && error.name === "AbortError") {
+          if (isAbortError(error)) {
             return;
           }
 
@@ -772,15 +640,13 @@ const Checkout = () => {
           const nextOptions = Array.isArray(payload.options) ? payload.options : [];
           setShippingOptions(nextOptions);
           setSelectedShippingToken((current) =>
-            nextOptions.some((option) => option.token === current)
-              ? current
-              : payload.selectedOptionToken || nextOptions[0]?.token || "",
+            getNextSelectedShippingToken(nextOptions, current, payload.selectedOptionToken),
           );
           setShippingMessage(payload.message || "");
           setShippingError(nextOptions.length === 0 ? "No shipping rates are available for this address yet." : "");
         })
         .catch((error) => {
-          if (error instanceof Error && error.name === "AbortError") {
+          if (isAbortError(error)) {
             return;
           }
 
@@ -833,60 +699,24 @@ const Checkout = () => {
       return;
     }
 
-    if (!isPickupInStore) {
-      if (!addressFieldsReady) {
-        toast({
-          title: "Shipping address required",
-          description: "Enter your shipping address so we can confirm it before loading carrier rates.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (addressVerificationStatus === "verifying") {
-        toast({
-          title: "Address still confirming",
-          description: "Wait for address confirmation to finish before continuing to payment.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!isAddressVerified) {
-        toast({
-          title: "Address confirmation required",
-          description: addressVerificationError || "Confirm your shipping address before continuing to payment.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!shippingAddressReady) {
-        toast({
-          title: "Contact details required",
-          description: "Enter your full name, email, and phone number to load shipping before checkout.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (isShippingLoading) {
-        toast({
-          title: "Shipping still loading",
-          description: "Wait for live shipping rates to finish loading before continuing.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (shippingError || !selectedShippingOption) {
-        toast({
-          title: "Shipping option required",
-          description: shippingError || "Select a shipping option before continuing to payment.",
-          variant: "destructive",
-        });
-        return;
-      }
+    const shippingGuard = getCheckoutShippingGuard({
+      isPickupInStore,
+      addressFieldsReady,
+      addressVerificationStatus,
+      isAddressVerified,
+      addressVerificationError,
+      shippingAddressReady,
+      isShippingLoading,
+      shippingError,
+      selectedShippingOption,
+    });
+    if (shippingGuard) {
+      toast({
+        title: shippingGuard.title,
+        description: shippingGuard.description,
+        variant: "destructive",
+      });
+      return;
     }
 
     setIsLoading(true);
@@ -954,12 +784,12 @@ const Checkout = () => {
 
       redirectToCheckout(payload.checkoutUrl);
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError" && document.visibilityState === "hidden") {
+      if (isAbortError(error) && document.visibilityState === "hidden") {
         return;
       }
 
       const message =
-        error instanceof Error && error.name === "AbortError"
+        isAbortError(error)
           ? "Checkout request timed out. Please check your connection and try again."
           : extractApiErrorMessage(error, "An unexpected error occurred while redirecting to Clover.");
       toast({

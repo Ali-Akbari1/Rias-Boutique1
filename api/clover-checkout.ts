@@ -43,184 +43,28 @@ import {
   WELCOME_DISCOUNT_RATE,
 } from "../server/lib/launch-discount.js";
 import { hasDiscountSubscriber } from "../server/lib/discount-subscribers.js";
+import {
+  buildCloverLineItems,
+  createCheckoutRequestId,
+  getCheckoutBaseUrl,
+  getUrlHost,
+  isDebugLoggingEnabled,
+  maskValue,
+  resolveImageUrl,
+  safeErrorMessage,
+  toShippingFingerprint,
+  validateServerConfiguration,
+} from "../server/lib/clover-checkout-helpers.js";
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
-const isDebugLoggingEnabled = () => process.env.CLOVER_DEBUG_LOGS?.trim().toLowerCase() === "true";
-const createRequestId = () => createDeterministicHash(`${Date.now()}|${Math.random()}`).slice(0, 12);
-const maskValue = (value: string, keepStart = 3, keepEnd = 4) => {
-  if (!value) {
-    return "";
-  }
-  if (value.length <= keepStart + keepEnd) {
-    return "*".repeat(value.length);
-  }
-  return `${value.slice(0, keepStart)}...${value.slice(-keepEnd)}`;
-};
-const safeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
-
-const getCheckoutBaseUrl = () => process.env.CLOVER_CHECKOUT_BASE_URL?.trim() || "";
-const resolveImageUrl = (image: string | undefined, checkoutBaseUrl: string) => {
-  const trimmed = (image || "").trim();
-  if (!trimmed) {
-    return "";
-  }
-
-  try {
-    return new URL(trimmed, checkoutBaseUrl).toString();
-  } catch {
-    return trimmed;
-  }
-};
-
-const validateServerConfiguration = () => {
-  const merchantId = process.env.CLOVER_MERCHANT_ID?.trim() || "";
-  const privateToken = process.env.CLOVER_PRIVATE_TOKEN?.trim() || "";
-  const checkoutBaseUrl = getCheckoutBaseUrl();
-  const apiBaseUrl = (process.env.CLOVER_API_BASE_URL?.trim() || "https://apisandbox.dev.clover.com").replace(
-    /\/+$/,
-    "",
-  );
-
-  if (!merchantId || !privateToken) {
-    return {
-      ok: false as const,
-      error: "Checkout is not available right now. Please try again later.",
-      details: "Missing CLOVER_MERCHANT_ID or CLOVER_PRIVATE_TOKEN.",
-    };
-  }
-
-  if (!checkoutBaseUrl || !checkoutBaseUrl.toLowerCase().startsWith("https://")) {
-    return {
-      ok: false as const,
-      error: "Checkout is not available right now. Please contact support.",
-      details: "CLOVER_CHECKOUT_BASE_URL must be configured with HTTPS.",
-    };
-  }
-
-  return {
-    ok: true as const,
-    merchantId,
-    privateToken,
-    checkoutBaseUrl: checkoutBaseUrl.replace(/\/+$/, ""),
-    apiBaseUrl,
-    pageConfigUuid: process.env.CLOVER_PAGE_CONFIG_UUID?.trim() || "",
-    enableTips: process.env.CLOVER_ENABLE_TIPS?.trim().toLowerCase() === "true",
-  };
-};
-
-const toShippingFingerprint = (customer: {
-  deliveryMethod?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
-}) =>
-  [
-    customer.deliveryMethod || "shipping",
-    customer.address || "",
-    customer.city || "",
-    customer.state || "",
-    customer.postalCode || "",
-    customer.country || "",
-  ]
-    .map((part) => part.trim().toLowerCase())
-    .join("|");
-
-const buildCloverLineItems = ({
-  lineItems,
-  discountMinor,
-  shippingMinor,
-  taxMinor,
-}: {
-  lineItems: OrderLineItem[];
-  discountMinor: number;
-  shippingMinor: number;
-  taxMinor: number;
-}) => {
-  const subtotalMinor = lineItems.reduce((sum, item) => sum + item.lineTotalMinor, 0);
-  const discountTarget = Math.max(0, Math.min(discountMinor, subtotalMinor));
-
-  const allocatedDiscounts = lineItems.map((item) =>
-    discountTarget > 0 ? Math.floor((discountTarget * item.lineTotalMinor) / subtotalMinor) : 0,
-  );
-  let remainingDiscount = discountTarget - allocatedDiscounts.reduce((sum, value) => sum + value, 0);
-
-  if (remainingDiscount > 0) {
-    const sortedIndexes = lineItems
-      .map((item, index) => ({ index, lineTotalMinor: item.lineTotalMinor }))
-      .sort((a, b) => b.lineTotalMinor - a.lineTotalMinor)
-      .map((entry) => entry.index);
-
-    let cursor = 0;
-    while (remainingDiscount > 0 && sortedIndexes.length > 0) {
-      const targetIndex = sortedIndexes[cursor % sortedIndexes.length] ?? 0;
-      allocatedDiscounts[targetIndex] = (allocatedDiscounts[targetIndex] || 0) + 1;
-      remainingDiscount -= 1;
-      cursor += 1;
-    }
-  }
-
-  const checkoutLineItems: Array<{ name: string; price: number; unitQty: number }> = [];
-
-  for (let index = 0; index < lineItems.length; index += 1) {
-    const item = lineItems[index];
-    if (!item) {
-      continue;
-    }
-
-    const itemDiscount = Math.max(0, Math.min(allocatedDiscounts[index] || 0, item.lineTotalMinor));
-    const quantity = Math.max(1, item.quantity);
-    const basePerUnitDiscount = Math.floor(itemDiscount / quantity);
-    const extraUnitDiscountCount = itemDiscount % quantity;
-
-    const regularUnitPrice = Math.max(1, item.unitAmountMinor - basePerUnitDiscount);
-    const extraDiscountedUnitPrice = Math.max(1, regularUnitPrice - 1);
-
-    const regularUnitCount = quantity - extraUnitDiscountCount;
-    if (regularUnitCount > 0) {
-      checkoutLineItems.push({
-        name: item.name,
-        price: regularUnitPrice,
-        unitQty: regularUnitCount,
-      });
-    }
-
-    if (extraUnitDiscountCount > 0) {
-      checkoutLineItems.push({
-        name: item.name,
-        price: extraDiscountedUnitPrice,
-        unitQty: extraUnitDiscountCount,
-      });
-    }
-  }
-
-  if (shippingMinor > 0) {
-    checkoutLineItems.push({
-      name: "Shipping",
-      price: shippingMinor,
-      unitQty: 1,
-    });
-  }
-
-  if (taxMinor > 0) {
-    checkoutLineItems.push({
-      name: "GST (5%)",
-      price: taxMinor,
-      unitQty: 1,
-    });
-  }
-
-  return checkoutLineItems;
-};
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "POST") {
     sendError(res, 405, "METHOD_NOT_ALLOWED", "Method not allowed.");
     return;
   }
-  const requestId = createRequestId();
+  const requestId = createCheckoutRequestId();
   const debugLogs = isDebugLoggingEnabled();
   res.setHeader("X-Request-Id", requestId);
 
@@ -562,13 +406,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       requestId,
       orderId: order.id,
       cloverCheckoutId: session.checkoutId,
-      checkoutUrlHost: (() => {
-        try {
-          return new URL(session.checkoutUrl).host;
-        } catch {
-          return "";
-        }
-      })(),
+      checkoutUrlHost: getUrlHost(session.checkoutUrl),
       apiBaseUrl: config.apiBaseUrl,
       merchantId: maskValue(config.merchantId),
       reused: false,
