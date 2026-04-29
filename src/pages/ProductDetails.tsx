@@ -437,12 +437,12 @@ const ProductDetails = () => {
                   Inquiry Only
                 </Badge>
               ) : hasDisplayPrice(product) ? (
-                <Badge variant="secondary" className="font-body">
+                <Badge variant="secondary" className="px-3 py-1 font-body text-sm sm:text-base">
                   {formatPrice(product.price)}
                 </Badge>
               ) : null}
               {isOnSale ? (
-                <span className="text-sm text-muted-foreground line-through">
+                <span className="text-sm text-muted-foreground line-through sm:text-base">
                   {formatPrice(product.compareAtPrice ?? 0)}
                 </span>
               ) : null}
