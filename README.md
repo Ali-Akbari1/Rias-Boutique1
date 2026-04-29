@@ -101,13 +101,18 @@ The script loads `.env` automatically, reads subscribers from `discount_subscrib
 - Live feed URL: `https://www.riasboutique.com/google-merchant-feed.xml`
 - Generation source: `src/content/products.json`
 - Build behavior: `npm run build` regenerates the sitemap, Merchant feed, and local inventory feed automatically.
+- Currency: the primary feed is CAD and includes shipping rows for Canada and the United States in CAD.
+- Optional USD feed: `public/google-merchant-feed-us.xml` is generated for a separate US-only USD product source. Do not attach the CAD local inventory feed to the USD product source.
 
 Merchant Center setup:
 
 1. Choose **Add products from a file**.
 2. Paste `https://www.riasboutique.com/google-merchant-feed.xml` as the file URL.
 3. Keep fetch schedule at daily (or more frequent if you change products often).
-4. Save and run **Fetch now** once to validate the feed.
+4. Set the country and currency to match the feed. Use CAD for the primary feed.
+5. Save and run **Fetch now** once to validate the feed.
+
+If Merchant Center reports `scheduled_fetch_file_*` with an unsupported file format, re-check that the scheduled fetch URL ends in `.xml` for the primary product feed or `.txt` for the local inventory feed. That Google-generated file name is not the feed URL, but the error often appears when the wrong source type or a storefront HTML URL was configured.
 
 ## Local inventory feed
 
@@ -116,6 +121,13 @@ Merchant Center setup:
 - Required store code env: `LOCAL_INVENTORY_STORE_CODE`
 - Feed columns: `store_code`, `id`, `availability`, `price`
 - Build behavior: `npm run build` regenerates the local inventory feed automatically.
+
+Merchant Center local inventory setup:
+
+1. Create the source as a local inventory supplemental source, not as the primary product source.
+2. Paste `https://www.riasboutique.com/local-inventory-feed.txt` as the scheduled fetch URL.
+3. Keep the local inventory source in CAD so its prices match `public/google-merchant-feed.xml`.
+4. After deploy, use **Fetch now** on both the primary product feed and the local inventory feed.
 
 ## Environment variable matrix
 

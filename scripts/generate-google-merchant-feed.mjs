@@ -13,11 +13,11 @@ const outputPathUsd = join(projectRoot, "public", "google-merchant-feed-us.xml")
 const DEFAULT_SITE_URL = "https://www.riasboutique.com";
 const DEFAULT_BRAND = "Ria's Boutique";
 const DEFAULT_CURRENCY = "CAD";
-const DEFAULT_SHIPPING_COUNTRY = "CA";
 const DEFAULT_SHIPPING_SERVICE = "Standard";
 const DEFAULT_SHIPPING_PRICE_CAD = 30;
 const DEFAULT_US_SHIPPING_PRICE_CAD = 40;
 const DEFAULT_CAD_TO_USD_RATE = 0.74;
+const DEFAULT_SHIPPING_COUNTRIES = ["CA", "US"];
 
 const routeManifest = JSON.parse(readFileSync(routeManifestPath, "utf8"));
 const siteUrl = (process.env.SITE_URL ?? routeManifest.siteUrl ?? DEFAULT_SITE_URL).replace(/\/+$/, "");
@@ -137,6 +137,27 @@ const toUsd = (value) => roundCurrency(value * cadToUsdRate);
 const toCad = (value) => roundCurrency(value);
 const formatPrice = (value, currency) => `${Math.max(0, value).toFixed(2)} ${currency}`;
 
+const parseShippingCountries = (value) => {
+  const countries = toStringValue(value)
+    .split(",")
+    .map((entry) => entry.trim().toUpperCase())
+    .filter((entry) => /^[A-Z]{2}$/.test(entry));
+
+  return countries.length > 0 ? [...new Set(countries)] : DEFAULT_SHIPPING_COUNTRIES;
+};
+
+const shippingPriceCadByCountry = {
+  CA: Math.max(0, toNumber(process.env.MERCHANT_FEED_SHIPPING_PRICE, DEFAULT_SHIPPING_PRICE_CAD)),
+  US: Math.max(0, toNumber(process.env.MERCHANT_FEED_US_SHIPPING_PRICE_CAD, DEFAULT_US_SHIPPING_PRICE_CAD)),
+};
+
+const getShippingOptions = ({ countries, currency, convertPrice }) =>
+  countries.map((country) => ({
+    country,
+    service: shippingService,
+    price: formatPrice(convertPrice(shippingPriceCadByCountry[country] ?? DEFAULT_US_SHIPPING_PRICE_CAD), currency),
+  }));
+
 const toItemXml = (variant) => {
   const colorNode =
     variant.color && variant.color.toLowerCase() !== "default"
@@ -151,13 +172,17 @@ const toItemXml = (variant) => {
     .map((imageUrl) => `    <g:additional_image_link>${escapeXml(imageUrl)}</g:additional_image_link>`)
     .join("\n");
   const additionalImageBlock = additionalImageNodes ? `${additionalImageNodes}\n` : "";
-  const shippingNode = [
-    "    <g:shipping>",
-    `      <g:country>${escapeXml(variant.shippingCountry)}</g:country>`,
-    `      <g:service>${escapeXml(variant.shippingService)}</g:service>`,
-    `      <g:price>${escapeXml(variant.shippingPrice)}</g:price>`,
-    "    </g:shipping>",
-  ].join("\n");
+  const shippingNodes = variant.shippingOptions
+    .map((option) =>
+      [
+        "    <g:shipping>",
+        `      <g:country>${escapeXml(option.country)}</g:country>`,
+        `      <g:service>${escapeXml(option.service)}</g:service>`,
+        `      <g:price>${escapeXml(option.price)}</g:price>`,
+        "    </g:shipping>",
+      ].join("\n"),
+    )
+    .join("\n");
 
   return [
     "  <item>",
@@ -178,7 +203,7 @@ const toItemXml = (variant) => {
     "    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>",
     `    <g:gender>${escapeXml(variant.gender)}</g:gender>`,
     `    <g:age_group>${escapeXml(variant.ageGroup)}</g:age_group>`,
-    shippingNode,
+    shippingNodes,
     colorNode.trimEnd(),
     sizeNode.trimEnd(),
     "  </item>",
@@ -190,12 +215,11 @@ const toItemXml = (variant) => {
 const buildFeed = ({
   outputPath,
   currency,
-  shippingCountry,
-  shippingPriceCad,
+  shippingCountries,
   convertPrice,
   titleSuffix,
 }) => {
-  const shippingPrice = formatPrice(convertPrice(shippingPriceCad), currency);
+  const shippingOptions = getShippingOptions({ countries: shippingCountries, currency, convertPrice });
   const productVariants = [];
   const skippedProducts = [];
 
@@ -260,9 +284,7 @@ const buildFeed = ({
           ageGroup: "adult",
           color,
           size,
-          shippingCountry,
-          shippingService,
-          shippingPrice,
+          shippingOptions,
         });
       }
     }
@@ -299,33 +321,20 @@ const buildFeed = ({
 };
 
 const currencyCad = (process.env.MERCHANT_FEED_CURRENCY || DEFAULT_CURRENCY).trim().toUpperCase();
-const shippingCountryCad =
-  ((process.env.MERCHANT_FEED_SHIPPING_COUNTRY || DEFAULT_SHIPPING_COUNTRY).trim() || DEFAULT_SHIPPING_COUNTRY)
-    .toUpperCase();
-const shippingPriceCad = Math.max(
-  0,
-  toNumber(process.env.MERCHANT_FEED_SHIPPING_PRICE, DEFAULT_SHIPPING_PRICE_CAD),
-);
+const shippingCountriesCad = parseShippingCountries(process.env.MERCHANT_FEED_SHIPPING_COUNTRIES || "CA,US");
 
 buildFeed({
   outputPath: outputPathCad,
   currency: currencyCad,
-  shippingCountry: shippingCountryCad,
-  shippingPriceCad,
+  shippingCountries: shippingCountriesCad,
   convertPrice: toCad,
   titleSuffix: currencyCad,
 });
 
-const usShippingPriceCad = Math.max(
-  0,
-  toNumber(process.env.MERCHANT_FEED_US_SHIPPING_PRICE_CAD, DEFAULT_US_SHIPPING_PRICE_CAD),
-);
-
 buildFeed({
   outputPath: outputPathUsd,
   currency: "USD",
-  shippingCountry: "US",
-  shippingPriceCad: usShippingPriceCad,
+  shippingCountries: ["US"],
   convertPrice: toUsd,
   titleSuffix: "USD",
 });

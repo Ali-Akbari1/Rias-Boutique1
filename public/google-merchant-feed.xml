@@ -12,7 +12,7 @@
     <link>https://www.riasboutique.com/products/Burgundy-Bridal-Dress</link>
     <g:image_link>https://www.riasboutique.com/uploads/burgundy-bridal-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/burgundy-bridal-dress-2.webp</g:additional_image_link>
-    <g:availability>out_of_stock</g:availability>
+    <g:availability>in_stock</g:availability>
     <g:price>450.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -26,6 +26,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Red</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -37,7 +42,7 @@
     <link>https://www.riasboutique.com/products/Burgundy-Bridal-Dress</link>
     <g:image_link>https://www.riasboutique.com/uploads/burgundy-bridal-dress-1.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/burgundy-bridal-dress-2.webp</g:additional_image_link>
-    <g:availability>out_of_stock</g:availability>
+    <g:availability>in_stock</g:availability>
     <g:price>450.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -50,6 +55,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Burgundy</g:color>
     <g:size>Medium</g:size>
@@ -78,6 +88,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Green</g:color>
     <g:size>Large</g:size>
   </item>
@@ -105,6 +120,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -130,6 +150,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Royal Blue</g:color>
     <g:size>Small</g:size>
@@ -160,6 +185,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Teal</g:color>
     <g:size>Small</g:size>
   </item>
@@ -187,6 +217,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>White</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -212,6 +247,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Black with Gold</g:color>
     <g:size>Large</g:size>
@@ -239,6 +279,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>White and Silver</g:color>
     <g:size>Large</g:size>
   </item>
@@ -263,6 +308,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>Small</g:size>
@@ -289,6 +339,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>Small</g:size>
   </item>
@@ -313,6 +368,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>Small</g:size>
@@ -339,6 +399,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>Small</g:size>
   </item>
@@ -363,6 +428,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>Medium</g:size>
@@ -389,6 +459,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -413,6 +488,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>Medium</g:size>
@@ -439,6 +519,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -463,6 +548,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>Large</g:size>
@@ -489,6 +579,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>Large</g:size>
   </item>
@@ -513,6 +608,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>Large</g:size>
@@ -539,6 +639,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>Large</g:size>
   </item>
@@ -563,6 +668,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Burgundy (Pre-order)</g:color>
     <g:size>X-Large</g:size>
@@ -589,6 +699,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple (Pre-order)</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -613,6 +728,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Red (Pre-order)</g:color>
     <g:size>X-Large</g:size>
@@ -639,6 +759,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue (Pre-order)</g:color>
     <g:size>X-Large</g:size>
   </item>
@@ -664,6 +789,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Pink</g:color>
     <g:size>Small</g:size>
@@ -692,6 +822,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Purple</g:color>
     <g:size>Small</g:size>
   </item>
@@ -719,6 +854,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Red</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -745,6 +885,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Burgundy</g:color>
     <g:size>Large</g:size>
   </item>
@@ -768,6 +913,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Dark Blue</g:color>
     <g:size>Small</g:size>
@@ -793,6 +943,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Burgundy</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -806,7 +961,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-black-and-gold-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>115.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -818,6 +973,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Black with Gold</g:color>
   </item>
@@ -831,8 +991,8 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-mens-parantoban-in-black-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/handmade-mens-parantoban-in-black-3.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>225.00 CAD</g:price>
+    <g:availability>out_of_stock</g:availability>
+    <g:price>250.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -844,6 +1004,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Black</g:color>
     <g:size>X-Large</g:size>
@@ -858,7 +1023,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-off-white-and-gold-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>115.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -870,6 +1035,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Off-white</g:color>
     <g:size>Small</g:size>
@@ -884,7 +1054,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-grey-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>out_of_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>115.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -896,6 +1066,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Grey</g:color>
     <g:size>Large</g:size>
@@ -910,7 +1085,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-handmade-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>225.00 CAD</g:price>
+    <g:price>250.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -922,6 +1097,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>White</g:color>
     <g:size>X-Large</g:size>
@@ -936,7 +1116,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-off-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>115.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -948,6 +1128,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Off-White</g:color>
     <g:size>Medium</g:size>
@@ -962,7 +1147,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-off-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>115.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -974,6 +1159,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Off-White</g:color>
     <g:size>XX-Large</g:size>
@@ -1000,6 +1190,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Sage Green</g:color>
     <g:size>Small</g:size>
   </item>
@@ -1024,6 +1219,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Sage Green</g:color>
     <g:size>Large</g:size>
@@ -1050,6 +1250,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Mustard Green</g:color>
     <g:size>Small</g:size>
   </item>
@@ -1074,6 +1279,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Baby Blue</g:color>
     <g:size>Large</g:size>
@@ -1101,6 +1311,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Emerald Green</g:color>
     <g:size>Medium</g:size>
   </item>
@@ -1127,6 +1342,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Teal</g:color>
     <g:size>Small</g:size>
   </item>
@@ -1140,7 +1360,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>115.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1152,6 +1372,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>True White</g:color>
     <g:size>Medium</g:size>
@@ -1166,7 +1391,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>115.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1178,6 +1403,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>True White</g:color>
     <g:size>Large</g:size>
@@ -1192,7 +1422,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>115.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1204,6 +1434,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>True White</g:color>
     <g:size>X-Large</g:size>
@@ -1218,7 +1453,7 @@
     <g:additional_image_link>https://www.riasboutique.com/uploads/men-s-white-parantoban-2.webp</g:additional_image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/size-chart.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>110.00 CAD</g:price>
+    <g:price>115.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1230,6 +1465,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>True White</g:color>
     <g:size>XX-Large</g:size>
@@ -1257,6 +1497,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Dark Blue</g:color>
     <g:size>Small</g:size>
   </item>
@@ -1266,10 +1511,10 @@
     <title>Blue Banaras Bridal Dress</title>
     <description>Beautiful long blue banaras bridal dress</description>
     <link>https://www.riasboutique.com/products/blue-banaras-dress</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_1327.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1328.jpg</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1329.jpg</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1330.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1327.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1328.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1329.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1330.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
     <g:price>550.00 CAD</g:price>
     <g:condition>new</g:condition>
@@ -1284,6 +1529,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue</g:color>
     <g:size>Large</g:size>
   </item>
@@ -1293,9 +1543,9 @@
     <title>Lilac Gulabatoon Dress</title>
     <description>Long lilac dress with gulabatoon detailing.</description>
     <link>https://www.riasboutique.com/products/Lilac-purple-gulabatoon%20dress</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_1403.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1417-2.jpg</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1419.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1403.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1417-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1419.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
     <g:price>400.00 CAD</g:price>
     <g:condition>new</g:condition>
@@ -1310,6 +1560,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Lilac</g:color>
     <g:size>Large</g:size>
   </item>
@@ -1319,10 +1574,10 @@
     <title>Lilac Barosha Dress</title>
     <description>Lilac barosha short dress with mirror work.</description>
     <link>https://www.riasboutique.com/products/barosha-purple-shortdress</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_1383.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1395.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1383.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1395.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>380.00 CAD</g:price>
+    <g:price>350.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1334,6 +1589,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Lilac</g:color>
     <g:size>Small</g:size>
@@ -1344,10 +1604,10 @@
     <title>Lilac Barosha Dress</title>
     <description>Lilac barosha short dress with mirror work.</description>
     <link>https://www.riasboutique.com/products/barosha-purple-shortdress</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_1383.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1395.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1383.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1395.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
-    <g:price>380.00 CAD</g:price>
+    <g:price>350.00 CAD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
@@ -1359,6 +1619,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Lilac</g:color>
     <g:size>Medium</g:size>
@@ -1369,9 +1634,9 @@
     <title>Short Banaras Red Dress</title>
     <description>Red banaras short dress</description>
     <link>https://www.riasboutique.com/products/Short-Banaras-red-dress</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_1508.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1510-2.jpg</g:additional_image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1511.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1508.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1510-2.webp</g:additional_image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1511.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
     <g:price>450.00 CAD</g:price>
     <g:condition>new</g:condition>
@@ -1385,6 +1650,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Red</g:color>
     <g:size>Small</g:size>
@@ -1395,8 +1665,8 @@
     <title>Dual Colour Banaras Pink Dress</title>
     <description>Pink dual-colour short banaras dress.</description>
     <link>https://www.riasboutique.com/products/dual-color-banaras-pink-dress</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_1528.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1531.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1528.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1531.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
     <g:price>450.00 CAD</g:price>
     <g:condition>new</g:condition>
@@ -1410,6 +1680,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>Pink</g:color>
     <g:size>Small</g:size>
@@ -1420,8 +1695,8 @@
     <title>Dual Color Short Dress</title>
     <description>Dual colour short dress with beautiful shawl.</description>
     <link>https://www.riasboutique.com/products/dual-color-short-blue</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_1564.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1567.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1564.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1567.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
     <g:price>450.00 CAD</g:price>
     <g:condition>new</g:condition>
@@ -1436,6 +1711,11 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:color>Blue</g:color>
     <g:size>Small</g:size>
   </item>
@@ -1445,8 +1725,8 @@
     <title>White Gulabatoon Short Dress</title>
     <description>Beautiful white dress with gulabatoon detailing and wide-legged pants.</description>
     <link>https://www.riasboutique.com/products/white-gulabatoon-short-dress</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_1519.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1521.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1519.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1521.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
     <g:price>380.00 CAD</g:price>
     <g:condition>new</g:condition>
@@ -1460,6 +1740,11 @@
       <g:country>CA</g:country>
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
     </g:shipping>
     <g:color>White</g:color>
     <g:size>Medium</g:size>
@@ -1470,8 +1755,8 @@
     <title>Light Blue Barosha Dress</title>
     <description>Light blue barosha dress with wide-legged pants.</description>
     <link>https://www.riasboutique.com/products/barosha-wide-legged-pants</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_1420.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1430.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1420.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1430.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
     <g:price>380.00 CAD</g:price>
     <g:condition>new</g:condition>
@@ -1486,7 +1771,132 @@
       <g:service>Standard</g:service>
       <g:price>30.00 CAD</g:price>
     </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
     <g:size>Large</g:size>
+  </item>
+  <item>
+    <g:id>burgundy-punjabi-3-piece-suit-small-burgundy</g:id>
+    <g:item_group_id>burgundy-punjabi-3-piece-suit</g:item_group_id>
+    <title>Burgundy 3 Piece Suit</title>
+    <description>3 piece velvet suit with gulabatoon detailing</description>
+    <link>https://www.riasboutique.com/products/burgundy-punjabi-3-piece-suit</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1768.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1765.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>250.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Burgundy</g:color>
+    <g:size>Small</g:size>
+  </item>
+  <item>
+    <g:id>burgundy-punjabi-3-piece-suit-medium-burgundy</g:id>
+    <g:item_group_id>burgundy-punjabi-3-piece-suit</g:item_group_id>
+    <title>Burgundy 3 Piece Suit</title>
+    <description>3 piece velvet suit with gulabatoon detailing</description>
+    <link>https://www.riasboutique.com/products/burgundy-punjabi-3-piece-suit</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1768.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1765.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>250.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Burgundy</g:color>
+    <g:size>Medium</g:size>
+  </item>
+  <item>
+    <g:id>burgundy-punjabi-3-piece-suit-x-large-burgundy</g:id>
+    <g:item_group_id>burgundy-punjabi-3-piece-suit</g:item_group_id>
+    <title>Burgundy 3 Piece Suit</title>
+    <description>3 piece velvet suit with gulabatoon detailing</description>
+    <link>https://www.riasboutique.com/products/burgundy-punjabi-3-piece-suit</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1768.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1765.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>250.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Burgundy</g:color>
+    <g:size>X-Large</g:size>
+  </item>
+  <item>
+    <g:id>burgundy-punjabi-3-piece-suit-xx-large-burgundy</g:id>
+    <g:item_group_id>burgundy-punjabi-3-piece-suit</g:item_group_id>
+    <title>Burgundy 3 Piece Suit</title>
+    <description>3 piece velvet suit with gulabatoon detailing</description>
+    <link>https://www.riasboutique.com/products/burgundy-punjabi-3-piece-suit</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1768.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1765.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>250.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Burgundy</g:color>
+    <g:size>XX-Large</g:size>
   </item>
 </channel>
 </rss>
