@@ -191,7 +191,7 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
         aria-hidden={!showPromo}
       >
         <div className="container mx-auto flex flex-col items-center justify-center gap-1 px-4 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.18em] sm:flex-row sm:gap-2 sm:text-[11px] sm:tracking-[0.2em]">
-          <span>Free shipping on orders over $400 CAD (Canada & US only)</span>
+          <span>Free shipping on orders over $400 CAD in Canada</span>
           <span className="hidden sm:inline" aria-hidden="true">
             |
           </span>

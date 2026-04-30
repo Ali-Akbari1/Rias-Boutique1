@@ -4,7 +4,7 @@ import shippingRatesHandler from "../../api/shipping-rates";
 import { getCatalogMap } from "../../server/lib/product-catalog";
 import { createMockRequest, createMockResponse } from "./test-utils/utils";
 
-const CUSTOMS_TEST_PRODUCT_ID = "mens-offwhite-with-white";
+const FREE_SHIPPING_THRESHOLD_PRODUCT_ID = "dark-blue-cheerma-dozi-machini";
 
 describe("shipping rates endpoint", () => {
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe("shipping rates endpoint", () => {
     process.env.EASYPOST_CUSTOMS_EEL_PFC = "NOEEI 30.37(a)";
   });
 
-  it("returns the default flat US shipping quote without calling EasyPost", async () => {
+  it("charges the default flat US shipping quote over the free-shipping threshold without calling EasyPost", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
@@ -51,14 +51,14 @@ describe("shipping rates endpoint", () => {
             country: "United States",
           },
           items: [
-            { productId: CUSTOMS_TEST_PRODUCT_ID, quantity: 1, selection: { size: "One Size", color: "Default" } },
+            { productId: FREE_SHIPPING_THRESHOLD_PRODUCT_ID, quantity: 1, selection: { size: "One Size", color: "Default" } },
           ],
         }),
       }),
       response,
     );
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode, JSON.stringify(response.jsonBody)).toBe(200);
     expect(response.jsonBody).toMatchObject({
       provider: "flat_rate",
       freeShippingApplied: false,
@@ -74,12 +74,61 @@ describe("shipping rates endpoint", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("keeps free flat-rate shipping for Canada orders over the threshold", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = createMockResponse();
+    await shippingRatesHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "user-agent": "Mozilla/5.0",
+        },
+        body: JSON.stringify({
+          customer: {
+            deliveryMethod: "shipping",
+            fullName: "Ali Mustanser Akbari",
+            email: "alimustanserakbari@gmail.com",
+            phone: "8254382985",
+            address: "260300 Writing Creek Cres",
+            city: "Balzac",
+            state: "AB",
+            postalCode: "T4A 0X8",
+            country: "Canada",
+          },
+          items: [
+            { productId: FREE_SHIPPING_THRESHOLD_PRODUCT_ID, quantity: 1, selection: { size: "One Size", color: "Default" } },
+          ],
+        }),
+      }),
+      response,
+    );
+
+    expect(response.statusCode, JSON.stringify(response.jsonBody)).toBe(200);
+    expect(response.jsonBody).toMatchObject({
+      provider: "flat_rate",
+      freeShippingApplied: true,
+      options: [
+        {
+          carrier: "Ria's Boutique",
+          service: "Standard Shipping",
+          quotedRateMinor: 3000,
+          customerRateMinor: 0,
+        },
+      ],
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("sends a Canada-origin customs declaration with total line-item value and weight", async () => {
     process.env.SHIPPING_PROVIDER_MODE = "easypost";
     const catalogMap = await getCatalogMap();
-    const product = catalogMap.get(CUSTOMS_TEST_PRODUCT_ID);
+    const product = catalogMap.get(FREE_SHIPPING_THRESHOLD_PRODUCT_ID);
     expect(product).toBeDefined();
-    const expectedCustomsValue = (product?.priceMinor || 0) / 100;
+    const quantity = 1;
+    const expectedCustomsValue = ((product?.priceMinor || 0) * quantity) / 100;
 
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
@@ -126,9 +175,9 @@ describe("shipping rates endpoint", () => {
         expect(body.shipment?.customs_info?.customs_items?.[0]?.code).toBe("620443");
         expect(body.shipment?.customs_info?.customs_items?.[0]?.hs_tariff_number).toBe("620443");
         expect(body.shipment?.customs_info?.customs_items?.[0]?.origin_country).toBe("CA");
-        expect(body.shipment?.customs_info?.customs_items?.[0]?.quantity).toBe(1);
+        expect(body.shipment?.customs_info?.customs_items?.[0]?.quantity).toBe(quantity);
         expect(body.shipment?.customs_info?.customs_items?.[0]?.value).toBe(expectedCustomsValue);
-        expect(body.shipment?.customs_info?.customs_items?.[0]?.weight).toBe(24);
+        expect(body.shipment?.customs_info?.customs_items?.[0]?.weight).toBe(24 * quantity);
 
         return new Response(
           JSON.stringify({
@@ -176,14 +225,24 @@ describe("shipping rates endpoint", () => {
             country: "United States",
           },
           items: [
-            { productId: CUSTOMS_TEST_PRODUCT_ID, quantity: 1, selection: { size: "One Size", color: "Default" } },
+            { productId: FREE_SHIPPING_THRESHOLD_PRODUCT_ID, quantity, selection: { size: "One Size", color: "Default" } },
           ],
         }),
       }),
       response,
     );
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode, JSON.stringify(response.jsonBody)).toBe(200);
+    expect(response.jsonBody).toMatchObject({
+      provider: "easypost",
+      freeShippingApplied: false,
+      options: [
+        {
+          quotedRateMinor: 1800,
+          customerRateMinor: 1800,
+        },
+      ],
+    });
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

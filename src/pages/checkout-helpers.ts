@@ -48,7 +48,8 @@ interface FreeShippingThresholdNoteInput {
   isPickupInStore: boolean;
   freeShippingApplied: boolean;
   selectedShippingOption: ShippingRateOption | null;
-  isCanadaOrUsDestination: boolean;
+  hasShippingCountry: boolean;
+  isCanadaDestination: boolean;
   isUsDestination: boolean;
   freeShippingThresholdMinor: number;
   flatShippingRateMinor: number;
@@ -239,7 +240,8 @@ export const buildFreeShippingThresholdNote = ({
   isPickupInStore,
   freeShippingApplied,
   selectedShippingOption,
-  isCanadaOrUsDestination,
+  hasShippingCountry,
+  isCanadaDestination,
   isUsDestination,
   freeShippingThresholdMinor,
   flatShippingRateMinor,
@@ -253,25 +255,33 @@ export const buildFreeShippingThresholdNote = ({
   }
 
   if (freeShippingApplied && selectedShippingOption) {
-    return `Free shipping on orders over ${thresholdLabel} (Canada & US only). Applied to ${selectedShippingOption.label}.`;
-  }
-
-  if (selectedShippingOption && !isCanadaOrUsDestination) {
-    return `International shipping is a flat ${formatPrice(selectedShippingOption.customerRateMinor / 100)} at checkout.`;
+    return `Free shipping on orders over ${thresholdLabel} (Canada only). Applied to ${selectedShippingOption.label}.`;
   }
 
   if (selectedShippingOption) {
     const deliveryLabel = selectedShippingOption.deliveryDays
       ? ` estimated ${selectedShippingOption.deliveryDays} business day${selectedShippingOption.deliveryDays === 1 ? "" : "s"}.`
       : ".";
-    return `${selectedShippingOption.label}${deliveryLabel} Orders under ${thresholdLabel} are charged ${formatPrice(
-      selectedShippingOption.customerRateMinor / 100,
-    )} shipping.`;
+    const selectedRateLabel = formatPrice(selectedShippingOption.customerRateMinor / 100);
+    if (isCanadaDestination) {
+      return `${selectedShippingOption.label}${deliveryLabel} Orders under ${thresholdLabel} are charged ${selectedRateLabel} shipping.`;
+    }
+    if (isUsDestination) {
+      return `${selectedShippingOption.label}${deliveryLabel} US shipping is ${selectedRateLabel} at checkout.`;
+    }
+    return `${selectedShippingOption.label}${deliveryLabel} International shipping is ${selectedRateLabel} at checkout.`;
   }
 
-  if (isCanadaOrUsDestination) {
-    const fallbackRateMinor = isUsDestination ? flatShippingRateInternationalMinor : flatShippingRateMinor;
-    return `Orders under ${thresholdLabel} are charged ${formatPrice(fallbackRateMinor / 100)} shipping.`;
+  if (!hasShippingCountry) {
+    return `Canada orders over ${thresholdLabel} qualify for free shipping.`;
+  }
+
+  if (isCanadaDestination) {
+    return `Orders under ${thresholdLabel} are charged ${formatPrice(flatShippingRateMinor / 100)} shipping.`;
+  }
+
+  if (isUsDestination) {
+    return `US shipping is a flat ${formatPrice(flatShippingRateInternationalMinor / 100)} at checkout.`;
   }
 
   return `International shipping is a flat ${formatPrice(flatShippingRateInternationalMinor / 100)} at checkout.`;

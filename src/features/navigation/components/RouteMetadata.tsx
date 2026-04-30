@@ -299,26 +299,6 @@ const buildShippingDetails = (): OfferShippingDetails[] => {
       },
       ...baseDetails,
     });
-    details.push({
-      "@type": "OfferShippingDetails",
-      shippingLabel: "Free shipping over threshold (United States)",
-      shippingRate: {
-        "@type": "MonetaryAmount",
-        value: 0,
-        currency: "CAD",
-      },
-      eligibleTransactionVolume: {
-        "@type": "PriceSpecification",
-        price: Number(freeThreshold.toFixed(2)),
-        minPrice: Number(freeThreshold.toFixed(2)),
-        priceCurrency: "CAD",
-      },
-      shippingDestination: {
-        "@type": "DefinedRegion",
-        addressCountry: "US",
-      },
-      deliveryTime: baseDetails.deliveryTime,
-    });
   }
 
   return details;

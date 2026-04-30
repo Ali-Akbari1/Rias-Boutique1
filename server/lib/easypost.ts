@@ -728,8 +728,8 @@ export const createShippingRatesQuote = async ({
   const originCountryCode = normalizeCountryCode(origin.country);
   const destinationCountryCode = verifiedAddress.normalizedAddress.countryCode;
   const isCanadaDestination = destinationCountryCode === "CA";
-  const isUsDestination = destinationCountryCode === "US";
-  const freeShippingEligible = isCanadaDestination || isUsDestination;
+  const freeShippingEligible = isCanadaDestination;
+  const freeShippingApplied = freeShippingEligible && subtotalMinor >= freeShippingThresholdMinor;
   const carrierAccounts = getCarrierAccountIds();
   const shipment = await easypostRequest<EasyPostShipmentResponse>({
     endpoint: "/shipments",
@@ -804,7 +804,7 @@ export const createShippingRatesQuote = async ({
       currency: rate.currency,
       deliveryDays: rate.deliveryDays,
       deliveryDate: rate.deliveryDate,
-      freeShippingApplied: freeShippingEligible && subtotalMinor >= freeShippingThresholdMinor,
+      freeShippingApplied,
       selectedAt: createdAt.toISOString(),
       expiresAt: quoteExpiresAt,
       contextHash,
@@ -823,8 +823,6 @@ export const createShippingRatesQuote = async ({
       shipmentId,
     } satisfies ShippingRateOption;
   });
-
-  const freeShippingApplied = freeShippingEligible && subtotalMinor >= freeShippingThresholdMinor;
 
   return {
     provider: "easypost",
@@ -852,7 +850,7 @@ export const createFlatRateShippingQuote = ({
   const destinationCountryCode = normalizeCountryCode(customer.country);
   const isCanadaDestination = destinationCountryCode === "CA";
   const isUsDestination = destinationCountryCode === "US";
-  const freeShippingEligible = isCanadaDestination || isUsDestination;
+  const freeShippingEligible = isCanadaDestination;
   const flatShippingRateMinor = isCanadaDestination
     ? getFlatShippingRateMinor()
     : getInternationalFlatShippingRateMinor();
@@ -905,7 +903,7 @@ export const createFlatRateShippingQuote = ({
     selectedOptionToken: option.token,
     quoteExpiresAt,
     message: freeShippingApplied
-      ? "Free shipping is applied automatically on orders over CA$400 in Canada & US."
+      ? "Free shipping is applied automatically on Canada orders over CA$400."
       : isCanadaDestination
         ? `Standard shipping in Canada is a flat ${formatCadMinor(flatShippingRateMinor)} at checkout.`
         : isUsDestination

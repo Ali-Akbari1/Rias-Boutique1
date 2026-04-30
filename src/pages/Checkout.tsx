@@ -146,9 +146,11 @@ const Checkout = () => {
   const addressFieldsReady = isAddressFieldsComplete(checkoutForm);
   const shippingAddressReady = isShippingAddressComplete(checkoutForm);
   const normalizedCountry = normalizeCountryCode(checkoutForm.country);
+  const hasShippingCountry = normalizedCountry.length > 0;
   const isCanadaDestination = normalizedCountry === "CA";
   const isUsDestination = normalizedCountry === "US";
-  const isCanadaOrUsDestination = isCanadaDestination || isUsDestination;
+  const showFreeShippingProgress =
+    !isPickupInStore && freeShippingThresholdCad > 0 && (!hasShippingCountry || isCanadaDestination);
   const fullNameValid = checkoutForm.fullName.trim().length >= 2;
   const emailValid = looksLikeEmail(checkoutForm.email);
   const phoneValid = checkoutForm.phone.trim().length >= 7;
@@ -170,7 +172,8 @@ const Checkout = () => {
     isPickupInStore,
     freeShippingApplied,
     selectedShippingOption,
-    isCanadaOrUsDestination,
+    hasShippingCountry,
+    isCanadaDestination,
     isUsDestination,
     freeShippingThresholdMinor: clientCommerceConfig.freeShippingThresholdMinor,
     flatShippingRateMinor: clientCommerceConfig.flatShippingRateMinor,
@@ -1290,7 +1293,7 @@ const Checkout = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">Rate source</p>
-                    <p>Shipping is charged at a flat rate in checkout unless your order qualifies for free shipping.</p>
+                    <p>Shipping is charged at a flat rate in checkout unless your Canada order qualifies for free shipping.</p>
                   </div>
                   <div className="sm:col-span-2">
                     <p className="font-semibold text-foreground">Free shipping</p>
@@ -1416,7 +1419,7 @@ const Checkout = () => {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground">{freeShippingThresholdNote}</p>
-                  {!isPickupInStore && freeShippingThresholdCad > 0 ? (
+                  {showFreeShippingProgress ? (
                     <div className="rounded-md border border-border/70 bg-card/40 p-3">
                       <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                         <span>Free Shipping</span>
@@ -1433,16 +1436,16 @@ const Checkout = () => {
                       </div>
                       <p className="mt-2 text-xs font-body text-muted-foreground">
                         {qualifiesForFreeShipping
-                          ? "You qualify for free shipping in Canada & US."
-                          : `You're ${formatPrice(freeShippingRemainingCad)} away from free shipping in Canada & US.`}
+                          ? "You qualify for free shipping in Canada."
+                          : `You're ${formatPrice(freeShippingRemainingCad)} away from free shipping in Canada.`}
                       </p>
                       {isUsd ? (
                         <p className="text-[11px] font-body text-muted-foreground">
-                          Threshold is CA$400 (USD shown is an estimate).
+                          Threshold is CA$400 for Canada orders (USD shown is an estimate).
                         </p>
                       ) : (
                         <p className="text-[11px] font-body text-muted-foreground">
-                          Applies to Canada & US orders over CA$400.
+                          Applies to Canada orders over CA$400.
                         </p>
                       )}
                     </div>

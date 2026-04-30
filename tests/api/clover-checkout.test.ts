@@ -5,6 +5,7 @@ import { createMockRequest, createMockResponse, createSignedShippingQuoteToken }
 import {
   closeOrderStoreForTests,
   createPendingOrder,
+  findOrderById,
   resetOrderStoreForTests,
 } from "../../server/lib/order-store.js";
 import * as productCatalog from "../../server/lib/product-catalog";
@@ -458,6 +459,69 @@ describe("clover checkout endpoint", () => {
     };
     expect(fetchPayload.shoppingCart?.lineItems?.[0]?.price).toBe(40000);
     expect(fetchPayload.shoppingCart?.lineItems?.[0]?.unitQty).toBe(1);
+  });
+
+  it("does not mark US orders over the Canada free-shipping threshold as free shipping", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_us_shipping", href: "https://checkout.clover.com/pay/checkout_us_shipping" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const baseBody = makeCheckoutBody();
+    const customer = {
+      ...baseBody.customer,
+      address: "999 E Street Northwest",
+      city: "Washington",
+      state: "DC",
+      postalCode: "20004",
+      country: "United States",
+    };
+    const body = {
+      ...baseBody,
+      customer,
+      shippingQuote: {
+        token: createSignedShippingQuoteToken({
+          customer,
+          items: baseBody.items,
+          subtotalMinor: 40_000,
+          customerRateMinor: 4_000,
+          quotedRateMinor: 4_000,
+          freeShippingApplied: false,
+        }),
+      },
+    };
+
+    const response = createMockResponse();
+    await handler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "user-agent": "Mozilla/5.0",
+        },
+        body: JSON.stringify(body),
+      }),
+      response,
+    );
+
+    expect(response.statusCode).toBe(200);
+
+    const responseBody = response.jsonBody as { orderId?: string };
+    const order = responseBody.orderId ? await findOrderById(responseBody.orderId) : null;
+    expect(order?.pricing).toMatchObject({
+      shippingMinor: 4_000,
+      quotedShippingMinor: 4_000,
+      freeShippingApplied: false,
+    });
+
+    const fetchPayload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body || "{}")) as {
+      shoppingCart?: { lineItems?: Array<{ name: string; price: number }> };
+    };
+    const shippingLine = fetchPayload.shoppingCart?.lineItems?.find((lineItem) => lineItem.name === "Shipping");
+    expect(shippingLine?.price).toBe(4_000);
   });
 
   it("reuses existing checkout session for duplicate submissions (idempotency)", async () => {

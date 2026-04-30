@@ -222,16 +222,16 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                   </div>
                   <p className="mt-2 text-xs font-body text-muted-foreground">
                     {qualifiesForFreeShipping
-                      ? "You qualify for free shipping"
-                      : `You're ${formatPrice(freeShippingRemainingCad)} away from free shipping`}
+                      ? "You qualify for free shipping within Canada"
+                      : `You're ${formatPrice(freeShippingRemainingCad)} away from free shipping within Canada`}
                   </p>
                   {isUsd ? (
                     <p className="text-[11px] font-body text-muted-foreground">
-                      Threshold is CA$400 (USD shown is an estimate).
+                      Threshold is CA$400 for Canada orders (USD shown is an estimate).
                     </p>
                   ) : (
                     <p className="text-[11px] font-body text-muted-foreground">
-                      Applies to Canada & US orders over CA$400.
+                      Applies to Canada orders over CA$400.
                     </p>
                   )}
                 </div>

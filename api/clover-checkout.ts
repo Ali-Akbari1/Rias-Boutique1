@@ -32,7 +32,6 @@ import {
 import { CloverApiError, createCloverCheckoutSession } from "../server/lib/clover.js";
 import {
   buildCheckoutPricing,
-  getFreeShippingThresholdMinor,
   isShippingChargesEnabled,
 } from "../server/lib/checkout-pricing.js";
 import { toQuoteCustomer, toQuoteLineItems, verifyShippingQuoteToken } from "../server/lib/easypost.js";
@@ -281,8 +280,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       ? Math.round(subtotalMinor * WELCOME_DISCOUNT_RATE)
       : 0;
   const isPickupInStore = payload.customer.deliveryMethod === "pickup";
-  const freeShippingThresholdMinor = getFreeShippingThresholdMinor();
-  const freeShippingApplied = !isPickupInStore && subtotalMinor >= freeShippingThresholdMinor;
   let verifiedShippingQuote = null;
   const quoteCustomer = toQuoteCustomer(payload.customer);
   const quoteItems = toQuoteLineItems(payload.items);
@@ -318,6 +315,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const shippingMinor = isPickupInStore ? 0 : verifiedShippingQuote?.customerRateMinor || 0;
+  const freeShippingApplied = !isPickupInStore && Boolean(verifiedShippingQuote?.freeShippingApplied);
   const { taxMinor, totalMinor } = buildCheckoutPricing({
     subtotalMinor,
     discountMinor,

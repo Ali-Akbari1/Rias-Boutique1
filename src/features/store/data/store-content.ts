@@ -55,7 +55,7 @@ export const shippingPolicy = {
   standardCost: `${formatCad(commerceConfig.flatShippingRateMinor / 100)} in Canada | ${formatCad(
     commerceConfig.flatShippingRateInternationalMinor / 100,
   )} in the US & international`,
-  freeShippingThreshold: `${formatCad(commerceConfig.freeShippingThresholdMinor / 100)}+ (Canada & US)`,
+  freeShippingThreshold: `${formatCad(commerceConfig.freeShippingThresholdMinor / 100)}+ (Canada only)`,
   standardTimeline: "5-10 business days (Canada & US) | International varies",
 };
 
@@ -85,13 +85,13 @@ export const faqItems: FaqItem[] = [
     id: "faq-4",
     question: "What are your shipping rates and delivery times?",
     answer:
-      "We offer standard shipping within Canada for a CA$30.00 flat rate at checkout, with delivery typically taking 5–10 business days. Orders over CA$400.00 qualify for free standard shipping within Canada and the US. Outside Canada, standard shipping is CA$40.00 and delivery timelines vary by destination.",
+      "We offer standard shipping within Canada for a CA$30.00 flat rate at checkout, with delivery typically taking 5–10 business days. Orders over CA$400.00 qualify for free standard shipping within Canada only. US and international standard shipping is CA$40.00, and delivery timelines vary by destination.",
   },
   {
     id: "faq-5",
     question: "How is shipping calculated?",
     answer:
-      "Shipping is charged at a flat rate during checkout unless your order qualifies for free shipping. Orders over CA$400.00 automatically receive free standard shipping within Canada and the US. Outside Canada, standard shipping is CA$40.00.",
+      "Shipping is charged at a flat rate during checkout unless your Canada order qualifies for free shipping. Orders over CA$400.00 automatically receive free standard shipping within Canada only. US and international standard shipping is CA$40.00.",
   },
   {
     id: "faq-6",
