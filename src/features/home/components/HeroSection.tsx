@@ -44,13 +44,13 @@ const HeroSection = () => {
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/78">
               Shop by Collection
             </p>
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-              {heroCtas.map((cta) => {
+            <div className="grid w-full max-w-[21rem] grid-cols-2 justify-items-center gap-3 sm:flex sm:max-w-none sm:flex-wrap sm:items-center sm:justify-start sm:gap-4">
+              {heroCtas.map((cta, index) => {
                 return (
                   <Link
                     key={cta.to}
                     to={cta.to}
-                    className={heroCtaClass}
+                    className={`${heroCtaClass} ${index === 2 ? "col-span-2" : ""}`}
                     onMouseEnter={() => void prefetchCollectionPage()}
                     onFocus={() => void prefetchCollectionPage()}
                   >

@@ -13,6 +13,7 @@ describe("resend discount emails script", () => {
       limit: null,
       email: "",
       filterCampaign: "",
+      filterCode: "",
       campaign: "",
       code: "",
       onlyNeverEmailed: false,
@@ -29,6 +30,7 @@ describe("resend discount emails script", () => {
         "--batch-size=50",
         "--email=Owner@Example.com",
         "--filter-campaign=legacy_welcome",
+        "--filter-code=launch10",
         "--campaign=welcome15_relaunch",
         "--code=welcome15",
         "--only-never-emailed",
@@ -39,6 +41,7 @@ describe("resend discount emails script", () => {
       limit: 25,
       email: "owner@example.com",
       filterCampaign: "legacy_welcome",
+      filterCode: "LAUNCH10",
       campaign: "welcome15_relaunch",
       code: "WELCOME15",
       onlyNeverEmailed: true,
@@ -103,11 +106,13 @@ describe("resend discount emails script", () => {
       },
     });
 
-    expect(message.subject).toContain("15% Off");
+    expect(message.subject).toContain("New Arrivals");
     expect(message.text).toContain("WELCOME15");
+    expect(message.text).toContain("So many new pieces have just arrived");
+    expect(message.text).toContain("launch discount subscribers");
     expect(message.text).toContain("https://www.riasboutique.com/collection");
     expect(message.html).toContain("WELCOME15");
-    expect(message.html).toContain("Enjoy 15% Off");
+    expect(message.html).toContain("New Arrivals Are Here");
     expect(message.replyTo).toBe("help@riasboutique.com");
   });
 });

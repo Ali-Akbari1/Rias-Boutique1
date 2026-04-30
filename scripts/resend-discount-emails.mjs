@@ -161,6 +161,7 @@ export const parseCommandLineArgs = (argv) => {
     limit: null,
     email: "",
     filterCampaign: "",
+    filterCode: "",
     campaign: "",
     code: "",
     onlyNeverEmailed: false,
@@ -208,6 +209,15 @@ export const parseCommandLineArgs = (argv) => {
 
     if (arg.startsWith("--filter-campaign=")) {
       options.filterCampaign = arg.slice("--filter-campaign=".length).trim();
+      continue;
+    }
+
+    if (arg.startsWith("--filter-code=")) {
+      const code = arg.slice("--filter-code=".length).trim().toUpperCase();
+      if (!code) {
+        throw new Error("--filter-code cannot be empty.");
+      }
+      options.filterCode = code;
       continue;
     }
 
@@ -287,12 +297,13 @@ export const buildWelcomeDiscountEmailMessage = ({
   const greetingName = fullName.trim() || "there";
   const hasExpiry = Boolean(offer.expiresAtDisplay.trim());
   const collectionUrl = `${websiteUrl}/collection`;
-  const subject = `${brandName} Welcome Offer - ${offer.percentLabel} Off Your First Order`;
+  const subject = `New Arrivals at ${brandName} - ${offer.percentLabel} Off Your First Order`;
   const text = [
     `Hi ${greetingName},`,
     "",
-    `Thanks for joining ${brandName}. Enjoy ${offer.percentLabel} off your first order with code ${offer.code}.`,
-    "This welcome offer is reserved for email subscribers placing their first order.",
+    "So many new pieces have just arrived, and we wanted you to be among the first to see them.",
+    `As a thank-you for signing up for our launch offer, enjoy ${offer.percentLabel} off your first order with code ${offer.code}.`,
+    "This offer is reserved for launch discount subscribers placing their first order.",
     ...(hasExpiry ? [`Offer valid until ${offer.expiresAtDisplay}.`] : []),
     "",
     `Start shopping: ${collectionUrl}`,
@@ -314,10 +325,8 @@ export const buildWelcomeDiscountEmailMessage = ({
                   <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">${escapeHtml(
                     brandName,
                   )}</p>
-                  <h1 style="margin:10px 0 0 0;font-size:34px;line-height:1.15;color:#111827;">Enjoy ${escapeHtml(
-                    offer.percentLabel,
-                  )} Off</h1>
-                  <p style="margin:8px 0 0 0;font-size:15px;color:#4b5563;">Use your welcome code below for ${escapeHtml(
+                  <h1 style="margin:10px 0 0 0;font-size:32px;line-height:1.15;color:#111827;">New Arrivals Are Here</h1>
+                  <p style="margin:8px 0 0 0;font-size:15px;color:#4b5563;">So many new pieces have dropped. Use your code below for ${escapeHtml(
                     offer.percentLabel,
                   )} off your first order.</p>
                 </td>
@@ -327,7 +336,7 @@ export const buildWelcomeDiscountEmailMessage = ({
                   <div style="display:inline-block;padding:10px 20px;border:1px dashed #111827;border-radius:8px;font-size:26px;letter-spacing:0.08em;font-weight:700;color:#111827;">
                     ${escapeHtml(offer.code)}
                   </div>
-                  <p style="margin:14px 0 0 0;font-size:14px;color:#6b7280;">Reserved for email subscribers on their first order.</p>
+                  <p style="margin:14px 0 0 0;font-size:14px;color:#6b7280;">Reserved for launch discount subscribers on their first order.</p>
                   ${
                     hasExpiry
                       ? `<p style="margin:8px 0 0 0;font-size:14px;color:#6b7280;">Valid until ${escapeHtml(
@@ -405,6 +414,7 @@ const fetchDiscountSubscribers = async ({
   supabase,
   email = "",
   filterCampaign = "",
+  filterCode = "",
   onlyNeverEmailed = false,
   limit = null,
   batchSize = DEFAULT_BATCH_SIZE,
@@ -431,6 +441,9 @@ const fetchDiscountSubscribers = async ({
     }
     if (filterCampaign) {
       query = query.eq("campaign", filterCampaign);
+    }
+    if (filterCode) {
+      query = query.eq("code", filterCode);
     }
     if (onlyNeverEmailed) {
       query = query.is("last_email_sent_at", null);
@@ -558,6 +571,7 @@ const printHelp = () => {
   console.log("  --email=<address>       Target a single subscriber first for a safe test.");
   console.log("  --limit=<n>             Restrict the number of matching subscribers.");
   console.log("  --filter-campaign=<id>  Only include subscribers currently tagged with this campaign.");
+  console.log("  --filter-code=<value>   Only include subscribers currently assigned this discount code.");
   console.log("  --campaign=<id>         Write this campaign value back to subscriber records after sending.");
   console.log("  --code=<value>          Override the welcome code sent in the email.");
   console.log("  --only-never-emailed    Only include subscribers with no last_email_sent_at value.");
@@ -566,6 +580,7 @@ const printHelp = () => {
   console.log("");
   console.log("Examples");
   console.log("  npm run discount:resend -- --email=you@example.com");
+  console.log("  npm run discount:resend -- --filter-code=LAUNCH10 --code=LAUNCH10");
   console.log("  npm run discount:resend -- --apply --limit=25");
   console.log("  npm run discount:resend -- --apply --code=WELCOME15 --campaign=welcome15_relaunch");
   console.log("");
@@ -598,6 +613,7 @@ export const runBulkDiscountResend = async (argv = process.argv.slice(2)) => {
     supabase,
     email: options.email,
     filterCampaign: options.filterCampaign,
+    filterCode: options.filterCode,
     onlyNeverEmailed: options.onlyNeverEmailed,
     limit: options.limit,
     batchSize: options.batchSize,
@@ -614,6 +630,9 @@ export const runBulkDiscountResend = async (argv = process.argv.slice(2)) => {
   }
   if (options.filterCampaign) {
     console.log(`[discount:resend] filter campaign: ${options.filterCampaign}`);
+  }
+  if (options.filterCode) {
+    console.log(`[discount:resend] filter code: ${options.filterCode}`);
   }
   if (options.email) {
     console.log(`[discount:resend] target email: ${options.email}`);
