@@ -1097,7 +1097,8 @@
       "slug": "bridal-green-cheerma-dozi",
       "maxQuantity": 1,
       "colors": [
-        "Red"
+        "Red",
+        "Green"
       ],
       "sizes": [
         "Large"
@@ -1113,7 +1114,7 @@
       "id": "bridal-green-cheerma-dozi-dress",
       "createdAt": "2026-04-28",
       "image": "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.png",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Beautiful long bridal green dress with handmade cheerma dozi work. ",
       "price_on_inquiry": true,
       "category": "Bridal",
