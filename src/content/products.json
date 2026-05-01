@@ -294,7 +294,7 @@
       "fabric": "Banaras",
       "price": 1,
       "galleryImages": [
-        "/uploads/5adac91d-aa0c-4cba-bdfd-f741193aac06.jpg",
+        "/uploads/5adac91d-aa0c-4cba-bdfd-f741193aac06.webp",
         "/uploads/bridal-green-banaras-dress-pre-order-only-1.webp",
         "/uploads/bridal-green-banaras-dress-pre-order-only-2.webp"
       ],
@@ -320,7 +320,7 @@
       ],
       "id": "Bridal-green-banaras",
       "createdAt": "2026-02-19",
-      "image": "/uploads/5adac91d-aa0c-4cba-bdfd-f741193aac06.jpg",
+      "image": "/uploads/5adac91d-aa0c-4cba-bdfd-f741193aac06.webp",
       "inventory": "sold_out",
       "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
       "price_on_inquiry": true,
@@ -832,6 +832,7 @@
         "Dry Clean Only "
       ],
       "id": "dark-blue-cheerma-dozi-machini",
+      "createdAt": "2026-04-04",
       "image": "/uploads/dark-blue-cheerma-dozi-dress-1.webp",
       "inventory": "available",
       "description": "Dark blue cheerma dozi dress with wide leg pants. ",
@@ -842,10 +843,10 @@
       "fabric": "Banaras",
       "price": 550,
       "galleryImages": [
-        "/uploads/img_1327.jpg",
-        "/uploads/img_1328.jpg",
-        "/uploads/img_1329.jpg",
-        "/uploads/img_1330.jpg"
+        "/uploads/img_1327.webp",
+        "/uploads/img_1328.webp",
+        "/uploads/img_1329.webp",
+        "/uploads/img_1330.webp"
       ],
       "name": "Blue Banaras Bridal Dress",
       "slug": "blue-banaras-dress",
@@ -858,7 +859,8 @@
       ],
       "department": "women",
       "id": "blue-banaras-dress",
-      "image": "/uploads/img_1327.jpg",
+      "createdAt": "2026-04-04",
+      "image": "/uploads/img_1327.webp",
       "inventory": "available",
       "description": "Beautiful long blue banaras bridal dress",
       "category": "Bridal",
@@ -868,9 +870,9 @@
       "fabric": "Velvet ",
       "price": 400,
       "galleryImages": [
-        "/uploads/img_1403.jpg",
-        "/uploads/img_1417-2.jpg",
-        "/uploads/img_1419.jpg"
+        "/uploads/img_1403.webp",
+        "/uploads/img_1417-2.webp",
+        "/uploads/img_1419.webp"
       ],
       "name": "Lilac Gulabatoon Dress",
       "slug": "Lilac-purple-gulabatoon dress",
@@ -884,7 +886,7 @@
       "department": "women",
       "id": "Lilac-purple-gulabatoon dress",
       "createdAt": "2026-04-04",
-      "image": "/uploads/img_1403.jpg",
+      "image": "/uploads/img_1403.webp",
       "inventory": "available",
       "description": "Long lilac dress with gulabatoon detailing. ",
       "category": "Party Wear",
@@ -894,8 +896,8 @@
       "fabric": "Barosha ",
       "price": 350,
       "galleryImages": [
-        "/uploads/img_1383.jpg",
-        "/uploads/img_1395.jpg"
+        "/uploads/img_1383.webp",
+        "/uploads/img_1395.webp"
       ],
       "name": "Lilac Barosha Dress ",
       "slug": "barosha-purple-shortdress",
@@ -912,7 +914,8 @@
         "Dry Clean Only"
       ],
       "id": "barosha-purple-shortdress",
-      "image": "/uploads/img_1383.jpg",
+      "createdAt": "2026-04-04",
+      "image": "/uploads/img_1383.webp",
       "inventory": "available",
       "description": "Lilac barosha short dress with mirror work.",
       "category": "Party Wear",
@@ -920,7 +923,7 @@
     },
     {
       "galleryImages": [
-        "/uploads/img_1497.jpg"
+        "/uploads/img_1497.webp"
       ],
       "name": "Bridal 2-Layer 925 Set ",
       "slug": "mashadi-bridal-2layer-set",
@@ -932,7 +935,7 @@
       ],
       "id": "mashadi-bridal-2layer-set",
       "createdAt": "2026-04-12",
-      "image": "/uploads/img_1497.jpg",
+      "image": "/uploads/img_1497.webp",
       "inventory": "available",
       "description": "Bridal 2 Layer 925 (Noqrah Set)",
       "price_on_inquiry": true,
@@ -943,9 +946,9 @@
       "fabric": "Banaras",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_1508.jpg",
-        "/uploads/img_1510-2.jpg",
-        "/uploads/img_1511.jpg"
+        "/uploads/img_1508.webp",
+        "/uploads/img_1510-2.webp",
+        "/uploads/img_1511.webp"
       ],
       "name": "Short Banaras Red Dress",
       "slug": "Short-Banaras-dress",
@@ -961,7 +964,7 @@
         "banaras"
       ],
       "id": "Short-Banaras-red-dress",
-      "image": "/uploads/img_1508.jpg",
+      "image": "/uploads/img_1508.webp",
       "inventory": "available",
       "description": "Red banaras short dress",
       "price_on_inquiry": false,
@@ -972,8 +975,8 @@
       "fabric": "Banaras",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_1528.jpg",
-        "/uploads/img_1531.jpg"
+        "/uploads/img_1528.webp",
+        "/uploads/img_1531.webp"
       ],
       "name": "Dual Colour Banaras Pink Dress",
       "slug": "dual-color-banaras-pink-dress",
@@ -993,7 +996,7 @@
       ],
       "id": "dual-color-banaras-pink-dress",
       "createdAt": "2026-04-14",
-      "image": "/uploads/img_1528.jpg",
+      "image": "/uploads/img_1528.webp",
       "inventory": "available",
       "description": "Pink dual-colour short banaras dress. ",
       "price_on_inquiry": false,
@@ -1004,8 +1007,8 @@
       "fabric": "Banaras",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_1564.jpg",
-        "/uploads/img_1567.jpg"
+        "/uploads/img_1564.webp",
+        "/uploads/img_1567.webp"
       ],
       "name": "Dual Color Short Dress",
       "slug": "dual-color-short-blue",
@@ -1022,7 +1025,7 @@
       ],
       "id": "dual-color-short-blue",
       "createdAt": "2026-04-14",
-      "image": "/uploads/img_1564.jpg",
+      "image": "/uploads/img_1564.webp",
       "inventory": "available",
       "description": "Dual colour short dress with beautiful shawl. ",
       "price_on_inquiry": false,
@@ -1033,8 +1036,8 @@
       "fabric": "Velvet",
       "price": 380,
       "galleryImages": [
-        "/uploads/img_1519.jpg",
-        "/uploads/img_1521.jpg"
+        "/uploads/img_1519.webp",
+        "/uploads/img_1521.webp"
       ],
       "name": "White Gulabatoon Short Dress",
       "slug": "white-gulabatoon-short-dress",
@@ -1054,7 +1057,7 @@
       ],
       "id": "white-gulabatoon-short-dress",
       "createdAt": "2026-04-15",
-      "image": "/uploads/img_1519.jpg",
+      "image": "/uploads/img_1519.webp",
       "inventory": "available",
       "description": "Beautiful white dress with gulabatoon detailing and wide-legged pants. ",
       "price_on_inquiry": false,
@@ -1065,8 +1068,8 @@
       "fabric": "Barosha",
       "price": 380,
       "galleryImages": [
-        "/uploads/img_1420.jpg",
-        "/uploads/img_1430.jpg"
+        "/uploads/img_1420.webp",
+        "/uploads/img_1430.webp"
       ],
       "name": "Light Blue Barosha Dress",
       "slug": "barosha-wide-legged-pants",
@@ -1079,7 +1082,7 @@
       ],
       "id": "barosha-wide-legged-pants",
       "createdAt": "2026-04-16",
-      "image": "/uploads/img_1420.jpg",
+      "image": "/uploads/img_1420.webp",
       "inventory": "available",
       "description": "Light blue barosha dress with wide-legged pants.",
       "price_on_inquiry": false,
@@ -1089,9 +1092,9 @@
     {
       "fabric": "Banaras",
       "galleryImages": [
-        "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.png",
-        "/uploads/chatgpt-image-apr-28-2026-02_14_42-pm.png",
-        "/uploads/chatgpt-image-apr-28-2026-02_25_36-pm.png"
+        "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.webp",
+        "/uploads/chatgpt-image-apr-28-2026-02_14_42-pm.webp",
+        "/uploads/chatgpt-image-apr-28-2026-02_25_36-pm.webp"
       ],
       "name": "Bridal Green Cheerma Dozi Dress",
       "slug": "bridal-green-cheerma-dozi",
@@ -1113,7 +1116,7 @@
       ],
       "id": "bridal-green-cheerma-dozi-dress",
       "createdAt": "2026-04-28",
-      "image": "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.png",
+      "image": "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.webp",
       "inventory": "sold_out",
       "description": "Beautiful long bridal green dress with handmade cheerma dozi work. ",
       "price_on_inquiry": true,
@@ -1124,8 +1127,8 @@
       "fabric": "Velvet",
       "price": 250,
       "galleryImages": [
-        "/uploads/img_1768.jpg",
-        "/uploads/img_1765.jpg"
+        "/uploads/img_1768.webp",
+        "/uploads/img_1765.webp"
       ],
       "name": "Burgundy 3 Piece Suit",
       "slug": "burgundy-punjabi-3-piece-suit",
@@ -1150,7 +1153,7 @@
       ],
       "id": "burgundy-punjabi-3-piece-suit",
       "createdAt": "2026-04-28",
-      "image": "/uploads/img_1768.jpg",
+      "image": "/uploads/img_1768.webp",
       "inventory": "available",
       "description": "3 piece velvet suit with gulabatoon detailing",
       "price_on_inquiry": false,
