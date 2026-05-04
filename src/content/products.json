@@ -471,7 +471,6 @@
       "price": 115,
       "galleryImages": [
         "/uploads/img_1801.jpg",
-        "",
         "/uploads/size-chart.webp"
       ],
       "name": "Men's Black and Gold Parantoban",
@@ -494,7 +493,7 @@
       "id": "men-black-gold",
       "createdAt": "2026-02-24",
       "image": "/uploads/img_1801.jpg",
-      "inventory": "sold_out",
+      "inventory": "available",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
       "category": "Machine Made",
       "fitInfo": "Please check our size chart for all specific measurements. \n\nPlease note: Elastic and/or an ezar band are not included with the pants."
