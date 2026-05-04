@@ -1172,6 +1172,9 @@
       "name": "Mens Black Handmade Parantoban",
       "slug": "Handmade-black-parantoban",
       "maxQuantity": 1,
+      "colors": [
+        "Black"
+      ],
       "sizes": [
         "Medium"
       ],
