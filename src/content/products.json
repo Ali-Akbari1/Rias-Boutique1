@@ -470,8 +470,8 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/men-s-black-and-gold-parantoban-1.webp",
-        "/uploads/men-s-black-and-gold-parantoban-2.webp",
+        "/uploads/img_1801.jpg",
+        "",
         "/uploads/size-chart.webp"
       ],
       "name": "Men's Black and Gold Parantoban",
@@ -479,18 +479,21 @@
       "colors": [
         "Black with Gold"
       ],
-      "sizes": [],
+      "sizes": [
+        "Small"
+      ],
       "department": "men",
       "popularity": 100,
       "careInstructions": [
         "Dry Clean Only"
       ],
       "tags": [
-        "black"
+        "black",
+        "mens"
       ],
       "id": "men-black-gold",
       "createdAt": "2026-02-24",
-      "image": "/uploads/men-s-black-and-gold-parantoban-1.webp",
+      "image": "/uploads/img_1801.jpg",
       "inventory": "sold_out",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
       "category": "Machine Made",
