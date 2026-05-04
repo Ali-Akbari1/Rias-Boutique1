@@ -1161,6 +1161,37 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements (Bust) \n-Small- 40in \n-Medium- 42in\n-Large-44in\n-X-Large- 46in \n-XX-Large- 48in \n\nWhat's Included\n-Top\n-Wide-Legged Pants\n-Scarf"
+    },
+    {
+      "fabric": "*Mirror work is handmade",
+      "price": 225,
+      "galleryImages": [
+        "/uploads/img_1799.jpg",
+        "/uploads/size-chart.png"
+      ],
+      "name": "Mens Black Handmade Parantoban",
+      "slug": "Handmade-black-parantoban",
+      "maxQuantity": 1,
+      "sizes": [
+        "Medium"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "mens",
+        "black",
+        "parantoban"
+      ],
+      "id": "Handmade-black-parantoban",
+      "createdAt": "2026-05-04",
+      "image": "/uploads/img_1799.jpg",
+      "inventory": "available",
+      "description": "Handmade men's black parantoban with silver embroidery and mirror work.",
+      "price_on_inquiry": false,
+      "category": "Handmade",
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     }
   ]
 }
