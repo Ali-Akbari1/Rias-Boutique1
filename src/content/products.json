@@ -1197,34 +1197,36 @@
       "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
-      "fabric": "",
-      "price": 340,
+      "price": 114,
       "galleryImages": [
-        "/uploads/image0.jpeg"
+        "/uploads/img_2031.jpg",
+        "/uploads/size-chart.png"
       ],
-      "name": "Cheerma Dozi",
-      "slug": "US-Online-Order",
+      "name": "Collared Mens Embroidered Parantoban ",
+      "slug": "collared-mens-white-parantoban ",
       "maxQuantity": 1,
-      "colors": [
-        ""
-      ],
       "sizes": [
-        ""
+        "Small",
+        "Medium",
+        "Large",
+        "X-Large"
       ],
       "department": "women",
       "careInstructions": [
-        "Dry Clean Only"
+        "Dry Clean Only "
       ],
       "tags": [
+        "mens ",
+        "machine made "
       ],
-      "id": "US-Online-Order",
-      "createdAt": "2026-05-13",
-      "image": "/uploads/image0.jpeg",
+      "id": "collared-mens-white-parantoban ",
+      "createdAt": "2026-05-05",
+      "image": "/uploads/img_2031.jpg",
       "inventory": "available",
-      "description": "",
+      "description": "Collared white mens parantoban with embroidery. ",
       "price_on_inquiry": false,
-      "category": "Party Wear",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n"
+      "category": "Machine Made",
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\n*Please allow \n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     }
   ]
 }
