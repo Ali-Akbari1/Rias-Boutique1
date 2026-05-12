@@ -1291,6 +1291,31 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Whats Included:\n-Dress\n-Pants\n-Scarf"
+    },
+    {
+      "fabric": "Lilimitten",
+      "price": 280,
+      "name": "Lilimitten Green Short Dress",
+      "slug": "lilimitten-short-dress-green",
+      "colors": [
+        "Green"
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "Lilimitten"
+      ],
+      "id": "lilimitten-short-dress-green",
+      "inventory": "sold_out",
+      "description": "Short Lilimitten dress in green",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Whats Included: \n-Dress \n-Pants \n-Scarf\n"
     }
   ]
 }
