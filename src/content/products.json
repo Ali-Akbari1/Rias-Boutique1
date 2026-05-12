@@ -1260,6 +1260,37 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Whats Included:\n-Dress\n-Wide-legged pants\n-Scarf"
+    },
+    {
+      "fabric": "Lilimitten",
+      "galleryImages": [
+        "/uploads/img_1750.jpg",
+        "/uploads/img_1749.jpg"
+      ],
+      "name": "Lilimitten Short Dress",
+      "slug": "Lilimitten-beige-short-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "Beige"
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "Lilimitten"
+      ],
+      "id": "Lilimitten-beige-short-dress",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/img_1750.jpg",
+      "inventory": "available",
+      "description": "Short Lilimitten dress",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Whats Included:\n-Dress\n-Pants\n-Scarf"
     }
   ]
 }
