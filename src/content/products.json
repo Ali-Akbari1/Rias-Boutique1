@@ -1382,6 +1382,35 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "What's Included:\n-Dress\n-Wide-Legged Pants\n-Embroidered scarf"
+    },
+    {
+      "fabric": "Thick Georgette",
+      "price": 250,
+      "galleryImages": [
+        "/uploads/img_2145.jpg",
+        "/uploads/img_2141.jpg"
+      ],
+      "name": "Blue Hazaragi Dress ",
+      "slug": "blue-long-hazaragi-dress",
+      "maxQuantity": 1,
+      "sizes": [
+        "X-Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "hazaragi"
+      ],
+      "id": "blue-long-hazaragi-dress",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/img_2145.jpg",
+      "inventory": "available",
+      "description": "Long blue hazaragi dress",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements: \n-Bust: 46in\nWhat's included: \n-Dress\n-Embroidered scarf"
     }
   ]
 }
