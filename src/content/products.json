@@ -1348,6 +1348,40 @@
       "price_on_inquiry": false,
       "category": "Machine Made",
       "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\nWhat's included:\n-Men's top \n-Bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+    },
+    {
+      "fabric": "Thick Georgette",
+      "price": 180,
+      "galleryImages": [
+        "/uploads/img_2103.jpg",
+        "/uploads/img_2108.jpg"
+      ],
+      "name": "White Hazaragi Dress",
+      "slug": "white-on-white-hazaragi-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "White"
+      ],
+      "sizes": [
+        "Small",
+        "Medium",
+        "Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "hazaragi"
+      ],
+      "id": "white-on-white-hazaragi-dress",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/img_2103.jpg",
+      "inventory": "available",
+      "description": "White hazaragi dress with white embroidery. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "What's Included:\n-Dress\n-Wide-Legged Pants\n-Embroidered scarf"
     }
   ]
 }
