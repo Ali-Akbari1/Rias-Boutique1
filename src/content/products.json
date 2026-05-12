@@ -1228,6 +1228,38 @@
       "price_on_inquiry": false,
       "category": "Machine Made",
       "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+    },
+    {
+      "fabric": "Velvet",
+      "price": 350,
+      "galleryImages": [
+        "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.png",
+        "/uploads/img_1708.jpg"
+      ],
+      "name": "Red Cheerma Dozi Dress",
+      "slug": "red-cheerma-dozi-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "Red"
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "Cheerma Dozi"
+      ],
+      "id": "red-cheerma-dozi-dress",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.png",
+      "inventory": "available",
+      "description": "Beautiful red velvet dress with handmade cheerma dozi detailing and wide-legged pants.",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Whats Included:\n-Dress\n-Wide-legged pants\n-Scarf"
     }
   ]
 }
