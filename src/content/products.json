@@ -1316,6 +1316,38 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Whats Included: \n-Dress \n-Pants \n-Scarf\n"
+    },
+    {
+      "price": 115,
+      "galleryImages": [
+        "/uploads/img_2024.jpg"
+      ],
+      "name": "Dual Coloured Men's Parantoban",
+      "slug": "dual-coloured-mens-parantoban",
+      "maxQuantity": 1,
+      "colors": [
+        "Grey"
+      ],
+      "sizes": [
+        "Medium",
+        "Large"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "Men's Parantoban",
+        "Machine Made"
+      ],
+      "id": "dual-coloured-mens-parantoban",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/img_2024.jpg",
+      "inventory": "available",
+      "description": "Dual-coloured men's parantoban",
+      "price_on_inquiry": false,
+      "category": "Machine Made",
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\nWhat's included:\n-Men's top \n-Bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     }
   ]
 }
