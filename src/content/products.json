@@ -1257,7 +1257,7 @@
       "id": "red-cheerma-dozi-dress",
       "createdAt": "2026-05-12",
       "image": "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.png",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Beautiful red velvet dress with handmade cheerma dozi detailing and wide-legged pants.",
       "price_on_inquiry": false,
       "category": "Party Wear",
@@ -1297,6 +1297,9 @@
     {
       "fabric": "Lilimitten",
       "price": 280,
+      "galleryImages": [
+        "/uploads/img_1759.jpg"
+      ],
       "name": "Lilimitten Green Short Dress",
       "slug": "lilimitten-short-dress-green",
       "colors": [
@@ -1313,6 +1316,7 @@
         "Lilimitten"
       ],
       "id": "lilimitten-short-dress-green",
+      "image": "/uploads/img_1759.jpg",
       "inventory": "sold_out",
       "description": "Short Lilimitten dress in green",
       "price_on_inquiry": false,
