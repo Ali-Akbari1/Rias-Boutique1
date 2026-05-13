@@ -1208,6 +1208,9 @@
       "name": "Collared Mens Embroidered Parantoban ",
       "slug": "collared-mens-white-parantoban ",
       "maxQuantity": 1,
+      "colors": [
+        "True White"
+      ],
       "sizes": [
         "Small",
         "Medium",
@@ -1483,6 +1486,11 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements: \n-Bust: 44in \n-Length of Dress: 54in \nWhat's Included: \n-Dress \n-White scarf"
+    },
+    {
+      "price_on_inquiry": false,
+      "department": "women",
+      "inventory": "available"
     }
   ]
 }
