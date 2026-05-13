@@ -1413,6 +1413,44 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements: \n-Bust: 46in\nWhat's included: \n-Dress\n-Embroidered scarf"
+    },
+    {
+      "fabric": "Shawl (marina) fabric",
+      "price": 400,
+      "galleryImages": [
+        "/uploads/img_2224.jpg",
+        "/uploads/img_2226.jpg"
+      ],
+      "name": "Handmade Hazaragi Dress",
+      "slug": "handmade-purple-hazaragi-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "Purple"
+      ],
+      "sizes": [
+        "X-Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "This is a very delicate piece. Please handle with care. Handwash only if needed."
+      ],
+      "tags": [
+        "handmade",
+        "hazaragi"
+      ],
+      "id": "handmade-purple-hazaragi-dress",
+      "createdAt": "2026-05-13",
+      "image": "/uploads/img_2224.jpg",
+      "inventory": "available",
+      "description": "Beautiful purple Hazaragi dress with handmade mirror work. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements:\n- Bust: 46in\n-Length of Dress: 56in\nWhat's Included:\n-Dress \n-White scarf"
+    },
+    {
+      "price_on_inquiry": false,
+      "department": "women",
+      "inventory": "available"
     }
   ]
 }
