@@ -908,12 +908,14 @@
         "Lilac"
       ],
       "sizes": [
-        "Small",
         "Medium"
       ],
       "department": "women",
       "careInstructions": [
         "Dry Clean Only"
+      ],
+      "tags": [
+        "barosha"
       ],
       "id": "barosha-purple-shortdress",
       "createdAt": "2026-04-04",
@@ -921,7 +923,7 @@
       "inventory": "available",
       "description": "Lilac barosha short dress with mirror work.",
       "category": "Party Wear",
-      "fitInfo": "Small - Bust: 38in\nMedium - Bust: 40in\n"
+      "fitInfo": "Small - Bust: 38in\nMedium - Bust: 42in\n"
     },
     {
       "galleryImages": [
@@ -1197,34 +1199,286 @@
       "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
-      "fabric": "",
-      "price": 340,
+      "price": 115,
       "galleryImages": [
-        "/uploads/image0.jpeg"
+        "/uploads/img_2031.jpg",
+        "/uploads/img_2027.jpg",
+        "/uploads/size-chart.png"
       ],
-      "name": "Cheerma Dozi",
-      "slug": "US-Online-Order",
+      "name": "Collared Mens Embroidered Parantoban ",
+      "slug": "collared-mens-white-parantoban ",
+      "maxQuantity": 1,
+      "sizes": [
+        "Small",
+        "Medium",
+        "Large",
+        "X-Large"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only "
+      ],
+      "tags": [
+        "mens ",
+        "machine made "
+      ],
+      "id": "collared-mens-white-parantoban ",
+      "createdAt": "2026-05-05",
+      "image": "/uploads/img_2031.jpg",
+      "inventory": "available",
+      "description": "Collared white mens parantoban with embroidery. ",
+      "price_on_inquiry": false,
+      "category": "Machine Made",
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+    },
+    {
+      "fabric": "Velvet",
+      "price": 350,
+      "galleryImages": [
+        "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.png",
+        "/uploads/img_1708.jpg"
+      ],
+      "name": "Red Cheerma Dozi Dress",
+      "slug": "red-cheerma-dozi-dress",
       "maxQuantity": 1,
       "colors": [
-        ""
+        "Red"
       ],
       "sizes": [
-        ""
+        "Small"
       ],
       "department": "women",
       "careInstructions": [
         "Dry Clean Only"
       ],
       "tags": [
+        "Cheerma Dozi"
       ],
-      "id": "US-Online-Order",
-      "createdAt": "2026-05-13",
-      "image": "/uploads/image0.jpeg",
+      "id": "red-cheerma-dozi-dress",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.png",
       "inventory": "available",
-      "description": "",
+      "description": "Beautiful red velvet dress with handmade cheerma dozi detailing and wide-legged pants.",
       "price_on_inquiry": false,
       "category": "Party Wear",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n"
+      "fitInfo": "Whats Included:\n-Dress\n-Wide-legged pants\n-Scarf"
+    },
+    {
+      "fabric": "Lilimitten",
+      "galleryImages": [
+        "/uploads/img_1750.jpg",
+        "/uploads/img_1749.jpg"
+      ],
+      "name": "Lilimitten Short Dress",
+      "slug": "Lilimitten-beige-short-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "Beige"
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "Lilimitten"
+      ],
+      "id": "Lilimitten-beige-short-dress",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/img_1750.jpg",
+      "inventory": "available",
+      "description": "Short Lilimitten dress",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Whats Included:\n-Dress\n-Pants\n-Scarf"
+    },
+    {
+      "fabric": "Lilimitten",
+      "price": 280,
+      "name": "Lilimitten Green Short Dress",
+      "slug": "lilimitten-short-dress-green",
+      "colors": [
+        "Green"
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "Lilimitten"
+      ],
+      "id": "lilimitten-short-dress-green",
+      "inventory": "sold_out",
+      "description": "Short Lilimitten dress in green",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Whats Included: \n-Dress \n-Pants \n-Scarf\n"
+    },
+    {
+      "price": 115,
+      "galleryImages": [
+        "/uploads/img_2024.jpg"
+      ],
+      "name": "Dual Coloured Men's Parantoban",
+      "slug": "dual-coloured-mens-parantoban",
+      "maxQuantity": 1,
+      "colors": [
+        "Grey"
+      ],
+      "sizes": [
+        "Medium",
+        "Large"
+      ],
+      "department": "men",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "Men's Parantoban",
+        "Machine Made"
+      ],
+      "id": "dual-coloured-mens-parantoban",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/img_2024.jpg",
+      "inventory": "available",
+      "description": "Dual-coloured men's parantoban",
+      "price_on_inquiry": false,
+      "category": "Machine Made",
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\nWhat's included:\n-Men's top \n-Bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+    },
+    {
+      "fabric": "Thick Georgette",
+      "price": 180,
+      "galleryImages": [
+        "/uploads/img_2103.jpg",
+        "/uploads/img_2108.jpg"
+      ],
+      "name": "White Hazaragi Dress",
+      "slug": "white-on-white-hazaragi-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "White"
+      ],
+      "sizes": [
+        "Small",
+        "Medium",
+        "Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "hazaragi"
+      ],
+      "id": "white-on-white-hazaragi-dress",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/img_2103.jpg",
+      "inventory": "available",
+      "description": "White hazaragi dress with white embroidery. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "What's Included:\n-Dress\n-Wide-Legged Pants\n-Embroidered scarf"
+    },
+    {
+      "fabric": "Thick Georgette",
+      "price": 250,
+      "galleryImages": [
+        "/uploads/img_2145.jpg",
+        "/uploads/img_2141.jpg"
+      ],
+      "name": "Blue Hazaragi Dress ",
+      "slug": "blue-long-hazaragi-dress",
+      "maxQuantity": 1,
+      "sizes": [
+        "X-Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "hazaragi"
+      ],
+      "id": "blue-long-hazaragi-dress",
+      "createdAt": "2026-05-12",
+      "image": "/uploads/img_2145.jpg",
+      "inventory": "available",
+      "description": "Long blue hazaragi dress",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements: \n-Bust: 46in\nWhat's included: \n-Dress\n-Embroidered scarf"
+    },
+    {
+      "fabric": "Shawl (marina) fabric",
+      "price": 400,
+      "galleryImages": [
+        "/uploads/img_2224.jpg",
+        "/uploads/img_2226.jpg"
+      ],
+      "name": "Handmade Hazaragi Dress",
+      "slug": "handmade-purple-hazaragi-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "Purple"
+      ],
+      "sizes": [
+        "X-Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "This is a very delicate piece. Please handle with care. Handwash only if needed."
+      ],
+      "tags": [
+        "handmade",
+        "hazaragi"
+      ],
+      "id": "handmade-purple-hazaragi-dress",
+      "createdAt": "2026-05-13",
+      "image": "/uploads/img_2224.jpg",
+      "inventory": "available",
+      "description": "Beautiful purple Hazaragi dress with handmade mirror work. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements:\n- Bust: 46in\n-Length of Dress: 56in\nWhat's Included:\n-Dress \n-White scarf"
+    },
+    {
+      "fabric": "Shawl (marina) fabric",
+      "price": 400,
+      "galleryImages": [
+        "/uploads/img_2206.jpg",
+        "/uploads/img_2214.jpg"
+      ],
+      "name": "Handmade Hazaragi Dress",
+      "slug": "handmade-hazaragi-dress-green",
+      "maxQuantity": 2,
+      "colors": [
+        "Green"
+      ],
+      "sizes": [
+        "Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "This is a very delicate piece. Please handle with care. Handwash only if needed."
+      ],
+      "tags": [
+        "Handmade",
+        "Hazaragi"
+      ],
+      "id": "handmade-hazaragi-dress-green",
+      "createdAt": "2026-05-13",
+      "image": "/uploads/img_2206.jpg",
+      "inventory": "available",
+      "description": "Beautiful handmade Hazaragi dress. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements: \n-Bust: 44in \n-Length of Dress: 54in \nWhat's Included: \n-Dress \n-White scarf"
     }
   ]
 }
