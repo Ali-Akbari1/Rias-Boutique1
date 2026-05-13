@@ -908,12 +908,14 @@
         "Lilac"
       ],
       "sizes": [
-        "Small",
         "Medium"
       ],
       "department": "women",
       "careInstructions": [
         "Dry Clean Only"
+      ],
+      "tags": [
+        "barosha"
       ],
       "id": "barosha-purple-shortdress",
       "createdAt": "2026-04-04",
@@ -921,7 +923,7 @@
       "inventory": "available",
       "description": "Lilac barosha short dress with mirror work.",
       "category": "Party Wear",
-      "fitInfo": "Small - Bust: 38in\nMedium - Bust: 40in\n"
+      "fitInfo": "Small - Bust: 38in\nMedium - Bust: 42in\n"
     },
     {
       "galleryImages": [
