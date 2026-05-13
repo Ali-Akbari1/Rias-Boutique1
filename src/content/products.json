@@ -1488,9 +1488,30 @@
       "fitInfo": "Measurements: \n-Bust: 44in \n-Length of Dress: 54in \nWhat's Included: \n-Dress \n-White scarf"
     },
     {
-      "price_on_inquiry": false,
+      "fabric": "Banaras",
+      "price": 350,
+      "galleryImages": [
+        "/uploads/img_2164.jpg",
+        "/uploads/img_2160.jpg"
+      ],
+      "maxQuantity": 1,
+      "colors": [
+        "Green"
+      ],
+      "sizes": [
+        "Small"
+      ],
       "department": "women",
-      "inventory": "available"
+      "tags": [
+        "Banaras"
+      ],
+      "id": "green-",
+      "image": "/uploads/img_2164.jpg",
+      "inventory": "available",
+      "description": "Beautiful green banaras dress with cheerma detailing. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements:\n-Bust: 38in\n-Length of Dress: 38in\n\nWhat's Included: \n-Dress \n-Pants\n-Scarf"
     }
   ]
 }
