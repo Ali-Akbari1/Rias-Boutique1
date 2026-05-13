@@ -1195,6 +1195,36 @@
       "price_on_inquiry": false,
       "category": "Handmade",
       "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+    },
+    {
+      "fabric": "",
+      "price": 340,
+      "galleryImages": [
+        "/uploads/image0.jpeg"
+      ],
+      "name": "Cheerma Dozi",
+      "slug": "US-Online-Order",
+      "maxQuantity": 1,
+      "colors": [
+        ""
+      ],
+      "sizes": [
+        ""
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+      ],
+      "id": "US-Online-Order",
+      "createdAt": "2026-05-13",
+      "image": "/uploads/image0.jpeg",
+      "inventory": "available",
+      "description": "",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n"
     }
   ]
 }
