@@ -66,6 +66,7 @@ store_code	id	availability	price
 16335217184145401742	collared-mens-white-parantoban-large-true-white	in_stock	115.00 CAD
 16335217184145401742	collared-mens-white-parantoban-x-large-true-white	in_stock	115.00 CAD
 16335217184145401742	red-cheerma-dozi-dress-small-red	out_of_stock	350.00 CAD
+16335217184145401742	Lilimitten-beige-short-dress-small-beige	in_stock	280.00 CAD
 16335217184145401742	lilimitten-short-dress-green-small-green	out_of_stock	280.00 CAD
 16335217184145401742	dual-coloured-mens-parantoban-medium-grey	in_stock	115.00 CAD
 16335217184145401742	dual-coloured-mens-parantoban-large-grey	in_stock	115.00 CAD

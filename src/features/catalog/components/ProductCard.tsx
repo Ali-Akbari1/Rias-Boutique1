@@ -25,7 +25,10 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const location = useLocation();
-  const isInquiryOnly = isInquiryOnlyProduct(product);
+  const isCatalogInquiryOnly = isInquiryOnlyProduct(product);
+  const isMissingCheckoutPrice =
+    !isCatalogInquiryOnly && product.availability !== "sold_out" && !hasDisplayPrice(product);
+  const isInquiryOnly = isCatalogInquiryOnly || isMissingCheckoutPrice;
   const isSoldOut = !isInquiryOnly && product.availability === "sold_out";
   const isOnSale = !isSoldOut && !isInquiryOnly && Boolean(product.salePercent && product.compareAtPrice);
   const checkoutEnabled = isCheckoutEnabled();

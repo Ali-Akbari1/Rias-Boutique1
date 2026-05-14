@@ -105,7 +105,7 @@ const ProductDetails = () => {
       return;
     }
 
-    if (isInquiryOnlyProduct(product)) {
+    if (isInquiryOnlyProduct(product) || !hasDisplayPrice(product)) {
       setIsInquiryOpen(true);
       return;
     }
@@ -302,7 +302,10 @@ const ProductDetails = () => {
     return <Navigate to="/" replace />;
   }
 
-  const isInquiryOnly = isInquiryOnlyProduct(product);
+  const isCatalogInquiryOnly = isInquiryOnlyProduct(product);
+  const isMissingCheckoutPrice =
+    !isCatalogInquiryOnly && product.availability !== "sold_out" && !hasDisplayPrice(product);
+  const isInquiryOnly = isCatalogInquiryOnly || isMissingCheckoutPrice;
   const isSoldOut = !isInquiryOnly && product.availability === "sold_out";
   const isOnSale = !isSoldOut && !isInquiryOnly && Boolean(product.salePercent && product.compareAtPrice);
   const hasSizeOptions = availableSizeKeys.length > 0;

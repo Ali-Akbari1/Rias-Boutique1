@@ -2053,6 +2053,36 @@
     <g:size>Small</g:size>
   </item>
   <item>
+    <g:id>Lilimitten-beige-short-dress-small-beige</g:id>
+    <g:item_group_id>Lilimitten-beige-short-dress</g:item_group_id>
+    <title>Lilimitten Short Dress</title>
+    <description>Short Lilimitten dress</description>
+    <link>https://www.riasboutique.com/products/Lilimitten-beige-short-dress</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_1750.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_1749.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>280.00 CAD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Party Wear</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>CA</g:country>
+      <g:service>Standard</g:service>
+      <g:price>30.00 CAD</g:price>
+    </g:shipping>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>40.00 CAD</g:price>
+    </g:shipping>
+    <g:color>Beige</g:color>
+    <g:size>Small</g:size>
+  </item>
+  <item>
     <g:id>lilimitten-short-dress-green-small-green</g:id>
     <g:item_group_id>lilimitten-short-dress-green</g:item_group_id>
     <title>Lilimitten Green Short Dress</title>
