@@ -77,6 +77,7 @@ export const createSignedShippingQuoteToken = ({
   customerRateMinor = 1800,
   currency = "CAD",
   freeShippingApplied = false,
+  provider = "easypost",
 }: {
   customer: {
     deliveryMethod?: "shipping" | "pickup";
@@ -98,6 +99,7 @@ export const createSignedShippingQuoteToken = ({
   customerRateMinor?: number;
   currency?: string;
   freeShippingApplied?: boolean;
+  provider?: "easypost" | "flat_rate";
 }) => {
   const secret =
     process.env.EASYPOST_QUOTE_SECRET?.trim() ||
@@ -127,7 +129,7 @@ export const createSignedShippingQuoteToken = ({
   const expiresAt = new Date(Date.now() + 30 * 60_000).toISOString();
   const payload = {
     v: 1,
-    provider: "easypost",
+    provider,
     shipmentId,
     rateId,
     carrier,

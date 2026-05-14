@@ -935,7 +935,7 @@ export const verifyShippingQuoteToken = ({
   }
 
   return {
-    provider: "easypost",
+    provider: payload.provider,
     shipmentId: payload.shipmentId,
     rateId: payload.rateId,
     carrier: payload.carrier,

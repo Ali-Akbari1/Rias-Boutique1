@@ -487,6 +487,11 @@ describe("clover checkout endpoint", () => {
           customer,
           items: baseBody.items,
           subtotalMinor: 40_000,
+          provider: "flat_rate",
+          shipmentId: "flat_rate",
+          rateId: "flat_standard_us",
+          carrier: "Ria's Boutique",
+          service: "Standard Shipping",
           customerRateMinor: 4_000,
           quotedRateMinor: 4_000,
           freeShippingApplied: false,
@@ -516,6 +521,7 @@ describe("clover checkout endpoint", () => {
       quotedShippingMinor: 4_000,
       freeShippingApplied: false,
     });
+    expect(order?.shippingQuote?.provider).toBe("flat_rate");
 
     const fetchPayload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body || "{}")) as {
       shoppingCart?: { lineItems?: Array<{ name: string; price: number }> };

@@ -13,7 +13,8 @@ export interface CatalogProduct {
 
 const productSchema = z.object({
   id: z.union([z.string(), z.number()]).transform((value) => String(value).trim()),
-  name: z.string().trim().min(1).max(180),
+  name: z.string().trim().min(1).max(180).optional(),
+  slug: z.string().trim().optional(),
   image: z.string().trim().optional(),
   price: z
     .union([z.number(), z.string(), z.null(), z.undefined()])
@@ -107,7 +108,7 @@ export const loadCatalog = async () => {
   const uniqueIds = new Set<string>();
 
   const mappedProducts: Array<CatalogProduct | null> = parsed.products
-    .map((product) => {
+    .map((product, index) => {
       const id = product.id.trim();
       if (!id) {
         throw new Error("Product catalog contains an empty product id.");
@@ -123,9 +124,11 @@ export const loadCatalog = async () => {
         return null;
       }
 
+      const name = product.name?.trim() || product.slug?.trim() || `Product ${index + 1}`;
+
       return {
         id,
-        name: product.name,
+        name,
         image: product.image,
         priceMinor: Math.round(product.price * 100),
         availability: normalizeAvailability(product.availability ?? product.inventory),
