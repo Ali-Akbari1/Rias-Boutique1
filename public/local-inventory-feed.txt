@@ -76,4 +76,3 @@ store_code	id	availability	price
 16335217184145401742	handmade-purple-hazaragi-dress-x-large-purple	in_stock	400.00 CAD
 16335217184145401742	handmade-hazaragi-dress-green-large-green	in_stock	400.00 CAD
 16335217184145401742	green--small-green	in_stock	350.00 CAD
-16335217184145401742	US-Online-Order-one-size-default	in_stock	340.00 CAD

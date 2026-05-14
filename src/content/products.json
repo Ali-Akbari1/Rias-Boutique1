@@ -1514,36 +1514,6 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements:\n-Bust: 38in\n-Length of Dress: 38in\n\nWhat's Included: \n-Dress \n-Pants\n-Scarf"
-    },
-    {
-      "fabric": "",
-      "price": 340,
-      "galleryImages": [
-        "/uploads/image0.webp"
-      ],
-      "name": "Cheerma Dozi",
-      "slug": "US-Online-Order",
-      "maxQuantity": 1,
-      "colors": [
-        ""
-      ],
-      "sizes": [
-        ""
-      ],
-      "department": "women",
-      "careInstructions": [
-        "Dry Clean Only"
-      ],
-      "tags": [
-      ],
-      "id": "US-Online-Order",
-      "createdAt": "2026-05-13",
-      "image": "/uploads/image0.webp",
-      "inventory": "available",
-      "description": "",
-      "price_on_inquiry": false,
-      "category": "Party Wear",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n"
     }
   ]
 }

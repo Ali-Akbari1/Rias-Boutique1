@@ -2348,32 +2348,5 @@
     <g:color>Green</g:color>
     <g:size>Small</g:size>
   </item>
-  <item>
-    <g:id>US-Online-Order-one-size-default</g:id>
-    <g:item_group_id>US-Online-Order</g:item_group_id>
-    <title>Cheerma Dozi</title>
-    <description>Cheerma Dozi</description>
-    <link>https://www.riasboutique.com/products/US-Online-Order</link>
-    <g:image_link>https://www.riasboutique.com/uploads/image0.webp</g:image_link>
-    <g:availability>in_stock</g:availability>
-    <g:price>340.00 CAD</g:price>
-    <g:condition>new</g:condition>
-    <g:brand>Ria&apos;s Boutique</g:brand>
-    <g:identifier_exists>no</g:identifier_exists>
-    <g:product_type>Party Wear</g:product_type>
-    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-    <g:gender>female</g:gender>
-    <g:age_group>adult</g:age_group>
-    <g:shipping>
-      <g:country>CA</g:country>
-      <g:service>Standard</g:service>
-      <g:price>30.00 CAD</g:price>
-    </g:shipping>
-    <g:shipping>
-      <g:country>US</g:country>
-      <g:service>Standard</g:service>
-      <g:price>40.00 CAD</g:price>
-    </g:shipping>
-  </item>
 </channel>
 </rss>

@@ -11,10 +11,14 @@ export interface CatalogProduct {
   image?: string;
 }
 
+const stringishSchema = z
+  .union([z.string(), z.number(), z.null(), z.undefined()])
+  .transform((value) => (value === null || value === undefined ? "" : String(value).trim()));
+
 const productSchema = z.object({
-  id: z.union([z.string(), z.number()]).transform((value) => String(value).trim()),
-  name: z.string().trim().min(1).max(180).optional(),
-  slug: z.string().trim().optional(),
+  id: stringishSchema,
+  name: stringishSchema.refine((value) => value.length <= 180, "name must be 180 characters or fewer"),
+  slug: stringishSchema,
   image: z.string().trim().optional(),
   price: z
     .union([z.number(), z.string(), z.null(), z.undefined()])
@@ -109,10 +113,7 @@ export const loadCatalog = async () => {
 
   const mappedProducts: Array<CatalogProduct | null> = parsed.products
     .map((product, index) => {
-      const id = product.id.trim();
-      if (!id) {
-        throw new Error("Product catalog contains an empty product id.");
-      }
+      const id = product.id || product.slug || String(index + 1);
 
       if (uniqueIds.has(id)) {
         throw new Error(`Product catalog contains duplicate product id: ${id}`);
@@ -124,7 +125,7 @@ export const loadCatalog = async () => {
         return null;
       }
 
-      const name = product.name?.trim() || product.slug?.trim() || `Product ${index + 1}`;
+      const name = product.name || product.slug || `Product ${index + 1}`;
 
       return {
         id,

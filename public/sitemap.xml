@@ -343,10 +343,4 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://www.riasboutique.com/products/US-Online-Order</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2026-05-13</lastmod>
-  </url>
 </urlset>
