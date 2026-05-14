@@ -470,7 +470,7 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_1801.webp",
+        "/uploads/img_1801.jpg",
         "/uploads/size-chart.webp"
       ],
       "name": "Men's Black and Gold Parantoban",
@@ -492,7 +492,7 @@
       ],
       "id": "men-black-gold",
       "createdAt": "2026-02-24",
-      "image": "/uploads/img_1801.webp",
+      "image": "/uploads/img_1801.jpg",
       "inventory": "available",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
       "category": "Machine Made",
@@ -1168,8 +1168,8 @@
       "fabric": "*Mirror work is handmade",
       "price": 225,
       "galleryImages": [
-        "/uploads/img_1799.webp",
-        "/uploads/size-chart.webp"
+        "/uploads/img_1799.jpg",
+        "/uploads/size-chart.png"
       ],
       "name": "Mens Black Handmade Parantoban",
       "slug": "Handmade-black-parantoban",
@@ -1191,7 +1191,7 @@
       ],
       "id": "Handmade-black-parantoban",
       "createdAt": "2026-05-04",
-      "image": "/uploads/img_1799.webp",
+      "image": "/uploads/img_1799.jpg",
       "inventory": "available",
       "description": "Handmade men's black parantoban with silver embroidery and mirror work.",
       "price_on_inquiry": false,
@@ -1201,9 +1201,9 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_2031.webp",
-        "/uploads/img_2027.webp",
-        "/uploads/size-chart.webp"
+        "/uploads/img_2031.jpg",
+        "/uploads/img_2027.jpg",
+        "/uploads/size-chart.png"
       ],
       "name": "Collared Mens Embroidered Parantoban ",
       "slug": "collared-mens-white-parantoban ",
@@ -1227,7 +1227,7 @@
       ],
       "id": "collared-mens-white-parantoban ",
       "createdAt": "2026-05-05",
-      "image": "/uploads/img_2031.webp",
+      "image": "/uploads/img_2031.jpg",
       "inventory": "available",
       "description": "Collared white mens parantoban with embroidery. ",
       "price_on_inquiry": false,
@@ -1238,8 +1238,8 @@
       "fabric": "Velvet",
       "price": 350,
       "galleryImages": [
-        "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.webp",
-        "/uploads/img_1708.webp"
+        "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.png",
+        "/uploads/img_1708.jpg"
       ],
       "name": "Red Cheerma Dozi Dress",
       "slug": "red-cheerma-dozi-dress",
@@ -1259,7 +1259,7 @@
       ],
       "id": "red-cheerma-dozi-dress",
       "createdAt": "2026-05-12",
-      "image": "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.webp",
+      "image": "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.png",
       "inventory": "sold_out",
       "description": "Beautiful red velvet dress with handmade cheerma dozi detailing and wide-legged pants.",
       "price_on_inquiry": false,
@@ -1268,10 +1268,9 @@
     },
     {
       "fabric": "Lilimitten",
-      "price": 280,
       "galleryImages": [
-        "/uploads/img_1750.webp",
-        "/uploads/img_1749.webp"
+        "/uploads/img_1750.jpg",
+        "/uploads/img_1749.jpg"
       ],
       "name": "Lilimitten Short Dress",
       "slug": "Lilimitten-beige-short-dress",
@@ -1291,7 +1290,7 @@
       ],
       "id": "Lilimitten-beige-short-dress",
       "createdAt": "2026-05-12",
-      "image": "/uploads/img_1750.webp",
+      "image": "/uploads/img_1750.jpg",
       "inventory": "available",
       "description": "Short Lilimitten dress",
       "price_on_inquiry": false,
@@ -1302,7 +1301,7 @@
       "fabric": "Lilimitten",
       "price": 280,
       "galleryImages": [
-        "/uploads/img_1759.webp"
+        "/uploads/img_1759.jpg"
       ],
       "name": "Lilimitten Green Short Dress",
       "slug": "lilimitten-short-dress-green",
@@ -1320,7 +1319,7 @@
         "Lilimitten"
       ],
       "id": "lilimitten-short-dress-green",
-      "image": "/uploads/img_1759.webp",
+      "image": "/uploads/img_1759.jpg",
       "inventory": "sold_out",
       "description": "Short Lilimitten dress in green",
       "price_on_inquiry": false,
@@ -1330,7 +1329,7 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_2024.webp"
+        "/uploads/img_2024.jpg"
       ],
       "name": "Dual Coloured Men's Parantoban",
       "slug": "dual-coloured-mens-parantoban",
@@ -1352,7 +1351,7 @@
       ],
       "id": "dual-coloured-mens-parantoban",
       "createdAt": "2026-05-12",
-      "image": "/uploads/img_2024.webp",
+      "image": "/uploads/img_2024.jpg",
       "inventory": "available",
       "description": "Dual-coloured men's parantoban",
       "price_on_inquiry": false,
@@ -1363,8 +1362,8 @@
       "fabric": "Thick Georgette",
       "price": 180,
       "galleryImages": [
-        "/uploads/img_2103.webp",
-        "/uploads/img_2108.webp"
+        "/uploads/img_2103.jpg",
+        "/uploads/img_2108.jpg"
       ],
       "name": "White Hazaragi Dress",
       "slug": "white-on-white-hazaragi-dress",
@@ -1386,7 +1385,7 @@
       ],
       "id": "white-on-white-hazaragi-dress",
       "createdAt": "2026-05-12",
-      "image": "/uploads/img_2103.webp",
+      "image": "/uploads/img_2103.jpg",
       "inventory": "available",
       "description": "White hazaragi dress with white embroidery. ",
       "price_on_inquiry": false,
@@ -1397,8 +1396,8 @@
       "fabric": "Thick Georgette",
       "price": 250,
       "galleryImages": [
-        "/uploads/img_2145.webp",
-        "/uploads/img_2141.webp"
+        "/uploads/img_2145.jpg",
+        "/uploads/img_2141.jpg"
       ],
       "name": "Blue Hazaragi Dress ",
       "slug": "blue-long-hazaragi-dress",
@@ -1415,7 +1414,7 @@
       ],
       "id": "blue-long-hazaragi-dress",
       "createdAt": "2026-05-12",
-      "image": "/uploads/img_2145.webp",
+      "image": "/uploads/img_2145.jpg",
       "inventory": "available",
       "description": "Long blue hazaragi dress",
       "price_on_inquiry": false,
@@ -1426,8 +1425,8 @@
       "fabric": "Shawl (marina) fabric",
       "price": 400,
       "galleryImages": [
-        "/uploads/img_2224.webp",
-        "/uploads/img_2226.webp"
+        "/uploads/img_2224.jpg",
+        "/uploads/img_2226.jpg"
       ],
       "name": "Handmade Hazaragi Dress",
       "slug": "handmade-purple-hazaragi-dress",
@@ -1436,7 +1435,7 @@
         "Purple"
       ],
       "sizes": [
-        "X-Large"
+        "Large"
       ],
       "department": "women",
       "careInstructions": [
@@ -1448,23 +1447,23 @@
       ],
       "id": "handmade-purple-hazaragi-dress",
       "createdAt": "2026-05-13",
-      "image": "/uploads/img_2224.webp",
+      "image": "/uploads/img_2224.jpg",
       "inventory": "available",
       "description": "Beautiful purple Hazaragi dress with handmade mirror work. ",
       "price_on_inquiry": false,
       "category": "Party Wear",
-      "fitInfo": "Measurements:\n- Bust: 46in\n-Length of Dress: 56in\nWhat's Included:\n-Dress \n-White scarf"
+      "fitInfo": "Measurements:\n- Bust: 46in\n-Length of Dress: 56in\n\nWhat's Included:\n-Dress \n-White scarf"
     },
     {
       "fabric": "Shawl (marina) fabric",
       "price": 400,
       "galleryImages": [
-        "/uploads/img_2206.webp",
-        "/uploads/img_2214.webp"
+        "/uploads/img_2206.jpg",
+        "/uploads/img_2214.jpg"
       ],
       "name": "Handmade Hazaragi Dress",
       "slug": "handmade-hazaragi-dress-green",
-      "maxQuantity": 2,
+      "maxQuantity": 1,
       "colors": [
         "Green"
       ],
@@ -1481,7 +1480,7 @@
       ],
       "id": "handmade-hazaragi-dress-green",
       "createdAt": "2026-05-13",
-      "image": "/uploads/img_2206.webp",
+      "image": "/uploads/img_2206.jpg",
       "inventory": "available",
       "description": "Beautiful handmade Hazaragi dress. ",
       "price_on_inquiry": false,
@@ -1492,11 +1491,11 @@
       "fabric": "Banaras",
       "price": 350,
       "galleryImages": [
-        "/uploads/img_2164.webp",
-        "/uploads/img_2160.webp"
+        "/uploads/img_2164.jpg",
+        "/uploads/img_2160.jpg"
       ],
-      "name": "Green Banaras Dress",
-      "slug": "green-banaras-dress",
+      "name": "Green Banaras Short Dress",
+      "slug": "green-banaras-short-dress",
       "maxQuantity": 1,
       "colors": [
         "Green"
@@ -1508,8 +1507,8 @@
       "tags": [
         "Banaras"
       ],
-      "id": "green-",
-      "image": "/uploads/img_2164.webp",
+      "id": "green-banaras-short-dress",
+      "image": "/uploads/img_2164.jpg",
       "inventory": "available",
       "description": "Beautiful green banaras dress with cheerma detailing. ",
       "price_on_inquiry": false,
