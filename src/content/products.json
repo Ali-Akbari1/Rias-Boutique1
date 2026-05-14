@@ -1514,6 +1514,38 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements:\n-Bust: 38in\n-Length of Dress: 38in\n\nWhat's Included: \n-Dress \n-Pants\n-Scarf"
+    },
+    {
+      "fabric": "Crushed Velvet",
+      "price": 280,
+      "galleryImages": [
+        "/uploads/img_2326.jpg",
+        "/uploads/img_2320.jpg",
+        "/uploads/img_2318.jpg"
+      ],
+      "name": "Emerald Green Long Dress",
+      "slug": "emerald-green-cheerma-dozi-long-dress",
+      "colors": [
+        "Emerald Green"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "cheerma dozi"
+      ],
+      "id": "emerald-green-cheerma-dozi-long-dress",
+      "createdAt": "2026-05-14",
+      "image": "/uploads/img_2326.jpg",
+      "inventory": "available",
+      "description": "Beautiful emerald green crushed velvet dress with cheerma detailing. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements: \n-Bust: 42in \n-Length of Dress: 52in \n\nWhat's Included: \n-Dress \n-Scarf"
     }
   ]
 }
