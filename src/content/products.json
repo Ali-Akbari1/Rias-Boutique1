@@ -1435,7 +1435,7 @@
         "Purple"
       ],
       "sizes": [
-        "X-Large"
+        "Large"
       ],
       "department": "women",
       "careInstructions": [
@@ -1452,7 +1452,7 @@
       "description": "Beautiful purple Hazaragi dress with handmade mirror work. ",
       "price_on_inquiry": false,
       "category": "Party Wear",
-      "fitInfo": "Measurements:\n- Bust: 46in\n-Length of Dress: 56in\nWhat's Included:\n-Dress \n-White scarf"
+      "fitInfo": "Measurements:\n- Bust: 46in\n-Length of Dress: 56in\n\nWhat's Included:\n-Dress \n-White scarf"
     },
     {
       "fabric": "Shawl (marina) fabric",
@@ -1463,7 +1463,7 @@
       ],
       "name": "Handmade Hazaragi Dress",
       "slug": "handmade-hazaragi-dress-green",
-      "maxQuantity": 2,
+      "maxQuantity": 1,
       "colors": [
         "Green"
       ],
