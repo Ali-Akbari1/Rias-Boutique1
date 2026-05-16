@@ -603,11 +603,15 @@
         "White"
       ],
       "sizes": [
+        "Medium",
         "X-Large"
       ],
       "department": "men",
       "careInstructions": [
         "Dry Clean Only"
+      ],
+      "tags": [
+        "handmade"
       ],
       "id": "mens-white-handmade-parantoban",
       "createdAt": "2026-02-25",
