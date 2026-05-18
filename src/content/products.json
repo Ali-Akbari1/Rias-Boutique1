@@ -1279,7 +1279,7 @@
       ],
       "name": "Lilimitten Short Dress",
       "slug": "Lilimitten-beige-short-dress",
-      "maxQuantity": 1,
+      "maxQuantity": "",
       "colors": [
         "Beige"
       ],
@@ -1296,7 +1296,7 @@
       "id": "Lilimitten-beige-short-dress",
       "createdAt": "2026-05-12",
       "image": "/uploads/img_1750.jpg",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Short Lilimitten dress",
       "price_on_inquiry": false,
       "category": "Party Wear",
