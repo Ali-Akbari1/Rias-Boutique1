@@ -761,7 +761,7 @@
     },
     {
       "fabric": "Barosha",
-      "price": 470,
+      "price": 250,
       "galleryImages": [
         "/uploads/teal-barosha-dress-1.webp",
         "/uploads/teal-barosha-dress-2.webp",
@@ -782,7 +782,7 @@
       "id": "teal-barosha-dress",
       "createdAt": "2026-03-08",
       "image": "/uploads/teal-barosha-dress-1.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Teal barosha dress with silver cheerma detailing. ",
       "category": "Party Wear",
       "fitInfo": "Measurements-\nBust: 38in \nSleeves: 21in\nLength of Dress: 36in\n\n\n"
