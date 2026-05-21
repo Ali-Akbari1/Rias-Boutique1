@@ -133,6 +133,18 @@ export const requestSendTrackingEmail = (adminToken: string, orderId: string) =>
     fallbackErrorMessage: "Unable to send the tracking email right now.",
   });
 
+export const requestSendPickupReadyEmail = (adminToken: string, orderId: string) =>
+  requestJson<AdminOrdersResponse>({
+    path: "/api/admin-orders",
+    method: "POST",
+    headers: buildAdminHeaders(adminToken),
+    body: {
+      action: "send_pickup_ready_email",
+      orderId,
+    },
+    fallbackErrorMessage: "Unable to send the pickup-ready email right now.",
+  });
+
 export const requestUpdateManualTracking = (
   adminToken: string,
   payload: {

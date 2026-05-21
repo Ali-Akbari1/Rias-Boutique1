@@ -1,6 +1,6 @@
 import { FormEvent, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Loader2, RefreshCcw } from "lucide-react";
+import { ArrowLeft, Loader2, MailCheck, RefreshCcw } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
@@ -10,6 +10,7 @@ import {
   requestRefundShipmentLabel,
   requestRetryShipmentLabel,
   requestEmailTest,
+  requestSendPickupReadyEmail,
   requestSendTrackingEmail,
   requestUpdateManualTracking,
   type AdminOrder,
@@ -63,6 +64,7 @@ const AdminOrders = () => {
   const [retryingOrderId, setRetryingOrderId] = useState("");
   const [refundingOrderId, setRefundingOrderId] = useState("");
   const [sendingTrackingOrderId, setSendingTrackingOrderId] = useState("");
+  const [sendingPickupReadyOrderId, setSendingPickupReadyOrderId] = useState("");
   const [savingTrackingOrderId, setSavingTrackingOrderId] = useState("");
   const [sendingTestConfirmationOrderId, setSendingTestConfirmationOrderId] = useState("");
   const [trackingInputs, setTrackingInputs] = useState<
@@ -172,6 +174,30 @@ const AdminOrders = () => {
       setErrorMessage(error instanceof Error ? error.message : "Unable to send the tracking email.");
     } finally {
       setSendingTrackingOrderId("");
+    }
+  };
+
+  const sendPickupReadyEmail = async (orderId: string) => {
+    const token = adminToken.trim();
+    if (!token) {
+      setErrorMessage("Enter your admin dashboard token.");
+      return;
+    }
+
+    setSendingPickupReadyOrderId(orderId);
+    setErrorMessage("");
+    setStatusMessage("");
+
+    try {
+      const payload = await requestSendPickupReadyEmail(token, orderId);
+      if (payload.order) {
+        setOrders((currentOrders) => currentOrders.map((order) => (order.id === payload.order?.id ? payload.order : order)));
+      }
+      setStatusMessage(payload.message || "Pickup-ready email sent successfully.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to send the pickup-ready email.");
+    } finally {
+      setSendingPickupReadyOrderId("");
     }
   };
 
@@ -394,9 +420,37 @@ const AdminOrders = () => {
                       <span className="font-semibold text-foreground">Phone:</span> {order.customer.phone || "-"}
                     </p>
                     {order.customer.deliveryMethod === "pickup" ? (
-                      <p>
-                        <span className="font-semibold text-foreground">Shipping:</span> Pickup in store selected.
-                      </p>
+                      <div className="flex flex-col gap-2 rounded-md border border-border bg-background p-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p>
+                            <span className="font-semibold text-foreground">Pickup:</span> In-store pickup selected.
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Send this when the order is packed and ready at the boutique.
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => void sendPickupReadyEmail(order.id)}
+                          disabled={order.paymentStatus !== "paid" || sendingPickupReadyOrderId === order.id}
+                          title={order.paymentStatus !== "paid" ? "Payment must be confirmed first" : "Email pickup instructions"}
+                          className="shrink-0"
+                        >
+                          {sendingPickupReadyOrderId === order.id ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Sending pickup email
+                            </>
+                          ) : (
+                            <>
+                              <MailCheck className="h-4 w-4" />
+                              Email pickup ready
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     ) : (
                       <p>
                         <span className="font-semibold text-foreground">Shipping:</span> {order.customer.address},{" "}

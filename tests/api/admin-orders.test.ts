@@ -70,6 +70,33 @@ const buildPendingOrderInput = () => {
   };
 };
 
+const buildPickupPendingOrderInput = () => ({
+  ...buildPendingOrderInput(),
+  customer: {
+    deliveryMethod: "pickup" as const,
+    fullName: "Pickup Customer",
+    email: "pickup@example.com",
+    phone: "+1 (403) 555-0102",
+    address: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "",
+  },
+  shippingQuote: null,
+  subtotalMinor: 40_000,
+  totalMinor: 40_000,
+  pricing: {
+    discountCode: "",
+    discountMinor: 0,
+    shippingMinor: 0,
+    quotedShippingMinor: 0,
+    taxMinor: 0,
+    freeShippingApplied: false,
+  },
+  idempotencyKey: "admin-orders-pickup-idempotency-key",
+});
+
 describe("admin orders endpoint", () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
@@ -139,6 +166,42 @@ describe("admin orders endpoint", () => {
           paymentStatus: "pending",
         },
       ],
+    });
+  });
+
+  it("sends a pickup-ready email for paid pickup orders", async () => {
+    const createdOrder = await createPendingOrder(buildPickupPendingOrderInput());
+    await markOrderPaidAndDecrementInventory({
+      orderId: createdOrder.id,
+      paymentReference: "pay_pickup_ready_test_123",
+    });
+
+    const pickupReadyResponse = createMockResponse();
+    await adminOrdersHandler(
+      createMockRequest({
+        method: "POST",
+        headers: {
+          origin: "https://www.riasboutique.com",
+          "x-admin-token": ADMIN_TOKEN,
+        },
+        body: JSON.stringify({
+          action: "send_pickup_ready_email",
+          orderId: createdOrder.id,
+        }),
+      }),
+      pickupReadyResponse,
+    );
+
+    expect(pickupReadyResponse.statusCode).toBe(200);
+    expect(pickupReadyResponse.jsonBody).toMatchObject({
+      message: "Pickup-ready email queued successfully.",
+      order: {
+        id: createdOrder.id,
+        customer: {
+          deliveryMethod: "pickup",
+          email: "pickup@example.com",
+        },
+      },
     });
   });
 

@@ -16,7 +16,7 @@ import {
   getClientIp,
   resolveAllowedOrigin,
 } from "../server/lib/security.js";
-import { sendOrderConfirmationEmail, sendTrackingEmail } from "../server/lib/email.js";
+import { sendOrderConfirmationEmail, sendPickupReadyEmail, sendTrackingEmail } from "../server/lib/email.js";
 import { ensureShipmentForOrder } from "../server/lib/order-fulfillment.js";
 import { refundShippingLabel } from "../server/lib/easypost.js";
 import {
@@ -58,6 +58,13 @@ const sendTrackingEmailSchema = z
   })
   .strict();
 
+const sendPickupReadyEmailSchema = z
+  .object({
+    action: z.literal("send_pickup_ready_email"),
+    orderId: z.string().trim().min(1).max(128),
+  })
+  .strict();
+
 const sendTestEmailSchema = z
   .object({
     action: z.literal("send_test_email"),
@@ -89,6 +96,7 @@ const adminShipmentActionSchema = z.discriminatedUnion("action", [
   retryLabelPurchaseSchema,
   refundLabelSchema,
   sendTrackingEmailSchema,
+  sendPickupReadyEmailSchema,
   sendTestEmailSchema,
   manualTrackingSchema,
 ]);
@@ -381,6 +389,42 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const order = await findOrderById(orderId);
   if (!order) {
     sendError(res, 404, "ORDER_NOT_FOUND", "Order not found.");
+    return;
+  }
+
+  if (actionData.action === "send_pickup_ready_email") {
+    if (order.customer.deliveryMethod !== "pickup") {
+      sendError(res, 409, "PICKUP_NOT_SELECTED", "This order is not marked for in-store pickup.");
+      return;
+    }
+
+    if (order.paymentStatus !== "paid") {
+      sendError(res, 409, "ORDER_NOT_PAID", "Pickup-ready emails can only be sent after payment is confirmed.");
+      return;
+    }
+
+    try {
+      const dispatch = await sendPickupReadyEmail(order);
+      res.setHeader("Cache-Control", "no-store");
+      res.status(200).json({
+        order,
+        message:
+          dispatch.status === "queued"
+            ? "Pickup-ready email queued successfully."
+            : "Pickup-ready email sent successfully.",
+      });
+    } catch (error) {
+      logger.error("admin-orders.pickup_ready_email_failed", {
+        orderId: order.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      sendError(
+        res,
+        502,
+        "PICKUP_READY_EMAIL_FAILED",
+        error instanceof Error ? error.message : "Unable to send the pickup-ready email right now.",
+      );
+    }
     return;
   }
 
