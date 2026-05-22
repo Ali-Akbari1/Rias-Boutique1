@@ -808,6 +808,10 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
+      "tags": [
+        "mens ",
+        "machine made"
+      ],
       "id": "true-white-mens-parantoban",
       "createdAt": "2026-02-19",
       "image": "/uploads/men-s-white-parantoban-1.webp",
@@ -1549,6 +1553,36 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements: \n-Bust: 42in \n-Length of Dress: 52in \n\nWhat's Included: \n-Dress \n-Scarf"
+    },
+    {
+      "price": 115,
+      "galleryImages": [
+        "/uploads/img_0786-2.jpg",
+        "/uploads/img_0787-2.jpg"
+      ],
+      "name": "Black Mens Parantoban ",
+      "slug": "black-parantoban-mens-2",
+      "colors": [
+        "Black"
+      ],
+      "sizes": [
+        "Small",
+        "Medium"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "machine made"
+      ],
+      "id": "black-parantoban-mens-2",
+      "image": "/uploads/img_0786-2.jpg",
+      "inventory": "available",
+      "description": "Black mens parantoban with gold embroidery. ",
+      "price_on_inquiry": false,
+      "category": "Machine Made",
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     }
   ]
 }
