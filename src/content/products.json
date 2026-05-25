@@ -1346,8 +1346,7 @@
         "Grey"
       ],
       "sizes": [
-        "Medium",
-        "Large"
+        "Medium"
       ],
       "department": "men",
       "careInstructions": [
@@ -1488,7 +1487,7 @@
       "id": "handmade-hazaragi-dress-green",
       "createdAt": "2026-05-13",
       "image": "/uploads/img_2206.jpg",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Beautiful handmade Hazaragi dress. ",
       "price_on_inquiry": false,
       "category": "Party Wear",
@@ -1558,7 +1557,8 @@
       "price": 115,
       "galleryImages": [
         "/uploads/img_0786-2.jpg",
-        "/uploads/img_0787-2.jpg"
+        "/uploads/img_0787-2.jpg",
+        "/uploads/size-chart.png"
       ],
       "name": "Black Mens Parantoban ",
       "slug": "black-parantoban-mens-2",
