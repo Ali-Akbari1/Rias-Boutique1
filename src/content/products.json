@@ -1488,7 +1488,7 @@
       "id": "handmade-hazaragi-dress-green",
       "createdAt": "2026-05-13",
       "image": "/uploads/img_2206.jpg",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Beautiful handmade Hazaragi dress. ",
       "price_on_inquiry": false,
       "category": "Party Wear",
