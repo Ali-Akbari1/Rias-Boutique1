@@ -1337,7 +1337,9 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_2024.jpg"
+        "/uploads/img_2024.jpg",
+        "/uploads/img_2018.jpg",
+        "/uploads/size-chart.png"
       ],
       "name": "Dual Coloured Men's Parantoban",
       "slug": "dual-coloured-mens-parantoban",
