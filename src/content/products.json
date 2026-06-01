@@ -1337,7 +1337,9 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_2024.jpg"
+        "/uploads/img_2024.jpg",
+        "/uploads/img_2018.jpg",
+        "/uploads/size-chart.png"
       ],
       "name": "Dual Coloured Men's Parantoban",
       "slug": "dual-coloured-mens-parantoban",
@@ -1582,6 +1584,36 @@
       "price_on_inquiry": false,
       "category": "Machine Made",
       "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+    },
+    {
+      "price": 115,
+      "galleryImages": [
+        "/uploads/img_2379.jpg",
+        "/uploads/img_2384-2.jpg",
+        "/uploads/size-chart.png"
+      ],
+      "name": "Machine Made Grey Mens",
+      "slug": "machine-made-grey-mens-parantoban-white-embroidery",
+      "maxQuantity": 1,
+      "colors": [
+        "Grey"
+      ],
+      "sizes": [
+        "Large"
+      ],
+      "department": "women",
+      "tags": [
+        "mens",
+        "machine made"
+      ],
+      "id": "machine-made-grey-mens-parantoban-white-embroidery",
+      "createdAt": "2026-06-01",
+      "image": "/uploads/img_2379.jpg",
+      "inventory": "available",
+      "description": "Machine-made grey mens parantoban with white embroidery. ",
+      "price_on_inquiry": false,
+      "category": "Machine Made",
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\nWhat's included:\n-Men's top\n-Bottom\n\n*Please allow for slight variations of a few inches due to measurement differences\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     }
   ]
 }
