@@ -471,7 +471,7 @@
       "price": 115,
       "galleryImages": [
         "/uploads/img_1801.jpg",
-        "/uploads/size-chart.webp"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Men's Black and Gold Parantoban",
       "slug": "men-black-gold",
@@ -496,7 +496,7 @@
       "inventory": "available",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Please check our size chart for all specific measurements. \n\nPlease note: Elastic and/or an ezar band are not included with the pants."
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
       "fabric": "*Mirror work is handmade. ",
@@ -505,7 +505,7 @@
         "/uploads/handmade-mens-parantoban-in-black-1.webp",
         "/uploads/handmade-mens-parantoban-in-black-2.webp",
         "/uploads/handmade-mens-parantoban-in-black-3.webp",
-        "/uploads/size-chart.webp"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Handmade Mens Parantoban in Black",
       "slug": "Handmade-mens-parantoban-black",
@@ -530,14 +530,14 @@
       "inventory": "sold_out",
       "description": "Black mens parantoban with handmade silver and mirror embroidery. ",
       "category": "Handmade",
-      "fitInfo": "Please check our size chart for all specific measurements. \n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
       "price": 115,
       "galleryImages": [
         "/uploads/men-s-off-white-and-gold-parantoban-1.webp",
         "/uploads/men-s-off-white-and-gold-parantoban-2.webp",
-        "/uploads/size-chart.webp"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Men's Off-White and Gold Parantoban ",
       "slug": "mens-offwhite-with-gold",
@@ -560,14 +560,14 @@
       "inventory": "available",
       "description": "Off-white machine made men's parantoban with gold embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n"
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering.\n"
     },
     {
       "price": 115,
       "galleryImages": [
         "/uploads/men-s-grey-parantoban-1.webp",
         "/uploads/men-s-grey-parantoban-2.webp",
-        "/uploads/size-chart.webp"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Men's Grey Parantoban",
       "slug": "mens-grey-parantoban",
@@ -581,13 +581,16 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
+      "tags": [
+        "men"
+      ],
       "id": "mens-grey-parantoban",
       "createdAt": "2026-02-25",
       "image": "/uploads/men-s-grey-parantoban-1.webp",
       "inventory": "sold_out",
       "description": "Machine made men's grey parantoban with silver and grey embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. "
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
       "fabric": "*Mirror work is handmade ",
@@ -595,7 +598,7 @@
       "galleryImages": [
         "/uploads/men-s-white-handmade-parantoban-1.webp",
         "/uploads/men-s-white-handmade-parantoban-2.webp",
-        "/uploads/size-chart.webp"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Men's White Handmade Parantoban",
       "slug": "mens-white-handmade-parantoban",
@@ -619,14 +622,14 @@
       "inventory": "available",
       "description": "Handmade men's white parantoban with silver embroidery and mirror work. ",
       "category": "Handmade",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n\nPlease measure before ordering. \n"
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering.\n"
     },
     {
       "price": 115,
       "galleryImages": [
         "/uploads/men-s-off-white-parantoban-1.webp",
         "/uploads/men-s-off-white-parantoban-2.webp",
-        "/uploads/size-chart.webp"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Men's Off-White Parantoban ",
       "slug": "mens-offwhite-with-white",
@@ -641,13 +644,16 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
+      "tags": [
+        "men"
+      ],
       "id": "mens-offwhite-with-white",
       "createdAt": "2026-03-04",
       "image": "/uploads/men-s-off-white-parantoban-1.webp",
       "inventory": "available",
       "description": "Men's off-white parantoban with white embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n\nPlease measure before ordering. "
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
       "fabric": "Hazaragi (Du-Domina) ",
@@ -792,7 +798,7 @@
       "galleryImages": [
         "/uploads/men-s-white-parantoban-1.webp",
         "/uploads/men-s-white-parantoban-2.webp",
-        "/uploads/size-chart.webp"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Men's White Parantoban ",
       "slug": "true-white-mens-parantoban",
@@ -818,7 +824,7 @@
       "inventory": "available",
       "description": "True white men's parantoban with white embroidery. ",
       "category": "Machine Made",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements. \n\nWhat's included- \nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included. \n\nPlease measure before ordering. "
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
       "fabric": "Velvet ",
@@ -1176,7 +1182,7 @@
       "price": 225,
       "galleryImages": [
         "/uploads/img_1799.jpg",
-        "/uploads/size-chart.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Mens Black Handmade Parantoban",
       "slug": "Handmade-black-parantoban",
@@ -1203,14 +1209,14 @@
       "description": "Handmade men's black parantoban with silver embroidery and mirror work.",
       "price_on_inquiry": false,
       "category": "Handmade",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
       "price": 115,
       "galleryImages": [
         "/uploads/img_2031.jpg",
         "/uploads/img_2027.jpg",
-        "/uploads/size-chart.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Collared Mens Embroidered Parantoban ",
       "slug": "collared-mens-white-parantoban ",
@@ -1339,7 +1345,7 @@
       "galleryImages": [
         "/uploads/img_2024.jpg",
         "/uploads/img_2018.jpg",
-        "/uploads/size-chart.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Dual Coloured Men's Parantoban",
       "slug": "dual-coloured-mens-parantoban",
@@ -1365,7 +1371,7 @@
       "description": "Dual-coloured men's parantoban",
       "price_on_inquiry": false,
       "category": "Machine Made",
-      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\nWhat's included:\n-Men's top \n-Bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
       "fabric": "Thick Georgette",
@@ -1559,7 +1565,7 @@
       "galleryImages": [
         "/uploads/img_0786-2.jpg",
         "/uploads/img_0787-2.jpg",
-        "/uploads/size-chart.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Black Mens Parantoban ",
       "slug": "black-parantoban-mens-2",
@@ -1575,7 +1581,8 @@
         "Dry Clean Only"
       ],
       "tags": [
-        "machine made"
+        "machine made",
+        "men"
       ],
       "id": "black-parantoban-mens-2",
       "image": "/uploads/img_0786-2.jpg",
@@ -1583,14 +1590,14 @@
       "description": "Black mens parantoban with gold embroidery. ",
       "price_on_inquiry": false,
       "category": "Machine Made",
-      "fitInfo": "Measurements-\nPlease check our size chart for all specific measurements.\n\nWhat's included-\nMen's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     },
     {
       "price": 115,
       "galleryImages": [
         "/uploads/img_2379.jpg",
         "/uploads/img_2384-2.jpg",
-        "/uploads/size-chart.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
       "name": "Machine Made Grey Mens",
       "slug": "machine-made-grey-mens-parantoban-white-embroidery",
@@ -1613,7 +1620,7 @@
       "description": "Machine-made grey mens parantoban with white embroidery. ",
       "price_on_inquiry": false,
       "category": "Machine Made",
-      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\nWhat's included:\n-Men's top\n-Bottom\n\n*Please allow for slight variations of a few inches due to measurement differences\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+      "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
     }
   ]
 }
