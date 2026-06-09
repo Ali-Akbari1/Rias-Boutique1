@@ -1683,7 +1683,38 @@
       "inventory": "available",
       "description": "Long velvet white dress with cheerma dozi detailing",
       "price_on_inquiry": false,
-      "category": "Party Wear"
+      "category": "Party Wear",
+      "fitInfo": "What's Included:\n-Dress\n-Scarf"
+    },
+    {
+      "fabric": "Crushed Velvet",
+      "price": 280,
+      "galleryImages": [
+        "/uploads/img_2339.jpg"
+      ],
+      "name": "Blue Cheerma Dozi Dress",
+      "slug": "Blue-Cheerma-Dozi-Dress-long",
+      "colors": [
+        "Blue"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "Cheerma dozi"
+      ],
+      "id": "Blue-Cheerma-Dozi-Dress-long",
+      "createdAt": "2026-06-09",
+      "image": "/uploads/img_2339.jpg",
+      "inventory": "available",
+      "description": "Long velvet white dress with cheerma dozi detailing",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "What's Included:\n-Dress\n-Scarf"
     }
   ]
 }
