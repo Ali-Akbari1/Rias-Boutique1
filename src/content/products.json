@@ -1654,6 +1654,36 @@
       "price_on_inquiry": false,
       "category": "Handmade",
       "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+    },
+    {
+      "fabric": "Crushed Velvet",
+      "price": 280,
+      "galleryImages": [
+        "/uploads/img_2554.jpg"
+      ],
+      "name": "White Cheerma Dozi Dress",
+      "slug": "white-cheerma-dozi-dress-long",
+      "maxQuantity": 1,
+      "colors": [
+        "White"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "cheerma dozi"
+      ],
+      "id": "white-cheerma-dozi-dress-long",
+      "createdAt": "2026-06-09",
+      "image": "/uploads/img_2554.jpg",
+      "inventory": "available",
+      "description": "Long velvet white dress with cheerma dozi detailing",
+      "price_on_inquiry": false,
+      "category": "Party Wear"
     }
   ]
 }
