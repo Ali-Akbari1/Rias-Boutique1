@@ -963,35 +963,6 @@
       "fabric": "Banaras",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_1508.webp",
-        "/uploads/img_1510-2.webp",
-        "/uploads/img_1511.webp"
-      ],
-      "name": "Short Banaras Red Dress",
-      "slug": "Short-Banaras-dress",
-      "maxQuantity": 1,
-      "colors": [
-        "Red"
-      ],
-      "sizes": [
-        "Small"
-      ],
-      "department": "women",
-      "tags": [
-        "banaras"
-      ],
-      "id": "Short-Banaras-red-dress",
-      "image": "/uploads/img_1508.webp",
-      "inventory": "available",
-      "description": "Red banaras short dress",
-      "price_on_inquiry": false,
-      "category": "Party Wear",
-      "fitInfo": "Measurements- \nSleeves: 22in \nBust: 40in \nLength of dress: 41in \n\nWhats Included-\nDress, pants, and scarf"
-    },
-    {
-      "fabric": "Banaras",
-      "price": 450,
-      "galleryImages": [
         "/uploads/img_1528.webp",
         "/uploads/img_1531.webp"
       ],
@@ -1654,6 +1625,35 @@
       "price_on_inquiry": false,
       "category": "Handmade",
       "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
+    },
+    {
+      "fabric": "Banaras",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_1508.webp",
+        "/uploads/img_1510-2.webp",
+        "/uploads/img_1511.webp"
+      ],
+      "name": "Short Banaras Red Dress",
+      "slug": "Short-Banaras-dress",
+      "maxQuantity": 1,
+      "colors": [
+        "Red"
+      ],
+      "sizes": [
+        "Small"
+      ],
+      "department": "women",
+      "tags": [
+        "banaras"
+      ],
+      "id": "Short-Banaras-red-dress",
+      "image": "/uploads/img_1508.webp",
+      "inventory": "available",
+      "description": "Red banaras short dress",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "Measurements- \nSleeves: 22in \nBust: 40in \nLength of dress: 41in \n\nWhats Included-\nDress, pants, and scarf"
     },
     {
       "fabric": "Crushed Velvet",
