@@ -1715,6 +1715,33 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "Measurements- \nSleeves: 22in \nBust: 40in \nLength of dress: 41in \n\nWhats Included-\nDress, pants, and scarf"
+    },
+    {
+      "price": 449,
+      "galleryImages": [
+        "/uploads/img_2574.jpg",
+        "/uploads/img_2575.jpg"
+      ],
+      "name": "Dark Green Bridal Dress",
+      "slug": "dark-green-bridal-dress",
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "bridal"
+      ],
+      "id": "dark-green-bridal-dress",
+      "createdAt": "2026-06-13",
+      "image": "/uploads/img_2574.jpg",
+      "inventory": "available",
+      "description": "Long dark green bridal dress with cheerma dozi detailing.",
+      "price_on_inquiry": false,
+      "category": "Bridal",
+      "fitInfo": "What's Included:\n-Dress\n-Pants\n-Scarf\n\nMeasurements:\n-Length of dress: 55in\n-Bust: 42in\n-Sleeves: 23in"
     }
   ]
 }
