@@ -1399,7 +1399,7 @@
       "id": "blue-long-hazaragi-dress",
       "createdAt": "2026-05-12",
       "image": "/uploads/img_2145.jpg",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Long blue hazaragi dress",
       "price_on_inquiry": false,
       "category": "Party Wear",
