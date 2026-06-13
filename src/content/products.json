@@ -1742,6 +1742,38 @@
       "price_on_inquiry": false,
       "category": "Bridal",
       "fitInfo": "What's Included:\n-Dress\n-Pants\n-Scarf\n\nMeasurements:\n-Length of dress: 55in\n-Bust: 42in\n-Sleeves: 23in"
+    },
+    {
+      "fabric": "Crushed Velvet",
+      "price": 280,
+      "galleryImages": [
+        "/uploads/img_2289.jpg",
+        "/uploads/img_2297.jpg"
+      ],
+      "name": "Red Cheerma Dozi Dress",
+      "slug": "Red-long-Cheerma-Dozi-Dress",
+      "colors": [
+        "Red"
+      ],
+      "sizes": [
+        "X-Large"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "cheerma dozi",
+        "long dress"
+      ],
+      "id": "Red-long-Cheerma-Dozi-Dress",
+      "createdAt": "2026-06-13",
+      "image": "/uploads/img_2289.jpg",
+      "inventory": "available",
+      "description": "Long red dress with cheerma dozi detailing. ",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "What's Included:\n-Dress\n-Scarf\n\nMeasurements:\n-Length of dress: 54in\n-Bust: 46in\n-Shoulders: 17in\n-Sleeves: 23in"
     }
   ]
 }
