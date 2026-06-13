@@ -1658,7 +1658,7 @@
     },
     {
       "fabric": "Crushed Velvet",
-      "price": 280,
+      "price": 240,
       "galleryImages": [
         "/uploads/img_2554.jpg"
       ],
@@ -1681,7 +1681,7 @@
       "id": "white-cheerma-dozi-dress-long",
       "createdAt": "2026-06-09",
       "image": "/uploads/img_2554.jpg",
-      "inventory": "sold_out",
+      "inventory": "available",
       "description": "Long velvet white dress with cheerma dozi detailing",
       "price_on_inquiry": false,
       "category": "Party Wear",
