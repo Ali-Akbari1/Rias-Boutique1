@@ -1777,6 +1777,7 @@
     },
     {
       "fabric": "Velvet",
+      "price": 450,
       "galleryImages": [
         "/uploads/img_2809.jpg",
         "/uploads/img_2787.jpg"
@@ -1804,7 +1805,7 @@
       "description": "Short burgundy cheerma dozi dress with wide-legged pants",
       "price_on_inquiry": false,
       "category": "Party Wear",
-      "fitInfo": "What's Included:\n-Dress\n-Wide-legged pants\n-Cheerma dozi embroidered scarf\n\nMeasurements:\n-Bust: 43in"
+      "fitInfo": "What's Included:\n-Dress\n-Wide-legged pants\n-Cheerma dozi embroidered scarf\n\nMeasurements:\n-Bust: 43in-44in"
     }
   ]
 }
