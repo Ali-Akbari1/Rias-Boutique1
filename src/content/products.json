@@ -1082,10 +1082,11 @@
       "galleryImages": [
         "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.webp",
         "/uploads/chatgpt-image-apr-28-2026-02_14_42-pm.webp",
-        "/uploads/chatgpt-image-apr-28-2026-02_25_36-pm.webp"
+        "/uploads/img_3016.jpg",
+        "/uploads/img_3019.jpg"
       ],
-      "name": "Bridal Green Cheerma Dozi Dress",
-      "slug": "bridal-green-cheerma-dozi",
+      "name": "Bridal 2 Layer Cheerma Dozi Dress",
+      "slug": "bridal-2-layer-long-cheerma-dozi-dress",
       "maxQuantity": 1,
       "colors": [
         "Red",
@@ -1102,7 +1103,7 @@
         "bridal",
         "cheerma dozi"
       ],
-      "id": "bridal-green-cheerma-dozi-dress",
+      "id": "bridal-2-layer-long-cheerma-dozi-dress",
       "createdAt": "2026-04-28",
       "image": "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.webp",
       "inventory": "sold_out",
