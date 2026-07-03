@@ -998,8 +998,8 @@
         "/uploads/img_1564.webp",
         "/uploads/img_1567.webp"
       ],
-      "name": "Dual Color Short Dress",
-      "slug": "dual-color-short-blue",
+      "name": "Dual Colour Short Banaras Dress",
+      "slug": "dual-colour-short-banaras-blue-dress",
       "colors": [
         "Blue"
       ],
@@ -1011,7 +1011,7 @@
         "dual colour",
         "banaras"
       ],
-      "id": "dual-color-short-blue",
+      "id": "dual-colour-short-banaras-blue-dress",
       "createdAt": "2026-04-14",
       "image": "/uploads/img_1564.webp",
       "inventory": "available",
@@ -1338,7 +1338,7 @@
       "id": "dual-coloured-mens-parantoban",
       "createdAt": "2026-05-12",
       "image": "/uploads/img_2024.jpg",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Dual-coloured men's parantoban",
       "price_on_inquiry": false,
       "category": "Machine Made",
@@ -1570,7 +1570,7 @@
         "/uploads/img_2384-2.jpg",
         "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
-      "name": "Machine Made Grey Mens",
+      "name": "Grey Mens Parantoban ",
       "slug": "machine-made-grey-mens-parantoban-white-embroidery",
       "maxQuantity": 1,
       "colors": [
@@ -1587,7 +1587,7 @@
       "id": "machine-made-grey-mens-parantoban-white-embroidery",
       "createdAt": "2026-06-01",
       "image": "/uploads/img_2379.jpg",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Machine-made grey mens parantoban with white embroidery. ",
       "price_on_inquiry": false,
       "category": "Machine Made",
