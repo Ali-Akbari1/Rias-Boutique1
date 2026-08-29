@@ -482,7 +482,9 @@
         "Black with Gold"
       ],
       "sizes": [
-        "Small"
+        "Small",
+        "Large",
+        "X-Large"
       ],
       "department": "men",
       "popularity": 100,
