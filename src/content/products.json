@@ -518,7 +518,7 @@
         "Black"
       ],
       "sizes": [
-        "X-Large"
+        "Medium"
       ],
       "department": "men",
       "popularity": "",
@@ -526,13 +526,14 @@
         "Dry Clean Only"
       ],
       "tags": [
-        "mirror-work",
-        "black"
+        "handmade ",
+        "black",
+        "mens "
       ],
       "id": "Handmade-mens-parantoban-black",
       "createdAt": "2026-02-24",
       "image": "/uploads/handmade-mens-parantoban-in-black-1.webp",
-      "inventory": "sold_out",
+      "inventory": "available",
       "description": "Black mens parantoban with handmade silver and mirror embroidery. ",
       "category": "Handmade",
       "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
