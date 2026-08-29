@@ -1135,8 +1135,6 @@
         "Burgundy"
       ],
       "sizes": [
-        "Small",
-        "Large",
         "XX-Large"
       ],
       "department": "women",
@@ -1440,7 +1438,7 @@
       "id": "handmade-purple-hazaragi-dress",
       "createdAt": "2026-05-13",
       "image": "/uploads/img_2224.jpg",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "Beautiful purple Hazaragi dress with handmade mirror work. ",
       "price_on_inquiry": false,
       "category": "Party Wear",
