@@ -1547,7 +1547,7 @@
       ],
       "sizes": [
         "Small",
-        "Medium"
+        "XX-Large"
       ],
       "department": "men",
       "careInstructions": [
@@ -1558,6 +1558,7 @@
         "men"
       ],
       "id": "black-parantoban-mens-2",
+      "createdAt": "2026-06-11",
       "image": "/uploads/img_0786-2.jpg",
       "inventory": "available",
       "description": "Black mens parantoban with gold embroidery. ",
