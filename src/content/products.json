@@ -809,16 +809,12 @@
         "/uploads/men-s-white-parantoban-2.webp",
         "/uploads/size-chart-mens-final-ria-s-boutique.png"
       ],
-      "name": "Men's White Parantoban ",
+      "name": "Men's True White Parantoban ",
       "slug": "true-white-mens-parantoban",
       "colors": [
         "True White"
       ],
-      "sizes": [
-        "Medium",
-        "Large",
-        "XX-Large"
-      ],
+      "sizes": [],
       "department": "men",
       "careInstructions": [
         "Dry Clean Only"
@@ -830,7 +826,7 @@
       "id": "true-white-mens-parantoban",
       "createdAt": "2026-02-19",
       "image": "/uploads/men-s-white-parantoban-1.webp",
-      "inventory": "available",
+      "inventory": "sold_out",
       "description": "True white men's parantoban with white embroidery. ",
       "category": "Machine Made",
       "fitInfo": "Measurements:\n-Please check our size chart for all specific measurements.\n\n*Please allow for slight variations of a few inches due to measurement differences\n\nWhat's included:\n-Men's top and bottom\n\n*Please note: Elastic and/or an ezar band for the pants are not included.\n\nPlease measure before ordering."
