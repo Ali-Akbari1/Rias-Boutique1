@@ -640,7 +640,9 @@
         "Off-White"
       ],
       "sizes": [
+        "Small",
         "Medium",
+        "Large",
         "XX-Large"
       ],
       "department": "men",
@@ -648,7 +650,9 @@
         "Dry Clean Only"
       ],
       "tags": [
-        "men"
+        "men",
+        "off-white",
+        "machine made"
       ],
       "id": "mens-offwhite-with-white",
       "createdAt": "2026-03-04",
