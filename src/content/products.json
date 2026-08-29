@@ -52,10 +52,13 @@
       "careInstructions": [
         "Dry Clean Only"
       ],
+      "tags": [
+        "bridal"
+      ],
       "id": "Green-Bridal-Dress",
       "createdAt": "2026-02-16",
       "image": "/uploads/green-bridal-dress-1.webp",
-      "inventory": 1,
+      "inventory": "sold_out",
       "description": "Green bridal banaras dress with handmade cheerma",
       "category": "Bridal",
       "fitInfo": "Bust: 44in\nSleeves: 22in \nDress Length: 40in"
