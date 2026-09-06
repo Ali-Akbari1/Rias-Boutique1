@@ -1685,7 +1685,7 @@
         "cheerma dozi"
       ],
       "id": "white-cheerma-dozi-dress-long",
-      "createdAt": "2026-06-09",
+      "createdAt": "2026-09-06",
       "image": "/uploads/img_2554.webp",
       "inventory": "sold_out",
       "description": "Long velvet white dress with cheerma dozi detailing",
@@ -1838,6 +1838,35 @@
       "price_on_inquiry": false,
       "category": "Bridal",
       "fitInfo": "Measurements-\nBust: 44in\nLength of dress: 58in\nLength of sleeves: 21in\n\nWhats Included-\nDress and scarf"
+    },
+    {
+      "fabric": "Velvet",
+      "galleryImages": [
+        "/uploads/img_4025.jpg",
+        "/uploads/img_4028.jpg"
+      ],
+      "name": "Bahar Dress",
+      "slug": "Bahar-dress-bridal-velvet-cheerma-dozi",
+      "colors": [
+        "Green"
+      ],
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean Only"
+      ],
+      "tags": [
+        "bridal",
+        "velvet",
+        "cheerma dozi"
+      ],
+      "id": "Bahar-dress-bridal-velvet-cheerma-dozi",
+      "createdAt": "2026-09-06",
+      "image": "/uploads/img_4025.jpg",
+      "inventory": null,
+      "description": "Bridal velvet dress with 2 layer handmade cheerma dozi work ",
+      "price_on_inquiry": true,
+      "category": "Bridal",
+      "fitInfo": "What's Included:\n-Dress \n-scarf"
     }
   ]
 }
