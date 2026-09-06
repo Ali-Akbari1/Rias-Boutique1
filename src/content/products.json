@@ -473,8 +473,8 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_1801.jpg",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/img_1801.webp",
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Men's Black and Gold Parantoban",
       "slug": "men-black-gold",
@@ -497,7 +497,7 @@
       ],
       "id": "men-black-gold",
       "createdAt": "2026-02-24",
-      "image": "/uploads/img_1801.jpg",
+      "image": "/uploads/img_1801.webp",
       "inventory": "available",
       "description": "Machine-made black men's parantoban with gold embroidery. ",
       "category": "Machine Made",
@@ -510,7 +510,7 @@
         "/uploads/handmade-mens-parantoban-in-black-1.webp",
         "/uploads/handmade-mens-parantoban-in-black-2.webp",
         "/uploads/handmade-mens-parantoban-in-black-3.webp",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Handmade Mens Parantoban in Black",
       "slug": "Handmade-mens-parantoban-black",
@@ -543,7 +543,7 @@
       "galleryImages": [
         "/uploads/men-s-off-white-and-gold-parantoban-1.webp",
         "/uploads/men-s-off-white-and-gold-parantoban-2.webp",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Men's Off-White and Gold Parantoban ",
       "slug": "mens-offwhite-with-gold",
@@ -573,7 +573,7 @@
       "galleryImages": [
         "/uploads/men-s-grey-parantoban-1.webp",
         "/uploads/men-s-grey-parantoban-2.webp",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Men's Grey Parantoban",
       "slug": "mens-grey-parantoban",
@@ -604,7 +604,7 @@
       "galleryImages": [
         "/uploads/men-s-white-handmade-parantoban-1.webp",
         "/uploads/men-s-white-handmade-parantoban-2.webp",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Men's White Handmade Parantoban",
       "slug": "mens-white-handmade-parantoban",
@@ -638,7 +638,7 @@
       "galleryImages": [
         "/uploads/men-s-off-white-parantoban-1.webp",
         "/uploads/men-s-off-white-parantoban-2.webp",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Men's Off-White Parantoban ",
       "slug": "mens-offwhite-with-white",
@@ -811,7 +811,7 @@
       "galleryImages": [
         "/uploads/men-s-white-parantoban-1.webp",
         "/uploads/men-s-white-parantoban-2.webp",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Men's True White Parantoban ",
       "slug": "true-white-mens-parantoban",
@@ -1091,8 +1091,8 @@
       "galleryImages": [
         "/uploads/chatgpt-image-apr-28-2026-01_11_12-pm.webp",
         "/uploads/chatgpt-image-apr-28-2026-02_14_42-pm.webp",
-        "/uploads/img_3016.jpg",
-        "/uploads/img_3019.jpg"
+        "/uploads/img_3016.webp",
+        "/uploads/img_3019.webp"
       ],
       "name": "Bridal 2 Layer Cheerma Dozi Dress",
       "slug": "bridal-2-layer-long-cheerma-dozi-dress",
@@ -1159,8 +1159,8 @@
       "fabric": "*Mirror work is handmade",
       "price": 225,
       "galleryImages": [
-        "/uploads/img_1799.jpg",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/img_1799.webp",
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Mens Black Handmade Parantoban",
       "slug": "Handmade-black-parantoban",
@@ -1182,7 +1182,7 @@
       ],
       "id": "Handmade-black-parantoban",
       "createdAt": "2026-05-04",
-      "image": "/uploads/img_1799.jpg",
+      "image": "/uploads/img_1799.webp",
       "inventory": "available",
       "description": "Handmade men's black parantoban with silver embroidery and mirror work.",
       "price_on_inquiry": false,
@@ -1192,9 +1192,9 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_2031.jpg",
-        "/uploads/img_2027.jpg",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/img_2031.webp",
+        "/uploads/img_2027.webp",
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Collared Mens Embroidered Parantoban ",
       "slug": "collared-mens-white-parantoban ",
@@ -1217,7 +1217,7 @@
       ],
       "id": "collared-mens-white-parantoban ",
       "createdAt": "2026-05-05",
-      "image": "/uploads/img_2031.jpg",
+      "image": "/uploads/img_2031.webp",
       "inventory": "available",
       "description": "Collared white mens parantoban with embroidery. ",
       "price_on_inquiry": false,
@@ -1228,8 +1228,8 @@
       "fabric": "Velvet",
       "price": 350,
       "galleryImages": [
-        "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.png",
-        "/uploads/img_1708.jpg"
+        "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.webp",
+        "/uploads/img_1708.webp"
       ],
       "name": "Red Cheerma Dozi Dress",
       "slug": "red-cheerma-dozi-dress",
@@ -1249,7 +1249,7 @@
       ],
       "id": "red-cheerma-dozi-dress",
       "createdAt": "2026-05-12",
-      "image": "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.png",
+      "image": "/uploads/chatgpt-image-may-12-2026-01_22_07-pm.webp",
       "inventory": "sold_out",
       "description": "Beautiful red velvet dress with handmade cheerma dozi detailing and wide-legged pants.",
       "price_on_inquiry": false,
@@ -1260,8 +1260,8 @@
       "fabric": "Lilimitten",
       "price": 280,
       "galleryImages": [
-        "/uploads/img_1750.jpg",
-        "/uploads/img_1749.jpg"
+        "/uploads/img_1750.webp",
+        "/uploads/img_1749.webp"
       ],
       "name": "Lilimitten Short Dress",
       "slug": "Lilimitten-beige-short-dress",
@@ -1281,7 +1281,7 @@
       ],
       "id": "Lilimitten-beige-short-dress",
       "createdAt": "2026-05-12",
-      "image": "/uploads/img_1750.jpg",
+      "image": "/uploads/img_1750.webp",
       "inventory": "sold_out",
       "description": "Short Lilimitten dress",
       "price_on_inquiry": false,
@@ -1292,7 +1292,7 @@
       "fabric": "Lilimitten",
       "price": 280,
       "galleryImages": [
-        "/uploads/img_1759.jpg"
+        "/uploads/img_1759.webp"
       ],
       "name": "Lilimitten Green Short Dress",
       "slug": "lilimitten-short-dress-green",
@@ -1310,7 +1310,7 @@
         "Lilimitten"
       ],
       "id": "lilimitten-short-dress-green",
-      "image": "/uploads/img_1759.jpg",
+      "image": "/uploads/img_1759.webp",
       "inventory": "sold_out",
       "description": "Short Lilimitten dress in green",
       "price_on_inquiry": false,
@@ -1320,9 +1320,9 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_2024.jpg",
-        "/uploads/img_2018.jpg",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/img_2024.webp",
+        "/uploads/img_2018.webp",
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Dual Coloured Men's Parantoban",
       "slug": "dual-coloured-mens-parantoban",
@@ -1343,7 +1343,7 @@
       ],
       "id": "dual-coloured-mens-parantoban",
       "createdAt": "2026-05-12",
-      "image": "/uploads/img_2024.jpg",
+      "image": "/uploads/img_2024.webp",
       "inventory": "sold_out",
       "description": "Dual-coloured men's parantoban",
       "price_on_inquiry": false,
@@ -1354,8 +1354,8 @@
       "fabric": "Thick Georgette",
       "price": 180,
       "galleryImages": [
-        "/uploads/img_2103.jpg",
-        "/uploads/img_2108.jpg"
+        "/uploads/img_2103.webp",
+        "/uploads/img_2108.webp"
       ],
       "name": "White Hazaragi Dress",
       "slug": "white-on-white-hazaragi-dress",
@@ -1375,7 +1375,7 @@
       ],
       "id": "white-on-white-hazaragi-dress",
       "createdAt": "2026-05-12",
-      "image": "/uploads/img_2103.jpg",
+      "image": "/uploads/img_2103.webp",
       "inventory": "sold_out",
       "description": "White hazaragi dress with white embroidery. ",
       "price_on_inquiry": false,
@@ -1386,8 +1386,8 @@
       "fabric": "Thick Georgette",
       "price": 250,
       "galleryImages": [
-        "/uploads/img_2145.jpg",
-        "/uploads/img_2141.jpg"
+        "/uploads/img_2145.webp",
+        "/uploads/img_2141.webp"
       ],
       "name": "Blue Hazaragi Dress ",
       "slug": "blue-long-hazaragi-dress",
@@ -1404,7 +1404,7 @@
       ],
       "id": "blue-long-hazaragi-dress",
       "createdAt": "2026-05-12",
-      "image": "/uploads/img_2145.jpg",
+      "image": "/uploads/img_2145.webp",
       "inventory": "sold_out",
       "description": "Long blue hazaragi dress",
       "price_on_inquiry": false,
@@ -1415,8 +1415,8 @@
       "fabric": "Shawl (marina) fabric",
       "price": 400,
       "galleryImages": [
-        "/uploads/img_2224.jpg",
-        "/uploads/img_2226.jpg"
+        "/uploads/img_2224.webp",
+        "/uploads/img_2226.webp"
       ],
       "name": "Handmade Hazaragi Dress",
       "slug": "handmade-purple-hazaragi-dress",
@@ -1437,7 +1437,7 @@
       ],
       "id": "handmade-purple-hazaragi-dress",
       "createdAt": "2026-05-13",
-      "image": "/uploads/img_2224.jpg",
+      "image": "/uploads/img_2224.webp",
       "inventory": "sold_out",
       "description": "Beautiful purple Hazaragi dress with handmade mirror work. ",
       "price_on_inquiry": false,
@@ -1448,8 +1448,8 @@
       "fabric": "Shawl (marina) fabric",
       "price": 400,
       "galleryImages": [
-        "/uploads/img_2206.jpg",
-        "/uploads/img_2214.jpg"
+        "/uploads/img_2206.webp",
+        "/uploads/img_2214.webp"
       ],
       "name": "Handmade Hazaragi Dress",
       "slug": "handmade-hazaragi-dress-green",
@@ -1470,7 +1470,7 @@
       ],
       "id": "handmade-hazaragi-dress-green",
       "createdAt": "2026-05-13",
-      "image": "/uploads/img_2206.jpg",
+      "image": "/uploads/img_2206.webp",
       "inventory": "sold_out",
       "description": "Beautiful handmade Hazaragi dress. ",
       "price_on_inquiry": false,
@@ -1481,8 +1481,8 @@
       "fabric": "Banaras",
       "price": 350,
       "galleryImages": [
-        "/uploads/img_2164.jpg",
-        "/uploads/img_2160.jpg"
+        "/uploads/img_2164.webp",
+        "/uploads/img_2160.webp"
       ],
       "name": "Green Banaras Short Dress",
       "slug": "green-banaras-short-dress",
@@ -1498,7 +1498,7 @@
         "Banaras"
       ],
       "id": "green-banaras-short-dress",
-      "image": "/uploads/img_2164.jpg",
+      "image": "/uploads/img_2164.webp",
       "inventory": "sold_out",
       "description": "Beautiful green banaras dress with cheerma detailing. ",
       "price_on_inquiry": false,
@@ -1509,9 +1509,9 @@
       "fabric": "Crushed Velvet",
       "price": 280,
       "galleryImages": [
-        "/uploads/img_2326.jpg",
-        "/uploads/img_2320.jpg",
-        "/uploads/img_2318.jpg"
+        "/uploads/img_2326.webp",
+        "/uploads/img_2320.webp",
+        "/uploads/img_2318.webp"
       ],
       "name": "Emerald Green Long Dress",
       "slug": "emerald-green-cheerma-dozi-long-dress",
@@ -1530,7 +1530,7 @@
       ],
       "id": "emerald-green-cheerma-dozi-long-dress",
       "createdAt": "2026-05-14",
-      "image": "/uploads/img_2326.jpg",
+      "image": "/uploads/img_2326.webp",
       "inventory": "sold_out",
       "description": "Beautiful emerald green crushed velvet dress with cheerma detailing. ",
       "price_on_inquiry": false,
@@ -1540,9 +1540,9 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_0786-2.jpg",
-        "/uploads/img_0787-2.jpg",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/img_0786-2.webp",
+        "/uploads/img_0787-2.webp",
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Black Mens Parantoban ",
       "slug": "black-parantoban-mens-2",
@@ -1563,7 +1563,7 @@
       ],
       "id": "black-parantoban-mens-2",
       "createdAt": "2026-06-11",
-      "image": "/uploads/img_0786-2.jpg",
+      "image": "/uploads/img_0786-2.webp",
       "inventory": "available",
       "description": "Black mens parantoban with gold embroidery. ",
       "price_on_inquiry": false,
@@ -1573,9 +1573,9 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_2379.jpg",
-        "/uploads/img_2384-2.jpg",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/img_2379.webp",
+        "/uploads/img_2384-2.webp",
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Grey Mens Parantoban ",
       "slug": "machine-made-grey-mens-parantoban-white-embroidery",
@@ -1593,7 +1593,7 @@
       ],
       "id": "machine-made-grey-mens-parantoban-white-embroidery",
       "createdAt": "2026-06-01",
-      "image": "/uploads/img_2379.jpg",
+      "image": "/uploads/img_2379.webp",
       "inventory": "sold_out",
       "description": "Machine-made grey mens parantoban with white embroidery. ",
       "price_on_inquiry": false,
@@ -1603,8 +1603,8 @@
     {
       "price": 115,
       "galleryImages": [
-        "/uploads/img_2540-2.jpg",
-        "/uploads/size-chart-mens-final-ria-s-boutique.png"
+        "/uploads/img_2540-2.webp",
+        "/uploads/size-chart-mens-final-ria-s-boutique.webp"
       ],
       "name": "Men's Off-White and Gold Parantoban 2 ",
       "slug": "mens-off-white-and-gold-2",
@@ -1625,7 +1625,7 @@
       ],
       "id": "mens-off-white-and-gold-2",
       "createdAt": "2026-06-07",
-      "image": "/uploads/img_2540-2.jpg",
+      "image": "/uploads/img_2540-2.webp",
       "inventory": "available",
       "description": "Off-white machine made men's parantoban with gold embroidery.",
       "price_on_inquiry": false,
@@ -1636,7 +1636,7 @@
       "fabric": "Crushed Velvet",
       "price": 280,
       "galleryImages": [
-        "/uploads/img_2339.jpg"
+        "/uploads/img_2339.webp"
       ],
       "name": "Blue Cheerma Dozi Dress",
       "slug": "Blue-Cheerma-Dozi-Dress-long",
@@ -1655,7 +1655,7 @@
       ],
       "id": "Blue-Cheerma-Dozi-Dress-long",
       "createdAt": "2026-06-09",
-      "image": "/uploads/img_2339.jpg",
+      "image": "/uploads/img_2339.webp",
       "inventory": "sold_out",
       "description": "Long velvet white dress with cheerma dozi detailing",
       "price_on_inquiry": false,
@@ -1666,7 +1666,7 @@
       "fabric": "Crushed Velvet",
       "price": 280,
       "galleryImages": [
-        "/uploads/img_2554.jpg"
+        "/uploads/img_2554.webp"
       ],
       "name": "White Cheerma Dozi Dress",
       "slug": "white-cheerma-dozi-dress-long",
@@ -1686,7 +1686,7 @@
       ],
       "id": "white-cheerma-dozi-dress-long",
       "createdAt": "2026-06-09",
-      "image": "/uploads/img_2554.jpg",
+      "image": "/uploads/img_2554.webp",
       "inventory": "sold_out",
       "description": "Long velvet white dress with cheerma dozi detailing",
       "price_on_inquiry": false,
@@ -1725,8 +1725,8 @@
     {
       "price": 450,
       "galleryImages": [
-        "/uploads/img_2574.jpg",
-        "/uploads/img_2575.jpg"
+        "/uploads/img_2574.webp",
+        "/uploads/img_2575.webp"
       ],
       "name": "Dark Green Bridal Dress",
       "slug": "dark-green-bridal-dress",
@@ -1742,7 +1742,7 @@
       ],
       "id": "dark-green-bridal-dress",
       "createdAt": "2026-06-13",
-      "image": "/uploads/img_2574.jpg",
+      "image": "/uploads/img_2574.webp",
       "inventory": "available",
       "description": "Long dark green bridal dress with cheerma dozi detailing.",
       "price_on_inquiry": false,
@@ -1753,8 +1753,8 @@
       "fabric": "Crushed Velvet",
       "price": 280,
       "galleryImages": [
-        "/uploads/img_2289.jpg",
-        "/uploads/img_2297.jpg"
+        "/uploads/img_2289.webp",
+        "/uploads/img_2297.webp"
       ],
       "name": "Red Cheerma Dozi Dress",
       "slug": "Red-long-Cheerma-Dozi-Dress",
@@ -1774,7 +1774,7 @@
       ],
       "id": "Red-long-Cheerma-Dozi-Dress",
       "createdAt": "2026-06-13",
-      "image": "/uploads/img_2289.jpg",
+      "image": "/uploads/img_2289.webp",
       "inventory": "available",
       "description": "Long red dress with cheerma dozi detailing. ",
       "price_on_inquiry": false,
@@ -1785,8 +1785,8 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_2809.jpg",
-        "/uploads/img_2787.jpg"
+        "/uploads/img_2809.webp",
+        "/uploads/img_2787.webp"
       ],
       "name": "Burgundy Cheerma Dozi Dress",
       "slug": "burgundy-cheerma-dozi-dress-short",
@@ -1806,7 +1806,7 @@
       ],
       "id": "burgundy-cheerma-dozi-dress-short",
       "createdAt": "2026-06-15",
-      "image": "/uploads/img_2809.jpg",
+      "image": "/uploads/img_2809.webp",
       "inventory": "sold_out",
       "description": "Short burgundy cheerma dozi dress with wide-legged pants",
       "price_on_inquiry": false,
