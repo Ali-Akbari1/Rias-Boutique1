@@ -301,8 +301,8 @@
         "/uploads/bridal-green-banaras-dress-pre-order-only-1.webp",
         "/uploads/bridal-green-banaras-dress-pre-order-only-2.webp"
       ],
-      "name": "Bridal Green Banaras Dress ",
-      "slug": "Bridal-green-banaras-2-layer-cheerma",
+      "name": "Naz Dress",
+      "slug": "Naz-dress-2-layer-cheerma-dress",
       "colors": [
         "Green ",
         "Red"
@@ -321,11 +321,11 @@
         "Banaras",
         "Bridal"
       ],
-      "id": "Bridal-green-banaras",
+      "id": "Naz-dress-2-layer-cheerma-dress",
       "createdAt": "2026-02-19",
       "image": "/uploads/5adac91d-aa0c-4cba-bdfd-f741193aac06.webp",
       "inventory": "sold_out",
-      "description": "Beautiful bridal green banaras dress with handmade cheerma detailing.",
+      "description": "Beautiful bridal green banaras dress with handmade 2 layer cheerma detailing.",
       "price_on_inquiry": true,
       "category": "Bridal",
       "fitInfo": "*Bridal Shawl sold separately"
@@ -1812,6 +1812,32 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "What's Included:\n-Dress\n-Wide-legged pants\n-Cheerma dozi embroidered scarf\n\nMeasurements:\n-Bust: 43in-44in"
+    },
+    {
+      "fabric": "Banaras",
+      "price": 500,
+      "galleryImages": [
+        "/uploads/img_4012.jpg",
+        "/uploads/img_4019.jpg"
+      ],
+      "name": "Bridal Green Banaras Dress",
+      "slug": "Bridal-Green-Banaras-Dress",
+      "department": "women",
+      "careInstructions": [
+        "Dry Clean"
+      ],
+      "tags": [
+        "bridal",
+        "banaras"
+      ],
+      "id": "Bridal-Green-Banaras-Dress",
+      "createdAt": "2026-09-06",
+      "image": "/uploads/img_4012.jpg",
+      "inventory": "available",
+      "description": "Bridal green banaras dress ",
+      "price_on_inquiry": false,
+      "category": "Bridal",
+      "fitInfo": "Measurements-\nBust: 44in\nLength of dress: 58in\nLength of sleeves: 21in\n\nWhats Included-\nDress and scarf"
     }
   ]
 }
