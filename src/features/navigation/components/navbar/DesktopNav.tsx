@@ -5,10 +5,10 @@ import { prefetchCollectionPage } from "@/lib/prefetch";
 import { type PrimaryNavState } from "./nav-links";
 
 const desktopNavLinkClass = (isActive: boolean) =>
-  `relative inline-flex items-center py-2 text-[0.95rem] font-semibold tracking-[0.04em] transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-center after:bg-foreground after:transition-transform after:duration-200 after:ease-out ${
+  `relative inline-flex items-center py-2 text-[1.05rem] font-semibold tracking-[0.04em] transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-center after:bg-foreground after:transition-transform after:duration-200 after:ease-out ${
     isActive
       ? "text-foreground after:scale-x-100"
-      : "text-muted-foreground after:scale-x-0 hover:text-foreground hover:after:scale-x-100"
+      : "text-foreground after:scale-x-0 hover:after:scale-x-100"
   }`;
 
 const DesktopNav = (state: PrimaryNavState) => {
