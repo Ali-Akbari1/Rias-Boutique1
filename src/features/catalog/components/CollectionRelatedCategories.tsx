@@ -11,6 +11,7 @@ interface CollectionRelatedCategoriesProps {
 }
 
 const categoryParam = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+const HIDDEN_CATEGORY_KEYS = new Set(["formal"]);
 
 const CollectionRelatedCategories = ({ department, activeCategory = "all" }: CollectionRelatedCategoriesProps) => {
   const scopedProducts = department === "all" ? products : products.filter((product) => product.department === department);
@@ -44,7 +45,7 @@ const CollectionRelatedCategories = ({ department, activeCategory = "all" }: Col
       new Map<string, { key: string; label: string; count: number; leadProduct: (typeof products)[number] }>(),
     ).values(),
   )
-    .filter((category) => category.key !== activeCategory)
+    .filter((category) => category.key !== activeCategory && !HIDDEN_CATEGORY_KEYS.has(category.key))
     .sort((a, b) => b.count - a.count || b.leadProduct.popularity - a.leadProduct.popularity)
     .slice(0, 4);
 

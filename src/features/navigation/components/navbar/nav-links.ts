@@ -1,6 +1,7 @@
 export interface PrimaryNavState {
   isWomensActive: boolean;
   isMensActive: boolean;
+  isBridalActive: boolean;
   isJewelryActive: boolean;
   isAboutActive: boolean;
   isFaqActive: boolean;
@@ -12,17 +13,14 @@ export interface PrimaryNavLink {
   isActive: boolean;
 }
 
-export const getPrimaryNavLinks = ({
+export const getMobileNavLinks = ({
   isWomensActive,
   isMensActive,
   isJewelryActive,
-  isAboutActive,
-  isFaqActive,
 }: PrimaryNavState): readonly PrimaryNavLink[] =>
   [
+    { to: "/collection", label: "Shop All", isActive: false },
     { to: "/collection/women", label: "Women's", isActive: isWomensActive },
     { to: "/collection/men", label: "Men's", isActive: isMensActive },
     { to: "/collection/jewelry", label: "Jewelry", isActive: isJewelryActive },
-    { to: "/about", label: "About", isActive: isAboutActive },
-    { to: "/faq", label: "FAQ", isActive: isFaqActive },
   ] as const;

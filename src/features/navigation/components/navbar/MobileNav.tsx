@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { prefetchAboutPage, prefetchCollectionPage, prefetchFaqPage } from "@/lib/prefetch";
-import { getPrimaryNavLinks, type PrimaryNavState } from "./nav-links";
+import { prefetchCollectionPage } from "@/lib/prefetch";
+import { getMobileNavLinks, type PrimaryNavState } from "./nav-links";
 
 interface MobileNavProps extends PrimaryNavState {
   open: boolean;
@@ -9,7 +9,7 @@ interface MobileNavProps extends PrimaryNavState {
 }
 
 const mobileNavLinkClass = (isActive: boolean) =>
-  `group flex items-center justify-between gap-4 border-b border-border/60 py-3.5 font-body transition-colors last:border-b-0 ${
+  `group flex items-center justify-between gap-4 border-b border-border/60 py-4 font-body transition-colors last:border-b-0 ${
     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
   }`;
 
@@ -18,22 +18,22 @@ const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
     return null;
   }
 
-  const links = getPrimaryNavLinks(state);
+  const links = getMobileNavLinks(state);
 
   return (
     <div
       id="mobile-navbar-menu"
       className="border-t border-border bg-background/95 backdrop-blur md:hidden animate-in fade-in-0 slide-in-from-top-2 motion-reduce:animate-none"
     >
-      <div className="container mx-auto flex flex-col gap-0 px-4 py-2 sm:px-6">
-        {links.map((link) => {
+      <div className="container mx-auto px-4 py-3 sm:px-6">
+        <p className="pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          Shop the collection
+        </p>
+        <div className="flex flex-col gap-0">
+          {links.map((link) => {
           const handlePrefetch = () => {
             if (link.to.startsWith("/collection")) {
               void prefetchCollectionPage();
-            } else if (link.to === "/about") {
-              void prefetchAboutPage();
-            } else if (link.to === "/faq") {
-              void prefetchFaqPage();
             }
           };
 
@@ -48,7 +48,7 @@ const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
               className={mobileNavLinkClass(link.isActive)}
               aria-current={link.isActive ? "page" : undefined}
             >
-              <span className="text-base font-semibold tracking-[0.04em]">{link.label}</span>
+              <span className="text-lg font-semibold tracking-[0.03em]">{link.label}</span>
               <span className="flex items-center gap-2">
                 <span
                   className={`h-px w-7 bg-foreground transition-opacity duration-200 ${
@@ -66,7 +66,8 @@ const MobileNav = ({ open, onClose, ...state }: MobileNavProps) => {
               </span>
             </Link>
           );
-        })}
+          })}
+        </div>
       </div>
     </div>
   );
