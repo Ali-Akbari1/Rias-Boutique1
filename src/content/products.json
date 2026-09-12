@@ -1871,6 +1871,25 @@
       "price_on_inquiry": true,
       "category": "Bridal",
       "fitInfo": "What's Included:\n-Dress \n-scarf"
+    },
+    {
+      "galleryImages": [
+        "/uploads/img_4044.jpg"
+      ],
+      "name": "1 Layer Pound Silver Set",
+      "slug": "1-layer-pound-silver-set",
+      "department": "jewelry",
+      "tags": [
+        "nukrah"
+      ],
+      "id": "1-layer-pound-silver-set",
+      "createdAt": "2026-09-12",
+      "image": "/uploads/img_4044.jpg",
+      "inventory": "available",
+      "description": "1 Layer nukrah set",
+      "price_on_inquiry": true,
+      "category": "925 Silver",
+      "fitInfo": "Whats Included:\n- 1-layer necklace\n- Bracelet\n- Ring\n- Earrings\n\n"
     }
   ]
 }
