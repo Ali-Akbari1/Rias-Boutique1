@@ -1890,6 +1890,34 @@
       "price_on_inquiry": true,
       "category": "925 Silver",
       "fitInfo": "Whats Included:\n- 1-layer necklace\n- Bracelet\n- Ring\n- Earrings\n\n"
+    },
+    {
+      "fabric": "Velvet",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_4064.jpg",
+        "/uploads/img_4065.jpg"
+      ],
+      "name": "Red Bridal Cheerma Dozi Dress 2 ",
+      "slug": "red-bridal-cheerma-dozi-silver",
+      "colors": [
+        "Red"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "tags": [
+        "bridal",
+        "cheerma dozi"
+      ],
+      "id": "red-bridal-cheerma-dozi-silver",
+      "createdAt": "2026-09-12",
+      "image": "/uploads/img_4064.jpg",
+      "inventory": "available",
+      "description": "Red bridal dress cheerma dozi",
+      "price_on_inquiry": false,
+      "category": "Bridal"
     }
   ]
 }
