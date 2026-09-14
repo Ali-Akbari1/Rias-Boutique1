@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
@@ -166,7 +166,7 @@ const LaunchDiscountPopup = () => {
               <>Your code is on the way. Check your inbox and use it at checkout.</>
             ) : (
               <>
-                Enjoy 10% off your order for a limited time. Enter your email below to receive your code.
+                Enjoy 10% off your order for a limited time. Use code FALL10 at checkout. Enter your email below to receive your code.
                 {welcomeDiscountHasExpiry ? (
                   <>
                     {" "}
@@ -218,8 +218,10 @@ const LaunchDiscountPopup = () => {
               </p>
             </form>
           ) : (
-            <Button type="button" className="mt-6 h-11 w-full text-sm font-semibold" onClick={() => setOpen(false)}>
-              Close
+            <Button asChild className="mt-6 h-11 w-full text-sm font-semibold">
+              <Link to="/collection" onClick={() => setOpen(false)}>
+                Shop the Collection
+              </Link>
             </Button>
           )}
 
