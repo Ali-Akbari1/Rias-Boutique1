@@ -27,6 +27,16 @@ export interface Product {
   deliveryEstimate: string;
   popularity: number;
   createdAt: string;
+  customerLooks?: CustomerLook[];
+}
+
+export interface CustomerLook {
+  id: string;
+  image: string;
+  instagramUrl: string;
+  customerName: string;
+  location: string;
+  altText: string;
 }
 
 export interface ProductSelectionSummary {
@@ -60,6 +70,15 @@ interface RawProduct {
   createdAt?: string;
   compareAtPrice?: number | string;
   salePercent?: number | string;
+  customerLooks?: RawCustomerLook[];
+}
+
+interface RawCustomerLook {
+  image?: unknown;
+  instagramUrl?: unknown;
+  customerName?: unknown;
+  location?: unknown;
+  altText?: unknown;
 }
 
 interface ProductContent {
@@ -152,6 +171,57 @@ const getOptionalNumber = (value: unknown) => {
 
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+};
+
+const normalizeInstagramUrl = (value: unknown) => {
+  const rawUrl = getString(value);
+  if (!rawUrl) {
+    return "";
+  }
+
+  try {
+    const url = new URL(rawUrl);
+    const hostname = url.hostname.toLowerCase();
+    const isInstagramHost = ["instagram.com", "www.instagram.com", "m.instagram.com"].includes(hostname);
+
+    return url.protocol === "https:" && isInstagramHost ? url.toString() : "";
+  } catch {
+    return "";
+  }
+};
+
+const normalizeCustomerLooks = (value: unknown): CustomerLook[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      return [];
+    }
+
+    const look = item as RawCustomerLook;
+    const image = getString(look.image);
+    const instagramUrl = normalizeInstagramUrl(look.instagramUrl);
+    if (!image || !instagramUrl) {
+      return [];
+    }
+
+    const customerName = getString(look.customerName);
+    const location = getString(look.location);
+    const altText = getString(look.altText);
+
+    return [
+      {
+        id: `${index}-${slugify(`${image}-${instagramUrl}`)}`,
+        image,
+        instagramUrl,
+        customerName,
+        location,
+        altText,
+      },
+    ];
+  });
 };
 
 const normalizeMaxQuantity = (value: unknown) => {
@@ -271,6 +341,7 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
   const sizes = getStringArray(product.sizes, ["size", "label", "value"]);
   const colors = getStringArray(product.colors, ["color", "label", "value", "name"]);
   const careInstructions = getStringArray(product.careInstructions, ["instruction", "text", "value"]);
+  const customerLooks = normalizeCustomerLooks(product.customerLooks);
   const createdAt = getString(product.createdAt) || new Date().toISOString().slice(0, 10);
   const category = getString(product.category) || "Party Wear";
   const department = normalizeDepartment(product.department, category);
@@ -318,6 +389,7 @@ const normalizeProduct = (product: RawProduct, index: number): Product => {
         : "You will receive an estimated delivery date upon completing your order."),
     popularity: Math.min(100, Math.max(0, getNumber(product.popularity, 0))),
     createdAt,
+    customerLooks,
   };
 };
 

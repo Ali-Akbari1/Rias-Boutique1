@@ -102,6 +102,24 @@ collections:
                 widget: "list"
                 required: false
                 field: { label: "Image", name: "image", widget: "image", choose_url: false }
+              - label: "Real Customers, Real Looks"
+                name: "customerLooks"
+                widget: "list"
+                required: false
+                max: 12
+                hint: "Add only photos shared with customer permission. These looks appear only on this product's page."
+                summary: "{{fields.instagramUrl}}"
+                fields:
+                  - { label: "Customer Photo", name: "image", widget: "image", choose_url: false }
+                  - label: "Instagram Link"
+                    name: "instagramUrl"
+                    widget: "string"
+                    pattern:
+                      - '^https:\/\/(www\.)?instagram\.com\/.+'
+                      - "Enter the full https://www.instagram.com/... link for this customer post or profile."
+                  - { label: "Customer Name or Handle (optional)", name: "customerName", widget: "string", required: false }
+                  - { label: "Location (optional)", name: "location", widget: "string", required: false, hint: "For example: Edmonton, AB" }
+                  - { label: "Photo Description (recommended)", name: "altText", widget: "string", required: false, hint: "Briefly describe the customer and their look for screen-reader users." }
               - { label: "Description", name: "description", widget: "text", required: false }
               - label: "Recommendation Tags"
                 name: "tags"

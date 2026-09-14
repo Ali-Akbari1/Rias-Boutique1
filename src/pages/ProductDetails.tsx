@@ -36,6 +36,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import ZoomableImageDialog from "@/features/product/components/ZoomableImageDialog";
 import ProductInquirySheet from "@/features/product/components/ProductInquirySheet";
+import CustomerLooksSection from "@/features/product/components/CustomerLooksSection";
 
 const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -640,6 +641,8 @@ const ProductDetails = () => {
             </Card>
           </div>
         </section>
+
+        <CustomerLooksSection productName={product.name} looks={product.customerLooks} />
 
         <ProductRecommendationRail
           title="You May Also Like"
