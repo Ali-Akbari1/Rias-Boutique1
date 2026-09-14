@@ -489,6 +489,33 @@ export const hasOrderForCustomerEmail = async (email: string, excludeOrderId = "
   return Boolean(data);
 };
 
+export const countPaidDiscountOrdersForCustomerEmail = async (email: string, discountCode: string) => {
+  const normalizedEmail = normalizeEmailAddress(email);
+  const normalizedDiscountCode = discountCode.trim().toUpperCase();
+  if (!normalizedEmail || !normalizedDiscountCode) {
+    return 0;
+  }
+
+  if (isMemoryStoreEnabled()) {
+    return [...memoryOrders.values()].filter(
+      (order) =>
+        order.paymentStatus === "paid" &&
+        normalizeEmailAddress(order.customer.email) === normalizedEmail &&
+        order.pricing.discountCode.trim().toUpperCase() === normalizedDiscountCode,
+    ).length;
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { count, error } = await supabase
+    .from("orders")
+    .select("id", { count: "exact", head: true })
+    .eq("customer_email", normalizedEmail)
+    .eq("payment_status", "paid")
+    .contains("pricing_json", { discountCode: normalizedDiscountCode });
+  ensureNoSupabaseError(error, "count paid discount orders for customer email");
+  return count || 0;
+};
+
 export const createPendingOrder = async (input: CreatePendingOrderInput) => {
   const createdAt = nowIso();
 

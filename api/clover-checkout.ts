@@ -22,9 +22,9 @@ import { checkoutRequestSchema, getMaxQuantityForCatalogProduct } from "../serve
 import { getCatalogMap } from "../server/lib/product-catalog.js";
 import {
   attachCheckoutSession,
+  countPaidDiscountOrdersForCustomerEmail,
   createPendingOrder,
   findOrderByIdempotencyKey,
-  hasOrderForCustomerEmail,
   isOrderStoreConfigured,
   markOrderFailed,
   type OrderLineItem,
@@ -41,7 +41,6 @@ import {
   WELCOME_DISCOUNT_CODE,
   WELCOME_DISCOUNT_RATE,
 } from "../server/lib/launch-discount.js";
-import { hasDiscountSubscriber } from "../server/lib/discount-subscribers.js";
 import {
   buildCloverLineItems,
   createCheckoutRequestId,
@@ -57,6 +56,7 @@ import {
 
 const DEFAULT_RATE_LIMIT = 20;
 const DEFAULT_RATE_WINDOW_MS = 60_000;
+const MAX_FALL10_USES_PER_EMAIL = 5;
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "POST") {
@@ -212,24 +212,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   if (requestedDiscountCode === WELCOME_DISCOUNT_CODE) {
     const normalizedCustomerEmail = payload.customer.email.trim().toLowerCase();
-    const subscriberExists = await hasDiscountSubscriber(normalizedCustomerEmail);
-    if (!subscriberExists) {
+    const paidDiscountUseCount = await countPaidDiscountOrdersForCustomerEmail(
+      normalizedCustomerEmail,
+      WELCOME_DISCOUNT_CODE,
+    );
+    if (paidDiscountUseCount >= MAX_FALL10_USES_PER_EMAIL) {
       sendError(
         res,
         400,
-        "DISCOUNT_CODE_NOT_ELIGIBLE",
-        "This welcome code is reserved for customers who joined the email list with this checkout email.",
-      );
-      return;
-    }
-
-    const hasExistingOrder = await hasOrderForCustomerEmail(normalizedCustomerEmail);
-    if (hasExistingOrder) {
-      sendError(
-        res,
-        409,
-        "FIRST_ORDER_DISCOUNT_INELIGIBLE",
-        "This 10% welcome code is only available on a first order. Remove the code to continue.",
+        "DISCOUNT_CODE_NOT_AVAILABLE",
+        "This discount code is not available for this checkout.",
       );
       return;
     }

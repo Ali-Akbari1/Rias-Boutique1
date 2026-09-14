@@ -112,7 +112,7 @@ describe("resend discount emails script", () => {
     expect(message.subject).toContain("New Arrivals");
     expect(message.text).toContain("WELCOME15");
     expect(message.text).toContain("So many new pieces have just arrived");
-    expect(message.text).toContain("launch discount subscribers");
+    expect(message.text).toContain("Your code works across the collection.");
     expect(message.text).toContain("https://www.riasboutique.com/collection");
     expect(message.html).toContain("WELCOME15");
     expect(message.html).toContain("New Arrivals Are Here");

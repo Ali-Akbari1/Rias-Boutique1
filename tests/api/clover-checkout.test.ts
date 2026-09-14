@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import handler from "../../api/clover-checkout";
 import { createMockRequest, createMockResponse, createSignedShippingQuoteToken } from "./test-utils/utils";
 import {
@@ -9,10 +9,6 @@ import {
   resetOrderStoreForTests,
 } from "../../server/lib/order-store.js";
 import * as productCatalog from "../../server/lib/product-catalog";
-import {
-  resetDiscountSubscribersForTests,
-  seedDiscountSubscriberForTests,
-} from "../../server/lib/discount-subscribers.js";
 
 const makeCheckoutBody = () => {
   const customer = {
@@ -48,6 +44,8 @@ describe("clover checkout endpoint", () => {
 
   beforeEach(async () => {
     vi.restoreAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-16T12:00:00.000Z"));
 
     process.env.ORDER_STORE_ADAPTER = "memory";
     await closeOrderStoreForTests();
@@ -79,7 +77,10 @@ describe("clover checkout endpoint", () => {
     );
 
     await resetOrderStoreForTests();
-    await resetDiscountSubscribersForTests();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("rejects malformed/tampered cart payload", async () => {
@@ -272,9 +273,13 @@ describe("clover checkout endpoint", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("rejects welcome discount when the checkout email is not subscribed", async () => {
-    process.env.WELCOME_DISCOUNT_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
-    const fetchMock = vi.fn();
+  it("applies FALL10 without requiring an email-list signup", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_fall10", href: "https://checkout.clover.com/pay/checkout_fall10" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
     vi.stubGlobal("fetch", fetchMock);
 
     const request = createMockRequest({
@@ -285,25 +290,18 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        discountCode: "WELCOME10",
+        discountCode: "FALL10",
       }),
     });
     const response = createMockResponse();
 
     await handler(request, response);
 
-    expect(response.statusCode).toBe(400);
-    expect(response.jsonBody).toMatchObject({
-      error: {
-        code: "DISCOUNT_CODE_NOT_ELIGIBLE",
-      },
-    });
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(response.statusCode).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("rejects welcome discount when the checkout email already has an order", async () => {
-    process.env.WELCOME_DISCOUNT_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
-    await seedDiscountSubscriberForTests({ email: "test@example.com" });
+  it("applies FALL10 even when the checkout email has a prior order", async () => {
     await createPendingOrder({
       idempotencyKey: "existing-order-1234567890",
       customer: {
@@ -342,7 +340,12 @@ describe("clover checkout endpoint", () => {
       },
     });
 
-    const fetchMock = vi.fn();
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_repeat", href: "https://checkout.clover.com/pay/checkout_repeat" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
     vi.stubGlobal("fetch", fetchMock);
 
     const request = createMockRequest({
@@ -353,25 +356,18 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        discountCode: "WELCOME10",
+        discountCode: "FALL10",
       }),
     });
     const response = createMockResponse();
 
     await handler(request, response);
 
-    expect(response.statusCode).toBe(409);
-    expect(response.jsonBody).toMatchObject({
-      error: {
-        code: "FIRST_ORDER_DISCOUNT_INELIGIBLE",
-      },
-    });
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(response.statusCode).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("applies WELCOME10 discount to checkout line items", async () => {
-    process.env.WELCOME_DISCOUNT_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
-    await seedDiscountSubscriberForTests({ email: "test@example.com" });
+  it("applies FALL10 discount to checkout line items", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "checkout_welcome10", href: "https://checkout.clover.com/pay/checkout_welcome10" }), {
         status: 200,
@@ -388,7 +384,7 @@ describe("clover checkout endpoint", () => {
       },
       body: JSON.stringify({
         ...makeCheckoutBody(),
-        discountCode: "welcome10",
+        discountCode: "fall10",
       }),
     });
     const response = createMockResponse();
@@ -574,8 +570,6 @@ describe("clover checkout endpoint", () => {
   });
 
   it("reuses an existing discounted checkout session for duplicate submissions", async () => {
-    process.env.WELCOME_DISCOUNT_EXPIRES_AT = "2099-01-01T00:00:00.000Z";
-    await seedDiscountSubscriberForTests({ email: "test@example.com" });
 
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "checkout_discounted", href: "https://checkout.clover.com/pay/checkout_discounted" }), {
@@ -587,7 +581,7 @@ describe("clover checkout endpoint", () => {
 
     const body = {
       ...makeCheckoutBody(),
-      discountCode: "WELCOME10",
+      discountCode: "FALL10",
     };
     const headers = {
       origin: "https://www.riasboutique.com",

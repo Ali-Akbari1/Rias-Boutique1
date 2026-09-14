@@ -291,7 +291,7 @@ export const buildWelcomeDiscountEmailMessage = ({
   offer,
   env = process.env,
 }) => {
-  const promotionName = offer.campaign === "fall_style_event_2026" ? "Fall Style Event" : "New Arrivals";
+  const promotionName = offer.campaign === "fall_arrivals_2026" ? "Fall Arrivals" : "New Arrivals";
   const brandName = env.STORE_BRAND_NAME?.trim() || "Ria's Boutique";
   const websiteUrl = cleanUrl(
     env.CLOVER_CHECKOUT_BASE_URL?.trim() || env.SITE_URL?.trim() || "",
@@ -308,20 +308,20 @@ export const buildWelcomeDiscountEmailMessage = ({
   const greetingName = fullName.trim() || "there";
   const hasExpiry = Boolean(offer.expiresAtDisplay.trim());
   const collectionUrl = `${websiteUrl}/collection`;
-  const subject = `${promotionName} at ${brandName} - ${offer.percentLabel} Off Your First Order`;
+  const subject = `${promotionName} at ${brandName} - ${offer.percentLabel} Off`;
   const text = [
     `Hi ${greetingName},`,
     "",
-    promotionName === "Fall Style Event"
-      ? "The Fall Style Event is here, and we wanted you to be among the first to shop it."
+    promotionName === "Fall Arrivals"
+      ? "Fall Arrivals are here, and we wanted you to be among the first to shop the collection."
       : "So many new pieces have just arrived, and we wanted you to be among the first to see them.",
-    `As a thank-you for signing up for our launch offer, enjoy ${offer.percentLabel} off your first order with code ${offer.code}.`,
-    "This offer is reserved for launch discount subscribers placing their first order.",
+    `As a thank-you for joining our email list, enjoy ${offer.percentLabel} off your order with code ${offer.code}.`,
+    "Your code works across the collection.",
     ...(hasExpiry ? [`Offer valid until ${offer.expiresAtDisplay}.`] : []),
     "",
     `Start shopping: ${collectionUrl}`,
     "",
-    "Use the same email address at checkout so we can verify your eligibility.",
+    "Use your code at checkout to apply it.",
     "",
     `Need help? Reply to this email${replyTo ? ` or contact ${replyTo}` : ""}.`,
   ].join("\n");
@@ -338,12 +338,12 @@ export const buildWelcomeDiscountEmailMessage = ({
                   <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">${escapeHtml(
                     brandName,
                   )}</p>
-                  <h1 style="margin:10px 0 0 0;font-size:32px;line-height:1.15;color:#111827;">${escapeHtml(promotionName)}${
-                    promotionName === "Fall Style Event" ? " Is Here" : " Are Here"
-                  }</h1>
+                  <h1 style="margin:10px 0 0 0;font-size:32px;line-height:1.15;color:#111827;">${escapeHtml(
+                    promotionName,
+                  )} Are Here</h1>
                   <p style="margin:8px 0 0 0;font-size:15px;color:#4b5563;">So many new pieces have dropped. Use your code below for ${escapeHtml(
                     offer.percentLabel,
-                  )} off your first order.</p>
+                  )} off your order.</p>
                 </td>
               </tr>
               <tr>
@@ -351,7 +351,7 @@ export const buildWelcomeDiscountEmailMessage = ({
                   <div style="display:inline-block;padding:10px 20px;border:1px dashed #111827;border-radius:8px;font-size:26px;letter-spacing:0.08em;font-weight:700;color:#111827;">
                     ${escapeHtml(offer.code)}
                   </div>
-                  <p style="margin:14px 0 0 0;font-size:14px;color:#6b7280;">Reserved for launch discount subscribers on their first order.</p>
+                  <p style="margin:14px 0 0 0;font-size:14px;color:#6b7280;">Your code works across the collection.</p>
                   ${
                     hasExpiry
                       ? `<p style="margin:8px 0 0 0;font-size:14px;color:#6b7280;">Valid until ${escapeHtml(
@@ -359,7 +359,7 @@ export const buildWelcomeDiscountEmailMessage = ({
                         )}</p>`
                       : ""
                   }
-                  <p style="margin:8px 0 0 0;font-size:14px;color:#4b5563;">Use the same email address at checkout to apply it.</p>
+                  <p style="margin:8px 0 0 0;font-size:14px;color:#4b5563;">Use your code at checkout to apply it.</p>
                   <p style="margin:18px 0 0 0;">
                     <a href="${escapeHtml(
                       collectionUrl,

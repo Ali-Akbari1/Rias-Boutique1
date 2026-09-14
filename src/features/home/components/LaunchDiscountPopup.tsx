@@ -149,7 +149,7 @@ const LaunchDiscountPopup = () => {
           />
           {!isSuccess ? (
             <p className="mt-3 text-xs uppercase tracking-[0.28em] text-muted-foreground">
-              Fall Style Event
+              Fall Arrivals
             </p>
           ) : null}
           <DialogTitle className="mt-4 text-center font-display font-bold text-foreground">
@@ -157,17 +157,16 @@ const LaunchDiscountPopup = () => {
               <span className="text-5xl leading-none sm:text-6xl">Thank You</span>
             ) : (
               <>
-                <span className="text-7xl leading-none sm:text-7xl">10%</span>
-                <span className="ml-2 text-4xl align-baseline sm:text-6xl">Off</span>
+                <span className="text-5xl leading-none sm:text-6xl">The Fall Collection</span>
               </>
             )}
           </DialogTitle>
           <DialogDescription className="mt-3 text-center text-sm leading-relaxed text-muted-foreground sm:text-base">
             {isSuccess ? (
-              <>Your welcome code is on the way. Check your inbox and use the same email at checkout for your first-order offer.</>
+              <>Your code is on the way. Check your inbox and use it at checkout.</>
             ) : (
               <>
-                Join the email list to receive 10% off your first order during our Fall Style Event.
+                Enjoy 10% off your order for a limited time. Enter your email below to receive your code.
                 {welcomeDiscountHasExpiry ? (
                   <>
                     {" "}
@@ -215,7 +214,7 @@ const LaunchDiscountPopup = () => {
                 {submitButtonLabel}
               </Button>
               <p className="text-xs text-muted-foreground">
-                This code is reserved for email subscribers and applies to first orders only.
+                Your code will be delivered to your inbox.
               </p>
             </form>
           ) : (
