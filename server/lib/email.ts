@@ -1119,7 +1119,7 @@ export const sendPickupReadyEmail = async (order: StoredOrder): Promise<Dispatch
   const logoUrl = cleanUrl(process.env.EMAIL_LOGO_URL?.trim() || "", "");
   const storeLocation = process.env.STORE_LOCATION_DISPLAY?.trim() || "Calgary, AB";
   const pickupAddress =
-    process.env.VITE_STORE_PICKUP_ADDRESS?.trim() || "260300 Writing Creek Cres Floor 1, Unit H31, Balzac, AB T4A 0X8";
+    process.env.VITE_STORE_PICKUP_ADDRESS?.trim() || "260300 Writing Creek Cres Floor 1, Unit H10B, Balzac, AB T4A 0X8";
   const pickupHours = process.env.VITE_STORE_PICKUP_HOURS?.trim() || "Regular store hours are 11:00 AM - 6:00 PM.";
   const orderNumber = toOrderNumber(order.id);
   const greetingName = order.customer.fullName?.trim() || "there";
@@ -1360,7 +1360,7 @@ export const sendOrderConfirmationEmail = async (order: StoredOrder) => {
   const logoUrl = cleanUrl(process.env.EMAIL_LOGO_URL?.trim() || "", "");
   const storeLocation = process.env.STORE_LOCATION_DISPLAY?.trim() || "Calgary, AB";
   const pickupAddress =
-    process.env.VITE_STORE_PICKUP_ADDRESS?.trim() || "260300 Writing Creek Cres Floor 1, Unit H31, Balzac, AB T4A 0X8";
+    process.env.VITE_STORE_PICKUP_ADDRESS?.trim() || "260300 Writing Creek Cres Floor 1, Unit H10B, Balzac, AB T4A 0X8";
   const pickupHours = process.env.VITE_STORE_PICKUP_HOURS?.trim() || "Regular store hours are 11:00 AM - 6:00 PM.";
   const orderNumber = toOrderNumber(order.id);
   const orderDate = formatDateTime(order.createdAt || new Date().toISOString());

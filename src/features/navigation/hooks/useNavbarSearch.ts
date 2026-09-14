@@ -73,7 +73,7 @@ export const useNavbarSearch = ({ pathname, search }: { pathname: string; search
 
   const suggestionTerms = useMemo(() => {
     if (!normalizedSearchQuery) {
-      return ["Women's", "Men's", "Bridal", "Party wear", "Handmade", "Formal"];
+      return ["Women's", "Men's", "Bridal", "Party wear", "Handmade", "Jewelry"];
     }
 
     const departmentMatches = availableProducts
@@ -91,7 +91,7 @@ export const useNavbarSearch = ({ pathname, search }: { pathname: string; search
       .map((product) => product.category)
       .filter((category) => normalizedTextMatchesQuery(normalizeSearchText(category), normalizedSearchQuery));
 
-    const popularMatches = ["Women's", "Men's", "Bridal", "Party wear", "Handmade", "Formal"].filter((term) =>
+    const popularMatches = ["Women's", "Men's", "Bridal", "Party wear", "Handmade", "Jewelry"].filter((term) =>
       normalizedTextMatchesQuery(normalizeSearchText(term), normalizedSearchQuery),
     );
 
@@ -117,7 +117,9 @@ export const useNavbarSearch = ({ pathname, search }: { pathname: string; search
   }, [pathname, search]);
 
   const isCollectionRoute = pathname.startsWith("/collection");
-  const isWomensActive = isCollectionRoute && activeDepartment === "women";
+  const activeCategory = new URLSearchParams(search).get("category")?.trim().toLowerCase() ?? "";
+  const isBridalActive = isCollectionRoute && activeDepartment === "women" && activeCategory === "bridal";
+  const isWomensActive = isCollectionRoute && activeDepartment === "women" && !isBridalActive;
   const isMensActive = isCollectionRoute && activeDepartment === "men";
   const isJewelryActive = isCollectionRoute && activeDepartment === "jewelry";
 
@@ -131,6 +133,7 @@ export const useNavbarSearch = ({ pathname, search }: { pathname: string; search
     suggestionTerms,
     isWomensActive,
     isMensActive,
+    isBridalActive,
     isJewelryActive,
     isAboutActive: pathname === "/about",
     isFaqActive: pathname === "/faq",

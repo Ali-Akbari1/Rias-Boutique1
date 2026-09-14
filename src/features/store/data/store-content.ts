@@ -131,7 +131,7 @@ export const trustBadges: TrustBadgeItem[] = [
   },
 ];
 
-const DEFAULT_PICKUP_ADDRESS = "260300 Writing Creek Cres Floor 1, Unit H31, Balzac, AB T4A 0X8";
+const DEFAULT_PICKUP_ADDRESS = "260300 Writing Creek Cres Floor 1, Unit H10B, Balzac, AB T4A 0X8";
 const DEFAULT_PICKUP_PHONE_DISPLAY = "+1 (403) 465-0640";
 const DEFAULT_PICKUP_PHONE_HREF = "+14034650640";
 const DEFAULT_PICKUP_HOURS = ["Regular store hours are 11:00 AM - 6:00 PM."];

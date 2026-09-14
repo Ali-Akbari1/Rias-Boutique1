@@ -145,7 +145,7 @@
       "image": "/uploads/handmade-hazaragi-dress-1.webp",
       "inventory": "sold_out",
       "description": "Handmade Hazaragi dress with black embroidery mirror work. \n\n2 pieces: Dress and pants \n",
-      "category": "Formal",
+      "category": "Party Wear",
       "fitInfo": "Bust: 36in \nWaist: 32in \nLength of Pants: 35in"
     },
     {
@@ -724,7 +724,7 @@
       "image": "/uploads/green-hazaragi-dress-1.webp",
       "inventory": "sold_out",
       "description": "Mustard green long dress with white scarf. ",
-      "category": "Formal",
+      "category": "Party Wear",
       "fitInfo": "Dress comes with a simple white scarf. \n\nSmall (Bust: 40in)\n"
     },
     {
@@ -1821,8 +1821,8 @@
       "fabric": "Banaras",
       "price": 500,
       "galleryImages": [
-        "/uploads/img_4012.jpg",
-        "/uploads/img_4019.jpg"
+        "/uploads/img_4012.webp",
+        "/uploads/img_4019.webp"
       ],
       "name": "Bridal Green Banaras Dress",
       "slug": "Bridal-Green-Banaras-Dress",
@@ -1836,7 +1836,7 @@
       ],
       "id": "Bridal-Green-Banaras-Dress",
       "createdAt": "2026-09-06",
-      "image": "/uploads/img_4012.jpg",
+      "image": "/uploads/img_4012.webp",
       "inventory": "available",
       "description": "Bridal green banaras dress ",
       "price_on_inquiry": false,
@@ -1846,8 +1846,8 @@
     {
       "fabric": "Velvet",
       "galleryImages": [
-        "/uploads/img_4025.jpg",
-        "/uploads/img_4028.jpg"
+        "/uploads/img_4025.webp",
+        "/uploads/img_4028.webp"
       ],
       "name": "Bahar Dress",
       "slug": "Bahar-dress-bridal-velvet-cheerma-dozi",
@@ -1865,7 +1865,7 @@
       ],
       "id": "Bahar-dress-bridal-velvet-cheerma-dozi",
       "createdAt": "2026-09-06",
-      "image": "/uploads/img_4025.jpg",
+      "image": "/uploads/img_4025.webp",
       "inventory": null,
       "description": "Bridal velvet dress with 2 layer handmade cheerma dozi work ",
       "price_on_inquiry": true,

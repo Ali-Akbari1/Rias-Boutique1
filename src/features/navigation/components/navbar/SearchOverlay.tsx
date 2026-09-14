@@ -12,7 +12,7 @@ const POPULAR_SEARCH_TERMS = [
   "Bridal",
   "Party wear",
   "Handmade",
-  "Formal",
+  "Jewelry",
 ] as const;
 
 interface SearchOverlayProps {
