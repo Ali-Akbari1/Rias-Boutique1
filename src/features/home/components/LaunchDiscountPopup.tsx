@@ -166,7 +166,7 @@ const LaunchDiscountPopup = () => {
               <>Your code is on the way. Check your inbox and use it at checkout.</>
             ) : (
               <>
-                Enjoy 10% off your order for a limited time. Use code FALL10 at checkout. Enter your email below to receive your code.
+                Enjoy 10% off your order for a limited time. Enter your email below to receive your code.
                 {welcomeDiscountHasExpiry ? (
                   <>
                     {" "}
