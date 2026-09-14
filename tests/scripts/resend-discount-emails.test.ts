@@ -34,7 +34,7 @@ describe("resend discount emails script", () => {
         "--filter-code=launch10",
         "--campaign=welcome15_relaunch",
         "--code=welcome15",
-        "--expires-at=2026-09-17T01:00:00.000Z",
+        "--expires-at=2026-09-22T01:00:00.000Z",
         "--only-never-emailed",
       ]),
     ).toEqual({
@@ -46,7 +46,7 @@ describe("resend discount emails script", () => {
       filterCode: "LAUNCH10",
       campaign: "welcome15_relaunch",
       code: "WELCOME15",
-      expiresAtIso: "2026-09-17T01:00:00.000Z",
+      expiresAtIso: "2026-09-22T01:00:00.000Z",
       onlyNeverEmailed: true,
       batchSize: 50,
     });

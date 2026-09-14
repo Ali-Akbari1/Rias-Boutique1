@@ -38,13 +38,13 @@ export const DEFAULT_FREE_SHIPPING_THRESHOLD_MINOR = 40_000;
 export const DEFAULT_FLAT_SHIPPING_RATE_MINOR = 3_000;
 export const DEFAULT_FLAT_SHIPPING_RATE_INTL_MINOR = 4_000;
 export const DEFAULT_CHECKOUT_TAX_RATE = 0.05;
-// Fall Style Event: 7:00 PM Calgary time, September 14 to September 16, 2026.
+// Fall Style Event: 7:00 PM Calgary time, September 14 to September 21, 2026.
 // These values intentionally take precedence over older WELCOME_* deployment
 // variables so the scheduled campaign cannot accidentally reuse an expired code.
 export const DEFAULT_WELCOME_DISCOUNT_CODE = "FALL10";
 export const DEFAULT_WELCOME_DISCOUNT_RATE = 0.1;
 export const DEFAULT_WELCOME_DISCOUNT_STARTS_AT = "2026-09-15T01:00:00.000Z";
-export const DEFAULT_WELCOME_DISCOUNT_EXPIRES_AT = "2026-09-17T01:00:00.000Z";
+export const DEFAULT_WELCOME_DISCOUNT_EXPIRES_AT = "2026-09-22T01:00:00.000Z";
 
 const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
 
