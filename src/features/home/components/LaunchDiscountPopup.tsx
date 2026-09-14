@@ -149,7 +149,7 @@ const LaunchDiscountPopup = () => {
           />
           {!isSuccess ? (
             <p className="mt-3 text-xs uppercase tracking-[0.28em] text-muted-foreground">
-              Welcome to Ria&apos;s Boutique
+              Fall Style Event
             </p>
           ) : null}
           <DialogTitle className="mt-4 text-center font-display font-bold text-foreground">
@@ -167,7 +167,7 @@ const LaunchDiscountPopup = () => {
               <>Your welcome code is on the way. Check your inbox and use the same email at checkout for your first-order offer.</>
             ) : (
               <>
-                Join the email list to receive 10% off your first order.
+                Join the email list to receive 10% off your first order during our Fall Style Event.
                 {welcomeDiscountHasExpiry ? (
                   <>
                     {" "}

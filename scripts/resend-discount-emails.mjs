@@ -164,6 +164,7 @@ export const parseCommandLineArgs = (argv) => {
     filterCode: "",
     campaign: "",
     code: "",
+    expiresAtIso: "",
     onlyNeverEmailed: false,
     batchSize: DEFAULT_BATCH_SIZE,
   };
@@ -235,6 +236,15 @@ export const parseCommandLineArgs = (argv) => {
       continue;
     }
 
+    if (arg.startsWith("--expires-at=")) {
+      const expiresAtIso = arg.slice("--expires-at=".length).trim();
+      if (Number.isNaN(new Date(expiresAtIso).getTime())) {
+        throw new Error("--expires-at must be a valid ISO date-time.");
+      }
+      options.expiresAtIso = expiresAtIso;
+      continue;
+    }
+
     throw new Error(`Unknown option: ${arg}`);
   }
 
@@ -281,6 +291,7 @@ export const buildWelcomeDiscountEmailMessage = ({
   offer,
   env = process.env,
 }) => {
+  const promotionName = offer.campaign === "fall_style_event_2026" ? "Fall Style Event" : "New Arrivals";
   const brandName = env.STORE_BRAND_NAME?.trim() || "Ria's Boutique";
   const websiteUrl = cleanUrl(
     env.CLOVER_CHECKOUT_BASE_URL?.trim() || env.SITE_URL?.trim() || "",
@@ -297,11 +308,13 @@ export const buildWelcomeDiscountEmailMessage = ({
   const greetingName = fullName.trim() || "there";
   const hasExpiry = Boolean(offer.expiresAtDisplay.trim());
   const collectionUrl = `${websiteUrl}/collection`;
-  const subject = `New Arrivals at ${brandName} - ${offer.percentLabel} Off Your First Order`;
+  const subject = `${promotionName} at ${brandName} - ${offer.percentLabel} Off Your First Order`;
   const text = [
     `Hi ${greetingName},`,
     "",
-    "So many new pieces have just arrived, and we wanted you to be among the first to see them.",
+    promotionName === "Fall Style Event"
+      ? "The Fall Style Event is here, and we wanted you to be among the first to shop it."
+      : "So many new pieces have just arrived, and we wanted you to be among the first to see them.",
     `As a thank-you for signing up for our launch offer, enjoy ${offer.percentLabel} off your first order with code ${offer.code}.`,
     "This offer is reserved for launch discount subscribers placing their first order.",
     ...(hasExpiry ? [`Offer valid until ${offer.expiresAtDisplay}.`] : []),
@@ -325,7 +338,9 @@ export const buildWelcomeDiscountEmailMessage = ({
                   <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;">${escapeHtml(
                     brandName,
                   )}</p>
-                  <h1 style="margin:10px 0 0 0;font-size:32px;line-height:1.15;color:#111827;">New Arrivals Are Here</h1>
+                  <h1 style="margin:10px 0 0 0;font-size:32px;line-height:1.15;color:#111827;">${escapeHtml(promotionName)}${
+                    promotionName === "Fall Style Event" ? " Is Here" : " Are Here"
+                  }</h1>
                   <p style="margin:8px 0 0 0;font-size:15px;color:#4b5563;">So many new pieces have dropped. Use your code below for ${escapeHtml(
                     offer.percentLabel,
                   )} off your first order.</p>
@@ -606,6 +621,7 @@ export const runBulkDiscountResend = async (argv = process.argv.slice(2)) => {
   const offer = resolveOfferConfig(env, {
     campaign: options.campaign,
     code: options.code,
+    expiresAtIso: options.expiresAtIso,
   });
 
   const supabase = createSupabaseAdminClient(env);

@@ -13,6 +13,8 @@ export interface CommerceRuntimeEnv {
   VITE_WELCOME_DISCOUNT_CODE?: string;
   WELCOME_DISCOUNT_RATE?: string;
   VITE_WELCOME_DISCOUNT_RATE?: string;
+  WELCOME_DISCOUNT_STARTS_AT?: string;
+  VITE_WELCOME_DISCOUNT_STARTS_AT?: string;
   WELCOME_DISCOUNT_EXPIRES_AT?: string;
   VITE_WELCOME_DISCOUNT_EXPIRES_AT?: string;
   LAUNCH10_EXPIRES_AT?: string;
@@ -28,6 +30,7 @@ export interface ResolvedCommerceConfig {
   shippingProviderMode: ShippingProviderMode;
   welcomeDiscountCode: string;
   welcomeDiscountRate: number;
+  welcomeDiscountStartsAtIso: string;
   welcomeDiscountExpiresAtIso: string;
 }
 
@@ -35,9 +38,13 @@ export const DEFAULT_FREE_SHIPPING_THRESHOLD_MINOR = 40_000;
 export const DEFAULT_FLAT_SHIPPING_RATE_MINOR = 3_000;
 export const DEFAULT_FLAT_SHIPPING_RATE_INTL_MINOR = 4_000;
 export const DEFAULT_CHECKOUT_TAX_RATE = 0.05;
-export const DEFAULT_WELCOME_DISCOUNT_CODE = "WELCOME10";
+// Fall Style Event: 7:00 PM Calgary time, September 14 to September 16, 2026.
+// These values intentionally take precedence over older WELCOME_* deployment
+// variables so the scheduled campaign cannot accidentally reuse an expired code.
+export const DEFAULT_WELCOME_DISCOUNT_CODE = "FALL10";
 export const DEFAULT_WELCOME_DISCOUNT_RATE = 0.1;
-export const DEFAULT_WELCOME_DISCOUNT_EXPIRES_AT = "2026-05-19T05:59:59.999Z";
+export const DEFAULT_WELCOME_DISCOUNT_STARTS_AT = "2026-09-15T01:00:00.000Z";
+export const DEFAULT_WELCOME_DISCOUNT_EXPIRES_AT = "2026-09-17T01:00:00.000Z";
 
 const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
 
@@ -72,21 +79,23 @@ export const resolveCommerceConfig = (env: CommerceRuntimeEnv): ResolvedCommerce
   ),
   checkoutTaxRate: toRate(env.CHECKOUT_TAX_RATE, DEFAULT_CHECKOUT_TAX_RATE),
   shippingProviderMode: resolveShippingProviderMode(env.SHIPPING_PROVIDER_MODE),
-  welcomeDiscountCode:
-    env.WELCOME_DISCOUNT_CODE?.trim() ||
-    env.VITE_WELCOME_DISCOUNT_CODE?.trim() ||
-    DEFAULT_WELCOME_DISCOUNT_CODE,
-  welcomeDiscountRate: toRate(
-    env.WELCOME_DISCOUNT_RATE?.trim() || env.VITE_WELCOME_DISCOUNT_RATE?.trim(),
-    DEFAULT_WELCOME_DISCOUNT_RATE,
-  ),
-  welcomeDiscountExpiresAtIso:
-    env.WELCOME_DISCOUNT_EXPIRES_AT?.trim() ||
-    env.VITE_WELCOME_DISCOUNT_EXPIRES_AT?.trim() ||
-    env.LAUNCH10_EXPIRES_AT?.trim() ||
-    env.VITE_LAUNCH10_EXPIRES_AT?.trim() ||
-    DEFAULT_WELCOME_DISCOUNT_EXPIRES_AT,
+  welcomeDiscountCode: DEFAULT_WELCOME_DISCOUNT_CODE,
+  welcomeDiscountRate: DEFAULT_WELCOME_DISCOUNT_RATE,
+  welcomeDiscountStartsAtIso: DEFAULT_WELCOME_DISCOUNT_STARTS_AT,
+  welcomeDiscountExpiresAtIso: DEFAULT_WELCOME_DISCOUNT_EXPIRES_AT,
 });
+
+export const getWelcomeDiscountStartDate = (
+  config: Pick<ResolvedCommerceConfig, "welcomeDiscountStartsAtIso">,
+) => {
+  const startsAtIso = config.welcomeDiscountStartsAtIso.trim();
+  if (!startsAtIso) {
+    return null;
+  }
+
+  const parsed = new Date(startsAtIso);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
 
 export const getWelcomeDiscountExpiryDate = (
   config: Pick<ResolvedCommerceConfig, "welcomeDiscountExpiresAtIso">,
@@ -109,11 +118,12 @@ export const hasWelcomeDiscountExpiryForConfig = (
 ) => Boolean(getWelcomeDiscountExpiryDate(config));
 
 export const isWelcomeDiscountActiveForConfig = (
-  config: Pick<ResolvedCommerceConfig, "welcomeDiscountExpiresAtIso">,
+  config: Pick<ResolvedCommerceConfig, "welcomeDiscountStartsAtIso" | "welcomeDiscountExpiresAtIso">,
   now = new Date(),
 ) => {
+  const startDate = getWelcomeDiscountStartDate(config);
   const expiryDate = getWelcomeDiscountExpiryDate(config);
-  return !expiryDate || now.getTime() <= expiryDate.getTime();
+  return (!startDate || now.getTime() >= startDate.getTime()) && (!expiryDate || now.getTime() <= expiryDate.getTime());
 };
 
 export const calculateWelcomeDiscountMinor = ({
