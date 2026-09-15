@@ -1948,6 +1948,32 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "What's Included:\n-Dress\n-Wide-Legged Pants\n-Embroidered scarf"
+    },
+    {
+      "fabric": "Velvet",
+      "galleryImages": [
+        "/uploads/img_4072.jpg"
+      ],
+      "name": "Bridal Green Cheerma Dozi ",
+      "slug": "bridal-cheerma-dozi-green-long-dress",
+      "colors": [
+        "Green"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "tags": [
+        "bridal",
+        "cheerma dozi"
+      ],
+      "id": "bridal-cheerma-dozi-green-long-dress",
+      "createdAt": "2026-09-14",
+      "image": "/uploads/img_4072.jpg",
+      "inventory": null,
+      "description": "Bridal green dress with gold embroidery",
+      "price_on_inquiry": true,
+      "fitInfo": "Whats Included: \n- Dress\n- Embroidered scarf"
     }
   ]
 }
