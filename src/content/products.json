@@ -1315,7 +1315,6 @@
         "Lilimitten"
       ],
       "id": "lilimitten-short-dress-green",
-      "createdAt": "2026-07-14",
       "image": "/uploads/img_1759.webp",
       "inventory": "sold_out",
       "description": "Short Lilimitten dress in green",
@@ -1504,7 +1503,6 @@
         "Banaras"
       ],
       "id": "green-banaras-short-dress",
-      "createdAt": "2026-07-14",
       "image": "/uploads/img_2164.webp",
       "inventory": "sold_out",
       "description": "Beautiful green banaras dress with cheerma detailing. ",
@@ -1722,7 +1720,6 @@
         "banaras"
       ],
       "id": "Short-Banaras-red-dress",
-      "createdAt": "2026-07-14",
       "image": "/uploads/img_1508.webp",
       "inventory": "sold_out",
       "description": "Red banaras short dress",
@@ -1878,7 +1875,7 @@
     },
     {
       "galleryImages": [
-        "/uploads/img_4044.webp"
+        "/uploads/img_4044.jpg"
       ],
       "name": "1 Layer Pound Silver Set",
       "slug": "1-layer-pound-silver-set",
@@ -1888,7 +1885,7 @@
       ],
       "id": "1-layer-pound-silver-set",
       "createdAt": "2026-09-12",
-      "image": "/uploads/img_4044.webp",
+      "image": "/uploads/img_4044.jpg",
       "inventory": "available",
       "description": "1 Layer nukrah set",
       "price_on_inquiry": true,
@@ -1899,8 +1896,8 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_4064.webp",
-        "/uploads/img_4065.webp"
+        "/uploads/img_4064.jpg",
+        "/uploads/img_4065.jpg"
       ],
       "name": "Red Bridal Cheerma Dozi Dress 2 ",
       "slug": "red-bridal-cheerma-dozi-silver",
@@ -1917,11 +1914,40 @@
       ],
       "id": "red-bridal-cheerma-dozi-silver",
       "createdAt": "2026-09-12",
-      "image": "/uploads/img_4064.webp",
+      "image": "/uploads/img_4064.jpg",
       "inventory": "available",
       "description": "Red bridal cheerma dozi dress",
       "price_on_inquiry": false,
       "category": "Bridal"
+    },
+    {
+      "fabric": "Thick Georgette",
+      "price": 200,
+      "galleryImages": [
+        "/uploads/img_4107.jpg"
+      ],
+      "name": "White Hazaragi Dress with Rhinestones",
+      "slug": "white-on-white-hazaragi-dress-2",
+      "maxQuantity": 1,
+      "colors": [
+        "White"
+      ],
+      "sizes": [
+        "Medium",
+        "Large"
+      ],
+      "department": "women",
+      "tags": [
+        "Hazaragi"
+      ],
+      "id": "white-on-white-hazaragi-dress-2",
+      "createdAt": "2026-09-14",
+      "image": "/uploads/img_4107.jpg",
+      "inventory": "available",
+      "description": "White Hazaragi dress with rhinestones",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "What's Included:\n-Dress\n-Wide-Legged Pants\n-Embroidered scarf"
     }
   ]
 }
