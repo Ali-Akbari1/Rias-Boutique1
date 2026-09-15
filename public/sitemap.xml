@@ -372,7 +372,7 @@
     <loc>https://www.riasboutique.com/products/white-cheerma-dozi-dress-long</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-09-06</lastmod>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/Short-Banaras-red-dress</loc>
@@ -402,5 +402,23 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <lastmod>2026-09-06</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/Bahar-dress-bridal-velvet-cheerma-dozi</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-09-06</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/1-layer-pound-silver-set</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-09-12</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/red-bridal-cheerma-dozi-silver</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-09-12</lastmod>
   </url>
 </urlset>

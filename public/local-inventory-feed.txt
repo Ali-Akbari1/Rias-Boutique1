@@ -81,7 +81,8 @@ store_code	id	availability	price
 16335217184145401742	Blue-Cheerma-Dozi-Dress-long-medium-blue	out_of_stock	280.00 CAD
 16335217184145401742	white-cheerma-dozi-dress-long-medium-white	out_of_stock	280.00 CAD
 16335217184145401742	Short-Banaras-red-dress-small-red	out_of_stock	450.00 CAD
-16335217184145401742	dark-green-bridal-dress-medium-default	in_stock	450.00 CAD
+16335217184145401742	dark-green-bridal-dress-medium-default	out_of_stock	450.00 CAD
 16335217184145401742	Red-long-Cheerma-Dozi-Dress-x-large-red	in_stock	280.00 CAD
 16335217184145401742	burgundy-cheerma-dozi-dress-short-large-burgundy	out_of_stock	450.00 CAD
 16335217184145401742	Bridal-Green-Banaras-Dress-one-size-default	in_stock	500.00 CAD
+16335217184145401742	red-bridal-cheerma-dozi-silver-medium-red	in_stock	450.00 CAD

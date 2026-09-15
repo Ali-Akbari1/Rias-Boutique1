@@ -2100,7 +2100,7 @@
     <link>https://www.riasboutique.com/products/dark-green-bridal-dress</link>
     <g:image_link>https://www.riasboutique.com/uploads/img_2574.webp</g:image_link>
     <g:additional_image_link>https://www.riasboutique.com/uploads/img_2575.webp</g:additional_image_link>
-    <g:availability>in_stock</g:availability>
+    <g:availability>out_of_stock</g:availability>
     <g:price>333.00 USD</g:price>
     <g:condition>new</g:condition>
     <g:brand>Ria&apos;s Boutique</g:brand>
@@ -2172,8 +2172,8 @@
     <title>Bridal Green Banaras Dress</title>
     <description>Bridal green banaras dress</description>
     <link>https://www.riasboutique.com/products/Bridal-Green-Banaras-Dress</link>
-    <g:image_link>https://www.riasboutique.com/uploads/img_4012.jpg</g:image_link>
-    <g:additional_image_link>https://www.riasboutique.com/uploads/img_4019.jpg</g:additional_image_link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_4012.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_4019.webp</g:additional_image_link>
     <g:availability>in_stock</g:availability>
     <g:price>370.00 USD</g:price>
     <g:condition>new</g:condition>
@@ -2188,6 +2188,31 @@
       <g:service>Standard</g:service>
       <g:price>29.60 USD</g:price>
     </g:shipping>
+  </item>
+  <item>
+    <g:id>red-bridal-cheerma-dozi-silver-medium-red</g:id>
+    <g:item_group_id>red-bridal-cheerma-dozi-silver</g:item_group_id>
+    <title>Red Bridal Cheerma Dozi Dress 2</title>
+    <description>Red bridal cheerma dozi dress</description>
+    <link>https://www.riasboutique.com/products/red-bridal-cheerma-dozi-silver</link>
+    <g:image_link>https://www.riasboutique.com/uploads/img_4064.webp</g:image_link>
+    <g:additional_image_link>https://www.riasboutique.com/uploads/img_4065.webp</g:additional_image_link>
+    <g:availability>in_stock</g:availability>
+    <g:price>333.00 USD</g:price>
+    <g:condition>new</g:condition>
+    <g:brand>Ria&apos;s Boutique</g:brand>
+    <g:identifier_exists>no</g:identifier_exists>
+    <g:product_type>Bridal</g:product_type>
+    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+    <g:gender>female</g:gender>
+    <g:age_group>adult</g:age_group>
+    <g:shipping>
+      <g:country>US</g:country>
+      <g:service>Standard</g:service>
+      <g:price>29.60 USD</g:price>
+    </g:shipping>
+    <g:color>Red</g:color>
+    <g:size>Medium</g:size>
   </item>
 </channel>
 </rss>

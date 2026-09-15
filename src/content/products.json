@@ -1875,7 +1875,7 @@
     },
     {
       "galleryImages": [
-        "/uploads/img_4044.jpg"
+        "/uploads/img_4044.webp"
       ],
       "name": "1 Layer Pound Silver Set",
       "slug": "1-layer-pound-silver-set",
@@ -1885,7 +1885,7 @@
       ],
       "id": "1-layer-pound-silver-set",
       "createdAt": "2026-09-12",
-      "image": "/uploads/img_4044.jpg",
+      "image": "/uploads/img_4044.webp",
       "inventory": "available",
       "description": "1 Layer nukrah set",
       "price_on_inquiry": true,
@@ -1896,8 +1896,8 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_4064.jpg",
-        "/uploads/img_4065.jpg"
+        "/uploads/img_4064.webp",
+        "/uploads/img_4065.webp"
       ],
       "name": "Red Bridal Cheerma Dozi Dress 2 ",
       "slug": "red-bridal-cheerma-dozi-silver",
@@ -1914,7 +1914,7 @@
       ],
       "id": "red-bridal-cheerma-dozi-silver",
       "createdAt": "2026-09-12",
-      "image": "/uploads/img_4064.jpg",
+      "image": "/uploads/img_4064.webp",
       "inventory": "available",
       "description": "Red bridal cheerma dozi dress",
       "price_on_inquiry": false,
