@@ -1,14 +1,23 @@
 /** @vitest-environment node */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import shippingRatesHandler from "../../api/shipping-rates";
-import { getCatalogMap } from "../../server/lib/product-catalog";
+import * as productCatalog from "../../server/lib/product-catalog";
 import { createMockRequest, createMockResponse } from "./test-utils/utils";
 
 const FREE_SHIPPING_THRESHOLD_PRODUCT_ID = "dark-blue-cheerma-dozi-machini";
+const shippingTestProduct = {
+  id: FREE_SHIPPING_THRESHOLD_PRODUCT_ID,
+  name: "Dark Blue Cheerma Dozi Dress",
+  priceMinor: 40_000,
+  availability: "available" as const,
+};
 
 describe("shipping rates endpoint", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.spyOn(productCatalog, "getCatalogMap").mockResolvedValue(
+      new Map([[FREE_SHIPPING_THRESHOLD_PRODUCT_ID, shippingTestProduct]]),
+    );
     delete process.env.SHIPPING_PROVIDER_MODE;
     process.env.CLOVER_CHECKOUT_BASE_URL = "https://www.riasboutique.com";
     process.env.ALLOWED_CHECKOUT_ORIGINS = "https://www.riasboutique.com";
@@ -124,7 +133,7 @@ describe("shipping rates endpoint", () => {
 
   it("sends a Canada-origin customs declaration with total line-item value and weight", async () => {
     process.env.SHIPPING_PROVIDER_MODE = "easypost";
-    const catalogMap = await getCatalogMap();
+    const catalogMap = await productCatalog.getCatalogMap();
     const product = catalogMap.get(FREE_SHIPPING_THRESHOLD_PRODUCT_ID);
     expect(product).toBeDefined();
     const quantity = 1;
