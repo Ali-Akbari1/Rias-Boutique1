@@ -166,13 +166,11 @@ const LaunchDiscountPopup = () => {
               <>Your code is on the way. Check your inbox and use it at checkout.</>
             ) : (
               <>
-                Enjoy 10% off your order for a limited time. Enter your email below to receive your code.
+                Enjoy 10% off your order for a limited time.
                 {welcomeDiscountHasExpiry ? (
                   <>
                     {" "}
-                    This welcome offer is available until
-                    <br />
-                    {welcomeDiscountEndsLabel}.
+                    This offer is available until {welcomeDiscountEndsLabel}.
                   </>
                 ) : null}{" "}
                 Enter your email to receive your code.
@@ -234,7 +232,7 @@ const LaunchDiscountPopup = () => {
               onClick={closeWithoutOffer}
               className="mt-5 text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
             >
-              Continue shopping without the welcome code
+              Continue shopping without the offer
             </button>
           ) : null}
         </div>

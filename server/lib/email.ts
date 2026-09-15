@@ -369,12 +369,12 @@ export const sendWelcomeDiscountEmail = async ({
       : "";
   const greetingName = fullName?.trim() || "there";
   const hasExpiry = Boolean(expiresAtDisplay.trim());
-  const subject = `${brandName} Welcome Offer - 10% Off Your First Order`;
+  const subject = `${brandName} - 10% Off Your First Order`;
   const text = [
     `Hi ${greetingName},`,
     "",
     `Thanks for joining ${brandName}. Enjoy 10% off your first order with code ${code}.`,
-    "This welcome offer is reserved for email subscribers placing their first order.",
+    "This offer is reserved for email subscribers placing their first order.",
     ...(hasExpiry ? [`Offer valid until ${expiresAtDisplay}.`] : []),
     "",
     `Start shopping: ${websiteUrl.replace(/\/+$/, "")}/collection`,
@@ -397,7 +397,7 @@ export const sendWelcomeDiscountEmail = async ({
                     brandName,
                   )}</p>
                   <h1 style="margin:10px 0 0 0;font-size:34px;line-height:1.15;color:#111827;">Enjoy 10% Off</h1>
-                  <p style="margin:8px 0 0 0;font-size:15px;color:#4b5563;">Use your welcome code below for 10% off your first order.</p>
+                  <p style="margin:8px 0 0 0;font-size:15px;color:#4b5563;">Use your exclusive code below for 10% off your first order.</p>
                 </td>
               </tr>
               <tr>

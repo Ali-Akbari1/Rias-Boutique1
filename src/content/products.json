@@ -1315,6 +1315,7 @@
         "Lilimitten"
       ],
       "id": "lilimitten-short-dress-green",
+      "createdAt": "2026-07-14",
       "image": "/uploads/img_1759.webp",
       "inventory": "sold_out",
       "description": "Short Lilimitten dress in green",
@@ -1503,6 +1504,7 @@
         "Banaras"
       ],
       "id": "green-banaras-short-dress",
+      "createdAt": "2026-07-14",
       "image": "/uploads/img_2164.webp",
       "inventory": "sold_out",
       "description": "Beautiful green banaras dress with cheerma detailing. ",
@@ -1720,6 +1722,7 @@
         "banaras"
       ],
       "id": "Short-Banaras-red-dress",
+      "createdAt": "2026-07-14",
       "image": "/uploads/img_1508.webp",
       "inventory": "sold_out",
       "description": "Red banaras short dress",
