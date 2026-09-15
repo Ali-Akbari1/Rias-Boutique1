@@ -1037,8 +1037,9 @@
       "fabric": "Crushed Velvet",
       "price": 380,
       "galleryImages": [
-        "/uploads/img_1519.webp",
-        "/uploads/img_1521.webp"
+        "/uploads/img_4098.jpg",
+        "/uploads/img_4100.jpg",
+        "/uploads/img_4101.jpg"
       ],
       "name": "White Gulabatoon Short Dress",
       "slug": "white-gulabatoon-short-dress",
@@ -1047,7 +1048,7 @@
         "White"
       ],
       "sizes": [
-        "X-Large"
+        "Medium"
       ],
       "department": "women",
       "careInstructions": [
@@ -1057,13 +1058,13 @@
         "gulabatoon"
       ],
       "id": "white-gulabatoon-short-dress",
-      "createdAt": "2026-04-15",
-      "image": "/uploads/img_1519.webp",
-      "inventory": "sold_out",
+      "createdAt": "2026-09-14",
+      "image": "/uploads/img_4098.jpg",
+      "inventory": "available",
       "description": "Beautiful white dress with gulabatoon detailing and wide-legged pants. ",
       "price_on_inquiry": false,
       "category": "Party Wear",
-      "fitInfo": "\nWhats Included\n- Dress\n- Embroidered scarf\n- Wide-legged pants\n\nMeasurements\n- Bust: 46in\n\n"
+      "fitInfo": "\nWhats Included\n- Dress\n- Embroidered scarf\n- Wide-legged pants\n\nMeasurements\n- Bust: 42in\n\n"
     },
     {
       "fabric": "Barosha",
