@@ -1975,6 +1975,29 @@
       "price_on_inquiry": true,
       "category": "Bridal",
       "fitInfo": "Whats Included: \n- Dress\n- Embroidered scarf"
+    },
+    {
+      "fabric": "Gulbakhmal",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_2896.jpg"
+      ],
+      "name": "Gulbakhmal Short Dress",
+      "slug": "gulbakhmal-short-dress-teal",
+      "colors": [
+        "Teal"
+      ],
+      "sizes": [
+        "Medium"
+      ],
+      "department": "women",
+      "id": "gulbakhmal-short-dress-teal",
+      "createdAt": "2026-09-16",
+      "image": "/uploads/img_2896.jpg",
+      "inventory": "available",
+      "description": "Gulbakhmal short dress with cheerma embroidery and zari detailing ",
+      "price_on_inquiry": false,
+      "category": "Party Wear"
     }
   ]
 }
