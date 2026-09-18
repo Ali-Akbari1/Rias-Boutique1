@@ -2027,6 +2027,27 @@
       "price_on_inquiry": false,
       "category": "Party Wear",
       "fitInfo": "What's Included:\n-Dress\n-Zari scarf\n\nMeasurements: \n-Bust: 38 in\n-Length of the daman: 40 in\n-Sleeves: 21 in"
+    },
+    {
+      "fabric": "Crushed Velvet",
+      "price": 450,
+      "galleryImages": [
+        "/uploads/img_2969.jpg"
+      ],
+      "name": "Short White Cheerma Dozi Dress",
+      "slug": "short-white-cheerma-dozi-dress",
+      "department": "women",
+      "tags": [
+        "Cheerma dozi"
+      ],
+      "id": "short-white-cheerma-dozi-dress",
+      "createdAt": "2026-09-17",
+      "image": "/uploads/img_2969.jpg",
+      "inventory": "available",
+      "description": "Short cheerma dozi dress with wide-legged pants",
+      "price_on_inquiry": false,
+      "category": "Party Wear",
+      "fitInfo": "What's Included:\n-Dress\n-Wide-legged pants\n-Embroidered pants\n\nMeasurements: \n-Bust: 40 in\n-Shoulders: 16 in\n-Sleeves: 20 in\n-Length of daman: 26 in\n"
     }
   ]
 }
