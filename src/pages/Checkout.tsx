@@ -19,8 +19,6 @@ import {
   SHIPPING_DISCOUNT_PROMO_CODE,
 } from "@/shared/config/commerce";
 import {
-  getWelcomeDiscountExpiryDateLabel,
-  hasWelcomeDiscountExpiry,
   isWelcomeDiscountActive,
   WELCOME_DISCOUNT_CODE,
 } from "@/lib/launch-discount";
@@ -99,8 +97,6 @@ const Checkout = () => {
   const pickupDetails = getStorePickupDetails();
   const shippingChargesEnabled = clientCommerceConfig.shippingChargesEnabled;
   const welcomeDiscountActive = isWelcomeDiscountActive();
-  const welcomeDiscountEndsLabel = getWelcomeDiscountExpiryDateLabel();
-  const welcomeDiscountHasExpiry = hasWelcomeDiscountExpiry();
   const checkoutControllerRef = useRef<AbortController | null>(null);
   const checkoutTimeoutRef = useRef<number | null>(null);
   const shippingControllerRef = useRef<AbortController | null>(null);
@@ -997,10 +993,7 @@ const Checkout = () => {
                           </p>
                         ) : (
                           <p className="text-xs text-muted-foreground">
-                            Use {FREE_SHIPPING_PROMO_CODE} for free shipping or {SHIPPING_DISCOUNT_PROMO_CODE} for CA$10 off shipping.
-                            {welcomeDiscountActive
-                              ? ` You can also use ${WELCOME_DISCOUNT_CODE} for 10% off your order${welcomeDiscountHasExpiry ? ` until ${welcomeDiscountEndsLabel}` : ""}.`
-                              : ""}
+                            Enter a discount code if you have one.
                           </p>
                         )}
                       </div>
