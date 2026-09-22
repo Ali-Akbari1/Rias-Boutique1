@@ -338,7 +338,7 @@ const Checkout = () => {
   }, [addToCart, searchParams]);
 
   useEffect(() => {
-    if (!welcomeDiscountActive && discountCode) {
+    if (!welcomeDiscountActive && discountCode.trim().toUpperCase() === WELCOME_DISCOUNT_CODE) {
       setDiscountCode("");
     }
   }, [welcomeDiscountActive, discountCode]);
