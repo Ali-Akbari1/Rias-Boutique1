@@ -32,6 +32,8 @@ import {
 import { CloverApiError, createCloverCheckoutSession } from "../server/lib/clover.js";
 import {
   buildCheckoutPricing,
+  calculateShippingPromotionMinor,
+  getShippingPromotion,
   isShippingChargesEnabled,
 } from "../server/lib/checkout-pricing.js";
 import { toQuoteCustomer, toQuoteLineItems, verifyShippingQuoteToken } from "../server/lib/easypost.js";
@@ -106,6 +108,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const payload = bodyResult.data;
   const requestedDiscountCode = (payload.discountCode || payload.promoCode || "").trim().toUpperCase();
   const welcomeDiscountActive = isWelcomeDiscountActive();
+  const shippingPromotion = getShippingPromotion(requestedDiscountCode);
 
   if (looksAutomatedTraffic(req)) {
     sendError(res, 403, "BOT_DETECTED", "Automated checkout attempts are not allowed.");
@@ -192,7 +195,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  if (requestedDiscountCode && requestedDiscountCode !== WELCOME_DISCOUNT_CODE) {
+  if (requestedDiscountCode && requestedDiscountCode !== WELCOME_DISCOUNT_CODE && !shippingPromotion) {
     sendError(res, 400, "INVALID_DISCOUNT_CODE", "Invalid discount code.");
     return;
   }
@@ -306,8 +309,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
   }
 
-  const shippingMinor = isPickupInStore ? 0 : verifiedShippingQuote?.customerRateMinor || 0;
-  const freeShippingApplied = !isPickupInStore && Boolean(verifiedShippingQuote?.freeShippingApplied);
+  const baseShippingMinor = isPickupInStore ? 0 : verifiedShippingQuote?.customerRateMinor || 0;
+  const shippingDiscountMinor = isPickupInStore
+    ? 0
+    : calculateShippingPromotionMinor({ shippingMinor: baseShippingMinor, promotion: shippingPromotion });
+  const shippingMinor = Math.max(0, baseShippingMinor - shippingDiscountMinor);
+  const freeShippingApplied =
+    !isPickupInStore && (Boolean(verifiedShippingQuote?.freeShippingApplied) || shippingPromotion === "free_shipping");
+  const pricedShippingQuote = verifiedShippingQuote
+    ? { ...verifiedShippingQuote, customerRateMinor: shippingMinor, freeShippingApplied }
+    : null;
   const { taxMinor, totalMinor } = buildCheckoutPricing({
     subtotalMinor,
     discountMinor,
@@ -342,12 +353,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       pricing: {
         discountCode: requestedDiscountCode,
         discountMinor,
+        shippingDiscountMinor,
         shippingMinor,
         quotedShippingMinor: verifiedShippingQuote?.quotedRateMinor || 0,
         taxMinor,
         freeShippingApplied,
       },
-      shippingQuote: verifiedShippingQuote,
+      shippingQuote: pricedShippingQuote,
   });
 
   if (debugLogs) {

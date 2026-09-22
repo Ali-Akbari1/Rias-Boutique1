@@ -45,6 +45,38 @@ export const DEFAULT_WELCOME_DISCOUNT_CODE = "FALL10";
 export const DEFAULT_WELCOME_DISCOUNT_RATE = 0.1;
 export const DEFAULT_WELCOME_DISCOUNT_STARTS_AT = "2026-09-15T01:00:00.000Z";
 export const DEFAULT_WELCOME_DISCOUNT_EXPIRES_AT = "2026-09-22T01:00:00.000Z";
+export const FREE_SHIPPING_PROMO_CODE = "FREESHIP";
+export const SHIPPING_DISCOUNT_PROMO_CODE = "SHIP10";
+export const SHIPPING_DISCOUNT_PROMO_MINOR = 1_000;
+
+export type ShippingPromotion = "free_shipping" | "shipping_discount" | null;
+
+export const getShippingPromotion = (submittedCode: string): ShippingPromotion => {
+  const code = submittedCode.trim().toUpperCase();
+  if (code === FREE_SHIPPING_PROMO_CODE) {
+    return "free_shipping";
+  }
+  if (code === SHIPPING_DISCOUNT_PROMO_CODE) {
+    return "shipping_discount";
+  }
+  return null;
+};
+
+export const calculateShippingPromotionMinor = ({
+  shippingMinor,
+  promotion,
+}: {
+  shippingMinor: number;
+  promotion: ShippingPromotion;
+}) => {
+  if (promotion === "free_shipping") {
+    return Math.max(0, shippingMinor);
+  }
+  if (promotion === "shipping_discount") {
+    return Math.min(Math.max(0, shippingMinor), SHIPPING_DISCOUNT_PROMO_MINOR);
+  }
+  return 0;
+};
 
 const toBoolean = (value: string | undefined) => value?.trim().toLowerCase() === "true";
 

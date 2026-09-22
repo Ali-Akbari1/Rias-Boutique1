@@ -33,6 +33,7 @@ export interface OrderLineItem {
 export interface OrderPricing {
   discountCode: string;
   discountMinor: number;
+  shippingDiscountMinor?: number;
   shippingMinor: number;
   quotedShippingMinor: number;
   taxMinor: number;
@@ -192,6 +193,7 @@ const normalizePricing = (value: unknown): OrderPricing => {
   return {
     discountCode: asString(pricing.discountCode).trim().toUpperCase(),
     discountMinor: asNumber(pricing.discountMinor),
+    shippingDiscountMinor: asNumber(pricing.shippingDiscountMinor),
     shippingMinor: asNumber(pricing.shippingMinor),
     quotedShippingMinor: asNumber(pricing.quotedShippingMinor),
     taxMinor: asNumber(pricing.taxMinor),

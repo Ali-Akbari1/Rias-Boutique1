@@ -35,6 +35,7 @@ const formatMinorCad = (value: number) => formatCad((Number(value) || 0) / 100);
 const getOrderPricing = (order: AdminOrder) => ({
   discountCode: order.pricing?.discountCode?.trim().toUpperCase() || "",
   discountMinor: Number(order.pricing?.discountMinor) || 0,
+  shippingDiscountMinor: Number(order.pricing?.shippingDiscountMinor) || 0,
   shippingMinor: Number(order.pricing?.shippingMinor) || 0,
   quotedShippingMinor: Number(order.pricing?.quotedShippingMinor) || 0,
   taxMinor: Number(order.pricing?.taxMinor) || 0,
@@ -734,6 +735,9 @@ const AdminOrders = () => {
                   <p>Payment Reference: {order.paymentReference || "-"}</p>
                   {pricing.discountMinor > 0 ? (
                     <p>Discount{pricing.discountCode ? ` (${pricing.discountCode})` : ""}: -{formatMinorCad(pricing.discountMinor)}</p>
+                  ) : null}
+                  {pricing.shippingDiscountMinor > 0 ? (
+                    <p>Shipping discount{pricing.discountCode ? ` (${pricing.discountCode})` : ""}: -{formatMinorCad(pricing.shippingDiscountMinor)}</p>
                   ) : null}
                   <p>Tax: {formatMinorCad(pricing.taxMinor)}</p>
                   <p className="font-semibold text-foreground sm:col-span-2">Order Total: {formatMinorCad(order.totalMinor)}</p>

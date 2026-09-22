@@ -1,8 +1,12 @@
 import {
   buildCheckoutPricing as buildResolvedCheckoutPricing,
+  calculateShippingPromotionMinor,
+  getShippingPromotion,
   resolveCommerceConfig,
   type ShippingProviderMode,
 } from "../../src/shared/config/commerce.js";
+
+export { calculateShippingPromotionMinor, getShippingPromotion };
 
 const getServerCommerceConfig = () => resolveCommerceConfig(process.env as Record<string, string | undefined>);
 

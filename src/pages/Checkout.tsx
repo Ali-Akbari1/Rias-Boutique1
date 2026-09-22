@@ -10,7 +10,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/sha
 import { Input } from "@/shared/ui/input";
 import { getClientCommerceConfig } from "@/lib/commerce-config";
 import { useCurrency } from "@/features/currency/context/useCurrency";
-import { buildCheckoutPricing, calculateWelcomeDiscountMinor } from "@/shared/config/commerce";
+import {
+  buildCheckoutPricing,
+  calculateShippingPromotionMinor,
+  calculateWelcomeDiscountMinor,
+  FREE_SHIPPING_PROMO_CODE,
+  getShippingPromotion,
+  SHIPPING_DISCOUNT_PROMO_CODE,
+} from "@/shared/config/commerce";
 import {
   getWelcomeDiscountExpiryDateLabel,
   hasWelcomeDiscountExpiry,
@@ -109,7 +116,9 @@ const Checkout = () => {
   const checkoutItems = useMemo(() => buildCheckoutItems(items), [items]);
   const subtotalMinor = Math.round(totalPrice * 100);
   const normalizedDiscountCode = discountCode.trim().toUpperCase();
-  const effectiveDiscountCode = welcomeDiscountActive ? normalizedDiscountCode : "";
+  const shippingPromotion = getShippingPromotion(normalizedDiscountCode);
+  const isWelcomeCode = welcomeDiscountActive && normalizedDiscountCode === WELCOME_DISCOUNT_CODE;
+  const effectiveDiscountCode = isWelcomeCode || shippingPromotion ? normalizedDiscountCode : "";
   const discountMinor = calculateWelcomeDiscountMinor({
     subtotalMinor,
     submittedCode: effectiveDiscountCode,
@@ -123,7 +132,11 @@ const Checkout = () => {
     [selectedShippingToken, shippingOptions],
   );
   const quotedShippingMinor = isPickupInStore ? 0 : selectedShippingOption?.quotedRateMinor || 0;
-  const shippingMinor = isPickupInStore ? 0 : selectedShippingOption?.customerRateMinor || 0;
+  const baseShippingMinor = isPickupInStore ? 0 : selectedShippingOption?.customerRateMinor || 0;
+  const shippingDiscountMinor = isPickupInStore
+    ? 0
+    : calculateShippingPromotionMinor({ shippingMinor: baseShippingMinor, promotion: shippingPromotion });
+  const shippingMinor = Math.max(0, baseShippingMinor - shippingDiscountMinor);
   const freeShippingApplied = !isPickupInStore && quotedShippingMinor > 0 && shippingMinor === 0;
   const pricing = buildCheckoutPricing({
     subtotalMinor,
@@ -960,33 +973,37 @@ const Checkout = () => {
                       ) : null}
                     </div>
 
-                      {welcomeDiscountActive ? (
-                        <div className="space-y-2 sm:col-span-2">
-                          <label htmlFor="discountCode" className="font-body text-sm font-semibold text-foreground">
-                            Discount code
-                          </label>
-                          <Input
-                            id="discountCode"
-                            maxLength={40}
-                            value={discountCode}
-                            onChange={(event) => setDiscountCode(event.target.value)}
-                            placeholder="Enter discount code"
-                            autoComplete="off"
-                          />
-                          {discountCode.trim() ? (
-                            <p className="text-xs text-muted-foreground">
-                              {normalizedDiscountCode !== WELCOME_DISCOUNT_CODE
-                                ? "Invalid code."
-                                : `${WELCOME_DISCOUNT_CODE} entered. Eligibility is verified at checkout for email subscribers placing their first order.`}
-                            </p>
-                          ) : (
-                            <p className="text-xs text-muted-foreground">
-                              Have a welcome code? Enter it above for 10% off your first order.
-                              {welcomeDiscountHasExpiry ? ` Offer ends ${welcomeDiscountEndsLabel}.` : ""}
-                            </p>
-                          )}
-                        </div>
-                      ) : null}
+                      <div className="space-y-2 sm:col-span-2">
+                        <label htmlFor="discountCode" className="font-body text-sm font-semibold text-foreground">
+                          Discount code
+                        </label>
+                        <Input
+                          id="discountCode"
+                          maxLength={40}
+                          value={discountCode}
+                          onChange={(event) => setDiscountCode(event.target.value)}
+                          placeholder="Enter discount code"
+                          autoComplete="off"
+                        />
+                        {discountCode.trim() ? (
+                          <p className="text-xs text-muted-foreground">
+                            {shippingPromotion === "free_shipping"
+                              ? `${FREE_SHIPPING_PROMO_CODE} entered. Free shipping will be applied at checkout.`
+                              : shippingPromotion === "shipping_discount"
+                                ? `${SHIPPING_DISCOUNT_PROMO_CODE} entered. CA$10 off shipping will be applied at checkout.`
+                                : isWelcomeCode
+                                  ? `${WELCOME_DISCOUNT_CODE} entered. Eligibility is verified at checkout for email subscribers placing their first order.`
+                                  : "Invalid code."}
+                          </p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">
+                            Use {FREE_SHIPPING_PROMO_CODE} for free shipping or {SHIPPING_DISCOUNT_PROMO_CODE} for CA$10 off shipping.
+                            {welcomeDiscountActive
+                              ? ` You can also use ${WELCOME_DISCOUNT_CODE} for 10% off your order${welcomeDiscountHasExpiry ? ` until ${welcomeDiscountEndsLabel}` : ""}.`
+                              : ""}
+                          </p>
+                        )}
+                      </div>
 
                     {isPickupInStore ? (
                       <div className="rounded-md border border-border bg-muted/20 p-3 text-sm text-muted-foreground sm:col-span-2">
@@ -1402,6 +1419,12 @@ const Checkout = () => {
                   <div className="flex items-center justify-between text-muted-foreground">
                     <span>Estimated discount ({WELCOME_DISCOUNT_CODE})</span>
                     <span>-{formatPrice(discount)}</span>
+                  </div>
+                ) : null}
+                {shippingDiscountMinor > 0 ? (
+                  <div className="flex items-center justify-between text-muted-foreground">
+                    <span>Shipping discount ({effectiveDiscountCode})</span>
+                    <span>-{formatPrice(shippingDiscountMinor / 100)}</span>
                   </div>
                 ) : null}
                 <div className="flex items-center justify-between text-muted-foreground">

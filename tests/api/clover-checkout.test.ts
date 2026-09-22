@@ -273,6 +273,67 @@ describe("clover checkout endpoint", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("applies FREESHIP and SHIP10 to the trusted shipping quote", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "checkout_shipping_promo", href: "https://checkout.clover.com/pay/checkout_shipping_promo" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const baseBody = makeCheckoutBody();
+    const shippingQuote = {
+      token: createSignedShippingQuoteToken({
+        customer: baseBody.customer,
+        items: baseBody.items,
+        subtotalMinor: 40_000,
+        customerRateMinor: 1_800,
+        quotedRateMinor: 1_800,
+        freeShippingApplied: false,
+      }),
+    };
+
+    const ship10Response = createMockResponse();
+    await handler(
+      createMockRequest({
+        method: "POST",
+        headers: { origin: "https://www.riasboutique.com", "user-agent": "Mozilla/5.0" },
+        body: JSON.stringify({ ...baseBody, shippingQuote, discountCode: "SHIP10", idempotencyKey: "ship10-promo-test" }),
+      }),
+      ship10Response,
+    );
+    expect(ship10Response.statusCode).toBe(200);
+    const ship10OrderId = (ship10Response.jsonBody as { orderId?: string }).orderId;
+    const ship10Order = ship10OrderId ? await findOrderById(ship10OrderId) : null;
+    expect(ship10Order?.pricing).toMatchObject({
+      discountCode: "SHIP10",
+      shippingDiscountMinor: 1_000,
+      shippingMinor: 800,
+      quotedShippingMinor: 1_800,
+    });
+
+    const freeShipResponse = createMockResponse();
+    await handler(
+      createMockRequest({
+        method: "POST",
+        headers: { origin: "https://www.riasboutique.com", "user-agent": "Mozilla/5.0" },
+        body: JSON.stringify({ ...baseBody, shippingQuote, discountCode: "FREESHIP", idempotencyKey: "freeship-promo-test" }),
+      }),
+      freeShipResponse,
+    );
+    expect(freeShipResponse.statusCode).toBe(200);
+    const freeShipOrderId = (freeShipResponse.jsonBody as { orderId?: string }).orderId;
+    const freeShipOrder = freeShipOrderId ? await findOrderById(freeShipOrderId) : null;
+    expect(freeShipOrder?.pricing).toMatchObject({
+      discountCode: "FREESHIP",
+      shippingDiscountMinor: 1_800,
+      shippingMinor: 0,
+      quotedShippingMinor: 1_800,
+      freeShippingApplied: true,
+    });
+  });
+
   it("applies FALL10 without requiring an email-list signup", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "checkout_fall10", href: "https://checkout.clover.com/pay/checkout_fall10" }), {

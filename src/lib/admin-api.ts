@@ -12,6 +12,7 @@ export interface AdminOrder {
   pricing?: {
     discountCode?: string;
     discountMinor?: number;
+    shippingDiscountMinor?: number;
     shippingMinor?: number;
     quotedShippingMinor?: number;
     taxMinor?: number;

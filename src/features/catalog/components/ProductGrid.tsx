@@ -23,7 +23,7 @@ type AvailabilityOption = "all" | "available" | "sold_out";
 type SaleOption = "all" | "on-sale" | "regular-price";
 type FacetOption = { value: string; label: string };
 const SEARCH_DEBOUNCE_MS = 250;
-const PRODUCTS_PER_PAGE = 20;
+const PRODUCTS_PER_PAGE = 21;
 
 interface ProductGridProps {
   initialDepartment?: DepartmentOption;
