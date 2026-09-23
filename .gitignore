@@ -29,3 +29,6 @@ dist-ssr
 # Runtime order/email artifacts
 data/*.sqlite
 data/*.jsonl
+
+# Generated product thumbnails (npm run images:thumbs)
+public/thumbs

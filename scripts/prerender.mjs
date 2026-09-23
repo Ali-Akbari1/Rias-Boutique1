@@ -1,7 +1,7 @@
 // Writes a static HTML file per public route with route-specific <head> tags, JSON-LD, and a
 // plain-HTML body, so crawlers and link previews that do not run JavaScript see real content.
 // Also writes app.html (SPA shell for checkout/admin) and 404.html (served with a 404 status).
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -32,6 +32,16 @@ const fallbackStyle =
   "<style>[data-prerender-fallback]{max-width:64rem;margin:0 auto;padding:7rem 1rem 2rem;line-height:1.6}" +
   "[data-prerender-fallback] h1{font-size:2rem;margin:1rem 0}[data-prerender-fallback] img{max-width:100%;height:auto}</style>";
 
+// The hero image is the home page's LCP element but is only requested once the JS bundle runs,
+// so preload it from the HTML.
+const heroImage = readdirSync(join(distDir, "assets")).find((file) => /^hero-bg-.*\.webp$/.test(file));
+if (!heroImage) {
+  console.warn("[prerender] hero image not found in dist/assets; home page will not preload it");
+}
+const heroPreload = heroImage
+  ? `<link rel="preload" as="image" href="/assets/${heroImage}" fetchpriority="high" />`
+  : "";
+
 const renderRoute = (path) => {
   const head = buildRouteHead(path, "");
   let html = setTitle(template, head.title);
@@ -54,7 +64,10 @@ const renderRoute = (path) => {
     `<meta id="rb-og-url" property="og:url" content="${canonical}" />`,
     `<script id="rb-jsonld" type="application/ld+json">${jsonLd}</script>`,
     fallbackStyle,
-  ].join("\n    ");
+    path === "/" ? heroPreload : "",
+  ]
+    .filter(Boolean)
+    .join("\n    ");
 
   html = html.replace("</head>", `    ${headTags}\n  </head>`);
   html = html.replace('<div id="root"></div>', `<div id="root">${renderFallbackBody(head)}</div>`);

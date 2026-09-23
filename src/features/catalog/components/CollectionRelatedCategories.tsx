@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { fallbackToOriginalImage, toThumbnailUrl } from "@/lib/image";
 import {
   type ProductDepartment,
   products,
@@ -80,7 +81,8 @@ const CollectionRelatedCategories = ({ department, activeCategory = "all" }: Col
               >
                 <div className="aspect-[4/5] overflow-hidden bg-muted/20">
                   <img
-                    src={category.leadProduct.image}
+                    src={toThumbnailUrl(category.leadProduct.image)}
+                    onError={fallbackToOriginalImage(category.leadProduct.image)}
                     alt={category.label}
                     loading="lazy"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

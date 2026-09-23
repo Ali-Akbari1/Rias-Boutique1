@@ -13,10 +13,12 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar onCartClick={openDrawer} />
-      <HeroSection />
-      <FeaturedProductsCarousel />
-      <TrustSection />
-      <InstagramSection />
+      <main>
+        <HeroSection />
+        <FeaturedProductsCarousel />
+        <TrustSection />
+        <InstagramSection />
+      </main>
       <Footer />
       <CartDrawer open={isOpen} onClose={closeDrawer} />
     </div>

@@ -18,6 +18,7 @@ import { rememberCollectionScrollPosition } from "@/lib/collection-scroll";
 import { prefetchProductDetailsPage } from "@/lib/prefetch";
 import { formatProductAlt } from "@/lib/seo";
 import BagIcon from "@/shared/ui/BagIcon";
+import { fallbackToOriginalImage, toThumbnailUrl } from "@/lib/image";
 
 interface ProductCardProps {
   product: Product;
@@ -177,7 +178,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
           onFocus={() => void prefetchProductDetailsPage()}
         >
           <img
-            src={product.image}
+            src={toThumbnailUrl(product.image)}
+            onError={fallbackToOriginalImage(product.image)}
             alt={formatProductAlt(product)}
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
