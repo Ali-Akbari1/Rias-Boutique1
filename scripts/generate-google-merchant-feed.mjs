@@ -112,6 +112,20 @@ const normalizeGender = (value) => {
   return "unisex";
 };
 
+const getGoogleProductCategory = (department, productType) => {
+  const normalizedDepartment = toStringValue(department).toLowerCase().replace(/[^a-z]+/g, "");
+  if (["jewelry", "jewellery", "accessory", "accessories"].includes(normalizedDepartment)) {
+    return "Apparel & Accessories > Jewelry";
+  }
+  if (normalizeGender(normalizedDepartment) === "male") {
+    return "Apparel & Accessories > Clothing > Traditional & Ceremonial Clothing";
+  }
+  if (toStringValue(productType).toLowerCase().includes("bridal")) {
+    return "Apparel & Accessories > Clothing > Wedding & Bridal Party Dresses > Wedding Dresses";
+  }
+  return "Apparel & Accessories > Clothing > Dresses";
+};
+
 const slugify = (value) =>
   toStringValue(value)
     .toLowerCase()
@@ -200,7 +214,7 @@ const toItemXml = (variant) => {
     `    <g:brand>${escapeXml(variant.brand)}</g:brand>`,
     "    <g:identifier_exists>no</g:identifier_exists>",
     `    <g:product_type>${escapeXml(variant.productType)}</g:product_type>`,
-    "    <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>",
+    `    <g:google_product_category>${escapeXml(variant.googleProductCategory)}</g:google_product_category>`,
     `    <g:gender>${escapeXml(variant.gender)}</g:gender>`,
     `    <g:age_group>${escapeXml(variant.ageGroup)}</g:age_group>`,
     shippingNodes,
@@ -279,6 +293,7 @@ const buildFeed = ({
           price: formatPrice(regularPrice, currency),
           salePrice: hasSalePrice ? formatPrice(price, currency) : "",
           productType,
+          googleProductCategory: getGoogleProductCategory(department, productType),
           brand,
           gender,
           ageGroup: "adult",

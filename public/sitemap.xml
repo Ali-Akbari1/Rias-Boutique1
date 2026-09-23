@@ -254,7 +254,7 @@
     <loc>https://www.riasboutique.com/products/white-gulabatoon-short-dress</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2026-04-15</lastmod>
+    <lastmod>2026-09-14</lastmod>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/barosha-wide-legged-pants</loc>
@@ -302,7 +302,7 @@
     <loc>https://www.riasboutique.com/products/lilimitten-short-dress-green</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-22</lastmod>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/dual-coloured-mens-parantoban</loc>
@@ -338,7 +338,7 @@
     <loc>https://www.riasboutique.com/products/green-banaras-short-dress</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-22</lastmod>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/emerald-green-cheerma-dozi-long-dress</loc>
@@ -380,7 +380,7 @@
     <loc>https://www.riasboutique.com/products/Short-Banaras-red-dress</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-22</lastmod>
   </url>
   <url>
     <loc>https://www.riasboutique.com/products/dark-green-bridal-dress</loc>
@@ -423,5 +423,35 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <lastmod>2026-09-12</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/white-on-white-hazaragi-dress-2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-09-14</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/bridal-cheerma-dozi-green-long-dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-09-14</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/gulbakhmal-short-dress-teal</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-09-16</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/kochi-gul-e-bakhmal-dress-blue</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-09-17</lastmod>
+  </url>
+  <url>
+    <loc>https://www.riasboutique.com/products/short-white-cheerma-dozi-dress</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-09-17</lastmod>
   </url>
 </urlset>

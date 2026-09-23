@@ -11,6 +11,19 @@ const NotFound = () => {
     });
   }, [location.pathname]);
 
+  useEffect(() => {
+    const robots = document.getElementById("rb-robots");
+    const previous = robots?.getAttribute("content");
+    robots?.setAttribute("content", "noindex,follow");
+    document.title = "Page Not Found | Ria's Boutique";
+
+    return () => {
+      if (robots && previous) {
+        robots.setAttribute("content", previous);
+      }
+    };
+  }, []);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted">
       <div className="text-center">

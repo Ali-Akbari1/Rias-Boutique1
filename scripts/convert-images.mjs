@@ -8,6 +8,8 @@ const IMAGE_DIRS = ["public/uploads", "public/instagram", "src/assets"];
 const CONVERTIBLE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png"]);
 const WEBP_QUALITY = 82;
 const WEBP_EFFORT = 5;
+// Phone photos arrive at 4000px+; cap the long edge so product pages stay fast.
+const MAX_DIMENSION = 2400;
 
 const walkFiles = async (directoryPath) => {
   const entries = await fs.readdir(directoryPath, { withFileTypes: true });
@@ -74,6 +76,7 @@ const convertImage = async (sourcePath) => {
 
   await sharp(sourcePath, { failOn: "none" })
     .rotate()
+    .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: "inside", withoutEnlargement: true })
     .webp({ quality: WEBP_QUALITY, effort: WEBP_EFFORT })
     .toFile(targetPath);
 
