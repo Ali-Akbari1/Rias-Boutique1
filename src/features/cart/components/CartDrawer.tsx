@@ -10,6 +10,7 @@ import { useCurrency } from "@/features/currency/context/useCurrency";
 import { isCheckoutEnabled } from "@/lib/checkout";
 import { formatProductAlt } from "@/lib/seo";
 import BagIcon from "@/shared/ui/BagIcon";
+import { fallbackToOriginalImage, toThumbnailUrl } from "@/lib/image";
 
 interface CartDrawerProps {
   open: boolean;
@@ -100,7 +101,8 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                 return (
                   <div key={id} className="flex gap-3 sm:gap-4">
                     <img
-                      src={product.image}
+                      src={toThumbnailUrl(product.image)}
+                      onError={fallbackToOriginalImage(product.image)}
                       alt={formatProductAlt(product)}
                       className="h-20 w-16 rounded-sm object-cover sm:h-24 sm:w-20"
                     />
@@ -164,7 +166,8 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Product added</p>
                   <div className="mt-2 flex items-center gap-3">
                     <img
-                      src={lastAddedItem.product.image}
+                      src={toThumbnailUrl(lastAddedItem.product.image)}
+                      onError={fallbackToOriginalImage(lastAddedItem.product.image)}
                       alt={formatProductAlt(lastAddedItem.product)}
                       className="h-14 w-11 rounded-sm object-cover"
                     />

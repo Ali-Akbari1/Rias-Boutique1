@@ -5,6 +5,7 @@ import { hasDisplayPrice, isInquiryOnlyProduct, type Product } from "@/features/
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import { formatProductAlt } from "@/lib/seo";
 import { Input } from "@/shared/ui/input";
+import { fallbackToOriginalImage, toThumbnailUrl } from "@/lib/image";
 
 const POPULAR_SEARCH_TERMS = [
   "Women's",
@@ -167,7 +168,8 @@ const SearchOverlay = ({
                       >
                         <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-muted/20">
                           <img
-                            src={product.image}
+                            src={toThumbnailUrl(product.image)}
+                            onError={fallbackToOriginalImage(product.image)}
                             alt={formatProductAlt(product)}
                             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                             loading={index < 4 ? "eager" : "lazy"}
@@ -212,7 +214,8 @@ const SearchOverlay = ({
                   >
                     <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-muted/20">
                       <img
-                        src={product.image}
+                        src={toThumbnailUrl(product.image)}
+                        onError={fallbackToOriginalImage(product.image)}
                         alt={formatProductAlt(product)}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                         loading={index < 4 ? "eager" : "lazy"}

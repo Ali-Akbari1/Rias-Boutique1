@@ -9,6 +9,7 @@ import {
 import { useCurrency } from "@/features/currency/context/useCurrency";
 import { prefetchProductDetailsPage } from "@/lib/prefetch";
 import { formatProductAlt } from "@/lib/seo";
+import { fallbackToOriginalImage, toThumbnailUrl } from "@/lib/image";
 
 interface ProductRecommendationRailProps {
   title: string;
@@ -179,7 +180,8 @@ const ProductRecommendationRail = ({
               >
                 <div className="h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-muted/20">
                   <img
-                    src={product.image}
+                    src={toThumbnailUrl(product.image)}
+                    onError={fallbackToOriginalImage(product.image)}
                     alt={formatProductAlt(product)}
                     loading="lazy"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -227,7 +229,8 @@ const ProductRecommendationRail = ({
             >
               <div className={`overflow-hidden bg-muted/20 ${compact ? "aspect-[4/5]" : "aspect-[3/4]"}`}>
                 <img
-                  src={product.image}
+                  src={toThumbnailUrl(product.image)}
+                  onError={fallbackToOriginalImage(product.image)}
                   alt={formatProductAlt(product)}
                   loading="lazy"
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
