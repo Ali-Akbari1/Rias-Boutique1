@@ -56,7 +56,7 @@ store_code	id	availability	price
 16335217184145401742	barosha-purple-shortdress-medium-lilac	out_of_stock	350.00 CAD
 16335217184145401742	dual-color-banaras-pink-dress-small-pink	out_of_stock	450.00 CAD
 16335217184145401742	dual-colour-short-banaras-blue-dress-small-blue	out_of_stock	450.00 CAD
-16335217184145401742	white-gulabatoon-short-dress-x-large-white	out_of_stock	380.00 CAD
+16335217184145401742	white-gulabatoon-short-dress-medium-white	out_of_stock	380.00 CAD
 16335217184145401742	barosha-wide-legged-pants-large-default	out_of_stock	380.00 CAD
 16335217184145401742	burgundy-punjabi-3-piece-suit-xx-large-burgundy	in_stock	250.00 CAD
 16335217184145401742	Handmade-black-parantoban-medium-black	in_stock	225.00 CAD
@@ -83,6 +83,11 @@ store_code	id	availability	price
 16335217184145401742	Short-Banaras-red-dress-small-red	out_of_stock	450.00 CAD
 16335217184145401742	dark-green-bridal-dress-medium-default	out_of_stock	450.00 CAD
 16335217184145401742	Red-long-Cheerma-Dozi-Dress-x-large-red	in_stock	280.00 CAD
-16335217184145401742	burgundy-cheerma-dozi-dress-short-large-burgundy	out_of_stock	450.00 CAD
+16335217184145401742	burgundy-cheerma-dozi-dress-short-medium-burgundy	in_stock	450.00 CAD
 16335217184145401742	Bridal-Green-Banaras-Dress-one-size-default	in_stock	500.00 CAD
-16335217184145401742	red-bridal-cheerma-dozi-silver-medium-red	in_stock	450.00 CAD
+16335217184145401742	red-bridal-cheerma-dozi-silver-medium-red	out_of_stock	450.00 CAD
+16335217184145401742	white-on-white-hazaragi-dress-2-medium-white	in_stock	200.00 CAD
+16335217184145401742	white-on-white-hazaragi-dress-2-large-white	in_stock	200.00 CAD
+16335217184145401742	gulbakhmal-short-dress-teal-medium-teal	in_stock	450.00 CAD
+16335217184145401742	kochi-gul-e-bakhmal-dress-blue-small-blue	in_stock	450.00 CAD
+16335217184145401742	short-white-cheerma-dozi-dress-one-size-default	in_stock	450.00 CAD

@@ -1037,9 +1037,9 @@
       "fabric": "Crushed Velvet",
       "price": 380,
       "galleryImages": [
-        "/uploads/img_4098.jpg",
-        "/uploads/img_4100.jpg",
-        "/uploads/img_4101.jpg"
+        "/uploads/img_4098.webp",
+        "/uploads/img_4100.webp",
+        "/uploads/img_4101.webp"
       ],
       "name": "White Gulabatoon Short Dress",
       "slug": "white-gulabatoon-short-dress",
@@ -1059,7 +1059,7 @@
       ],
       "id": "white-gulabatoon-short-dress",
       "createdAt": "2026-09-14",
-      "image": "/uploads/img_4098.jpg",
+      "image": "/uploads/img_4098.webp",
       "inventory": "sold_out",
       "description": "Beautiful white dress with gulabatoon detailing and wide-legged pants. ",
       "price_on_inquiry": false,
@@ -1878,7 +1878,7 @@
     },
     {
       "galleryImages": [
-        "/uploads/img_4044.jpg"
+        "/uploads/img_4044.webp"
       ],
       "name": "1 Layer Pound Silver Set",
       "slug": "1-layer-pound-silver-set",
@@ -1888,7 +1888,7 @@
       ],
       "id": "1-layer-pound-silver-set",
       "createdAt": "2026-09-12",
-      "image": "/uploads/img_4044.jpg",
+      "image": "/uploads/img_4044.webp",
       "inventory": "available",
       "description": "1 Layer nukrah set",
       "price_on_inquiry": true,
@@ -1899,8 +1899,8 @@
       "fabric": "Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_4064.jpg",
-        "/uploads/img_4065.jpg"
+        "/uploads/img_4064.webp",
+        "/uploads/img_4065.webp"
       ],
       "name": "Red Bridal Cheerma Dozi Dress 2 ",
       "slug": "red-bridal-cheerma-dozi-silver",
@@ -1917,7 +1917,7 @@
       ],
       "id": "red-bridal-cheerma-dozi-silver",
       "createdAt": "2026-09-12",
-      "image": "/uploads/img_4064.jpg",
+      "image": "/uploads/img_4064.webp",
       "inventory": "sold_out",
       "description": "Red bridal cheerma dozi dress",
       "price_on_inquiry": false,
@@ -1927,7 +1927,7 @@
       "fabric": "Thick Georgette",
       "price": 200,
       "galleryImages": [
-        "/uploads/img_4107.jpg"
+        "/uploads/img_4107.webp"
       ],
       "name": "White Hazaragi Dress with Rhinestones",
       "slug": "white-on-white-hazaragi-dress-2",
@@ -1945,7 +1945,7 @@
       ],
       "id": "white-on-white-hazaragi-dress-2",
       "createdAt": "2026-09-14",
-      "image": "/uploads/img_4107.jpg",
+      "image": "/uploads/img_4107.webp",
       "inventory": "available",
       "description": "White Hazaragi dress with rhinestones",
       "price_on_inquiry": false,
@@ -1955,7 +1955,7 @@
     {
       "fabric": "Velvet",
       "galleryImages": [
-        "/uploads/img_4072.jpg"
+        "/uploads/img_4072.webp"
       ],
       "name": "Bridal Green Cheerma Dozi ",
       "slug": "bridal-cheerma-dozi-green-long-dress",
@@ -1972,7 +1972,7 @@
       ],
       "id": "bridal-cheerma-dozi-green-long-dress",
       "createdAt": "2026-09-14",
-      "image": "/uploads/img_4072.jpg",
+      "image": "/uploads/img_4072.webp",
       "inventory": null,
       "description": "Bridal green dress with gold embroidery",
       "price_on_inquiry": true,
@@ -1983,7 +1983,7 @@
       "fabric": "Gulbakhmal",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_2896.jpg"
+        "/uploads/img_2896.webp"
       ],
       "name": "Gulbakhmal Short Dress",
       "slug": "gulbakhmal-short-dress-teal",
@@ -1996,7 +1996,7 @@
       "department": "women",
       "id": "gulbakhmal-short-dress-teal",
       "createdAt": "2026-09-16",
-      "image": "/uploads/img_2896.jpg",
+      "image": "/uploads/img_2896.webp",
       "inventory": "available",
       "description": "Gulbakhmal short dress with cheerma embroidery and zari detailing ",
       "price_on_inquiry": false,
@@ -2006,7 +2006,7 @@
       "fabric": "Gul-e-bakhmal",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_2937.jpg"
+        "/uploads/img_2937.webp"
       ],
       "name": "Blue Kochi Dress",
       "slug": "kochi-gul-e-bakhmal-dress-blue",
@@ -2024,7 +2024,7 @@
       ],
       "id": "kochi-gul-e-bakhmal-dress-blue",
       "createdAt": "2026-09-17",
-      "image": "/uploads/img_2937.jpg",
+      "image": "/uploads/img_2937.webp",
       "inventory": "available",
       "description": "Gul-e-bakhmal kochi dress with cheerma detailing.",
       "price_on_inquiry": false,
@@ -2035,7 +2035,7 @@
       "fabric": "Crushed Velvet",
       "price": 450,
       "galleryImages": [
-        "/uploads/img_2969.jpg"
+        "/uploads/img_2969.webp"
       ],
       "name": "Short White Cheerma Dozi Dress",
       "slug": "short-white-cheerma-dozi-dress",
@@ -2045,7 +2045,7 @@
       ],
       "id": "short-white-cheerma-dozi-dress",
       "createdAt": "2026-09-17",
-      "image": "/uploads/img_2969.jpg",
+      "image": "/uploads/img_2969.webp",
       "inventory": "available",
       "description": "Short cheerma dozi dress with wide-legged pants",
       "price_on_inquiry": false,

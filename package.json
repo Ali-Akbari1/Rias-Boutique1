@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "npm run sitemap:generate && npm run merchant-feed:generate && npm run local-inventory-feed:generate",
-    "build": "vite build",
+    "build": "vite build && npm run prerender",
     "build:dev": "vite build --mode development",
     "typecheck": "npm run typecheck:app && npm run typecheck:server",
     "typecheck:app": "npx tsc --noEmit -p tsconfig.app.json",
@@ -20,7 +20,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prerender": "vite build --ssr src/prerender-entry.ts --outDir dist-ssr && node scripts/prerender.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",

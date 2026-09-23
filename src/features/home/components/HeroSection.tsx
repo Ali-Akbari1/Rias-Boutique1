@@ -32,9 +32,9 @@ const HeroSection = () => {
             <p className="mb-4 pl-1.5 text-sm font-brand uppercase tracking-[0.28em] text-white sm:pl-2 sm:text-lg sm:tracking-[0.34em]">
               Traditional Afghan Fashion
             </p>
-            <h2 className="mb-6 text-4xl font-display font-bold leading-tight text-white sm:text-5xl md:text-7xl">
+            <h1 className="mb-6 text-4xl font-display font-bold leading-tight text-white sm:text-5xl md:text-7xl">
               Elevated Afghan Fashion, redefined
-            </h2>
+            </h1>
             <p className="mb-4 max-w-md text-lg font-body leading-relaxed text-white sm:text-xl">
               Hand-finished embroidery, shipped worldwide, and designed to stand out.
             </p>
